@@ -130,20 +130,20 @@ import lib.ntext.NTParameter;
     @NTParameter(tableName = "Params" + "/" + kSwerveModuleTag)
     private final static class SwerveModuleParams {
       private final static class Drive {
-        static final double kP = 8.0;
-        static final double kI = 0.14;
-        static final double kD = 0.0;
-        static final double kS = 0.0;
-        static final double kV = 0.1247;
-        static final double kA = 0.01215;
+        static final double kP = 1;
+        static final double kI = 0;
+        static final double kD = 0;
+        static final double kS = 0;
+        static final double kV = 0;
+        static final double kA = 0;
         static final boolean isBrake = true;
       }
 
       private final static class Steer {
-        static final double kP = 10;
-        static final double kI = 0.001;
-        static final double kD = 0.15;
-        static final double kS = 0.005;
+        static final double kP = 1;
+        static final double kI = 0;
+        static final double kD = 0;
+        static final double kS = 0;
         static final boolean isBrake = true;
       }
     }

@@ -4,22 +4,73 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import java.lang.reflect.Field;
+
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.pathplanner.lib.commands.FollowPathCommand;
+
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import lib.ironpulse.utils.PhoenixUtils;
+import lib.ntext.NTParameterRegistry;
 
-public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-
-  private final RobotContainer m_robotContainer;
+public class Robot extends LoggedRobot {
+  private Command autonomousCommand;
+  private  RobotContainer robotContainer;
+  public static PowerDistribution powerDistribution;
 
   public Robot() {
-    m_robotContainer = new RobotContainer();
+    super(RobotConstants.LOOPER_DT);
+    powerDistribution = new PowerDistribution();
+  }
+
+  @Override
+  public void robotInit() {
+    // logger initialization
+    Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
+    Logger.addDataReceiver(new WPILOGWriter());
+    
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.start();
+    
+    // config watchdog
+    try {
+      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+      watchdogField.setAccessible(true);
+      Watchdog watchdog = (Watchdog) watchdogField.get(this);
+      watchdog.setTimeout(0.2);
+    } catch (Exception e) {
+      DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
+    }
+    CommandScheduler.getInstance().setPeriod(0.2);
+    
+    powerDistribution.clearStickyFaults();
+    robotContainer = new RobotContainer();
+    
+    // elastic
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+    
+    // warm-up path-following
+    FollowPathCommand.warmupCommand().schedule();
   }
 
   @Override
   public void robotPeriodic() {
+    PhoenixUtils.refreshAll();
     CommandScheduler.getInstance().run();
+    NTParameterRegistry.refresh();
+
+    robotContainer.robotPeriodic();
   }
 
   @Override
@@ -33,10 +84,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
   }
 
@@ -48,8 +99,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
   }
 
