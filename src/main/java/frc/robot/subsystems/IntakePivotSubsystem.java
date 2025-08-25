@@ -12,7 +12,7 @@ public class IntakePivotSubsystem extends ServoMotorSubsystem<MotorInputsAutoLog
       IntakePivotConfig.CONFIG,
       new MotorInputsAutoLogged(),
       new MotorIOTalonFX(IntakePivotConfig.CONFIG),
-      IntakePivotConfig.PARAMS
+      IntakePivotParamsNT.asServoMotorParamSources()
     );
   }
 }

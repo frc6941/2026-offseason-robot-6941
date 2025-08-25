@@ -134,6 +134,8 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       return Meters.of(rotations.in(Rotations) * metersPerRotation);
     }
 
+    //hack to hook NTParameterProcessor to generate ParamSources for uses in subsystems
+    //REMEMBER to update NTParameterProcessor when adding new fields to ParamSources
     public interface ParamSources {
       double kP();
       double kI();

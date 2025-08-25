@@ -229,6 +229,41 @@ public class NTParameterProcessor extends AbstractProcessor {
                     .append(";\n  }\n");
         }
 
+        // Append ServoMotorSubsystem.ParamSources adapter factory
+        Set<String> names = new HashSet<>(fieldNames);
+        builder.append("\n  public static lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources asServoMotorParamSources() {\n")
+                .append("    return new lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources() {\n")
+                .append("      public double kP() { return ")
+                .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
+                .append("      public double kI() { return ")
+                .append(names.contains("kI") ? "kI.getValue()" : "0.0").append("; }\n")
+                .append("      public double kD() { return ")
+                .append(names.contains("kD") ? "kD.getValue()" : "0.0").append("; }\n")
+                .append("      public double kA() { return ")
+                .append(names.contains("kA") ? "kA.getValue()" : "0.0").append("; }\n")
+                .append("      public double kV() { return ")
+                .append(names.contains("kV") ? "kV.getValue()" : "0.0").append("; }\n")
+                .append("      public double kS() { return ")
+                .append(names.contains("kS") ? "kS.getValue()" : "0.0").append("; }\n")
+                .append("      public double kG() { return ")
+                .append(names.contains("kG") ? "kG.getValue()" : "0.0").append("; }\n")
+                .append("      public double motionMagicVelRPS() { return ")
+                .append(names.contains("motionMagicVelRPS") ? "motionMagicVelRPS.getValue()" : "0.0").append("; }\n")
+                .append("      public double motionMagicAccelRPS2() { return ")
+                .append(names.contains("motionMagicAccelRPS2") ? "motionMagicAccelRPS2.getValue()" : "0.0").append("; }\n")
+                .append("      public double motionMagicJerkRPS3() { return ")
+                .append(names.contains("motionMagicJerkRPS3") ? "motionMagicJerkRPS3.getValue()" : "0.0").append("; }\n")
+                .append("      public double positionAtGoalToleranceDegrees() { return ")
+                .append(names.contains("atGoalToleranceDegrees") ? "atGoalToleranceDegrees.getValue()" : "1.0").append("; }\n")
+                .append("      public double positionAtGoalToleranceMeters() { return 0.005; }\n")
+                .append("      public boolean isBrake() { return ")
+                .append(names.contains("isBrake") ? "isBrake.getValue()" : "true").append("; }\n")
+                .append("      public boolean hasChanged() { return ")
+                .append(fieldNames.isEmpty() ? "false" : "isAnyChanged()")
+                .append("; }\n")
+                .append("    };\n")
+                .append("  }\n");
+
         // end, write as a generated java file
         builder.append("}\n");
 
@@ -263,6 +298,47 @@ public class NTParameterProcessor extends AbstractProcessor {
 
         // do recursive adding
         buildClassContent(rootClass, tableName, builder, "  ", "");
+
+        // Collect top-level field names for adapter generation
+        List<VariableElement> topFields = ElementFilter.fieldsIn(rootClass.getEnclosedElements());
+        Set<String> names = new HashSet<>();
+        for (VariableElement f : topFields) {
+            names.add(f.getSimpleName().toString());
+        }
+
+        // Append ServoMotorSubsystem.ParamSources adapter factory (top-level fields only)
+        builder.append("\n  public static lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources asServoMotorParamSources() {\n")
+                .append("    return new lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources() {\n")
+                .append("      public double kP() { return ")
+                .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
+                .append("      public double kI() { return ")
+                .append(names.contains("kI") ? "kI.getValue()" : "0.0").append("; }\n")
+                .append("      public double kD() { return ")
+                .append(names.contains("kD") ? "kD.getValue()" : "0.0").append("; }\n")
+                .append("      public double kA() { return ")
+                .append(names.contains("kA") ? "kA.getValue()" : "0.0").append("; }\n")
+                .append("      public double kV() { return ")
+                .append(names.contains("kV") ? "kV.getValue()" : "0.0").append("; }\n")
+                .append("      public double kS() { return ")
+                .append(names.contains("kS") ? "kS.getValue()" : "0.0").append("; }\n")
+                .append("      public double kG() { return ")
+                .append(names.contains("kG") ? "kG.getValue()" : "0.0").append("; }\n")
+                .append("      public double motionMagicVelRPS() { return ")
+                .append(names.contains("motionMagicVelRPS") ? "motionMagicVelRPS.getValue()" : "0.0").append("; }\n")
+                .append("      public double motionMagicAccelRPS2() { return ")
+                .append(names.contains("motionMagicAccelRPS2") ? "motionMagicAccelRPS2.getValue()" : "0.0").append("; }\n")
+                .append("      public double motionMagicJerkRPS3() { return ")
+                .append(names.contains("motionMagicJerkRPS3") ? "motionMagicJerkRPS3.getValue()" : "0.0").append("; }\n")
+                .append("      public double positionAtGoalToleranceDegrees() { return ")
+                .append(names.contains("atGoalToleranceDegrees") ? "atGoalToleranceDegrees.getValue()" : "1.0").append("; }\n")
+                .append("      public double positionAtGoalToleranceMeters() { return 0.005; }\n")
+                .append("      public boolean isBrake() { return ")
+                .append(names.contains("isBrake") ? "isBrake.getValue()" : "true").append("; }\n")
+                .append("      public boolean hasChanged() { return ")
+                .append(names.isEmpty() ? "false" : "isAnyChanged()")
+                .append("; }\n")
+                .append("    };\n")
+                .append("  }\n");
 
         // end, write as a generated java file
         builder.append("}\n");

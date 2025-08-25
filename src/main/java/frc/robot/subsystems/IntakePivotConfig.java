@@ -62,22 +62,6 @@ public final class IntakePivotConfig {
     public static final double atGoalToleranceDegrees = 3.5;
     public static final boolean isBrake = true;
   }
-
-  /** Adapter exposing Params as ParamSources. */
-  public static final ParamSources PARAMS =
-    new ParamSources() {
-      public double kP() { return IntakePivotParamsNT.kP.getValue(); }
-      public double kI() { return IntakePivotParamsNT.kI.getValue(); }
-      public double kD() { return IntakePivotParamsNT.kD.getValue(); }
-      public double kS() { return IntakePivotParamsNT.kS.getValue(); }
-      public double kG() { return IntakePivotParamsNT.kG.getValue(); }
-      public double motionMagicVelRPS() { return IntakePivotParamsNT.motionMagicVelRPS.getValue(); }
-      public double motionMagicAccelRPS2() { return IntakePivotParamsNT.motionMagicAccelRPS2.getValue(); }
-      public double motionMagicJerkRPS3() { return IntakePivotParamsNT.motionMagicJerkRPS3.getValue(); }
-      public double atGoalToleranceDegrees() { return IntakePivotParamsNT.atGoalToleranceDegrees.getValue(); }
-      public boolean isBrake() { return IntakePivotParamsNT.isBrake.getValue(); }
-      public boolean hasChanged() { return IntakePivotParamsNT.isAnyChanged(); }
-    };
 }
 
 
