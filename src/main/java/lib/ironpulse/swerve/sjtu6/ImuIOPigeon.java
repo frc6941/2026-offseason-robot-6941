@@ -42,7 +42,6 @@ public class ImuIOPigeon implements ImuIO {
         System.out.println("ImuIOPigeon: Initializing Pigeon2 with ID " + config.pigeonId);
         
         // Get the shared sync thread from swerve modules (it should already be created by now)
-        //TODO: consider maybe move this to module?
         syncThread = SwerveModuleIOSJTU6.getSyncThread();
         
         // Initialize Pigeon2

@@ -44,7 +44,7 @@ public final class IntakePivotConfig {
 
   // NetworkTables-backed params
   @NTParameter(tableName = "Params/" + NAME)
-  public static final class Params {
+  public static final class IntakePivotParams {
     // PID/FF gains
     public static final double kP = 4.7;
     public static final double kI = 0.5;
@@ -66,16 +66,17 @@ public final class IntakePivotConfig {
   /** Adapter exposing Params as ParamSources. */
   public static final ParamSources PARAMS =
     new ParamSources() {
-      public double kP() { return Params.kP; }
-      public double kI() { return Params.kI; }
-      public double kD() { return Params.kD; }
-      public double kS() { return Params.kS; }
-      public double kG() { return Params.kG; }
-      public double motionMagicVelRPS() { return Params.motionMagicVelRPS; }
-      public double motionMagicAccelRPS2() { return Params.motionMagicAccelRPS2; }
-      public double motionMagicJerkRPS3() { return Params.motionMagicJerkRPS3; }
-      public double atGoalToleranceDegrees() { return Params.atGoalToleranceDegrees; }
-      public boolean isBrake() { return Params.isBrake; }
+      public double kP() { return IntakePivotParamsNT.kP.getValue(); }
+      public double kI() { return IntakePivotParamsNT.kI.getValue(); }
+      public double kD() { return IntakePivotParamsNT.kD.getValue(); }
+      public double kS() { return IntakePivotParamsNT.kS.getValue(); }
+      public double kG() { return IntakePivotParamsNT.kG.getValue(); }
+      public double motionMagicVelRPS() { return IntakePivotParamsNT.motionMagicVelRPS.getValue(); }
+      public double motionMagicAccelRPS2() { return IntakePivotParamsNT.motionMagicAccelRPS2.getValue(); }
+      public double motionMagicJerkRPS3() { return IntakePivotParamsNT.motionMagicJerkRPS3.getValue(); }
+      public double atGoalToleranceDegrees() { return IntakePivotParamsNT.atGoalToleranceDegrees.getValue(); }
+      public boolean isBrake() { return IntakePivotParamsNT.isBrake.getValue(); }
+      public boolean hasChanged() { return IntakePivotParamsNT.isAnyChanged(); }
     };
 }
 

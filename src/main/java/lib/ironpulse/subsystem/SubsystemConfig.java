@@ -41,6 +41,8 @@ public class SubsystemConfig {
   @Default public final boolean isInverted = false;
 
   @Default public final double SensorToMechanismRatio = 1.0;
+  /**ONLY used when a linear mechenism meters-per-rotation for linear mechanisms (0.0 disables linear mode). */
+  @Default public final double metersPerRotation = 0.0;
 
   //other close loop configs
   @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;

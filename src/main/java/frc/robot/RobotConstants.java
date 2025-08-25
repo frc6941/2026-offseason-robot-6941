@@ -6,10 +6,10 @@ package frc.robot;
  */
 public final class RobotConstants {
     // Robot timing constants
-    public static final double LOOPER_DT = 0.02; // 50Hz control loop
+    public static final double LOOPER_DT = 0.01; // 50Hz control loop
     
     // CAN bus configuration
-    public static final String CANIVORE_CAN_BUS_NAME = "canivore";
+    public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
     
     // Hardware device IDs
     public static final int PIGEON_ID = 1; // Pigeon2 IMU device ID

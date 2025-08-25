@@ -6,6 +6,9 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lombok.Getter;
@@ -16,11 +19,14 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     private final SubsystemConfig config;
     protected final ParamSources params;
     private final Slot0Configs slot0Configs;
+    // Optional linear mechanism mode: meters per motor rotation (> 0 enables linear mode)
+    private final double metersPerRotation;
 
     public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, ParamSources params) {
       super(config, inputs, io);
       this.config = config;
       this.params = params;
+      this.metersPerRotation = config.metersPerRotation;
       slot0Configs = new Slot0Configs();
       slot0Configs.kP = params.kP();
       slot0Configs.kI = params.kI();
@@ -48,12 +54,24 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       }
     }
 
-    public boolean atGoal(Angle tolerance){
-        return MotorToMechanismAngle(Rotations.of(inputs.unitPosition)).isNear(positionSetpoint, tolerance);
+    public boolean positionAtGoal(Angle tolerance){
+        return Rotations.of(inputs.unitPosition).isNear(positionSetpoint, tolerance);
     }
 
-    public boolean atGoal(){
-      return MotorToMechanismAngle(Rotations.of(inputs.unitPosition)).isNear(positionSetpoint, Degrees.of(params.atGoalToleranceDegrees()));
+    // Linear variants (enabled when metersPerRotation > 0)
+    public boolean positionAtGoal(Distance tolerance) {
+      if (!isLinearMode()) return positionAtGoal(Degrees.of(params.positionAtGoalToleranceDegrees()));
+      Distance current = metersFromRotations(Rotations.of(inputs.unitPosition));
+      Distance goal = metersFromRotations(positionSetpoint);
+      return current.isNear(goal, tolerance);
+    }
+
+    public boolean positionAtGoal() {
+      if (!isLinearMode()) {
+        return positionAtGoal(Degrees.of(params.positionAtGoalToleranceDegrees()));
+      } else {
+        return positionAtGoal(Meters.of(params.positionAtGoalToleranceMeters()));
+      }
     }
 
     public void setCurrentPositionAsZero(){
@@ -61,26 +79,59 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     }
 
     public void setMotionMagicSetpoint(Angle position){
-      io.setMotionMagicSetpoint(MechanismToMotorAngle(position), 
+      if (isLinearMode()) {
+        throw new IllegalStateException("Linear mode enabled: use Distance-based setMotionMagicSetpoint");
+      }
+      io.setMotionMagicSetpoint(position, 
       RotationsPerSecond.of(params.motionMagicVelRPS()),
       RotationsPerSecondPerSecond.of(params.motionMagicAccelRPS2()),
       params.motionMagicJerkRPS3());
     }
 
     public void setMotionMagicSetpoint(Angle position, AngularVelocity velocity, AngularAcceleration acceleration, double jerk){
-      io.setMotionMagicSetpoint(MechanismToMotorAngle(position), velocity, acceleration, jerk);
+      if (isLinearMode()) {
+        throw new IllegalStateException("Linear mode enabled: use Distance-based setMotionMagicSetpoint");
+      }
+      io.setMotionMagicSetpoint(position, velocity, acceleration, jerk);
+    }
+
+    // Linear setters
+    public void setMotionMagicSetpoint(Distance position) {
+      Angle rotations = rotationsFromMeters(position);
+      setMotionMagicSetpoint(rotations);
+    }
+    public void setMotionMagicSetpoint(Distance position, LinearVelocity velocity, LinearAcceleration acceleration, double jerk) {
+      Angle rotations = rotationsFromMeters(position);
+      // Convert linear velocity/accel to rotational equivalents
+      AngularVelocity rotVel = RotationsPerSecond.of(velocity.in(MetersPerSecond) / metersPerRotation);
+      AngularAcceleration rotAcc = RotationsPerSecondPerSecond.of(acceleration.in(MetersPerSecondPerSecond) / metersPerRotation);
+      setMotionMagicSetpoint(rotations, rotVel, rotAcc, jerk);
     }
 
     public void setPositionSetpoint(Angle position) {
-      io.setPositionSetpoint(MechanismToMotorAngle(position));
+      if (isLinearMode()) {
+        throw new IllegalStateException("Linear mode enabled: use setPositionSetpoint(Distance)");
+      }
+      io.setPositionSetpoint(position);
+    }
+    public void setPositionSetpoint(Distance position) {
+      io.setPositionSetpoint(rotationsFromMeters(position));
     }
 
-    private Angle MechanismToMotorAngle(Angle position){
-      return config.enableRemoteCANcoder?position:position.times(config.SensorToMechanismRatio);
+    private boolean isLinearMode() {
+      return metersPerRotation > 0.0;
     }
-
-    private Angle MotorToMechanismAngle(Angle position){
-      return config.enableRemoteCANcoder?position:position.div(config.SensorToMechanismRatio);
+    private Angle rotationsFromMeters(Distance distance) {
+      if (!isLinearMode()) {
+        throw new IllegalStateException("Linear mode disabled: set metersPerRotation > 0 in SubsystemConfig");
+      }
+      return Rotations.of(distance.in(Meters) / metersPerRotation);
+    }
+    private Distance metersFromRotations(Angle rotations) {
+      if (!isLinearMode()) {
+        throw new IllegalStateException("Linear mode disabled: set metersPerRotation > 0 in SubsystemConfig");
+      }
+      return Meters.of(rotations.in(Rotations) * metersPerRotation);
     }
 
     public interface ParamSources {
@@ -94,8 +145,10 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       default double motionMagicVelRPS() { return 0.0; }
       default double motionMagicAccelRPS2() { return 0.0; }
       default double motionMagicJerkRPS3() { return 0.0; }
-      default double atGoalToleranceDegrees() { return 1.0; }
+      default double positionAtGoalToleranceDegrees() { return 1.0; }
+      default double positionAtGoalToleranceMeters() { return 0.005; }
       default boolean isBrake() { return true; }
+      /* hook to ParamsNT.isAnyChanged() */
       default boolean hasChanged() { return false; }
     }
 

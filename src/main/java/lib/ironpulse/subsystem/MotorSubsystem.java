@@ -27,6 +27,7 @@ import java.util.function.DoubleSupplier;
  * - Provides minimal open-loop helper command
  */
 public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends SubsystemBase {
+  //TODO: perhaps this is not a very good place to extend SubsystemBase, considering impliment subsystem instead?
   protected final U io;
   protected final T inputs;
   protected final SubsystemConfig config;
