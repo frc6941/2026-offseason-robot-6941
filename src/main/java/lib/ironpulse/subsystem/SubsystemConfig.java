@@ -56,9 +56,8 @@ public class SubsystemConfig {
   public static class RemoteCANcoder {
     public final int id;
     public final String bus;
-
-    public final double magnetOffset = 0.0;
-    public final double rotorToSensorRatio = 1.0;
+    public final double magnetOffset;
+    public final double rotorToSensorRatio;
     @Default public final SensorDirectionValue sensorDirection = SensorDirectionValue.CounterClockwise_Positive;
     @Default public final FeedbackSensorSourceValue feedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     @Default public final boolean useContinousWrap = false;

@@ -4,15 +4,17 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
+import lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources;
 import lib.ntext.NTParameter;
 
 import static edu.wpi.first.units.Units.*;
 
 /** Constants and NT-backed params for {@link IntakePivotSubsystem}. */
-public final class IntakePivotSubsystemConstants {
-  private IntakePivotSubsystemConstants() {}
+public final class IntakePivotConfig {
+  private IntakePivotConfig() {}
 
   public static final String NAME = "IntakePivot";
+  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
 
   // Local hardware constants (copied/adapted from provided snippet)
   private static final int INTAKE_PIVOT_MOTOR_ID = 16;
@@ -24,14 +26,16 @@ public final class IntakePivotSubsystemConstants {
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
     .name(NAME)
     .mainId(INTAKE_PIVOT_MOTOR_ID)
-    .mainBus(frc.robot.RobotConstants.CANIVORE_CAN_BUS_NAME)
+    .mainBus(CANIVORE_CAN_BUS_NAME)
     .isInverted(false)
     .SensorToMechanismRatio(1.0)
     .gravityType(GravityTypeValue.Arm_Cosine)
     .enableRemoteCANcoder(true)
     .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
       .id(INTAKE_PIVOT_ENCODER_ID)
-      .bus(frc.robot.RobotConstants.CANIVORE_CAN_BUS_NAME)
+      .bus(CANIVORE_CAN_BUS_NAME)
+      .magnetOffset(INTAKE_PIVOT_ENCODER_OFFSET)
+      .rotorToSensorRatio(INTAKE_PIVOT_ROTOR_ENCODER_RATIO)
       .sensorDirection(SensorDirectionValue.CounterClockwise_Positive)
       .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
       .useContinousWrap(false)
@@ -45,8 +49,6 @@ public final class IntakePivotSubsystemConstants {
     public static final double kP = 4.7;
     public static final double kI = 0.5;
     public static final double kD = 0.02;
-    public static final double kA = 0.0;
-    public static final double kV = 0.0;
     public static final double kS = 0.0;
     public static final double kG = -0.035;
 
@@ -62,13 +64,11 @@ public final class IntakePivotSubsystemConstants {
   }
 
   /** Adapter exposing Params as ParamSources. */
-  public static final lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources PARAMS =
-    new lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources() {
+  public static final ParamSources PARAMS =
+    new ParamSources() {
       public double kP() { return Params.kP; }
       public double kI() { return Params.kI; }
       public double kD() { return Params.kD; }
-      public double kA() { return Params.kA; }
-      public double kV() { return Params.kV; }
       public double kS() { return Params.kS; }
       public double kG() { return Params.kG; }
       public double motionMagicVelRPS() { return Params.motionMagicVelRPS; }

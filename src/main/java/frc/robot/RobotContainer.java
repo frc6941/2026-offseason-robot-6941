@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -12,7 +14,9 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveConstants;
+import frc.robot.subsystems.IntakePivotSubsystem;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.ServoMotorSubsystem;
@@ -25,6 +29,8 @@ import lib.ironpulse.swerve.sjtu6.SwerveModuleIOSJTU6;
 
 public class RobotContainer {
   private Swerve swerve;
+  private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
+  private final CommandXboxController driver = new CommandXboxController(0);
   public RobotContainer() {
     if (RobotBase.isReal()){
       swerve = new Swerve(
@@ -50,7 +56,11 @@ public class RobotContainer {
     //reserved for vision fusion
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    // Intake Pivot: A -> 0 degrees, B -> 100 degrees
+    driver.a().onTrue(Commands.runOnce(() -> intakePivot.setMotionMagicSetpoint(Degrees.of(0.0)), intakePivot));
+    driver.b().onTrue(Commands.runOnce(() -> intakePivot.setMotionMagicSetpoint(Degrees.of(100.0)), intakePivot));
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
