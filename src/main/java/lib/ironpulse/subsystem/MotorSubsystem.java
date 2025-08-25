@@ -45,14 +45,27 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
   }
 
   /**
-   * Open-loop duty cycle helper command (0.0 - 1.0 where 1.0 = 100%).
+   * Open-loop duty cycle command, exits instantly ([-1.0, 1.0] where 1.0 = 100%).
    */
   public Command runDutyCycle(DoubleSupplier dutyCycle) {
     return run(
         () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()));
   }
 
-  // Convenience accessors to commonly used inputs
+  /**
+   * Stop command, exits instantly.
+   */
+  public Command runStop() {
+    return run(() -> io.setOpenLoopDutyCycle(0.0));
+  }
+
+  /**
+   * Set neutral mode command, exits instantly.
+   */
+  public Command setNeutralMode(boolean wantsBreak) {
+    return run(() -> io.setNeutralMode(wantsBreak));
+  }
+
   public Current getStatorCurrent() { return Amps.of(inputs.currentStatorAmps); }
   public Current getSupplyCurrent() { return Amps.of(inputs.currentSupplyAmps); }
   public Voltage getMotorVoltage() { return Volts.of(inputs.motorVolts); }

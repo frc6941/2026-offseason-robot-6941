@@ -17,7 +17,7 @@ public interface MotorIO {
   void setOpenLoopDutyCycle(double dutyCycle);
   void setPositionSetpoint(Angle position);
   void setMotionMagicSetpoint(Angle position, AngularVelocity velocity, AngularAcceleration acceleration, double jerk);
-  void setNeutralMode(NeutralModeValue mode);
+  void setNeutralMode(boolean wantsBreak);
   void setVelocitySetpoint(AngularVelocity velocity);
   void setCurrentPositionAsZero();
   void setCurrentPosition(Angle position);

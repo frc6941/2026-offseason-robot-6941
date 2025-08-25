@@ -32,10 +32,10 @@ public class MotorIOTalonFX implements MotorIO {
   private final TalonFX main;
   private final TalonFX[] followers;
 
-  private final PositionVoltage positionCtrl = new PositionVoltage(0.0);
-  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0);
-  private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0);
-  private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0);
+  private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
+  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0).withEnableFOC(true);
+  private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
+  private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
   private final StatusSignal<Angle> posSig;
   private final StatusSignal<AngularVelocity> velSig;
@@ -46,7 +46,7 @@ public class MotorIOTalonFX implements MotorIO {
   private final BaseStatusSignal[] signals;
   private boolean connected = false;
   private final TalonFXConfiguration fx;
-
+  //TODO: static ArrayList<MotorIOTalonFX> instances
   public MotorIOTalonFX(SubsystemConfig cfg) {
     this.main = new TalonFX(cfg.mainId, cfg.mainBus);
 
@@ -64,6 +64,8 @@ public class MotorIOTalonFX implements MotorIO {
     // Soft limit enables per config (thresholds should be in fxConfig)
     fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = cfg.enableForwardSoftLimit;
     fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = cfg.enableReverseSoftLimit;
+
+    fx.Feedback.SensorToMechanismRatio = cfg.SensorToMechanismRatio;
 
     fx.Slot0.GravityType = cfg.gravityType;
     fx.Slot0.StaticFeedforwardSign = cfg.kSValue;
@@ -132,7 +134,6 @@ public class MotorIOTalonFX implements MotorIO {
     main.setControl(positionCtrl.withPosition(position));
   }
 
-
   @Override
   public void setMotionMagicSetpoint(Angle position, AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
     main.setControl(dynamicMotionMagicCtrl
@@ -143,9 +144,9 @@ public class MotorIOTalonFX implements MotorIO {
   }
 
   @Override
-  public void setNeutralMode(NeutralModeValue mode) {
+  public void setNeutralMode(boolean wantsBreak) {
     main.getConfigurator().refresh(this.fx);
-    this.fx.MotorOutput.NeutralMode = mode;
+    this.fx.MotorOutput.NeutralMode = wantsBreak ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     main.getConfigurator().apply(this.fx);
   }
 
@@ -179,5 +180,3 @@ public class MotorIOTalonFX implements MotorIO {
     main.getConfigurator().apply(this.fx);
   }
 }
-
-

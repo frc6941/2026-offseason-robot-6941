@@ -40,11 +40,14 @@ public class SubsystemConfig {
   /** Whether the motor is inverted. */
   @Default public final boolean isInverted = false;
 
+  @Default public final double SensorToMechanismRatio = 1.0;
+
   //other close loop configs
   @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;
   @Default public final StaticFeedforwardSignValue kSValue = StaticFeedforwardSignValue.UseClosedLoopSign;
 
   /** Soft-limit enables at init; thresholds should be part of fxConfig if used. */
+  //TODO: soft limit
   @Default public final boolean enableForwardSoftLimit = false;
   @Default public final boolean enableReverseSoftLimit = false;
 
@@ -54,8 +57,8 @@ public class SubsystemConfig {
     public final int id;
     public final String bus;
 
-    @Default public final double magnetOffset = 0.0;
-    @Default public final double rotorToSensorRatio = 1.0;
+    public final double magnetOffset = 0.0;
+    public final double rotorToSensorRatio = 1.0;
     @Default public final SensorDirectionValue sensorDirection = SensorDirectionValue.CounterClockwise_Positive;
     @Default public final FeedbackSensorSourceValue feedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     @Default public final boolean useContinousWrap = false;
