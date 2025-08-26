@@ -12,7 +12,7 @@ public final class RobotConstants {
     public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
     
     // Hardware device IDs
-    public static final int PIGEON_ID = 1; // Pigeon2 IMU device ID
+    public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID
     
     private RobotConstants() {
         // Prevent instantiation

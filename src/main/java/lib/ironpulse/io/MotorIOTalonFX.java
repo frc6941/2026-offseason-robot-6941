@@ -51,6 +51,8 @@ public class MotorIOTalonFX implements MotorIO {
     this.main = new TalonFX(cfg.mainId, cfg.mainBus);
 
     this.fx = cfg.fxConfig;
+    
+    fx.MotorOutput.Inverted = cfg.motorInvertedValue;
     // Optional: remote CANcoder feedback configuration
     if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
       configureCANcoder(cfg.remoteCANcoder);
@@ -135,12 +137,12 @@ public class MotorIOTalonFX implements MotorIO {
   }
 
   @Override
-  public void setMotionMagicSetpoint(Angle position, AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
+  public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
+    dynamicMotionMagicCtrl.Velocity = velocity;
+    dynamicMotionMagicCtrl.Acceleration = acceleration;
+    dynamicMotionMagicCtrl.Jerk = jerk;
     main.setControl(dynamicMotionMagicCtrl
-      .withPosition(position)
-      .withVelocity(velocity)
-      .withAcceleration(acceleration)
-      .withJerk(jerk));
+      .withPosition(position));
   }
 
   @Override
@@ -174,6 +176,7 @@ public class MotorIOTalonFX implements MotorIO {
   @Override
   public void updateGains(Slot0Configs slot0) {
     this.fx.Slot0 = slot0;
+    fx.withSlot0(slot0);
     main.getConfigurator().apply(this.fx);
   }
 }

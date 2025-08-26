@@ -3,6 +3,7 @@ package lib.ironpulse.subsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
@@ -37,8 +38,8 @@ public class SubsystemConfig {
   // Optional followers
   @Default public final FollowerConfig[] followers = new FollowerConfig[0];
 
-  /** Whether the motor is inverted. */
-  @Default public final boolean isInverted = false;
+  
+  @Default public final InvertedValue motorInvertedValue = InvertedValue.CounterClockwise_Positive;
 
   @Default public final double SensorToMechanismRatio = 1.0;
   /**ONLY used when a linear mechenism meters-per-rotation for linear mechanisms (0.0 disables linear mode). */

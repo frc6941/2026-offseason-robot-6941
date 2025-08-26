@@ -35,7 +35,6 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       slot0Configs.kV = params.kV();
       slot0Configs.kS = params.kS();
       slot0Configs.kG = params.kG();
-
       io.updateGains(slot0Configs);
     }
 
@@ -84,12 +83,12 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
         throw new IllegalStateException("Linear mode enabled: use Distance-based setMotionMagicSetpoint");
       }
       io.setMotionMagicSetpoint(position, 
-      RotationsPerSecond.of(params.motionMagicVelRPS()),
-      RotationsPerSecondPerSecond.of(params.motionMagicAccelRPS2()),
+      params.motionMagicVelRPS(),
+      params.motionMagicAccelRPS2(),
       params.motionMagicJerkRPS3());
     }
 
-    public void setMotionMagicSetpoint(Angle position, AngularVelocity velocity, AngularAcceleration acceleration, double jerk){
+    public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk){
       if (isLinearMode()) {
         throw new IllegalStateException("Linear mode enabled: use Distance-based setMotionMagicSetpoint");
       }
@@ -101,12 +100,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       Angle rotations = rotationsFromMeters(position);
       setMotionMagicSetpoint(rotations);
     }
-    public void setMotionMagicSetpoint(Distance position, LinearVelocity velocity, LinearAcceleration acceleration, double jerk) {
+    public void setMotionMagicSetpoint(Distance position, double velocity, double acceleration, double jerk) {
       Angle rotations = rotationsFromMeters(position);
-      // Convert linear velocity/accel to rotational equivalents
-      AngularVelocity rotVel = RotationsPerSecond.of(velocity.in(MetersPerSecond) / metersPerRotation);
-      AngularAcceleration rotAcc = RotationsPerSecondPerSecond.of(acceleration.in(MetersPerSecondPerSecond) / metersPerRotation);
-      setMotionMagicSetpoint(rotations, rotVel, rotAcc, jerk);
+      setMotionMagicSetpoint(rotations, velocity, acceleration, jerk);
     }
 
     public void setPositionSetpoint(Angle position) {

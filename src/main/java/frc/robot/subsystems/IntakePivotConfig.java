@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources;
@@ -27,7 +28,7 @@ public final class IntakePivotConfig {
     .name(NAME)
     .mainId(INTAKE_PIVOT_MOTOR_ID)
     .mainBus(CANIVORE_CAN_BUS_NAME)
-    .isInverted(false)
+    .motorInvertedValue(InvertedValue.Clockwise_Positive)
     .SensorToMechanismRatio(1.0)
     .gravityType(GravityTypeValue.Arm_Cosine)
     .enableRemoteCANcoder(true)
@@ -52,10 +53,8 @@ public final class IntakePivotConfig {
     public static final double kS = 0.0;
     public static final double kG = -0.035;
 
-    // Motion Magic in rotations/second and derivatives
-    // IntakePivotGainsClass defaults are 100 deg/s and 100 deg/s^2
-    public static final double motionMagicVelRPS = 100.0 / 360.0;       // ~0.278 rps
-    public static final double motionMagicAccelRPS2 = 100.0 / 360.0;    // ~0.278 rps^2
+    public static final double motionMagicVelRPS = 100.0;       
+    public static final double motionMagicAccelRPS2 = 100.0;   
 
     // Tolerances / behavior
     public static final double atGoalToleranceDegrees = 3.5;
