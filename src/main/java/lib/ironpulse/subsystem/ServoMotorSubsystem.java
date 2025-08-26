@@ -50,18 +50,19 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
         this.slot0Configs.kV = params.kV();
         this.slot0Configs.kS = params.kS();
         this.slot0Configs.kG = params.kG();
+        io.setNeutralMode(params.isBrake());
         io.updateGains(slot0Configs);
       }
     }
 
     public boolean positionAtGoal(Angle tolerance){
-        return Rotations.of(inputs.unitPosition).isNear(positionSetpoint, tolerance);
+        return Rotations.of(inputs.positionRot).isNear(positionSetpoint, tolerance);
     }
 
     // Linear variants (enabled when metersPerRotation > 0)
     public boolean positionAtGoal(Distance tolerance) {
       if (!isLinearMode()) return positionAtGoal(Degrees.of(params.positionAtGoalToleranceDegrees()));
-      Distance current = metersFromRotations(Rotations.of(inputs.unitPosition));
+      Distance current = metersFromRotations(Rotations.of(inputs.positionRot));
       Distance goal = metersFromRotations(positionSetpoint);
       return current.isNear(goal, tolerance);
     }

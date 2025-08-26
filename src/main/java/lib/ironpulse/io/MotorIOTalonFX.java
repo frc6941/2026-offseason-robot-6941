@@ -111,8 +111,8 @@ public class MotorIOTalonFX implements MotorIO {
   @Override
   public void readInputs(MotorInputs inputs) {
     connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig,supplyVoltSig, statorSig, supplySig);
-    inputs.unitPosition = posSig.getValueAsDouble();
-    inputs.velocityUnitsPerSecond = velSig.getValueAsDouble();
+    inputs.positionRot = posSig.getValueAsDouble();
+    inputs.velocityRotPerSecond = velSig.getValueAsDouble();
     inputs.motorVolts = motorVoltSig.getValueAsDouble();
     inputs.motorVolts = supplyVoltSig.getValueAsDouble();
     inputs.currentStatorAmps = statorSig.getValueAsDouble();
@@ -145,7 +145,6 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void setNeutralMode(boolean wantsBreak) {
-    main.getConfigurator().refresh(this.fx);
     this.fx.MotorOutput.NeutralMode = wantsBreak ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     main.getConfigurator().apply(this.fx);
   }
@@ -161,13 +160,12 @@ public class MotorIOTalonFX implements MotorIO {
   }
 
   @Override
-  public void setCurrentPosition(Angle position) {
-    main.setPosition(position);
+  public void setCurrentPosition(Angle positionRad) {
+    main.setPosition(positionRad);
   }
 
   @Override
   public void setEnableSoftLimits(boolean forward, boolean reverse) {
-    main.getConfigurator().refresh(this.fx);
     this.fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
     this.fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
     main.getConfigurator().apply(this.fx);
@@ -175,7 +173,6 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void updateGains(Slot0Configs slot0) {
-    main.getConfigurator().refresh(this.fx);
     this.fx.Slot0 = slot0;
     main.getConfigurator().apply(this.fx);
   }

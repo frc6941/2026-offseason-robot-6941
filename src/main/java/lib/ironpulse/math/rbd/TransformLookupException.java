@@ -1,4 +1,4 @@
-package lib.ironpulse.rbd;
+package lib.ironpulse.math.rbd;
 
 public class TransformLookupException extends RuntimeException {
     public TransformLookupException(String target, String reference) {

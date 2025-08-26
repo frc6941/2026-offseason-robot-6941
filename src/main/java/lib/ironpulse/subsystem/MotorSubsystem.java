@@ -71,7 +71,7 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
   public Current getSupplyCurrent() { return Amps.of(inputs.currentSupplyAmps); }
   public Voltage getMotorVoltage() { return Volts.of(inputs.motorVolts); }
   public AngularVelocity getVelocityUnitsPerSecond() { 
-    return Rotations.of(inputs.velocityUnitsPerSecond).div(Seconds.of(1)); }
+    return Rotations.of(inputs.velocityRotPerSecond).div(Seconds.of(1)); }
 }
 
 

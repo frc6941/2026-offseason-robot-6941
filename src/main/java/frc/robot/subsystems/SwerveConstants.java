@@ -32,8 +32,9 @@ import lib.ntext.NTParameter;
         .build();
     public static SwerveLimit kDefaultSwerveLimit = SwerveLimit.builder()
         .maxLinearVelocity(MetersPerSecond.of(4.5))
+        //prevents skidding, see orbit archive ytb channel open class for theory
         .maxSkidAcceleration(MetersPerSecondPerSecond.of(15.0))
-        // must be smaller than 4.5 / (dist * sqrt(2)) to be actually effective
+        // must be smaller than 4.5 / (distModuletocenter * sqrt(2)) to be actually effective
         .maxAngularVelocity(DegreesPerSecond.of(700.0))
         // accelerate in 0.2s, also must be smaller than the defined module limit to be actually effective
         .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0))

@@ -1,4 +1,4 @@
-package lib.ironpulse.rbd;
+package lib.ironpulse.math.rbd;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -12,8 +12,8 @@ import lombok.Setter;
 import java.util.*;
 
 import static edu.wpi.first.units.Units.*;
-import static lib.ironpulse.rbd.TransformTools.inverse;
-import static lib.ironpulse.rbd.TransformTools.toTransform3d;
+import static lib.ironpulse.math.rbd.TransformTools.inverse;
+import static lib.ironpulse.math.rbd.TransformTools.toTransform3d;
 
 public class TransformRecorder {
     public static final String kFrameWorld = "World";

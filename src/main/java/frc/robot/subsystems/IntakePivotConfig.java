@@ -42,7 +42,7 @@ public final class IntakePivotConfig {
       .build())
     .build();
 
-  // NetworkTables-backed params
+
   @NTParameter(tableName = "Params/" + NAME)
   public static final class IntakePivotParams {
     // PID/FF gains
@@ -56,7 +56,6 @@ public final class IntakePivotConfig {
     // IntakePivotGainsClass defaults are 100 deg/s and 100 deg/s^2
     public static final double motionMagicVelRPS = 100.0 / 360.0;       // ~0.278 rps
     public static final double motionMagicAccelRPS2 = 100.0 / 360.0;    // ~0.278 rps^2
-    public static final double motionMagicJerkRPS3 = 0.0;
 
     // Tolerances / behavior
     public static final double atGoalToleranceDegrees = 3.5;
