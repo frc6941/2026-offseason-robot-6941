@@ -15,13 +15,13 @@ public final class IntakePivotConfig {
   private IntakePivotConfig() {}
 
   public static final String NAME = "IntakePivot";
-  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
+  public static final String CANIVORE_CAN_BUS_NAME = "10541Canivore0";
 
   // Local hardware constants (copied/adapted from provided snippet)
-  private static final int INTAKE_PIVOT_MOTOR_ID = 16;
-  private static final int INTAKE_PIVOT_ENCODER_ID = 17;
-  private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818; // (45/11)*(56/20)*(56/8)
-  private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
+  private static final int INTAKE_PIVOT_MOTOR_ID = 19;
+  // private static final int INTAKE_PIVOT_ENCODER_ID = 17;
+  // private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818; // (45/11)*(56/20)*(56/8)
+  // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
 
   // Mechanism config
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
@@ -31,16 +31,16 @@ public final class IntakePivotConfig {
     .motorInvertedValue(InvertedValue.Clockwise_Positive)
     .SensorToMechanismRatio(1.0)
     .gravityType(GravityTypeValue.Arm_Cosine)
-    .enableRemoteCANcoder(true)
-    .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
-      .id(INTAKE_PIVOT_ENCODER_ID)
-      .bus(CANIVORE_CAN_BUS_NAME)
-      .magnetOffset(INTAKE_PIVOT_ENCODER_OFFSET)
-      .rotorToSensorRatio(INTAKE_PIVOT_ROTOR_ENCODER_RATIO)
-      .sensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-      .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-      .useContinousWrap(false)
-      .build())
+    // .enableRemoteCANcoder(true)
+    // .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
+    //   .id(INTAKE_PIVOT_ENCODER_ID)
+    //   .bus(CANIVORE_CAN_BUS_NAME)
+    //   .magnetOffset(INTAKE_PIVOT_ENCODER_OFFSET)
+    //   .rotorToSensorRatio(INTAKE_PIVOT_ROTOR_ENCODER_RATIO)
+    //   .sensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+    //   .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+    //   .useContinousWrap(false)
+    //   .build())
     .build();
 
 
@@ -58,7 +58,7 @@ public final class IntakePivotConfig {
 
     // Tolerances / behavior
     public static final double atGoalToleranceDegrees = 3.5;
-    public static final boolean isBrake = true;
+    public static final boolean isBrake = false;
   }
 }
 

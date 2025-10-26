@@ -11,16 +11,16 @@ import edu.wpi.first.units.measure.AngularVelocity;
  */
 public interface MotorIO {
   // Read
-  void readInputs(MotorInputs inputs);
-
+  default void readInputs(MotorInputs inputs){};
   // Write (mechanism units)
-  void setOpenLoopDutyCycle(double dutyCycle);
-  void setPositionSetpoint(Angle position);
-  void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk);
-  void setNeutralMode(boolean wantsBreak);
-  void setVelocitySetpoint(AngularVelocity velocity);
-  void setCurrentPositionAsZero();
-  void setCurrentPosition(Angle position);
-  void setEnableSoftLimits(boolean forward, boolean reverse);
-  void updateGains(Slot0Configs slot0);
-}
+  default void setOpenLoopDutyCycle(double dutyCycle){};
+  default void setPositionSetpoint(Angle position){};
+  default void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk){};
+  default void setNeutralMode(boolean wantsBreak){};
+  default void setVelocitySetpoint(AngularVelocity velocity){};
+  default void setCurrentPositionAsZero(){};
+  default void setCurrentPosition(Angle position){};
+  default void setEnableSoftLimits(boolean forward, boolean reverse){};
+  default void updateGains(Slot0Configs slot0){};
+  default boolean isConnected(){return true;};
+} 
