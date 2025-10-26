@@ -38,7 +38,7 @@ public class MotorIOSim implements MotorIO{
                 motor,
                 cfg.MOI.in(KilogramSquareMeters),
                 cfg.gearRatio
-            ), motor, cfg.posStdv
+            ), motor, cfg.stdvs
             );
         pidController = new PIDController(0,0,0);
         driveFF = new SimpleMotorFeedforward(0,0,0);

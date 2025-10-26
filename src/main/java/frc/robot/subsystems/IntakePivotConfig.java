@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources;
+import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 import lib.ntext.NTParameter;
 
 import static edu.wpi.first.units.Units.*;
@@ -43,6 +44,11 @@ public final class IntakePivotConfig {
     //   .build())
     .build();
 
+    public static final SimConfig SIM_CONFIG = SubsystemConfig.SimConfig.builder()
+    .MOI(KilogramSquareMeters.of(0.04))
+    .gearRatio(1)
+    .stdvs(new double[] {0.02, 0.02})
+    .build();
 
   @NTParameter(tableName = "Params/" + NAME)
   public static final class IntakePivotParams {

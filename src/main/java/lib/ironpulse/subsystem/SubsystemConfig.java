@@ -85,7 +85,7 @@ public class SubsystemConfig {
   public static class SimConfig{
     @Default public final MomentOfInertia MOI = KilogramSquareMeters.of(0);
     @Default public final double gearRatio = 1.0d;
-    @Default public final double[] posStdv = new double[] {0.0d, 0.0d};
+    @Default public final double[] stdvs = new double[] {0.0d, 0.0d};
   }
 }
 
