@@ -1,5 +1,7 @@
 package lib.ironpulse.subsystem;
 
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -7,6 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import edu.wpi.first.units.measure.MomentOfInertia;
 import lombok.Builder;
 import lombok.Builder.Default;
 
@@ -76,6 +79,13 @@ public class SubsystemConfig {
     /** If true, follower output is inverted (oppose main). */
     @Default public final boolean opposeMain = false;
 
+  }
+
+  @Builder
+  public static class SimConfig{
+    @Default public final MomentOfInertia MOI = KilogramSquareMeters.of(0);
+    @Default public final double gearRatio = 1.0d;
+    @Default public final double[] stdvs = new double[] {0.0d, 0.0d};
   }
 }
 

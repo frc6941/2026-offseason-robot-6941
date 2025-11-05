@@ -120,7 +120,7 @@ public class MotorIOTalonFX implements MotorIO {
     inputs.currentStatorAmps = statorSig.getValueAsDouble();
     inputs.currentSupplyAmps = supplySig.getValueAsDouble();
   }
-
+  @Override
   /** Whether all primary signals are reporting without errors. */
   public boolean isConnected() {
     return connected;
