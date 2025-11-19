@@ -138,11 +138,6 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
-    System.out.println("[MotorIOTalonFX] ID: " + main.getDeviceID() + 
-      " | Setting MotionMagic: Pos=" + position.in(Units.Rotations) + " rot" +
-      " | Vel=" + velocity + " rps" +
-      " | Accel=" + acceleration + " rps²" +
-      " | Jerk=" + jerk + " rps³");
     dynamicMotionMagicCtrl.Velocity = velocity;
     dynamicMotionMagicCtrl.Acceleration = acceleration;
     dynamicMotionMagicCtrl.Jerk = jerk;
