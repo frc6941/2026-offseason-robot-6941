@@ -99,6 +99,10 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
         setVelocitySetpoint(0.0);
     }
 
+    public void setInputVoltage(double Voltage){
+        io.setInputVoltage(Voltage);
+    }
+
     //hack to hook NTParameterProcessor to generate ParamSources for uses in subsystems
     //REMEMBER to update NTParameterProcessor when adding new fields to ParamSources
     public interface ParamSources {

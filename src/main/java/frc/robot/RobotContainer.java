@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveConstants;
+import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.IntakePivotSubsystem;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -30,6 +31,7 @@ import lib.ironpulse.swerve.sjtu6.SwerveModuleIOSJTU6;
 public class RobotContainer {
   private Swerve swerve;
   private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
+  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   private final CommandXboxController driver = new CommandXboxController(0);
   public RobotContainer() {
     if (RobotBase.isReal()){
@@ -57,12 +59,12 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // Intake Pivot: A -> 0 degrees, B -> 100 degrees
-    driver.a().onTrue(Commands.runOnce(() -> intakePivot.setNeutralModeTo(false)));
-    driver.x().onTrue(Commands.runOnce(()-> intakePivot.setNeutralModeTo(true)));
+  
     // driver.y().onTrue(Commands.runOnce(()-> intakePivot.setNeutralMode(true)));
     driver.y().onTrue(Commands.runOnce(()-> intakePivot.setMotionMagicSetpoint(Degrees.of(40.0))));
-    // driver.b().whileTrue(Commands.print());
+    driver.b().whileTrue(Commands.runOnce(()-> flywheelSubsystem.setVelocitySetpoint(1000)));
+    driver.a().whileTrue(Commands.runOnce(()-> flywheelSubsystem.setInputVoltage(-10)));
+    
     
   }
 
