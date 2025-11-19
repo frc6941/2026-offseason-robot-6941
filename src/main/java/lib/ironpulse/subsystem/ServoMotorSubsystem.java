@@ -82,10 +82,15 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       if (isLinearMode()) {
         throw new IllegalStateException("Linear mode enabled: use Distance-based setMotionMagicSetpoint");
       }
-      io.setMotionMagicSetpoint(position, 
-      params.motionMagicVelRPS(),
-      params.motionMagicAccelRPS2(),
-      params.motionMagicJerkRPS3());
+      double vel = params.motionMagicVelRPS();
+      double accel = params.motionMagicAccelRPS2();
+      double jerk = params.motionMagicJerkRPS3();
+      System.out.println("[MotionMagic] Subsystem: " + getName() + 
+        " | Position: " + position.in(Rotations) + " rot" +
+        " | Vel: " + vel + " rps" +
+        " | Accel: " + accel + " rps²" + 
+        " | Jerk: " + jerk + " rps³");
+      io.setMotionMagicSetpoint(position, vel, accel, jerk);
     }
 
     public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk){
@@ -113,6 +118,14 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     }
     public void setPositionSetpoint(Distance position) {
       io.setPositionSetpoint(rotationsFromMeters(position));
+    }
+
+    public void setVelocitySetpoint(double velocty){
+      io.setVelocitySetpoint(RotationsPerSecond.of(velocty));
+    }
+
+    public void setNeutralModeTo(boolean isLocked){
+      io.setNeutralMode(isLocked);;
     }
 
     private boolean isLinearMode() {

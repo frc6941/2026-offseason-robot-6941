@@ -58,10 +58,10 @@ public class RobotContainer {
 
   private void configureBindings() {
     // Intake Pivot: A -> 0 degrees, B -> 100 degrees
-    driver.a().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(0.0))));
-    driver.x().onTrue(Commands.runOnce(()-> intakePivot.setCurrentPositionAsZero()));
+    driver.a().onTrue(Commands.runOnce(() -> intakePivot.setNeutralModeTo(false)));
+    driver.x().onTrue(Commands.runOnce(()-> intakePivot.setNeutralModeTo(true)));
     // driver.y().onTrue(Commands.runOnce(()-> intakePivot.setNeutralMode(true)));
-    driver.y().onTrue(Commands.runOnce(()-> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
+    driver.y().onTrue(Commands.runOnce(()-> intakePivot.setMotionMagicSetpoint(Degrees.of(40.0))));
     // driver.b().whileTrue(Commands.print());
     
   }
