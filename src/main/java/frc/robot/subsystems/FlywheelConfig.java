@@ -11,11 +11,11 @@ import lib.ntext.NTParameter;
 
 import static edu.wpi.first.units.Units.*;
 
-/** Constants and NT-backed params for {@link IntakePivotSubsystem}. */
-public final class IntakePivotConfig {
-  private IntakePivotConfig() {}
+/** Constants and NT-backed params for {@link FlywheelSubsystem}. */
+public final class FlywheelConfig {
+  private FlywheelConfig() {}
 
-  public static final String NAME = "IntakePivot";
+  public static final String NAME = "Flywheel";
   public static final String CANIVORE_CAN_BUS_NAME = "10541Canivore0";
 
   // Local hardware constants (copied/adapted from provided snippet)
@@ -31,7 +31,6 @@ public final class IntakePivotConfig {
     .mainBus(CANIVORE_CAN_BUS_NAME)
     .motorInvertedValue(InvertedValue.Clockwise_Positive)
     .SensorToMechanismRatio(1.0)
-    .gravityType(GravityTypeValue.Arm_Cosine)
     // .enableRemoteCANcoder(true)
     // .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
     //   .id(INTAKE_PIVOT_ENCODER_ID)
@@ -51,23 +50,18 @@ public final class IntakePivotConfig {
     .build();
 
   @NTParameter(tableName = "Params/" + NAME)
-  public static final class IntakePivotParams {
-    // PID/FF gains
-    public static final double kP = 4.7;
-    public static final double kI = 0.5;
-    public static final double kD = 0.02;
+  public static final class FlywheelParams {
+    // PID/FF gains for velocity control
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
     public static final double kV = 0.12;
-    public static final double kA = 0.11;
-    public static final double kS = 0.0;
-    public static final double kG = -0.035;
-
-    public static final double motionMagicVelRPS = 100.0;       
-    public static final double motionMagicAccelRPS2 = 100.0;
-    public static final double motionMagicJerkRPS3 = 1000.0;   
+    public static final double kA = 0.0;
+    public static final double kS = 0.05;
 
     // Tolerances / behavior
-    public static final double atGoalToleranceDegrees = 3.5;
-    public static final boolean isBrake = false;
+    public static final double velocityAtGoalToleranceRPS = 2.0;
+    public static final boolean isBrake = false;  // Flywheels typically use coast
   }
 }
 

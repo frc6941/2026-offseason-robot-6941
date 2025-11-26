@@ -7,17 +7,16 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
-import lib.ironpulse.subsystem.ServoMotorSubsystem;
 
-/** Intake pivot mechanism using a TalonFX and remote CANcoder, extending ServoMotorSubsystem. */
-public class IntakePivotSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
+/** Flywheel mechanism for velocity control (shooter/intake rollers), with hardware abstraction. */
+public class FlywheelSubsystem extends lib.ironpulse.subsystem.FlywheelSubsystem<MotorInputsAutoLogged, MotorIO> {
 
-  public IntakePivotSubsystem() {
+  public FlywheelSubsystem() {
     super(
-      IntakePivotConfig.CONFIG,
+      FlywheelConfig.CONFIG,
       new MotorInputsAutoLogged(),
       createIO(),
-      IntakePivotParamsNT.asServoMotorParamSources()
+      FlywheelParamsNT.asFlywheelParamSources()
     );
   }
 
@@ -33,13 +32,13 @@ public class IntakePivotSubsystem extends ServoMotorSubsystem<MotorInputsAutoLog
       return new MotorIO() {};
     } else if (RobotBase.isReal()) {
       // 真实机器人：使用TalonFX硬件
-      System.out.println("[IntakePivot] Using REAL hardware (TalonFX ID: " + 
-        IntakePivotConfig.CONFIG.mainId + ")");
-      return new MotorIOTalonFX(IntakePivotConfig.CONFIG);
+      System.out.println("[Flywheel] Using REAL hardware (TalonFX ID: " + 
+        FlywheelConfig.CONFIG.mainId + ")");
+      return new MotorIOTalonFX(FlywheelConfig.CONFIG);
     } else {
       // 模拟模式：使用物理模拟
-      System.out.println("[IntakePivot] Using SIMULATION");
-      return new MotorIOSim(IntakePivotConfig.SIM_CONFIG);
+      System.out.println("[Flywheel] Using SIMULATION");
+      return new MotorIOSim(FlywheelConfig.SIM_CONFIG);
     }
   }
 }

@@ -10,9 +10,12 @@ import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -143,6 +146,11 @@ public class MotorIOTalonFX implements MotorIO {
     dynamicMotionMagicCtrl.Jerk = jerk;
     main.setControl(dynamicMotionMagicCtrl
       .withPosition(position));
+  }
+
+  @Override
+  public void setInputVoltage(double voltage) {
+    main.setControl(new VoltageOut(MathUtil.clamp(voltage, -12.0f, 12.0f)));
   }
 
   @Override
