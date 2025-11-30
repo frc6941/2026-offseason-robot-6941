@@ -9,7 +9,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 
@@ -59,6 +61,7 @@ public class SubsystemConfig {
 
   /** Optional remote CANcoder configuration summary. */
   @Builder
+  @AllArgsConstructor
   public static class RemoteCANcoder {
     public final int id;
     public final String bus;
@@ -72,6 +75,7 @@ public class SubsystemConfig {
 
   /** Optional follower TalonFX configuration. */
   @Builder
+  @AllArgsConstructor
   public static class FollowerConfig {
     public final int id;
     public final String bus;
@@ -82,11 +86,15 @@ public class SubsystemConfig {
   }
 
   @Builder
+  @AllArgsConstructor
   public static class SimConfig{
     @Default public final MomentOfInertia MOI = KilogramSquareMeters.of(0);
     @Default public final double gearRatio = 1.0d;
     @Default public final double[] stdvs = new double[] {0.0d, 0.0d};
+    @Default public final TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(50.0, 100.0);
   }
+
+  @Default public SimConfig simConfig = new SimConfig(null, 0, null,null);
 }
 
 

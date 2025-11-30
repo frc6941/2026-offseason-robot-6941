@@ -39,7 +39,7 @@ public class IntakePivotSubsystem extends ServoMotorSubsystem<MotorInputsAutoLog
     } else {
       // 模拟模式：使用物理模拟
       System.out.println("[IntakePivot] Using SIMULATION");
-      return new MotorIOSim(IntakePivotConfig.SIM_CONFIG);
+      return new MotorIOSim(IntakePivotConfig.CONFIG);
     }
   }
 }

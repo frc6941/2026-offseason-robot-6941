@@ -38,7 +38,7 @@ public class FlywheelSubsystem extends lib.ironpulse.subsystem.FlywheelSubsystem
     } else {
       // 模拟模式：使用物理模拟
       System.out.println("[Flywheel] Using SIMULATION");
-      return new MotorIOSim(FlywheelConfig.SIM_CONFIG);
+      return new MotorIOSim(FlywheelConfig.CONFIG);
     }
   }
 }

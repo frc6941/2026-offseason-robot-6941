@@ -24,6 +24,11 @@ public final class IntakePivotConfig {
   // private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818; // (45/11)*(56/20)*(56/8)
   // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
 
+    public static final SimConfig SIM_CONFIG = SubsystemConfig.SimConfig.builder()
+    .MOI(KilogramSquareMeters.of(1))
+    .gearRatio(1)
+    .stdvs(new double[] {0.02, 0.02})
+    .build();
   // Mechanism config
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
     .name(NAME)
@@ -42,13 +47,9 @@ public final class IntakePivotConfig {
     //   .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
     //   .useContinousWrap(false)
     //   .build())
+    .simConfig(SIM_CONFIG)
     .build();
 
-    public static final SimConfig SIM_CONFIG = SubsystemConfig.SimConfig.builder()
-    .MOI(KilogramSquareMeters.of(0.04))
-    .gearRatio(1)
-    .stdvs(new double[] {0.02, 0.02})
-    .build();
 
   @NTParameter(tableName = "Params/" + NAME)
   public static final class IntakePivotParams {

@@ -1,159 +1,201 @@
 package lib.ironpulse.io;
 
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 
-public class MotorIOSim implements MotorIO{
-    private final DCMotorSim motorSim;
-    private final DCMotor motor;
-    private final SimConfig cfg;
-    private PIDController pidController;
-    private SimpleMotorFeedforward driveFF;
-    private boolean isDriveCloseLoop = false;
-    
-    // Motion Magic simulation
-    private TrapezoidProfile motionProfile;
-    private TrapezoidProfile.State motionProfileGoal;
-    private TrapezoidProfile.State motionProfileSetpoint;
-    private double lastProfileTime = 0.0;
+import java.util.Random;
 
-    public MotorIOSim(SimConfig cfg){
-        this.cfg = cfg;
-        this.motor = DCMotor.getKrakenX60(1); 
-        this.motorSim = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                motor,
-                cfg.MOI.in(KilogramSquareMeters),
-                cfg.gearRatio
-            ), motor, cfg.stdvs
-            );
-        pidController = new PIDController(0,0,0);
-        driveFF = new SimpleMotorFeedforward(0,0,0);
-        pidController.reset();
+public class MotorIOSim implements MotorIO{
+
+    private DCMotorSim dcMotorSim;
+    private DCMotor dcMotor;
+    private SimConfig cfg;
+    private final SubsystemConfig subsystemConfig;
+    private SimpleMotorFeedforward feedforward;
+    private PIDController pidController;
+    private ProfiledPIDController profiledPidController;
+        private final Random random = new Random();
         
-        // Initialize motion profile with default constraints
-        motionProfile = new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(0, 0)
-        );
-        motionProfileGoal = new TrapezoidProfile.State();
-        motionProfileSetpoint = new TrapezoidProfile.State();
+        private double appliedVolts;
+        private boolean isCloseLoop = false;
+        private double kg = 0.0;
+        
+        // Motion Magic support
+        private TrapezoidProfile motionProfile;
+        private TrapezoidProfile.State motionProfileGoal;
+        private double motionProfileStartTime = -1;
+        private TrapezoidProfile.State lastSetpoint;
+    
+        public MotorIOSim(SubsystemConfig cfg){
+            this.cfg = cfg.simConfig;
+            this.subsystemConfig = cfg;
+            this.dcMotor = DCMotor.getKrakenX60Foc(1);
+            this.dcMotorSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(dcMotor, this.cfg.MOI.magnitude(), this.cfg.gearRatio), dcMotor, this.cfg.stdvs);
+            initializeControllers();
+        }
+    
+    private void initializeControllers(){
+        pidController = new PIDController(0, 0, 0);
+        feedforward = new SimpleMotorFeedforward(0, 0, 0);
+            
+        // ProfiledPID for position control with trajectory generation
+        // Use constraints from SimConfig, or default if not set
+        TrapezoidProfile.Constraints constraints = (cfg.profile != null) 
+            ? cfg.profile 
+            : new TrapezoidProfile.Constraints(50.0, 100.0);
+        profiledPidController = new ProfiledPIDController(0, 0, 0, constraints);
     }
 
     @Override
     public void readInputs(MotorInputs inputs) {
-        inputs.velocityRotPerSecond = motorSim.getAngularVelocityRadPerSec();
-        inputs.positionRot = motorSim.getAngularPositionRotations();
-        inputs.appliedVolts = motorSim.getInputVoltage();
-        inputs.motorVolts = motorSim.getInputVoltage();
-        inputs.currentSupplyAmps = motorSim.getCurrentDrawAmps();
-        inputs.currentStatorAmps = motorSim.getCurrentDrawAmps();
-    }
-
-    @Override
-    public boolean isConnected() {
-        return true;
+        dcMotorSim.setInputVoltage(appliedVolts);  // 使用计算出的 appliedVolts
+        dcMotorSim.update(0.02);
+        inputs.appliedVolts = appliedVolts;
+        // 生成正态分布噪声：均值 0.95，方差 0.1，标准差 √0.1 ≈ 0.316
+        double noiseMultiplier = 0.95 + Math.sqrt(0.1) * random.nextGaussian();
+        inputs.currentStatorAmps = dcMotorSim.getCurrentDrawAmps() * noiseMultiplier;
+        inputs.currentSupplyAmps = dcMotorSim.getCurrentDrawAmps();
+        inputs.positionRot = dcMotorSim.getAngularPositionRotations();
+        inputs.velocityRotPerSecond = dcMotorSim.getAngularVelocityRadPerSec()/(2* Math.PI);
+        inputs.motorVolts = dcMotor.getVoltage(dcMotorSim.getTorqueNewtonMeters(),dcMotorSim.getAngularVelocityRadPerSec())*cfg.gearRatio;
+        
     }
 
     @Override
     public void setOpenLoopDutyCycle(double dutyCycle) {
-        isDriveCloseLoop = false;
-        if (dutyCycle < -1.0 || dutyCycle > 1.0) {
-            throw new IllegalArgumentException("Input must be in [-1, 1]");
-        }
-        motorSim.setInputVoltage(dutyCycle * 12.0);
+        isCloseLoop = false;
+        appliedVolts = MathUtil.clamp(dutyCycle*12, -12.0f, 12.0f);
     }
 
     @Override
-    public void setCurrentPositionAsZero() {
-        motorSim.setAngle(0);
-    }
-
-    @Override
-    public void setCurrentPosition(Angle position) {
-        motorSim.setAngle(position.in(Radians));
+    public void setInputVoltage(double voltage) {
+        isCloseLoop = false;
+        appliedVolts = MathUtil.clamp(voltage, -12.0f, 12.0f);
     }
 
     @Override
     public void setVelocitySetpoint(AngularVelocity velocity) {
-        if (!isDriveCloseLoop) {
-            isDriveCloseLoop = true;
-            pidController.reset();
-        }
-        double output = pidController.calculate(motorSim.getAngularVelocityRadPerSec(), velocity.in(RadiansPerSecond));
-        double feedforward = driveFF.calculate(velocity.in(RadiansPerSecond));
-        motorSim.setInputVoltage(output + feedforward);
+        if (!isCloseLoop) {isCloseLoop = true; pidController.reset();}
+        double fb = pidController.calculate(dcMotorSim.getAngularVelocityRadPerSec() / (2 * Math.PI) , velocity.in(RotationsPerSecond));
+        double ff = feedforward.calculate(velocity.in(RotationsPerSecond));
+        appliedVolts = MathUtil.clamp(fb + ff, -12.0, 12.0);
     }
-    
-    @Override
-    public void setNeutralMode(boolean wantsBreak) {}
 
     @Override
     public void setPositionSetpoint(Angle position) {
-        if (!isDriveCloseLoop) {
-            isDriveCloseLoop = true;
+        if (!isCloseLoop) {
+            isCloseLoop = true;
+            profiledPidController.reset(dcMotorSim.getAngularPositionRotations());
+        }
+        
+        double currentPosition = dcMotorSim.getAngularPositionRotations();
+        double targetPosition = position.in(Rotations);
+        
+        // ProfiledPID calculates feedback with automatic trajectory generation
+        double fb = profiledPidController.calculate(currentPosition, targetPosition);
+        
+        // Feedforward based on the profiled setpoint velocity + gravity compensation
+        TrapezoidProfile.State setpoint = profiledPidController.getSetpoint();
+        double ff = feedforward.calculate(setpoint.velocity) + kg;
+        
+        // Apply voltage
+        appliedVolts = MathUtil.clamp(fb + ff, -12.0, 12.0);
+    }
+    @Override
+    public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
+        if (!isCloseLoop) {
+            isCloseLoop = true;
             pidController.reset();
         }
-        double output = pidController.calculate(motorSim.getAngularPositionRad(), position.in(Radians));
-        double feedforward = driveFF.calculate(0); // Position control uses zero velocity feedforward
-        motorSim.setInputVoltage(output + feedforward);
+
+        double currentTime = Timer.getFPGATimestamp();
+        double currentPosition = dcMotorSim.getAngularPositionRotations();
+        double currentVelocity = dcMotorSim.getAngularVelocityRadPerSec() / (2 * Math.PI);
+        
+        TrapezoidProfile.State currentState = new TrapezoidProfile.State(currentPosition, currentVelocity);
+        
+        // 检查是否需要重新规划轨迹
+        boolean needsNewProfile = motionProfile == null || 
+                                !(motionProfileGoal.position - (position.in(Rotations)) == 0.0003) ||
+                                motionProfileStartTime < 0;
+        
+        if (needsNewProfile) {
+            // 创建新的运动规划
+            TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(velocity, acceleration);
+            motionProfile = new TrapezoidProfile(constraints);
+            motionProfileGoal = new TrapezoidProfile.State(position.in(Rotations), 0.0);
+            motionProfileStartTime = currentTime;
+            lastSetpoint = currentState;
+        }
+        
+        // 计算当前时间的setpoint
+        double elapsedTime = currentTime - motionProfileStartTime;
+        TrapezoidProfile.State setpoint = motionProfile.calculate(elapsedTime, lastSetpoint, motionProfileGoal);
+        
+        // 使用PID跟踪轨迹setpoint
+        double fb = pidController.calculate(currentPosition, setpoint.position);
+        
+        // 前馈补偿
+        double ff = feedforward.calculate(setpoint.velocity);
+        
+        // 应用电压
+        appliedVolts = MathUtil.clamp(fb + ff + kg, -12.0, 12.0);
+        
+        // 更新上一次的setpoint用于下一次计算
+        lastSetpoint = setpoint;
+    }
+    @Override
+    public void setCurrentPositionAsZero() {
+        setCurrentPosition(Radians.of(0));
     }
 
     @Override
-    public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
-        if (!isDriveCloseLoop) {
-            isDriveCloseLoop = true;
-            pidController.reset();
-            lastProfileTime = 0.0;
-        }
+    public void setCurrentPosition(Angle position) {
+        // DCMotorSim.setState() 需要弧度作为参数
+        double positionRad = position.in(Radians);
+        double currentVelocityRadPerSec = dcMotorSim.getAngularVelocityRadPerSec();
         
-        // Update motion profile constraints with the provided velocity and acceleration
-        // Note: Jerk is not directly supported in WPILib's TrapezoidProfile
-        motionProfile = new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(velocity, acceleration)
-        );
-        
-        // Set the goal state
-        motionProfileGoal = new TrapezoidProfile.State(position.in(Radians), 0);
-        
-        // Calculate the current profile setpoint
-        // In a real implementation, this would be called periodically (e.g., in periodic())
-        // For now, we'll calculate the next setpoint based on a 20ms timestep (50Hz)
-        double dt = 0.02;
-        lastProfileTime += dt;
-        
-        TrapezoidProfile.State currentState = new TrapezoidProfile.State(
-            motorSim.getAngularPositionRad(),
-            motorSim.getAngularVelocityRadPerSec()
-        );
-        
-        motionProfileSetpoint = motionProfile.calculate(dt, currentState, motionProfileGoal);
-        
-        // Use PID + feedforward to track the profile setpoint
-        double positionOutput = pidController.calculate(
-            motorSim.getAngularPositionRad(), 
-            motionProfileSetpoint.position
-        );
-        double feedforward = driveFF.calculate(motionProfileSetpoint.velocity);
-        
-        motorSim.setInputVoltage(positionOutput + feedforward);
+        // 设置新位置，保持当前速度不变
+        dcMotorSim.setState(positionRad, currentVelocityRadPerSec);
     }
 
     @Override
     public void updateGains(Slot0Configs slot0) {
-        pidController.setPID(slot0.kP, slot0.kI, slot0.kD);
-        driveFF = new SimpleMotorFeedforward(slot0.kS, slot0.kV, slot0.kA);
+        double kp = slot0.kP;  
+        double ki = slot0.kI;    
+        double kd = slot0.kD;
+        double ka = slot0.kA;  
+        double kv = slot0.kV;  
+        double ks = slot0.kS;  
+        kg = slot0.kG;
+
+        // Update velocity PID controller
+        pidController.setPID(kp, ki, kd);
+        feedforward.setKa(ka);
+        feedforward.setKs(ks);
+        feedforward.setKv(kv);
+        
+        // Update position ProfiledPID controller
+        profiledPidController.setPID(kp, ki, kd);
+        
+        // kg is stored separately and added in position/motion magic control
     }
+
 }

@@ -60,9 +60,9 @@ public class RobotContainer {
 
   private void configureBindings() {
   
-    // driver.y().onTrue(Commands.runOnce(()-> intakePivot.setNeutralMode(true)));
-    driver.y().onTrue(Commands.runOnce(()-> intakePivot.setMotionMagicSetpoint(Degrees.of(40.0))));
-    driver.b().whileTrue(Commands.runOnce(()-> flywheelSubsystem.setVelocitySetpoint(1000)));
+    driver.x().onTrue(Commands.runOnce(()-> intakePivot.setMotionMagicSetpoint(Degrees.of(-100.0))));
+    driver.y().onTrue(Commands.runOnce(()-> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
+    driver.b().whileTrue(Commands.runOnce(()-> flywheelSubsystem.setVelocitySetpoint(75)));
     driver.a().whileTrue(Commands.runOnce(()-> flywheelSubsystem.setInputVoltage(-10)));
     
     

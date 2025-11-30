@@ -25,6 +25,12 @@ public final class FlywheelConfig {
   // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
 
   // Mechanism config
+  public static final SimConfig SIM_CONFIG = SubsystemConfig.SimConfig.builder()
+    .MOI(KilogramSquareMeters.of(0.00035))
+    .gearRatio(6.75)
+    .stdvs(new double[] {0.02, 0.02})
+    .build();
+
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
     .name(NAME)
     .mainId(INTAKE_PIVOT_MOTOR_ID)
@@ -41,23 +47,19 @@ public final class FlywheelConfig {
     //   .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
     //   .useContinousWrap(false)
     //   .build())
+    .simConfig(SIM_CONFIG)
     .build();
 
-    public static final SimConfig SIM_CONFIG = SubsystemConfig.SimConfig.builder()
-    .MOI(KilogramSquareMeters.of(0.04))
-    .gearRatio(1)
-    .stdvs(new double[] {0.02, 0.02})
-    .build();
-
+    
   @NTParameter(tableName = "Params/" + NAME)
   public static final class FlywheelParams {
     // PID/FF gains for velocity control
-    public static final double kP = 0.1;
+    public static final double kP = 0.2;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kV = 0.12;
-    public static final double kA = 0.0;
-    public static final double kS = 0.05;
+    public static final double kD = 0.001;
+    public static final double kV = 0.003;
+    public static final double kA = 0.115;
+    public static final double kS = 0.285;
 
     // Tolerances / behavior
     public static final double velocityAtGoalToleranceRPS = 2.0;
