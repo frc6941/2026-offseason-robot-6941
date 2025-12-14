@@ -16,13 +16,13 @@ public final class IntakePivotConfig {
   private IntakePivotConfig() {}
 
   public static final String NAME = "IntakePivot";
-  public static final String CANIVORE_CAN_BUS_NAME = "10541Canivore0";
+  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
 
-  // Local hardware constants (copied/adapted from provided snippet)
-  private static final int INTAKE_PIVOT_MOTOR_ID = 33;
-  // private static final int INTAKE_PIVOT_ENCODER_ID = 17;
-  // private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818; // (45/11)*(56/20)*(56/8)
-  // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
+  // Local hardware constants (from RobotConstants.IntakeConstants)
+  private static final int INTAKE_PIVOT_MOTOR_ID = 16;
+  private static final int INTAKE_PIVOT_ENCODER_ID = 17;
+  private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818; // (45/11)*(56/20)*(56/8)
+  private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
 
     public static final SimConfig SIM_CONFIG = SubsystemConfig.SimConfig.builder()
     .MOI(KilogramSquareMeters.of(1))
@@ -37,23 +37,23 @@ public final class IntakePivotConfig {
     .motorInvertedValue(InvertedValue.Clockwise_Positive)
     .SensorToMechanismRatio(1.0)
     .gravityType(GravityTypeValue.Arm_Cosine)
-    // .enableRemoteCANcoder(true)
-    // .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
-    //   .id(INTAKE_PIVOT_ENCODER_ID)
-    //   .bus(CANIVORE_CAN_BUS_NAME)
-    //   .magnetOffset(INTAKE_PIVOT_ENCODER_OFFSET)
-    //   .rotorToSensorRatio(INTAKE_PIVOT_ROTOR_ENCODER_RATIO)
-    //   .sensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-    //   .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-    //   .useContinousWrap(false)
-    //   .build())
+    .enableRemoteCANcoder(true)
+    .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
+      .id(INTAKE_PIVOT_ENCODER_ID)
+      .bus(CANIVORE_CAN_BUS_NAME)
+      .magnetOffset(INTAKE_PIVOT_ENCODER_OFFSET)
+      .rotorToSensorRatio(INTAKE_PIVOT_ROTOR_ENCODER_RATIO)
+      .sensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+      .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+      .useContinousWrap(false)
+      .build())
     .simConfig(SIM_CONFIG)
     .build();
 
 
   @NTParameter(tableName = "Params/" + NAME)
   public static final class IntakePivotParams {
-    // PID/FF gains
+    // PID/FF gains (from RobotConstants.IntakeConstants.IntakePivotGainsClass)
     public static final double kP = 4.7;
     public static final double kI = 0.5;
     public static final double kD = 0.02;
@@ -62,9 +62,10 @@ public final class IntakePivotConfig {
     public static final double kS = 0.0;
     public static final double kG = -0.035;
 
-    public static final double motionMagicVelRPS = 100.0;       
+    // Motion Magic parameters
+    public static final double motionMagicVelRPS = 100.0;
     public static final double motionMagicAccelRPS2 = 100.0;
-    public static final double motionMagicJerkRPS3 = 1000.0;   
+    public static final double motionMagicJerkRPS3 = 0.0;
 
     // Tolerances / behavior
     public static final double atGoalToleranceDegrees = 3.5;

@@ -131,13 +131,12 @@ public class MotorIOSim implements MotorIO{
         
         TrapezoidProfile.State currentState = new TrapezoidProfile.State(currentPosition, currentVelocity);
         
-        // 检查是否需要重新规划轨迹
+
         boolean needsNewProfile = motionProfile == null || 
                                 !(motionProfileGoal.position - (position.in(Rotations)) == 0.0003) ||
                                 motionProfileStartTime < 0;
         
         if (needsNewProfile) {
-            // 创建新的运动规划
             TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(velocity, acceleration);
             motionProfile = new TrapezoidProfile(constraints);
             motionProfileGoal = new TrapezoidProfile.State(position.in(Rotations), 0.0);
@@ -145,20 +144,15 @@ public class MotorIOSim implements MotorIO{
             lastSetpoint = currentState;
         }
         
-        // 计算当前时间的setpoint
         double elapsedTime = currentTime - motionProfileStartTime;
         TrapezoidProfile.State setpoint = motionProfile.calculate(elapsedTime, lastSetpoint, motionProfileGoal);
         
-        // 使用PID跟踪轨迹setpoint
         double fb = pidController.calculate(currentPosition, setpoint.position);
         
-        // 前馈补偿
         double ff = feedforward.calculate(setpoint.velocity);
         
-        // 应用电压
         appliedVolts = MathUtil.clamp(fb + ff + kg, -12.0, 12.0);
         
-        // 更新上一次的setpoint用于下一次计算
         lastSetpoint = setpoint;
     }
     @Override
@@ -168,11 +162,9 @@ public class MotorIOSim implements MotorIO{
 
     @Override
     public void setCurrentPosition(Angle position) {
-        // DCMotorSim.setState() 需要弧度作为参数
         double positionRad = position.in(Radians);
         double currentVelocityRadPerSec = dcMotorSim.getAngularVelocityRadPerSec();
         
-        // 设置新位置，保持当前速度不变
         dcMotorSim.setState(positionRad, currentVelocityRadPerSec);
     }
 

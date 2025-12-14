@@ -16,10 +16,10 @@ public final class FlywheelConfig {
   private FlywheelConfig() {}
 
   public static final String NAME = "Flywheel";
-  public static final String CANIVORE_CAN_BUS_NAME = "10541Canivore0";
+  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
 
   // Local hardware constants (copied/adapted from provided snippet)
-  private static final int INTAKE_PIVOT_MOTOR_ID = 33;
+  private static final int INTAKE_PIVOT_MOTOR_ID = 22;
   // private static final int INTAKE_PIVOT_ENCODER_ID = 17;
   // private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818; // (45/11)*(56/20)*(56/8)
   // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25

@@ -120,7 +120,7 @@ public class MotorIOTalonFX implements MotorIO {
     inputs.positionRot = posSig.getValueAsDouble();
     inputs.velocityRotPerSecond = velSig.getValueAsDouble();
     inputs.motorVolts = motorVoltSig.getValueAsDouble();
-    inputs.motorVolts = supplyVoltSig.getValueAsDouble();
+    inputs.appliedVolts = supplyVoltSig.getValueAsDouble();
     inputs.currentStatorAmps = statorSig.getValueAsDouble();
     inputs.currentSupplyAmps = supplySig.getValueAsDouble();
   }

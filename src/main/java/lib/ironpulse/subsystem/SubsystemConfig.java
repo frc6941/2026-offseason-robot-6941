@@ -59,6 +59,8 @@ public class SubsystemConfig {
   @Default public final boolean enableForwardSoftLimit = false;
   @Default public final boolean enableReverseSoftLimit = false;
 
+
+
   /** Optional remote CANcoder configuration summary. */
   @Builder
   @AllArgsConstructor

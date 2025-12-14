@@ -1,5 +1,7 @@
 package lib.ironpulse.subsystem;
 
+import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -51,6 +53,14 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
   public Command runDutyCycle(DoubleSupplier dutyCycle) {
     return run(
         () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()));
+  }
+
+  /**
+   * Open-loop duty cycle command, -12-12V.
+   */
+  public Command runVoltage(DoubleSupplier voltage) {
+    return run(
+        () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(),-12.0,12.0)));
   }
 
   /**

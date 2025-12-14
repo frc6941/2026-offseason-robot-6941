@@ -2,7 +2,11 @@ package lib.ironpulse.subsystem;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -14,7 +18,11 @@ import lombok.Getter;
  */
 public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
 
-    @Getter private AngularVelocity velocitySetpoint = RotationsPerSecond.of(0.0);
+    @Getter
+    private FlywheelSetpoint currSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
+    @Getter
+    private FlywheelSetpoint prevSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
+
     private final SubsystemConfig config;
     protected final ParamSources params;
     private final Slot0Configs slot0Configs;
@@ -46,14 +54,32 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
             io.setNeutralMode(params.isBrake());
             io.updateGains(slot0Configs);
         }
+
+        if (setptHasChanged()) {
+            switch (currSetpoint.modeFlywheel) {
+                case VELOCITY:
+                    io.setVelocitySetpoint(currSetpoint.velocitySetpt);
+                    break;
+                case DUTY_CYCLE:
+                    runDutyCycle(currSetpoint.openLoop);
+                    break;
+                case VOLTAGE:
+                    runVoltage(currSetpoint.openLoop);
+                    break;
+                default:
+                    io.setVelocitySetpoint(currSetpoint.velocitySetpt);
+                    break;
+            }
+        }
+        prevSetpoint = currSetpoint;
     }
 
     /**
      * Set flywheel velocity setpoint in rotations per second (RPS)
      */
     public void setVelocitySetpoint(AngularVelocity velocity) {
-        this.velocitySetpoint = velocity;
-        io.setVelocitySetpoint(velocity);
+        currSetpoint.modeFlywheel = ModeFlywheel.VELOCITY;
+        currSetpoint.velocitySetpt = velocity;
     }
 
     /**
@@ -64,11 +90,27 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
     }
 
     /**
+     * Set flywheel open loop duty cycle [-1.0, 1.0]
+     */
+    public void setOpenLoopDutyCycle(double dutyCycle) {
+        currSetpoint.openLoop = () -> MathUtil.clamp(dutyCycle, -1.0d, 1.0d);
+        currSetpoint.modeFlywheel = ModeFlywheel.DUTY_CYCLE;
+    }
+
+    /**
+     * Set flywheel voltage [-12.0, 12.0]
+     */
+    public void setVoltage(double voltage) {
+        currSetpoint.openLoop = () -> MathUtil.clamp(voltage, -12.0d, 12.0d);
+        currSetpoint.modeFlywheel = ModeFlywheel.VOLTAGE;
+    }
+
+    /**
      * Check if flywheel velocity is within tolerance of setpoint
      */
     public boolean velocityAtGoal(AngularVelocity tolerance) {
         AngularVelocity current = RotationsPerSecond.of(inputs.velocityRotPerSecond);
-        return current.isNear(velocitySetpoint, tolerance);
+        return current.isNear(currSetpoint.velocitySetpt, tolerance);
     }
 
     /**
@@ -99,22 +141,61 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
         setVelocitySetpoint(0.0);
     }
 
-    public void setInputVoltage(double Voltage){
-        io.setInputVoltage(Voltage);
-    }
-
-    //hack to hook NTParameterProcessor to generate ParamSources for uses in subsystems
-    //REMEMBER to update NTParameterProcessor when adding new fields to ParamSources
+    // hack to hook NTParameterProcessor to generate ParamSources for uses in subsystems
+    // REMEMBER to update NTParameterProcessor when adding new fields to ParamSources
     public interface ParamSources {
         double kP();
+
         double kI();
+
         double kD();
-        default double kA() { return 0.0; }
-        default double kV() { return 0.0; }
-        default double kS() { return 0.0; }
-        default double velocityAtGoalToleranceRPS() { return 1.0; }
-        default boolean isBrake() { return false; } // Typically coast for flywheels
+
+        default double kA() {
+            return 0.0;
+        }
+
+        default double kV() {
+            return 0.0;
+        }
+
+        default double kS() {
+            return 0.0;
+        }
+
+        default double velocityAtGoalToleranceRPS() {
+            return 1.0;
+        }
+
+        default boolean isBrake() {
+            return false;
+        } // Typically coast for flywheels
+
         /* hook to ParamsNT.isAnyChanged() */
-        default boolean hasChanged() { return false; }
+        default boolean hasChanged() {
+            return false;
+        }
+    }
+
+    private enum ModeFlywheel {
+        VELOCITY,
+        VOLTAGE,
+        DUTY_CYCLE
+    }
+
+    private boolean setptHasChanged() {
+        return !(currSetpoint.velocitySetpt.equals(prevSetpoint.velocitySetpt) && 
+                 currSetpoint.modeFlywheel == prevSetpoint.modeFlywheel);
+    }
+
+    public static class FlywheelSetpoint {
+        private ModeFlywheel modeFlywheel;
+        private AngularVelocity velocitySetpt;
+        private DoubleSupplier openLoop;
+
+        private FlywheelSetpoint(ModeFlywheel modeFlywheel, AngularVelocity velocitySetpt, DoubleSupplier openLoop) {
+            this.modeFlywheel = modeFlywheel;
+            this.velocitySetpt = velocitySetpt;
+            this.openLoop = openLoop;
+        }
     }
 }

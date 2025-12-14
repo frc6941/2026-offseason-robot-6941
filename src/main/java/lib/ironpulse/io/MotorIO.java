@@ -1,5 +1,7 @@
 package lib.ironpulse.io;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
@@ -20,6 +22,7 @@ public interface MotorIO {
   default void setNeutralMode(boolean wantsBreak){};
   default void setVelocitySetpoint(AngularVelocity velocity){};
   default void setCurrentPositionAsZero(){};
+  default void setVoltage(double voltage){};
   default void setCurrentPosition(Angle position){};
   default void setEnableSoftLimits(boolean forward, boolean reverse){};
   default void updateGains(Slot0Configs slot0){};
