@@ -24,8 +24,8 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
-import lib.ironpulse.swerve.sjtu6.ImuIOPigeon;
-import lib.ironpulse.swerve.sjtu6.SwerveModuleIOSJTU6;
+import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
+import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 
 public class RobotContainer {
   private Swerve swerve;
@@ -36,10 +36,10 @@ public class RobotContainer {
       swerve = new Swerve(
         SwerveConstants.kRealConfig,
         new ImuIOPigeon(SwerveConstants.kRealConfig),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 0),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 1),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 2),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 3));
+        new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 0),
+        new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 1),
+        new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 2),
+        new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 3));
     } else {
       swerve = new Swerve(
         SwerveConstants.kSimConfig,
