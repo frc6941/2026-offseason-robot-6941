@@ -11,7 +11,7 @@ import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveLimit;
 import lib.ironpulse.swerve.SwerveModuleLimit;
 import lib.ironpulse.swerve.sim.SwerveSimConfig;
-import lib.ironpulse.swerve.sjtu6.SwerveSJTU6Config;
+import lib.ironpulse.swerve.mk5n.SwerveMK5NConfig;
 import lib.ntext.NTParameter;
 
 /**
@@ -110,20 +110,20 @@ import lib.ntext.NTParameter;
         })
         .build();
     
-    public static SwerveSJTU6Config kRealConfig = SwerveSJTU6Config.builder()
+    public static SwerveMK5NConfig kRealConfig = SwerveMK5NConfig.builder()
         .name("Swerve")
         .dtS(RobotConstants.LOOPER_DT)
-        .wheelDiameter(Inch.of(4.1))
-        .driveGearRatio(6.7460317460317460317460317460317)
-        .steerGearRatio(21.428571428571428571428571428571)
+        .wheelDiameter(Inch.of(4.0))
+        .driveGearRatio(6.03)
+        .steerGearRatio(287.0 / 11.0)
         .defaultSwerveLimit(kDefaultSwerveLimit)
         .defaultSwerveModuleLimit(kDefaultSwerveModuleLimit)
         .moduleConfigs(new SwerveConfig.SwerveModuleConfig[]{
             kModuleCompFL, kModuleCompFR, kModuleCompBL, kModuleCompBR
         })
         .odometryFrequency(Hertz.of(100))
-        .driveStatorCurrentLimit(Amps.of(100))
-        .steerStatorCurrentLimit(Amps.of(40))
+        .driveStatorCurrentLimit(Amps.of(80))
+        .steerStatorCurrentLimit(Amps.of(40)) 
         .canivoreCanBusName(RobotConstants.CANIVORE_CAN_BUS_NAME)
         .pigeonId(RobotConstants.PIGEON_ID)
         .build();

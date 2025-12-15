@@ -123,7 +123,7 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         driveControlConfig.MotorOutput.Inverted = moduleConfig.driveInverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
         driveControlConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        // current limits - reasonable defaults for MK5N
+        // current limits - reasonable defaults for MK5n (assume Kraken X60 drive motor)
         driveControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         driveControlConfig.CurrentLimits.StatorCurrentLimit = config.driveStatorCurrentLimit.in(Amp);
 
@@ -178,7 +178,7 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         steerControlConfig.Feedback.FeedbackRemoteSensorID = moduleConfig.encoderId;
         steerControlConfig.Feedback.RotorToSensorRatio = config.steerGearRatio;
 
-        // current limits
+        // current limits - MK5n uses Kraken X44 for steering (smaller motor, typically ~40A limit)
         steerControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         steerControlConfig.CurrentLimits.StatorCurrentLimit = config.steerStatorCurrentLimit.in(Amp);
 
@@ -395,7 +395,7 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
      * - Example: 6.14:1 gear ratio means motor rotates 6.14 times per wheel rotation
      *
      * Steer System:
-     * - Motor shaft -> [gear ratio] -> Module rotation
+     * - Motor shaft -> [26.09:1 gear ratio] -> Module rotation
      * - CANcoder provides absolute position feedback fused with motor encoder
      * - For MK5N, typically 1:1 (direct drive) so no gear ratio conversion needed
      */
