@@ -75,7 +75,6 @@ public class MotorIOSim implements MotorIO{
         inputs.positionRot = dcMotorSim.getAngularPositionRotations();
         inputs.velocityRotPerSecond = dcMotorSim.getAngularVelocityRadPerSec()/(2* Math.PI);
         inputs.motorVolts = dcMotor.getVoltage(dcMotorSim.getTorqueNewtonMeters(),dcMotorSim.getAngularVelocityRadPerSec())*cfg.gearRatio;
-        
     }
 
     @Override

@@ -64,7 +64,7 @@ public class RobotContainer {
   
     driver.x().onTrue(Commands.runOnce(()-> intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
     driver.y().onTrue(Commands.runOnce(()-> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
-    driver.b().whileTrue(Commands.runOnce(() -> elevatorSubsystem.setVoltage(8)));
+    driver.b().whileTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(1)));
     driver.a().whileTrue(elevatorSubsystem.zeroElevator());
     
     

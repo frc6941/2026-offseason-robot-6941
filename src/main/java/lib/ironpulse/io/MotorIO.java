@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public interface MotorIO {
   // Read
   default void readInputs(MotorInputs inputs){};
+  default void readFollowerInputs(MotorInputs[] inputs){};
   // Write (mechanism units)
   default void setOpenLoopDutyCycle(double dutyCycle){};
   default void setInputVoltage(double voltage){};

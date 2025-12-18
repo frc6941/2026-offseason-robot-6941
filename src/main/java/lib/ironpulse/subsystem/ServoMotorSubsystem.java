@@ -6,6 +6,8 @@ import java.lang.StackWalker.Option;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.MathUtil;
@@ -24,14 +26,14 @@ import lombok.Getter;
 public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
 
   @Getter
-  private ServoSetpoint currSetpoint = new ServoSetpoint(ModeServo.POSITION, Degrees.of(0), () -> 0.0);
+  private ServoSetpoint currSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, Degrees.of(0), () -> 0.0);
   @Getter
-  private ServoSetpoint prevSetpoint = new ServoSetpoint(ModeServo.POSITION, Degrees.of(0), () -> 0.0);
+  private ServoSetpoint prevSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, Degrees.of(0), () -> 0.0);
 
   private final SubsystemConfig config;
   protected final ParamSources params;
   private final Slot0Configs slot0Configs;
-  private ModeServo currentMode = ModeServo.MOTIONMAGIC;
+  private ModeServo currentMode = ModeServo.VOLTAGE;
 
   public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, ParamSources params) {
     super(config, inputs, io);
@@ -50,8 +52,8 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   @Override
   public void periodic() {
-    System.out.println(config.name + currSetpoint.modeServo);
-    System.out.println(config.name + currSetpoint.setpt.in(Degrees));
+    Logger.recordOutput(config.name, currSetpoint.modeServo);
+    Logger.recordOutput(config.name, currSetpoint.setpt.in(Degrees));
     super.periodic();
     if (params.hasChanged()) {
       this.slot0Configs.kP = params.kP();
@@ -81,7 +83,6 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
           runVoltage(currSetpoint.openLoop);
           break;
         default:
-          runVoltage(()->8);
           break;
       }
     }

@@ -41,7 +41,6 @@ public final class ElevatorConfig {
     .mainId(ELEVATOR_MOTOR_MAIN_ID)
     .mainBus(CANIVORE_CAN_BUS_NAME)
     .motorInvertedValue(InvertedValue.Clockwise_Positive)
-    .SensorToMechanismRatio(1.0)
     .metersPerRotation((Math.PI * ELEVATOR_SPOOL_DIAMETER) / ELEVATOR_GEAR_RATIO)
     .gravityType(GravityTypeValue.Elevator_Static)
     .followers(new SubsystemConfig.FollowerConfig[] {

@@ -93,6 +93,7 @@ public class MotorIOTalonFX implements MotorIO {
     supplyVoltSig = main.getSupplyVoltage();
     statorSig = main.getStatorCurrent();
     supplySig = main.getSupplyCurrent();
+
     signals = new BaseStatusSignal[] { posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig };
     // configure update frequencies and register signals
     posSig.setUpdateFrequency(100.0);
