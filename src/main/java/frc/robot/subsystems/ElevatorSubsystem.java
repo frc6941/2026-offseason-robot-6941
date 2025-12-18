@@ -123,8 +123,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
             SignalLogger.writeDouble("elevator-stator-current", inputs.currentStatorAmps, "A");
         }
 
-        System.out.println(currentFilter.lastValue());
-
         LoggedTracer.record("Elevator");
     }
 

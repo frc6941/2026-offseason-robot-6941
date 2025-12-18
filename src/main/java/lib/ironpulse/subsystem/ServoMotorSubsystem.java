@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.MathUtil;
@@ -33,6 +34,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final SubsystemConfig config;
   protected final ParamSources params;
   private final Slot0Configs slot0Configs;
+  private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();;
   private ModeServo currentMode = ModeServo.VOLTAGE;
 
   public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, ParamSources params) {
@@ -52,8 +54,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   @Override
   public void periodic() {
-    Logger.recordOutput(config.name, currSetpoint.modeServo);
-    Logger.recordOutput(config.name, currSetpoint.setpt.in(Degrees));
+
     super.periodic();
     if (params.hasChanged()) {
       this.slot0Configs.kP = params.kP();
@@ -70,8 +71,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     if (setptHasChanged()) {
       switch (currSetpoint.modeServo) {
         case MOTIONMAGIC:
-          io.setMotionMagicSetpoint(currSetpoint.setpt, params.motionMagicVelRPS(), params.motionMagicAccelRPS2(),
-              params.motionMagicJerkRPS3());
+          io.setMotionMagicSetpoint(currSetpoint.setpt, motionMagicConfigs.MotionMagicCruiseVelocity, motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
           break;
         case POSITION:
           io.setPositionSetpoint(currSetpoint.setpt);
@@ -86,9 +86,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
           break;
       }
     }
-    prevSetpoint = currSetpoint;
-
+    prevSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setpt, currSetpoint.openLoop);
   }
+    
 
   public boolean positionAtGoal(Angle tolerance) {
     return Rotations.of(inputs.positionRot).isNear(currSetpoint.setpt, tolerance);
@@ -103,7 +103,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   }
 
   public void setMotionMagicSetpoint(Angle position) {
-    double vel = params.motionMagicVelRPS();
+    motionMagicConfigs.MotionMagicAcceleration = params.motionMagicAccelRPS2();
+    motionMagicConfigs.MotionMagicCruiseVelocity = params.motionMagicVelRPS();
+    motionMagicConfigs.MotionMagicJerk = params.motionMagicJerkRPS3();
     double accel = params.motionMagicAccelRPS2();
     double jerk = params.motionMagicJerkRPS3();
     currSetpoint.modeServo = ModeServo.MOTIONMAGIC;
@@ -124,6 +126,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     currSetpoint.modeServo = ModeServo.MOTIONMAGIC;
     currSetpoint.setpt = position;
     currentMode = ModeServo.MOTIONMAGIC;
+    motionMagicConfigs.MotionMagicAcceleration = acceleration;
+    motionMagicConfigs.MotionMagicCruiseVelocity = velocity;
+    motionMagicConfigs.MotionMagicJerk = jerk;
   }
 
   public void setPositionSetpoint(Angle position) {

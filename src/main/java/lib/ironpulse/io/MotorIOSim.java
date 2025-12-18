@@ -65,10 +65,10 @@ public class MotorIOSim implements MotorIO{
 
     @Override
     public void readInputs(MotorInputs inputs) {
-        dcMotorSim.setInputVoltage(appliedVolts);  // 使用计算出的 appliedVolts
+        dcMotorSim.setInputVoltage(appliedVolts); 
         dcMotorSim.update(0.02);
         inputs.appliedVolts = appliedVolts;
-        // 生成正态分布噪声：均值 0.95，方差 0.1，标准差 √0.1 ≈ 0.316
+
         double noiseMultiplier = 0.95 + Math.sqrt(0.1) * random.nextGaussian();
         inputs.currentStatorAmps = dcMotorSim.getCurrentDrawAmps() * noiseMultiplier;
         inputs.currentSupplyAmps = dcMotorSim.getCurrentDrawAmps();
