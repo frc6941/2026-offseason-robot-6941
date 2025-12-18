@@ -5,13 +5,21 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -19,9 +27,11 @@ import frc.robot.subsystems.SwerveConstants;
 import frc.robot.subsystems.IntakePivotSubsystem;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.subsystem.ServoMotorSubsystem;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.swerve.Swerve;
+import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
@@ -29,7 +39,7 @@ import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 
 public class RobotContainer {
   private Swerve swerve;
-  private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
+  // private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
   private final CommandXboxController driver = new CommandXboxController(0);
   public RobotContainer() {
     if (RobotBase.isReal()){
@@ -53,13 +63,33 @@ public class RobotContainer {
   }
 
   public void robotPeriodic() {
-    //reserved for vision fusion
+    var now = Seconds.of(Timer.getTimestamp());
+        swerve.getEstimatedPoseAt(now).ifPresent(
+                pose -> RobotStateRecorder.getInstance().putTransform(
+                        pose, now, RobotStateRecorder.kFrameWorld, RobotStateRecorder.kFrameRobot));
   }
 
   private void configureBindings() {
     // Intake Pivot: A -> 0 degrees, B -> 100 degrees
-    driver.a().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(0.0)), intakePivot));
-    driver.b().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(40.0)), intakePivot));
+    // driver.a().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(0.0)), intakePivot));
+    // driver.b().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(40.0)), intakePivot));
+    swerve.setDefaultCommand(SwerveCommands.driveWithJoystick(
+            swerve, 
+            () -> driver.getLeftY(), 
+            () -> driver.getLeftX(),
+            () -> driver.getRightX(), 
+            //TODO: not working
+            () -> RobotStateRecorder.getInstance().getTransform(
+                Seconds.of(Timer.getTimestamp()),
+                DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(
+                    DriverStation.Alliance.Blue) ? RobotStateRecorder.kFrameDriverStationBlue 
+                    : RobotStateRecorder.kFrameDriverStationRed,
+                TransformRecorder.kFrameRobot
+            ).orElse(new Pose3d()), 
+            MetersPerSecond.of(0.05), 
+            DegreesPerSecond.of(5.0)
+        ));
+
   }
 
   public Command getAutonomousCommand() {
