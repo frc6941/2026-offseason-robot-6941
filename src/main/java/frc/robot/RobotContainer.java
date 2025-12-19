@@ -36,6 +36,7 @@ import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
+import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
   private Swerve swerve;
@@ -73,23 +74,27 @@ public class RobotContainer {
     // Intake Pivot: A -> 0 degrees, B -> 100 degrees
     // driver.a().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(0.0)), intakePivot));
     // driver.b().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(40.0)), intakePivot));
-    swerve.setDefaultCommand(SwerveCommands.driveWithJoystick(
-            swerve, 
-            () -> driver.getLeftY(), 
-            () -> driver.getLeftX(),
-            () -> driver.getRightX(), 
-            //TODO: not working
-            () -> RobotStateRecorder.getInstance().getTransform(
-                Seconds.of(Timer.getTimestamp()),
-                DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(
-                    DriverStation.Alliance.Blue) ? RobotStateRecorder.kFrameDriverStationBlue 
-                    : RobotStateRecorder.kFrameDriverStationRed,
-                TransformRecorder.kFrameRobot
-            ).orElse(new Pose3d()), 
-            MetersPerSecond.of(0.05), 
-            DegreesPerSecond.of(5.0)
-        ));
+    swerve.setDefaultCommand(
+        SwerveCommands.driveWithJoystick(
+            swerve,
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> driver.getRightX(),
+            RobotStateRecorder::getPoseDriverRobotCurrent,
+            MetersPerSecond.of(0.04),
+            DegreesPerSecond.of(3.0)));
 
+    driver.start().onTrue(
+        SwerveCommands.resetAngle(swerve, () -> AllianceFlipUtil.shouldFlip() ? Rotation2d.kZero : Rotation2d.k180deg)
+            .alongWith(
+                Commands.runOnce(() -> {
+                  RobotStateRecorder.getInstance().resetTransform(
+                      TransformRecorder.kFrameWorld,
+                      TransformRecorder.kFrameRobot);
+                }))
+            .ignoringDisable(true)
+    );
+        
   }
 
   public Command getAutonomousCommand() {

@@ -48,8 +48,8 @@ import lib.ntext.NTParameter;
         .steerMotorId(3)
         .encoderId(10)
         .driveMotorEncoderOffset(Degree.of(0))
-        .steerMotorEncoderOffset(Rotations.of(-0.247802))
-        .driveInverted(false)
+        .steerMotorEncoderOffset(Rotations.of(0.140625))
+        .driveInverted(true)
         .steerInverted(true)
         .encoderInverted(false)
         .build();
@@ -60,8 +60,8 @@ import lib.ntext.NTParameter;
         .steerMotorId(5)
         .encoderId(11)
         .driveMotorEncoderOffset(Degree.of(0))
-        .steerMotorEncoderOffset(Rotations.of(-0.295898))
-        .driveInverted(true)
+        .steerMotorEncoderOffset(Rotations.of(0.149658203125))
+        .driveInverted(false)
         .steerInverted(true)
         .encoderInverted(false)
         .build();
@@ -72,8 +72,8 @@ import lib.ntext.NTParameter;
         .steerMotorId(1)
         .encoderId(0)
         .driveMotorEncoderOffset(Degree.of(0))
-        .steerMotorEncoderOffset(Rotations.of(0.04003906))
-        .driveInverted(false)
+        .steerMotorEncoderOffset(Rotations.of(-0.376708984375))
+        .driveInverted(true)
         .steerInverted(true)
         .encoderInverted(false)
         .build();
@@ -84,7 +84,7 @@ import lib.ntext.NTParameter;
         .steerMotorId(7)
         .encoderId(20)
         .driveMotorEncoderOffset(Degree.of(0))
-        .steerMotorEncoderOffset(Rotations.of(-0.3833007))
+        .steerMotorEncoderOffset(Rotations.of(0.28955078125))
         .driveInverted(true)
         .steerInverted(true)
         .encoderInverted(false)
@@ -132,12 +132,12 @@ import lib.ntext.NTParameter;
     @NTParameter(tableName = "Params" + "/" + kSwerveModuleTag)
     private final static class SwerveModuleParams {
       private final static class Drive {
-        static final double kP = 1;
-        static final double kI = 0;
-        static final double kD = 0;
-        static final double kS = 0;
-        static final double kV = 0;
-        static final double kA = 0;
+        static final double kP = 5.78;
+        static final double kI = 0.05;
+        static final double kD = 0.1;
+        static final double kS = 1.3;
+        static final double kV = 0.1;
+        static final double kA = 0.19;
         static final boolean isBrake = true;
       }
 
