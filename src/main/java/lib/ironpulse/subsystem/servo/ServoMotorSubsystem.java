@@ -25,9 +25,9 @@ import lib.ironpulse.io.MotorInputsAutoLogged;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO, K extends  ServoOutputsAutoLogged> extends MotorSubsystem<T, U> {
+public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO, K extends ServoOutputsAutoLogged> extends MotorSubsystem<T, U> {
   private final LinearFilter currentFilter;
-  private ServoOutputsAutoLogged outputs;
+  private K outputs;
   private boolean zeroing;
   private boolean runningCharacterization;
 
