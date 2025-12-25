@@ -48,10 +48,11 @@ public final class ElevatorConfig {
     .followers(new SubsystemConfig.FollowerConfig[] {
     SubsystemConfig.FollowerConfig.builder()
     .bus(CANIVORE_CAN_BUS_NAME)
-    .id(51)
+    .id(ELEVATOR_MOTOR_FOLLOWER_ID)
     .opposeMain(true)
     .build()
     })
+    .filterSize(ELEVATOR_ZEROING_FILTER_SIZE)
     .sysidConfig(SYSID_CONFIG)
     // .enableRemoteCANcoder(true)
     // .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()

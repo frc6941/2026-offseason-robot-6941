@@ -46,6 +46,7 @@ public final class IntakePivotConfig {
       .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
       .useContinousWrap(false)
       .build())
+    .filterSize(5)
     .simConfig(SIM_CONFIG)
     .build();
 

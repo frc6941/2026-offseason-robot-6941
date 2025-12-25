@@ -8,7 +8,6 @@ import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.servo.ServoMotorSubsystem;
-import lib.ironpulse.subsystem.servo.ServoOutputsAutoLogged;
 import lombok.Getter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
