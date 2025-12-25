@@ -8,6 +8,7 @@ import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.servo.ServoMotorSubsystem;
+import lib.ironpulse.subsystem.servo.ServoOutputsAutoLogged;
 import lombok.Getter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -16,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
 import java.util.function.DoubleSupplier;
 
 /** Elevator mechanism using ServoMotorSubsystem with custom functionality for zeroing and characterization. */
-public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
+public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO, ServoOutputsAutoLogged> {
 
     @AutoLogOutput(key = "Elevator/setPoint")
     @Getter
@@ -41,6 +42,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
             ElevatorConfig.CONFIG,
             new MotorInputsAutoLogged(),
             createIO(),
+            new ServoOutputsAutoLogged(),
             ElevatorParamsNT.asServoMotorParamSources()
         );
     }

@@ -23,10 +23,11 @@ import edu.wpi.first.math.MathUtil;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
-public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
+public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO, K extends  ServoOutputsAutoLogged> extends MotorSubsystem<T, U> {
   private final LinearFilter currentFilter;
-  private ServoOutputs outputs;
+  private ServoOutputsAutoLogged outputs;
   private boolean zeroing;
   private boolean runningCharacterization;
 
@@ -35,7 +36,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final SysIdRoutine sysIdRoutine;
   @Getter
   private ServoSetpoint currSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, Degrees.of(0), () -> 0.0);
-  private  ServoSetpoint tempSetpoint;
+  private ServoSetpoint tempSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, Degrees.of(0), () -> 0.0);
   @Getter
   private ServoSetpoint prevSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, Degrees.of(0), () -> 0.0);
 
@@ -45,7 +46,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();;
   private ModeServo currentMode = ModeServo.VOLTAGE;
 
-  public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, ServoParamSources params) {
+  public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, K outputs ,ServoParamSources params) {
     super(config, inputs, io);
     this.config = config;
     this.params = params;
@@ -59,6 +60,8 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     slot0Configs.kG = params.kG();
     io.updateGains(slot0Configs);
     currentFilter = LinearFilter.movingAverage(config.filterSize);
+
+    this.outputs = outputs;
 
     this.sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -115,6 +118,8 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
         default:
           break;
       }
+
+      Logger.processInputs(config.name + "output", outputs);
     }
     prevSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
 
