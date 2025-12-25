@@ -5,7 +5,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
-import lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 import lib.ntext.NTParameter;
 

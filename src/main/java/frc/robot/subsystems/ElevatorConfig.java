@@ -1,11 +1,8 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
-import lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 import lib.ntext.NTParameter;
 
@@ -35,6 +32,11 @@ public final class ElevatorConfig {
     .gearRatio(1)
     .stdvs(new double[] {0.02, 0.02})
     .build();
+
+    public static final SubsystemConfig.SysidConfig SYSID_CONFIG = SubsystemConfig.SysidConfig.builder()
+            .sysIdDynamicVoltage(5.0)
+            .sysIdRampRateVoltsPerSec(1.0)
+            .build();
   // Mechanism config
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
     .name(NAME)
@@ -50,6 +52,7 @@ public final class ElevatorConfig {
     .opposeMain(true)
     .build()
     })
+    .sysidConfig(SYSID_CONFIG)
     // .enableRemoteCANcoder(true)
     // .remoteCANcoder(SubsystemConfig.RemoteCANcoder.builder()
     //   .id(INTAKE_PIVOT_ENCODER_ID)

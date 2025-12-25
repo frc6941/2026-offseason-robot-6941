@@ -40,15 +40,19 @@ public class SubsystemConfig {
   @Default public final boolean enableRemoteCANcoder = false;
   public final RemoteCANcoder remoteCANcoder; // nullable unless enableRemoteCANcoder is true
 
+  public final SysidConfig sysidConfig;
   // Optional followers
   @Default public final FollowerConfig[] followers = new FollowerConfig[0];
 
   
   @Default public final InvertedValue motorInvertedValue = InvertedValue.CounterClockwise_Positive;
 
+  @Default public final int filterSize = 1;
   @Default public final double SensorToMechanismRatio = 1.0;
   /**ONLY used when a linear mechenism meters-per-rotation for linear mechanisms (0.0 disables linear mode). */
   @Default public final double metersPerRotation = 0.0;
+
+  @Default public final boolean updateOutputs = true;
 
   //other close loop configs
   @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;
@@ -73,6 +77,13 @@ public class SubsystemConfig {
     @Default public final FeedbackSensorSourceValue feedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     @Default public final boolean useContinousWrap = false;
 
+  }
+
+  @Builder
+  @AllArgsConstructor
+  public static class SysidConfig{
+    @Default public double sysIdRampRateVoltsPerSec = 1.0;
+    @Default public double sysIdDynamicVoltage = 5.0;
   }
 
   /** Optional follower TalonFX configuration. */

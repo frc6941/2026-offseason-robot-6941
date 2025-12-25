@@ -1,4 +1,4 @@
-package lib.ironpulse.subsystem;
+package lib.ironpulse.subsystem.flywheel;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -8,8 +8,11 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.subsystem.MotorSubsystem;
+import lib.ironpulse.subsystem.SubsystemConfig;
 import lombok.Getter;
 
 /**
@@ -24,10 +27,10 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
     private FlywheelSetpoint prevSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
 
     private final SubsystemConfig config;
-    protected final ParamSources params;
+    protected final FlywheelParamSources params;
     private final Slot0Configs slot0Configs;
 
-    public FlywheelSubsystem(SubsystemConfig config, T inputs, U io, ParamSources params) {
+    public FlywheelSubsystem(SubsystemConfig config, T inputs, U io, FlywheelParamSources params) {
         super(config, inputs, io);
         this.config = config;
         this.params = params;
@@ -55,7 +58,7 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
             io.updateGains(slot0Configs);
         }
 
-        if (setptHasChanged()) {
+        if (setPointHasChanged()) {
             switch (currSetpoint.modeFlywheel) {
                 case VELOCITY:
                     io.setVelocitySetpoint(currSetpoint.velocitySetpt);
@@ -141,48 +144,13 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
         setVelocitySetpoint(0.0);
     }
 
-    // hack to hook NTParameterProcessor to generate ParamSources for uses in subsystems
-    // REMEMBER to update NTParameterProcessor when adding new fields to ParamSources
-    public interface ParamSources {
-        double kP();
-
-        double kI();
-
-        double kD();
-
-        default double kA() {
-            return 0.0;
-        }
-
-        default double kV() {
-            return 0.0;
-        }
-
-        default double kS() {
-            return 0.0;
-        }
-
-        default double velocityAtGoalToleranceRPS() {
-            return 1.0;
-        }
-
-        default boolean isBrake() {
-            return false;
-        } // Typically coast for flywheels
-
-        /* hook to ParamsNT.isAnyChanged() */
-        default boolean hasChanged() {
-            return false;
-        }
-    }
-
     private enum ModeFlywheel {
         VELOCITY,
         VOLTAGE,
         DUTY_CYCLE
     }
 
-    private boolean setptHasChanged() {
+    private boolean setPointHasChanged() {
         return !(currSetpoint.velocitySetpt.equals(prevSetpoint.velocitySetpt) && 
                  currSetpoint.modeFlywheel == prevSetpoint.modeFlywheel);
     }

@@ -232,8 +232,8 @@ public class NTParameterProcessor extends AbstractProcessor {
         // Append ServoMotorSubsystem.ParamSources adapter factory
         Set<String> names = new HashSet<>(fieldNames);
         // ServoMotorSubsystem adapter
-        builder.append("\n  public static lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources asServoMotorParamSources() {\n")
-                .append("    return new lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources() {\n")
+        builder.append("\n  public static lib.ironpulse.subsystem.servo.ServoParamSources asServoMotorParamSources() {\n")
+                .append("    return new lib.ironpulse.subsystem.servo.ServoParamSources.ParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
                 .append("      public double kI() { return ")
@@ -266,8 +266,8 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("  }\n");
 
         // FlywheelSubsystem adapter
-        builder.append("\n  public static lib.ironpulse.subsystem.FlywheelSubsystem.ParamSources asFlywheelParamSources() {\n")
-                .append("    return new lib.ironpulse.subsystem.FlywheelSubsystem.ParamSources() {\n")
+        builder.append("\n  public static lib.ironpulse.subsystem.flywheel.FlywheelParamSources asFlywheelParamSources() {\n")
+                .append("    return new lib.ironpulse.subsystem.flywheel.FlywheelParamSources.ParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
                 .append("      public double kI() { return ")
@@ -333,8 +333,8 @@ public class NTParameterProcessor extends AbstractProcessor {
         }
 
         // Append ServoMotorSubsystem.ParamSources adapter factory (top-level fields only)
-        builder.append("\n  public static lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources asServoMotorParamSources() {\n")
-                .append("    return new lib.ironpulse.subsystem.ServoMotorSubsystem.ParamSources() {\n")
+        builder.append("\n  public static lib.ironpulse.subsystem.servo.ServoParamSources asServoMotorParamSources() {\n")
+                .append("    return new lib.ironpulse.subsystem.servo.ServoParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
                 .append("      public double kI() { return ")
@@ -367,8 +367,8 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("  }\n");
 
         // FlywheelSubsystem adapter
-        builder.append("\n  public static lib.ironpulse.subsystem.FlywheelSubsystem.ParamSources asFlywheelParamSources() {\n")
-                .append("    return new lib.ironpulse.subsystem.FlywheelSubsystem.ParamSources() {\n")
+        builder.append("\n  public static lib.ironpulse.subsystem.flywheel.FlywheelParamSources asFlywheelParamSources() {\n")
+                .append("    return new lib.ironpulse.subsystem.flywheel.FlywheelParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
                 .append("      public double kI() { return ")

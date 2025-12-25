@@ -9,7 +9,7 @@ import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 
 /** Flywheel mechanism for velocity control (shooter/intake rollers), with hardware abstraction. */
-public class FlywheelSubsystem extends lib.ironpulse.subsystem.FlywheelSubsystem<MotorInputsAutoLogged, MotorIO> {
+public class FlywheelSubsystem extends lib.ironpulse.subsystem.flywheel.FlywheelSubsystem<MotorInputsAutoLogged, MotorIO> {
 
   public FlywheelSubsystem() {
     super(
@@ -24,11 +24,8 @@ public class FlywheelSubsystem extends lib.ironpulse.subsystem.FlywheelSubsystem
     if (Logger.hasReplaySource()) {
       return new MotorIO() {};
     } else if (RobotBase.isReal()) {
-      System.out.println("[Flywheel] Using REAL hardware (TalonFX ID: " + 
-        FlywheelConfig.CONFIG.mainId + ")");
       return new MotorIOTalonFX(FlywheelConfig.CONFIG);
     } else {
-      System.out.println("[Flywheel] Using SIMULATION");
       return new MotorIOSim(FlywheelConfig.CONFIG);
     }
   }
