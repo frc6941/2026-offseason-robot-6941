@@ -4,8 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VoltageUnit;
 import frc.robot.RobotConstants;
 import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveLimit;
@@ -131,6 +129,7 @@ public final class SwerveConstants {
             .build();
 
     @NTParameter(tableName = "Params" + "/" + kSwerveModuleTag)
+    @SuppressWarnings("unused")
     private final static class SwerveModuleParams {
         private final static class Drive {
             static final double kP = 1;

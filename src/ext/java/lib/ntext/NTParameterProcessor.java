@@ -508,25 +508,6 @@ public class NTParameterProcessor extends AbstractProcessor {
         }
     }
 
-    /**
-     * Build content for specific fields (used for field-level annotations).
-     */
-    private void buildFieldsContent(
-            List<VariableElement> fields, String tableName, StringBuilder builder, String indent) {
-        for (VariableElement field : fields) {
-            String fieldName = field.getSimpleName().toString();
-            String typeName = NT_TYPES_TABLE.get(field.asType().toString());
-            Object defaultValue = field.getConstantValue();
-            String defaultLiteral = getDefaultLiteral(defaultValue, typeName);
-
-            builder.append(indent).append("public static final NTParameterWrapper<").append(typeName).append(
-                    "> ").append(fieldName).append(" = new NTParameterWrapper<>(").append("\"").append(
-                            tableName)
-                    .append("/").append(fieldName).append("\", ").append(defaultLiteral).append(");\n");
-
-        }
-    }
-
     public static class FieldTypeError extends Error {
         public FieldTypeError(String message) {
             super(message);

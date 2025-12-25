@@ -1,11 +1,7 @@
 package lib.ironpulse.io;
 
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 /**

@@ -8,7 +8,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.MotorSubsystem;

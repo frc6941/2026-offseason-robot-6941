@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import lib.ironpulse.subsystem.servo.ServoOutputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.RobotBase;

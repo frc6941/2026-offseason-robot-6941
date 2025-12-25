@@ -43,8 +43,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final SubsystemConfig config;
   protected final ServoParamSources params;
   private final Slot0Configs slot0Configs;
-  private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();;
-  private ModeServo currentMode = ModeServo.VOLTAGE;
+  private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
 
   public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, ServoParamSources params) {
     super(config, inputs, io);
@@ -195,7 +194,6 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
     currSetpoint.modeServo = ModeServo.MOTIONMAGIC;
     currSetpoint.setPoint = position;
-    currentMode = ModeServo.MOTIONMAGIC;
     motionMagicConfigs.MotionMagicAcceleration = acceleration;
     motionMagicConfigs.MotionMagicCruiseVelocity = velocity;
     motionMagicConfigs.MotionMagicJerk = jerk;
@@ -212,11 +210,11 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
             currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
             if (currentFilterValue <= params.zeroingCurrentLimit()) {
               currSetpoint.openLoop = () -> -1;
-              currentMode = ModeServo.VOLTAGE;
+              currSetpoint.modeServo = ModeServo.VOLTAGE;
             }
             if (currentFilterValue > params.zeroingCurrentLimit()) {
               currSetpoint.openLoop = () -> 0;
-              currentMode = ModeServo.VOLTAGE;
+              currSetpoint.modeServo = ModeServo.VOLTAGE;
               setCurrentPositionAsZero();
               zeroing = false;
             }

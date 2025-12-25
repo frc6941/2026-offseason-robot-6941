@@ -14,12 +14,10 @@ import lib.ironpulse.utils.PhoenixUtils;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ImuIOPigeon implements ImuIO {
     // Use the SAME sync thread and lock as swerve modules to ensure synchronized
     // sampling
-    private static final ReentrantLock syncLock = SwerveModuleIOSJTU6.getSyncLock();
     private static PhoenixSynchronizationThread syncThread = SwerveModuleIOSJTU6.getSyncThread();
 
     private final Pigeon2 pigeon;
