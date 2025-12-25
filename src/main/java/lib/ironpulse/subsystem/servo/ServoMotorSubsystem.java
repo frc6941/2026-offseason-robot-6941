@@ -25,9 +25,9 @@ import lib.ironpulse.io.MotorInputsAutoLogged;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO, K extends ServoOutputsAutoLogged> extends MotorSubsystem<T, U> {
+public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
   private final LinearFilter currentFilter;
-  private K outputs;
+  private ServoOutputsAutoLogged outputs = new ServoOutputsAutoLogged();
   private boolean zeroing;
   private boolean runningCharacterization;
 
@@ -46,7 +46,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();;
   private ModeServo currentMode = ModeServo.VOLTAGE;
 
-  public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, K outputs ,ServoParamSources params) {
+  public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io ,ServoParamSources params) {
     super(config, inputs, io);
     this.config = config;
     this.params = params;
@@ -60,8 +60,6 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     slot0Configs.kG = params.kG();
     io.updateGains(slot0Configs);
     currentFilter = LinearFilter.movingAverage(config.filterSize);
-
-    this.outputs = outputs;
 
     this.sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(

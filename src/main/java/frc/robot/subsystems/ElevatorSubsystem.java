@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
 import java.util.function.DoubleSupplier;
 
 /** Elevator mechanism using ServoMotorSubsystem with custom functionality for zeroing and characterization. */
-public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO, ServoOutputsAutoLogged> {
+public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
 
     @AutoLogOutput(key = "Elevator/setPoint")
     @Getter
@@ -42,7 +42,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
             ElevatorConfig.CONFIG,
             new MotorInputsAutoLogged(),
             createIO(),
-            new ServoOutputsAutoLogged(),
             ElevatorParamsNT.asServoMotorParamSources()
         );
     }
