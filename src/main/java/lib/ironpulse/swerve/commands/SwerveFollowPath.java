@@ -31,7 +31,7 @@ public class SwerveFollowPath extends Command {
     private Strategy strategy = Strategy.PurePursuit;
 
     public SwerveFollowPath(Swerve swerve, PathPlannerPath path, PIDController translationController,
-                            PIDController rotationController) {
+            PIDController rotationController) {
         this.swerve = swerve;
         this.path = path;
         this.translationController = translationController;

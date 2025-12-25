@@ -35,13 +35,13 @@ public class SwerveDriveToPose extends Command {
   protected PIDController rotationController;
 
   public SwerveDriveToPose(Swerve swerve,
-                           Supplier<Pose3d> poseWorldRobotSupplier,
-                           Supplier<Pose3d> poseWorldTargetSupplier,
-                           Supplier<Pose2d> velocityWorldRobotSupplier,
-                           PIDController translationController,
-                           PIDController rotationController,
-                           Distance translationTolerance,
-                           Angle rotationTolerance) {
+      Supplier<Pose3d> poseWorldRobotSupplier,
+      Supplier<Pose3d> poseWorldTargetSupplier,
+      Supplier<Pose2d> velocityWorldRobotSupplier,
+      PIDController translationController,
+      PIDController rotationController,
+      Distance translationTolerance,
+      Angle rotationTolerance) {
     this.swerve = swerve;
     this.poseWorldRobotSupplier = poseWorldRobotSupplier;
     this.poseWorldTargetSupplier = poseWorldTargetSupplier;
@@ -81,7 +81,8 @@ public class SwerveDriveToPose extends Command {
     double pRT_norm = pRT.getNorm();
     Rotation2d pRT_dir = toAngle(pRT);
     // NOTE: as pRT_norm is always positive, then vRT_norm is always negative.
-    // to make the robot move along but not opposite to pRT_dir, we take the minus sign before vRT_norm
+    // to make the robot move along but not opposite to pRT_dir, we take the minus
+    // sign before vRT_norm
     double vRT_norm = translationController.calculate(pRT_norm, 0.0);
     Translation2d vRT = new Translation2d(-vRT_norm, pRT_dir);
 
@@ -110,7 +111,7 @@ public class SwerveDriveToPose extends Command {
 
     double tolTransM = translationTolerance.in(Meters);
     double tolRotDeg = rotationTolerance.in(Degrees);
-    
+
     boolean translationOnTarget = epsilonEquals(TRT.getTranslation().toTranslation2d(), new Translation2d(), tolTransM);
     boolean rotationOnTarget = epsilonEquals(TRT.getRotation().toRotation2d().getDegrees(), 0.0, tolRotDeg);
     Logger.recordOutput(kTag + "/translationOnTarget", translationOnTarget);
@@ -131,4 +132,3 @@ public class SwerveDriveToPose extends Command {
     static final double rotationAccelerationMax = 20.0;
   }
 }
-

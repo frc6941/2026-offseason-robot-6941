@@ -15,7 +15,10 @@ import org.littletonrobotics.junction.Logger;
 
 import java.util.function.DoubleSupplier;
 
-/** Elevator mechanism using ServoMotorSubsystem with custom functionality for zeroing and characterization. */
+/**
+ * Elevator mechanism using ServoMotorSubsystem with custom functionality for
+ * zeroing and characterization.
+ */
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
 
     @AutoLogOutput(key = "Elevator/setPoint")
@@ -25,29 +28,28 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     @Getter
     @AutoLogOutput(key = "Elevator/atGoal")
     private boolean atGoal = false;
-    
+
     @Getter
     @AutoLogOutput(key = "Elevator/isGoingUp")
     private boolean isGoingUp = false;
 
-    
     @AutoLogOutput(key = "Elevator/stopDueToLimit")
     private boolean stopDueToLimit = false;
-    
+
     private double previousWantedPosition = 0.16;
 
     public ElevatorSubsystem() {
         super(
-            ElevatorConfig.CONFIG,
-            new MotorInputsAutoLogged(),
-            createIO(),
-            ElevatorParamsNT.asServoMotorParamSources()
-        );
+                ElevatorConfig.CONFIG,
+                new MotorInputsAutoLogged(),
+                createIO(),
+                ElevatorParamsNT.asServoMotorParamSources());
     }
 
     private static MotorIO createIO() {
         if (Logger.hasReplaySource()) {
-            return new MotorIO() {};
+            return new MotorIO() {
+            };
         } else if (RobotBase.isReal()) {
             return new MotorIOTalonFX(ElevatorConfig.CONFIG);
         } else {
@@ -58,20 +60,20 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     @Override
     public void periodic() {
         super.periodic();
-        
-        
+
         if (wantedPosition > ElevatorParamsNT.maxExtensionMeters.getValue()) {
             stopDueToLimit = true;
         } else if (stopDueToLimit) {
             stopDueToLimit = false;
         }
 
-            atGoal = positionAtGoal(Rotations.of(ElevatorParamsNT.atGoalToleranceMeters.getValue() / ElevatorConfig.CONFIG.metersPerRotation));
-            
-            if (wantedPosition != previousWantedPosition) {
-                isGoingUp = wantedPosition > previousWantedPosition;
-                previousWantedPosition = wantedPosition;
-            }
+        atGoal = positionAtGoal(Rotations
+                .of(ElevatorParamsNT.atGoalToleranceMeters.getValue() / ElevatorConfig.CONFIG.metersPerRotation));
+
+        if (wantedPosition != previousWantedPosition) {
+            isGoingUp = wantedPosition > previousWantedPosition;
+            previousWantedPosition = wantedPosition;
+        }
 
     }
 
@@ -85,29 +87,26 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
         this.wantedPosition = meters;
         if (goingUp) {
             setMotionMagicSetpoint(
-                Rotations.of(meters / ElevatorConfig.CONFIG.metersPerRotation),
-                ElevatorParamsNT.motionMagicVelRPSUp.getValue(),
-                ElevatorParamsNT.motionMagicAccelRPS2Up.getValue(),
-                ElevatorParamsNT.motionMagicJerkRPS3Up.getValue()
-            );
+                    Rotations.of(meters / ElevatorConfig.CONFIG.metersPerRotation),
+                    ElevatorParamsNT.motionMagicVelRPSUp.getValue(),
+                    ElevatorParamsNT.motionMagicAccelRPS2Up.getValue(),
+                    ElevatorParamsNT.motionMagicJerkRPS3Up.getValue());
         } else {
             setMotionMagicSetpoint(
-                Rotations.of(meters / ElevatorConfig.CONFIG.metersPerRotation),
-                ElevatorParamsNT.motionMagicVelRPSDown.getValue(),
-                ElevatorParamsNT.motionMagicAccelRPS2Down.getValue(),
-                ElevatorParamsNT.motionMagicJerkRPS3Down.getValue()
-            );
+                    Rotations.of(meters / ElevatorConfig.CONFIG.metersPerRotation),
+                    ElevatorParamsNT.motionMagicVelRPSDown.getValue(),
+                    ElevatorParamsNT.motionMagicAccelRPS2Down.getValue(),
+                    ElevatorParamsNT.motionMagicJerkRPS3Down.getValue());
         }
     }
-    
+
     public boolean elevatorAtGoal(double offset) {
         return positionAtGoal(Rotations.of(offset / ElevatorConfig.CONFIG.metersPerRotation));
     }
 
-    public void elevatorVoltage(double voltage){
-      setVoltage(voltage);
+    public void elevatorVoltage(double voltage) {
+        setVoltage(voltage);
     }
-
 
     public boolean isSafeToFlip() {
         return (getMechanismPositionFromMotor().in(Meters) > ElevatorParamsNT.safeHeightFlip.getValue());

@@ -26,7 +26,7 @@ import lib.ntext.NTParameterRegistry;
 
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
-  private  RobotContainer robotContainer;
+  private RobotContainer robotContainer;
   public static PowerDistribution powerDistribution;
 
   public Robot() {
@@ -39,10 +39,10 @@ public class Robot extends LoggedRobot {
     // logger initialization
     Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
     Logger.addDataReceiver(new WPILOGWriter());
-    
+
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.start();
-    
+
     // config watchdog
     try {
       Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
@@ -53,13 +53,13 @@ public class Robot extends LoggedRobot {
       DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
     }
     CommandScheduler.getInstance().setPeriod(0.2);
-    
+
     powerDistribution.clearStickyFaults();
     robotContainer = new RobotContainer();
-    
+
     // elastic
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-    
+
     // warm-up path-following
     FollowPathCommand.warmupCommand().schedule();
   }
@@ -74,13 +74,16 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+  }
 
   @Override
   public void autonomousInit() {
@@ -92,10 +95,12 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+  }
 
   @Override
   public void teleopInit() {
@@ -105,10 +110,12 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -116,8 +123,10 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 }

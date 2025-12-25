@@ -46,7 +46,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();;
   private ModeServo currentMode = ModeServo.VOLTAGE;
 
-  public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io ,ServoParamSources params) {
+  public ServoMotorSubsystem(SubsystemConfig config, T inputs, U io, ServoParamSources params) {
     super(config, inputs, io);
     this.config = config;
     this.params = params;
@@ -62,23 +62,22 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     currentFilter = LinearFilter.movingAverage(config.filterSize);
 
     this.sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(
-                    Units.Volts.of(config.sysidConfig.sysIdRampRateVoltsPerSec).per(Units.Second),
-                    Units.Volts.of(config.sysidConfig.sysIdDynamicVoltage),
-                    null,
-                    (state) -> SignalLogger.writeString("sysid-state", state.toString())
-            ),
-            new SysIdRoutine.Mechanism(
-                    (Voltage volts) -> {
-                      currSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, currSetpoint.setPoint, ()->volts.in(Volts));
-                      SignalLogger.writeDouble("sysid-" + config.name + "-voltage", inputs.appliedVolts, "V");
-                      SignalLogger.writeDouble("sysid-" + config.name + "-position", getMechanismPositionFromMotor().in(Meters), "m");
-                      SignalLogger.writeDouble("sysid-" + config.name + "-velocity", getMechanismVelocityFromMotor().in(MetersPerSecond), "m/s");
-                    },
-                    null,
-                    this
-            )
-    );
+        new SysIdRoutine.Config(
+            Units.Volts.of(config.sysidConfig.sysIdRampRateVoltsPerSec).per(Units.Second),
+            Units.Volts.of(config.sysidConfig.sysIdDynamicVoltage),
+            null,
+            (state) -> SignalLogger.writeString("sysid-state", state.toString())),
+        new SysIdRoutine.Mechanism(
+            (Voltage volts) -> {
+              currSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, currSetpoint.setPoint, () -> volts.in(Volts));
+              SignalLogger.writeDouble("sysid-" + config.name + "-voltage", inputs.appliedVolts, "V");
+              SignalLogger.writeDouble("sysid-" + config.name + "-position", getMechanismPositionFromMotor().in(Meters),
+                  "m");
+              SignalLogger.writeDouble("sysid-" + config.name + "-velocity",
+                  getMechanismVelocityFromMotor().in(MetersPerSecond), "m/s");
+            },
+            null,
+            this));
   }
 
   @Override
@@ -95,14 +94,15 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       io.setNeutralMode(params.isBrake());
       io.updateGains(slot0Configs);
     }
-    if (config.updateOutputs){
+    if (config.updateOutputs) {
       updateOutputs();
     }
 
     if (setPointHasChanged()) {
       switch (currSetpoint.modeServo) {
         case MOTIONMAGIC:
-          io.setMotionMagicSetpoint(currSetpoint.setPoint, motionMagicConfigs.MotionMagicCruiseVelocity, motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
+          io.setMotionMagicSetpoint(currSetpoint.setPoint, motionMagicConfigs.MotionMagicCruiseVelocity,
+              motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
           break;
         case POSITION:
           io.setPositionSetpoint(currSetpoint.setPoint);
@@ -132,7 +132,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     LoggedTracer.record(config.name);
   }
 
-  public void updateOutputs(){
+  public void updateOutputs() {
     outputs.currentFilterValue = currentFilterValue;
     outputs.setpointDegrees = currSetpoint.setPoint.in(Degrees);
     outputs.positionAtGoal = positionAtGoal();
@@ -203,104 +203,109 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   public Command zeroSubsystem() {
     return Commands.startRun(
-                    () -> {
-                      zeroing = true;
-                      tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
-                    },
-                    () -> {
-                      if (RobotBase.isReal()) {
-                        currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
-                        if (currentFilterValue <= params.zeroingCurrentLimit()) {
-                          currSetpoint.openLoop = () -> -1;
-                          currentMode = ModeServo.VOLTAGE;
-                        }
-                        if (currentFilterValue > params.zeroingCurrentLimit()) {
-                          currSetpoint.openLoop = () -> 0;
-                          currentMode = ModeServo.VOLTAGE;
-                          setCurrentPositionAsZero();
-                          zeroing = false;
-                        }
-                      } else {
-                        setMotionMagicSetpoint(Rotations.of(0));
-                        if (Math.abs(inputs.positionRot) < 0.01) {
-                          zeroing = false;
-                        }
-                      }
-                    })
-            .until(() -> !zeroing)
-            .finallyDo(() -> {
+        () -> {
+          zeroing = true;
+          tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
+        },
+        () -> {
+          if (RobotBase.isReal()) {
+            currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
+            if (currentFilterValue <= params.zeroingCurrentLimit()) {
+              currSetpoint.openLoop = () -> -1;
+              currentMode = ModeServo.VOLTAGE;
+            }
+            if (currentFilterValue > params.zeroingCurrentLimit()) {
+              currSetpoint.openLoop = () -> 0;
+              currentMode = ModeServo.VOLTAGE;
+              setCurrentPositionAsZero();
               zeroing = false;
-              currSetpoint = tempSetpoint;
-            });
+            }
+          } else {
+            setMotionMagicSetpoint(Rotations.of(0));
+            if (Math.abs(inputs.positionRot) < 0.01) {
+              zeroing = false;
+            }
+          }
+        })
+        .until(() -> !zeroing)
+        .finallyDo(() -> {
+          zeroing = false;
+          currSetpoint = tempSetpoint;
+        });
   }
 
-   // SysId characterization commands
-       /**
-    * Returns a command that runs a quasistatic test in the given direction.
-    * @param direction The direction to run the test (kForward = up, kReverse = down)
-    * @return The SysId quasistatic command
-    */
-   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-       return Commands.sequence(
-           Commands.runOnce(()->tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop)),
-           Commands.runOnce(() -> runningCharacterization = true),
-           sysIdRoutine.quasistatic(direction),
-           Commands.runOnce(() -> runningCharacterization = false),
-           Commands.runOnce(()->currSetpoint = tempSetpoint)
-       );
-   }
+  // SysId characterization commands
+  /**
+   * Returns a command that runs a quasistatic test in the given direction.
+   * 
+   * @param direction The direction to run the test (kForward = up, kReverse =
+   *                  down)
+   * @return The SysId quasistatic command
+   */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return Commands.sequence(
+        Commands.runOnce(() -> tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint,
+            currSetpoint.openLoop)),
+        Commands.runOnce(() -> runningCharacterization = true),
+        sysIdRoutine.quasistatic(direction),
+        Commands.runOnce(() -> runningCharacterization = false),
+        Commands.runOnce(() -> currSetpoint = tempSetpoint));
+  }
 
-   /**
-    * Returns a command that runs a dynamic test in the given direction.
-    * @param direction The direction to run the test (kForward = up, kReverse = down)
-    * @return The SysId dynamic command
-    */
-   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-       return Commands.sequence(
-           Commands.runOnce(()->tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop)),
-           Commands.runOnce(() -> runningCharacterization = true),
-           sysIdRoutine.dynamic(direction),
-           Commands.runOnce(() -> runningCharacterization = false),
-           Commands.runOnce(()->currSetpoint = tempSetpoint)
-       );
-   }
+  /**
+   * Returns a command that runs a dynamic test in the given direction.
+   * 
+   * @param direction The direction to run the test (kForward = up, kReverse =
+   *                  down)
+   * @return The SysId dynamic command
+   */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return Commands.sequence(
+        Commands.runOnce(() -> tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint,
+            currSetpoint.openLoop)),
+        Commands.runOnce(() -> runningCharacterization = true),
+        sysIdRoutine.dynamic(direction),
+        Commands.runOnce(() -> runningCharacterization = false),
+        Commands.runOnce(() -> currSetpoint = tempSetpoint));
+  }
 
-   /**
-    * Returns a command that runs the complete SysId characterization sequence.
-    * Automatically starts SignalLogger, pauses climber, runs all 4 tests, then stops logging.
-    * @return Complete SysId characterization command sequence
-    */
-   public Command sysIdComplete() {
-       return Commands.sequence(
-           Commands.runOnce(SignalLogger::start),
-           Commands.print("Starting " + config.name + " SysId - Climber Paused"),
-           Commands.waitSeconds(0.5), // Let climber settle
-           Commands.print("Starting " + config.name + " SysId - Quasistatic Forward"),
-           sysIdQuasistatic(SysIdRoutine.Direction.kForward),
-           Commands.waitSeconds(1.0), // Brief pause between tests
-           Commands.print("Starting " + config.name + " SysId - Quasistatic Reverse"),
-           sysIdQuasistatic(SysIdRoutine.Direction.kReverse),
-           Commands.waitSeconds(1.0),
-           Commands.print("Starting " + config.name + " SysId - Dynamic Forward"),
-           sysIdDynamic(SysIdRoutine.Direction.kForward),
-           Commands.waitSeconds(1.0),
-           Commands.print("Starting " + config.name + " SysId - Dynamic Reverse"),
-           sysIdDynamic(SysIdRoutine.Direction.kReverse),
-           Commands.runOnce(SignalLogger::stop),
-           Commands.print(config.name + " SysId Complete - Check logs")
-       );
-   }
+  /**
+   * Returns a command that runs the complete SysId characterization sequence.
+   * Automatically starts SignalLogger, pauses climber, runs all 4 tests, then
+   * stops logging.
+   * 
+   * @return Complete SysId characterization command sequence
+   */
+  public Command sysIdComplete() {
+    return Commands.sequence(
+        Commands.runOnce(SignalLogger::start),
+        Commands.print("Starting " + config.name + " SysId - Climber Paused"),
+        Commands.waitSeconds(0.5), // Let climber settle
+        Commands.print("Starting " + config.name + " SysId - Quasistatic Forward"),
+        sysIdQuasistatic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0), // Brief pause between tests
+        Commands.print("Starting " + config.name + " SysId - Quasistatic Reverse"),
+        sysIdQuasistatic(SysIdRoutine.Direction.kReverse),
+        Commands.waitSeconds(1.0),
+        Commands.print("Starting " + config.name + " SysId - Dynamic Forward"),
+        sysIdDynamic(SysIdRoutine.Direction.kForward),
+        Commands.waitSeconds(1.0),
+        Commands.print("Starting " + config.name + " SysId - Dynamic Reverse"),
+        sysIdDynamic(SysIdRoutine.Direction.kReverse),
+        Commands.runOnce(SignalLogger::stop),
+        Commands.print(config.name + " SysId Complete - Check logs"));
+  }
 
   public void setPositionSetpoint(Angle position) {
     currSetpoint.modeServo = ModeServo.POSITION;
     currSetpoint.setPoint = position;
   }
 
-  public Distance getMechanismPositionFromMotor(){
+  public Distance getMechanismPositionFromMotor() {
     return Meters.of(inputs.positionRot * config.metersPerRotation);
   }
 
-  public LinearVelocity getMechanismVelocityFromMotor(){
+  public LinearVelocity getMechanismVelocityFromMotor() {
     return MetersPerSecond.of(inputs.velocityRotPerSecond * config.metersPerRotation);
   }
 

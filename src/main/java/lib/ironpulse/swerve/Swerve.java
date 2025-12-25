@@ -75,8 +75,7 @@ public class Swerve extends SubsystemBase {
         kinematics,
         new Rotation3d(),
         getModulePositions(),
-        new Pose3d()
-    );
+        new Pose3d());
 
     // precompute
     var moduleLocations = config.moduleLocations();
@@ -106,9 +105,9 @@ public class Swerve extends SubsystemBase {
     for (int i = 0; i < swerveModulePositionsWithTime.size(); i++) {
       var positionWithTime = swerveModulePositionsWithTime.get(i);
       poseEstimator.updateWithTime(
-          now, rotations[i], // FIXME: there's a discrepancy between Phoenix time and rio time. need to find the offset. this fix is temporary
-          positionWithTime.getSecond()
-      );
+          now, rotations[i], // FIXME: there's a discrepancy between Phoenix time and rio time. need to find
+                             // the offset. this fix is temporary
+          positionWithTime.getSecond());
     }
     odometryLock.unlock();
     LoggedTracer.record(config.name + "/Inputs");
@@ -123,9 +122,11 @@ public class Swerve extends SubsystemBase {
 
     var limit = getSwerveLimit();
     Logger.recordOutput(config.name + "/Limit/MaxLinVelMps", limit.maxLinearVelocity().in(MetersPerSecond));
-    Logger.recordOutput(config.name + "/Limit/MaxSkidAccMps2", limit.maxSkidAcceleration().in(MetersPerSecondPerSecond));
+    Logger.recordOutput(config.name + "/Limit/MaxSkidAccMps2",
+        limit.maxSkidAcceleration().in(MetersPerSecondPerSecond));
     Logger.recordOutput(config.name + "/Limit/MaxAngvelDegps", limit.maxAngularVelocity().in(DegreesPerSecond));
-    Logger.recordOutput(config.name + "/Limit/MaxAngAccDegps2", limit.maxAngularAcceleration().in(DegreesPerSecondPerSecond));
+    Logger.recordOutput(config.name + "/Limit/MaxAngAccDegps2",
+        limit.maxAngularAcceleration().in(DegreesPerSecondPerSecond));
   }
 
   // -------- Run -------
@@ -133,8 +134,10 @@ public class Swerve extends SubsystemBase {
   /**
    * Run a twist for the swerve drive.
    *
-   * @param VRT the desired twist. note twist is expressed under the robot frame. if want to use field oriented
-   *            drive,need to do frame transform elsewhere before pass in the command.
+   * @param VRT the desired twist. note twist is expressed under the robot frame.
+   *            if want to use field oriented
+   *            drive,need to do frame transform elsewhere before pass in the
+   *            command.
    */
   public void runTwist(ChassisSpeeds VRT) {
     mode = MODE.VELOCITY;
@@ -223,14 +226,12 @@ public class Swerve extends SubsystemBase {
     return poseEstimator.sampleAt(time.in(Seconds));
   }
 
-
   public void addVisionMeasurement(
       Pose3d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N4, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
-
 
   // ------- Configurations -------
   public SwerveLimit getSwerveLimit() {

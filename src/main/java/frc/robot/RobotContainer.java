@@ -26,39 +26,39 @@ public class RobotContainer {
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
   private final CommandXboxController driver = new CommandXboxController(0);
+
   public RobotContainer() {
-    if (RobotBase.isReal()){
+    if (RobotBase.isReal()) {
       swerve = new Swerve(
-        SwerveConstants.kRealConfig,
-        new ImuIOPigeon(SwerveConstants.kRealConfig),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 0),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 1),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 2),
-        new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 3));
+          SwerveConstants.kRealConfig,
+          new ImuIOPigeon(SwerveConstants.kRealConfig),
+          new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 0),
+          new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 1),
+          new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 2),
+          new SwerveModuleIOSJTU6(SwerveConstants.kRealConfig, 3));
     } else {
       swerve = new Swerve(
-        SwerveConstants.kSimConfig,
-        new ImuIOSim(),
-        new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 0),
-        new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 1),
-        new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 2),
-        new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 3));
+          SwerveConstants.kSimConfig,
+          new ImuIOSim(),
+          new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 0),
+          new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 1),
+          new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 2),
+          new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 3));
     }
     configureBindings();
   }
 
   public void robotPeriodic() {
-    //reserved for vision fusion
+    // reserved for vision fusion
   }
 
   private void configureBindings() {
-  
-    driver.x().onTrue(Commands.runOnce(()-> intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
-    driver.y().onTrue(Commands.runOnce(()-> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
+
+    driver.x().onTrue(Commands.runOnce(() -> intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
+    driver.y().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
     driver.b().whileTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(1)));
     driver.a().whileTrue(elevatorSubsystem.zeroSubsystem());
-    
-    
+
   }
 
   public Command getAutonomousCommand() {

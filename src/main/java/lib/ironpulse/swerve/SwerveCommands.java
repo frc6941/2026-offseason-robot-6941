@@ -30,7 +30,6 @@ public class SwerveCommands {
   private static final Function<Double, Double> kJoystickCurveCubic = (x) -> x * x * x;
   private static final Function<Double, Double> kJoystickCurveSemiCubic = (x) -> Math.pow(x, 2.5);
 
-
   public static Command driveWithJoystick(
       Swerve swerve,
       DoubleSupplier xSupplier,
@@ -40,8 +39,7 @@ public class SwerveCommands {
       LinearVelocity translationDeadband,
       AngularVelocity rotationDeadband,
       Function<Double, Double> translationJoystickCurve,
-      Function<Double, Double> rotationJoystickCurve
-  ) {
+      Function<Double, Double> rotationJoystickCurve) {
     var cmd = Commands.run(() -> {
       SwerveLimit swerveLimit = swerve.getSwerveLimit();
 
@@ -53,26 +51,24 @@ public class SwerveCommands {
       // compute linear velocity
       double vNorm = MathUtil.applyDeadband(
           Math.hypot(x, y) * swerveLimit.maxLinearVelocity().in(MetersPerSecond),
-          translationDeadband.in(MetersPerSecond)
-      );
+          translationDeadband.in(MetersPerSecond));
       Rotation2d vDir = epsilonEquals(vNorm, 0.0) ? Rotation2d.kZero : new Rotation2d(x, y);
       Translation2d v = new Translation2d(vNorm, vDir);
 
       // compute angular velocity
       double omegaNorm = MathUtil.applyDeadband(
           Math.abs(z) * swerveLimit.maxAngularVelocity().in(RadiansPerSecond),
-          rotationDeadband.in(RadiansPerSecond)
-      );
+          rotationDeadband.in(RadiansPerSecond));
       double omegaDir = Math.signum(z);
       AngularVelocity omega = RadiansPerSecond.of(omegaNorm * omegaDir);
 
       // compose to chassis speeds
-      // NOTE: the so-called "FieldRelative" is actually "DriverStationRelative". we take the relative speed
+      // NOTE: the so-called "FieldRelative" is actually "DriverStationRelative". we
+      // take the relative speed
       // of the drivetrain w.r.t DriverStation, based on alliance color
       ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
           v.getX(), v.getY(), omega.in(RadiansPerSecond),
-          poseDriveRobotSupplier.get().getRotation().toRotation2d()
-      );
+          poseDriveRobotSupplier.get().getRotation().toRotation2d());
 
       swerve.runTwist(chassisSpeeds);
     });
@@ -88,14 +84,12 @@ public class SwerveCommands {
       DoubleSupplier zSupplier,
       Supplier<Pose3d> poseDriverRobotSupplier,
       LinearVelocity translationDeadband,
-      AngularVelocity rotationDeadband
-  ) {
+      AngularVelocity rotationDeadband) {
     return driveWithJoystick(
         swerve, xSupplier, ySupplier, zSupplier, poseDriverRobotSupplier, translationDeadband,
         rotationDeadband,
         kJoystickCurveLinear,
-        kJoystickCurveQuadratic
-    );
+        kJoystickCurveQuadratic);
   }
 
   public static Command driveToPose(
@@ -106,18 +100,15 @@ public class SwerveCommands {
       PIDController translationController,
       PIDController rotationController,
       Distance translationTolerance,
-      Angle rotationTolerance
-  ) {
+      Angle rotationTolerance) {
     return new SwerveDriveToPose(
         swerve, poseWorldRobotSupplier, poseWorldTargetSupplier, velocityWorldRobotSupplier,
-        translationController, rotationController, translationTolerance, rotationTolerance
-    );
+        translationController, rotationController, translationTolerance, rotationTolerance);
   }
 
   public static Command stop(Swerve swerve) {
     return Commands.runOnce(swerve::runStop);
   }
-
 
   public static Command xLock(Swerve swerve) {
     return Commands.runOnce(swerve::runStopAndLock);
@@ -129,8 +120,7 @@ public class SwerveCommands {
 
   public static Command resetAngle(
       Swerve swerve,
-      Rotation2d rotation
-  ) {
+      Rotation2d rotation) {
     return Commands.runOnce(() -> {
       Pose3d poseWorldRobotCurr = swerve.getEstimatedPose();
       Pose3d newPoseWorldRobotCurr = new Pose3d(poseWorldRobotCurr.getTranslation(), new Rotation3d(rotation));
@@ -142,8 +132,7 @@ public class SwerveCommands {
     return Commands.runOnce(() -> {
       Pose3d poseWorldRobotCurr = swerve.getEstimatedPose();
       Pose3d newPoseWorldRobotCurr = new Pose3d(
-          new Pose2d(poseWorldRobotCurr.toPose2d().getTranslation(), rotation.get())
-      );
+          new Pose2d(poseWorldRobotCurr.toPose2d().getTranslation(), rotation.get()));
       swerve.resetEstimatedPose(newPoseWorldRobotCurr);
     }).ignoringDisable(true);
   }
@@ -156,23 +145,20 @@ public class SwerveCommands {
       PIDController rotationController,
       Distance translationTolerance,
       Angle rotationTolerance,
-      Consumer<Event> eventConsumer
-  ) {
+      Consumer<Event> eventConsumer) {
     return new SwerveFollowPathPlannerTrajectory(
         swerve, poseWorldRobotSupplier,
         trajectory,
         translationController, rotationController,
         translationTolerance, rotationTolerance,
-        eventConsumer
-    );
+        eventConsumer);
   }
 
   public static SysIdRoutine sysid(
       Swerve swerve,
       Velocity<VoltageUnit> rampVelocity,
       Voltage stepVoltage,
-      Time timeout
-  ) {
+      Time timeout) {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
             rampVelocity, stepVoltage, timeout,
@@ -180,24 +166,18 @@ public class SwerveCommands {
               Logger.recordOutput("Sysid/Swerve/Voltage", swerve.getPreviouslyAppliedVoltage());
               Logger.recordOutput(
                   "Sysid/Swerve/Position",
-                  swerve.getEstimatedPose().toPose2d().getTranslation().getNorm()
-              );
+                  swerve.getEstimatedPose().toPose2d().getTranslation().getNorm());
               var speed = swerve.getChassisSpeeds();
               Logger.recordOutput(
                   "Sysid/Swerve/Velocity",
                   Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond)
-                      * Math.signum(swerve.getPreviouslyAppliedVoltage().in(Volts))
-              );
+                      * Math.signum(swerve.getPreviouslyAppliedVoltage().in(Volts)));
               Logger.recordOutput("Sysid/Swerve/State", state.toString());
-            }
-        ),
+            }),
         new SysIdRoutine.Mechanism(
             swerve::runVoltage,
             null,
-            swerve
-        )
-    );
+            swerve));
   }
-
 
 }

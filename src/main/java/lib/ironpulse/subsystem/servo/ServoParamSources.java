@@ -56,5 +56,7 @@ public interface ServoParamSources {
         return false;
     }
 
-    default double zeroingCurrentLimit(){return 40.0;}
+    default double zeroingCurrentLimit() {
+        return 40.0;
+    }
 }

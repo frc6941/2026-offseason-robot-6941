@@ -26,17 +26,21 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.PhoenixUtils;
 
 /**
- * TalonFX implementation of MotorIO, with optional remote CANcoder feedback and followers.
+ * TalonFX implementation of MotorIO, with optional remote CANcoder feedback and
+ * followers.
  *
- * Note: Mechanism units returned by getPosition()/getVelocity() depend on Phoenix Feedback
- * ratios (SensorToMechanismRatio, RotorToSensorRatio) configured via SubsystemConfig.
+ * Note: Mechanism units returned by getPosition()/getVelocity() depend on
+ * Phoenix Feedback
+ * ratios (SensorToMechanismRatio, RotorToSensorRatio) configured via
+ * SubsystemConfig.
  */
 public class MotorIOTalonFX implements MotorIO {
   private final TalonFX main;
   private final TalonFX[] followers;
 
   private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
-  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0).withEnableFOC(true);
+  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0)
+      .withEnableFOC(true);
   private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
   private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
@@ -49,13 +53,15 @@ public class MotorIOTalonFX implements MotorIO {
   private final BaseStatusSignal[] signals;
   private boolean connected = false;
   private final TalonFXConfiguration fx;
-  //TODO: static ArrayList<MotorIOTalonFX> instances
-  //Reply: Possibly impossible lol? Tried but seemed can't work on real, although will work for simulation.
+
+  // TODO: static ArrayList<MotorIOTalonFX> instances
+  // Reply: Possibly impossible lol? Tried but seemed can't work on real, although
+  // will work for simulation.
   public MotorIOTalonFX(SubsystemConfig cfg) {
     this.main = new TalonFX(cfg.mainId, cfg.mainBus);
 
     this.fx = cfg.fxConfig;
-    
+
     fx.MotorOutput.Inverted = cfg.motorInvertedValue;
     // Optional: remote CANcoder feedback configuration
     if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
@@ -117,7 +123,7 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void readInputs(MotorInputs inputs) {
-    connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig,supplyVoltSig, statorSig, supplySig);
+    connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig);
     inputs.positionRot = posSig.getValueAsDouble();
     inputs.velocityRotPerSecond = velSig.getValueAsDouble();
     inputs.motorVolts = motorVoltSig.getValueAsDouble();
@@ -125,6 +131,7 @@ public class MotorIOTalonFX implements MotorIO {
     inputs.currentStatorAmps = statorSig.getValueAsDouble();
     inputs.currentSupplyAmps = supplySig.getValueAsDouble();
   }
+
   @Override
   /** Whether all primary signals are reporting without errors. */
   public boolean isConnected() {
@@ -147,7 +154,7 @@ public class MotorIOTalonFX implements MotorIO {
     dynamicMotionMagicCtrl.Acceleration = acceleration;
     dynamicMotionMagicCtrl.Jerk = jerk;
     main.setControl(dynamicMotionMagicCtrl
-      .withPosition(position));
+        .withPosition(position));
   }
 
   @Override

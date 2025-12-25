@@ -16,15 +16,19 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lombok.Getter;
 
 /**
- * Flywheel subsystem for velocity-controlled mechanisms (shooters, intakes, etc.)
- * Extends MotorSubsystem with velocity control, velocity-at-goal checking, and tunable PID.
+ * Flywheel subsystem for velocity-controlled mechanisms (shooters, intakes,
+ * etc.)
+ * Extends MotorSubsystem with velocity control, velocity-at-goal checking, and
+ * tunable PID.
  */
 public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
 
     @Getter
-    private FlywheelSetpoint currSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
+    private FlywheelSetpoint currSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0),
+            () -> 0.0);
     @Getter
-    private FlywheelSetpoint prevSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
+    private FlywheelSetpoint prevSetpoint = new FlywheelSetpoint(ModeFlywheel.VELOCITY, RotationsPerSecond.of(0.0),
+            () -> 0.0);
 
     private final SubsystemConfig config;
     protected final FlywheelParamSources params;
@@ -151,8 +155,8 @@ public class FlywheelSubsystem<T extends MotorInputsAutoLogged, U extends MotorI
     }
 
     private boolean setPointHasChanged() {
-        return !(currSetpoint.velocitySetpt.equals(prevSetpoint.velocitySetpt) && 
-                 currSetpoint.modeFlywheel == prevSetpoint.modeFlywheel);
+        return !(currSetpoint.velocitySetpt.equals(prevSetpoint.velocitySetpt) &&
+                currSetpoint.modeFlywheel == prevSetpoint.modeFlywheel);
     }
 
     public static class FlywheelSetpoint {

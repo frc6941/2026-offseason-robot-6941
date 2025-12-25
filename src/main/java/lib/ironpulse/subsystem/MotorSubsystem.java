@@ -22,14 +22,16 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.DoubleSupplier;
 
 /**
- * Skeleton base for single-motor mechanisms following the AdvantageKit IO style.
+ * Skeleton base for single-motor mechanisms following the AdvantageKit IO
+ * style.
  *
  * - Owns IO and AutoLogged inputs
  * - Reads inputs and logs in periodic()
  * - Provides minimal open-loop helper command
  */
 public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends SubsystemBase {
-  //TODO: perhaps this is not a very good place to extend SubsystemBase, considering impliment subsystem instead?
+  // TODO: perhaps this is not a very good place to extend SubsystemBase,
+  // considering impliment subsystem instead?
   protected final U io;
   protected final T inputs;
   protected final SubsystemConfig config;
@@ -60,7 +62,7 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
    */
   public Command runVoltage(DoubleSupplier voltage) {
     return run(
-        () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(),-12.0,12.0)));
+        () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0)));
   }
 
   /**
@@ -77,11 +79,19 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
     return run(() -> io.setNeutralMode(wantsBreak));
   }
 
-  public Current getStatorCurrent() { return Amps.of(inputs.currentStatorAmps); }
-  public Current getSupplyCurrent() { return Amps.of(inputs.currentSupplyAmps); }
-  public Voltage getMotorVoltage() { return Volts.of(inputs.motorVolts); }
-  public AngularVelocity getVelocityUnitsPerSecond() { 
-    return Rotations.of(inputs.velocityRotPerSecond).div(Seconds.of(1)); }
+  public Current getStatorCurrent() {
+    return Amps.of(inputs.currentStatorAmps);
+  }
+
+  public Current getSupplyCurrent() {
+    return Amps.of(inputs.currentSupplyAmps);
+  }
+
+  public Voltage getMotorVoltage() {
+    return Volts.of(inputs.motorVolts);
+  }
+
+  public AngularVelocity getVelocityUnitsPerSecond() {
+    return Rotations.of(inputs.velocityRotPerSecond).div(Seconds.of(1));
+  }
 }
-
-

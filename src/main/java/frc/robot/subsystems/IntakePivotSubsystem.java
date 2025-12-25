@@ -10,21 +10,24 @@ import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.servo.ServoMotorSubsystem;
 
-/** Intake pivot mechanism using a TalonFX and remote CANcoder, extending ServoMotorSubsystem. */
+/**
+ * Intake pivot mechanism using a TalonFX and remote CANcoder, extending
+ * ServoMotorSubsystem.
+ */
 public class IntakePivotSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
 
   public IntakePivotSubsystem() {
     super(
-      IntakePivotConfig.CONFIG,
-      new MotorInputsAutoLogged(),
-      createIO(),
-      IntakePivotParamsNT.asServoMotorParamSources()
-    );
+        IntakePivotConfig.CONFIG,
+        new MotorInputsAutoLogged(),
+        createIO(),
+        IntakePivotParamsNT.asServoMotorParamSources());
   }
 
   private static MotorIO createIO() {
     if (Logger.hasReplaySource()) {
-      return new MotorIO() {};
+      return new MotorIO() {
+      };
     } else if (RobotBase.isReal()) {
       return new MotorIOTalonFX(IntakePivotConfig.CONFIG);
     } else {
@@ -32,5 +35,3 @@ public class IntakePivotSubsystem extends ServoMotorSubsystem<MotorInputsAutoLog
     }
   }
 }
-
-

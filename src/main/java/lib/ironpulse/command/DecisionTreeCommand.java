@@ -2,7 +2,6 @@ package lib.ironpulse.command;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-
 public class DecisionTreeCommand extends Command {
   private final DecisionTree tree;
 
@@ -29,7 +28,8 @@ public class DecisionTreeCommand extends Command {
   public void end(boolean interrupted) {
     if (interrupted) {
       Command current = tree.getCurrentCommand();
-      if (current != null && current.isScheduled()) current.cancel();
+      if (current != null && current.isScheduled())
+        current.cancel();
     }
   }
 }

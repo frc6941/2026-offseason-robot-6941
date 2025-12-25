@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-@SupportedAnnotationTypes({"lib.ntext.NTParameter"})
+@SupportedAnnotationTypes({ "lib.ntext.NTParameter" })
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedOptions("DEBUG")
 @AutoService(Processor.class)
@@ -41,8 +41,7 @@ public class NTParameterProcessor extends AbstractProcessor {
             Map.entry("java.lang.String", "String"), Map.entry("java.lang.String[]", "String[]"),
 
             // Raw bytes
-            Map.entry("byte[]", "Byte[]")
-    );
+            Map.entry("byte[]", "Byte[]"));
 
     /**
      * Main processing method for dealing with all the annotations.
@@ -74,14 +73,12 @@ public class NTParameterProcessor extends AbstractProcessor {
                     continue;
                 }
 
-
                 // Group fields by their containing class
                 classToFields.computeIfAbsent(containingClass, k -> new ArrayList<>()).add(field);
             } else {
                 processingEnv.getMessager().printMessage(
                         Diagnostic.Kind.ERROR, "@lib.ntext.NTParameter can only be applied to classes or fields.",
-                        annotated
-                );
+                        annotated);
             }
         }
 
@@ -112,8 +109,7 @@ public class NTParameterProcessor extends AbstractProcessor {
             processingEnv.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     "Field '" + field.getSimpleName() + "' in class '" + className + "' must be declared static.",
-                    field
-            );
+                    field);
             return false;
         }
 
@@ -122,8 +118,7 @@ public class NTParameterProcessor extends AbstractProcessor {
             processingEnv.getMessager().printMessage(
                     Diagnostic.Kind.ERROR,
                     "Invalid field type '" + typeName + "' in class '" + className + "'.",
-                    field
-            );
+                    field);
             return false;
         }
 
@@ -143,8 +138,7 @@ public class NTParameterProcessor extends AbstractProcessor {
                 processingEnv.getMessager().printMessage(
                         Diagnostic.Kind.ERROR,
                         "Field '" + field.getSimpleName() + "' in class '" + className + "' must be declared static.",
-                        field
-                );
+                        field);
                 continue;
             }
 
@@ -152,8 +146,7 @@ public class NTParameterProcessor extends AbstractProcessor {
             if (!NT_TYPES_TABLE.containsKey(typeName)) {
                 processingEnv.getMessager().printMessage(
                         Diagnostic.Kind.ERROR, "Invalid field type '" + typeName + "' in class '" + className + "'.",
-                        field
-                );
+                        field);
                 throw new FieldTypeError("Invalid field type '" + typeName + "' in class '" + className + "'.");
             }
         }
@@ -164,9 +157,9 @@ public class NTParameterProcessor extends AbstractProcessor {
             } else if (enclosed.getKind() == ElementKind.CLASS) {
                 processingEnv.getMessager().printMessage(
                         Diagnostic.Kind.ERROR,
-                        "Nested class '" + enclosed.getSimpleName() + "' in '" + className + "' must be declared static.",
-                        enclosed
-                );
+                        "Nested class '" + enclosed.getSimpleName() + "' in '" + className
+                                + "' must be declared static.",
+                        enclosed);
                 throw new FieldTypeError("Nested class '" + enclosed.getSimpleName() + "' in '" + className + "'.");
             }
         }
@@ -189,7 +182,8 @@ public class NTParameterProcessor extends AbstractProcessor {
             }
         }
 
-        if (tableName == null) tableName = containingClass.getSimpleName().toString();
+        if (tableName == null)
+            tableName = containingClass.getSimpleName().toString();
 
         String pkgName = processingEnv.getElementUtils().getPackageOf(containingClass).toString();
         String className = containingClass.getSimpleName() + "NT";
@@ -232,7 +226,8 @@ public class NTParameterProcessor extends AbstractProcessor {
         // Append ServoMotorSubsystem.ParamSources adapter factory
         Set<String> names = new HashSet<>(fieldNames);
         // ServoMotorSubsystem adapter
-        builder.append("\n  public static lib.ironpulse.subsystem.servo.ServoParamSources asServoMotorParamSources() {\n")
+        builder.append(
+                "\n  public static lib.ironpulse.subsystem.servo.ServoParamSources asServoMotorParamSources() {\n")
                 .append("    return new lib.ironpulse.subsystem.servo.ServoParamSources.ParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
@@ -251,11 +246,14 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("      public double motionMagicVelRPS() { return ")
                 .append(names.contains("motionMagicVelRPS") ? "motionMagicVelRPS.getValue()" : "0.0").append("; }\n")
                 .append("      public double motionMagicAccelRPS2() { return ")
-                .append(names.contains("motionMagicAccelRPS2") ? "motionMagicAccelRPS2.getValue()" : "0.0").append("; }\n")
+                .append(names.contains("motionMagicAccelRPS2") ? "motionMagicAccelRPS2.getValue()" : "0.0")
+                .append("; }\n")
                 .append("      public double motionMagicJerkRPS3() { return ")
-                .append(names.contains("motionMagicJerkRPS3") ? "motionMagicJerkRPS3.getValue()" : "0.0").append("; }\n")
+                .append(names.contains("motionMagicJerkRPS3") ? "motionMagicJerkRPS3.getValue()" : "0.0")
+                .append("; }\n")
                 .append("      public double positionAtGoalToleranceDegrees() { return ")
-                .append(names.contains("atGoalToleranceDegrees") ? "atGoalToleranceDegrees.getValue()" : "1.0").append("; }\n")
+                .append(names.contains("atGoalToleranceDegrees") ? "atGoalToleranceDegrees.getValue()" : "1.0")
+                .append("; }\n")
                 .append("      public double positionAtGoalToleranceMeters() { return 0.005; }\n")
                 .append("      public boolean isBrake() { return ")
                 .append(names.contains("isBrake") ? "isBrake.getValue()" : "true").append("; }\n")
@@ -266,7 +264,8 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("  }\n");
 
         // FlywheelSubsystem adapter
-        builder.append("\n  public static lib.ironpulse.subsystem.flywheel.FlywheelParamSources asFlywheelParamSources() {\n")
+        builder.append(
+                "\n  public static lib.ironpulse.subsystem.flywheel.FlywheelParamSources asFlywheelParamSources() {\n")
                 .append("    return new lib.ironpulse.subsystem.flywheel.FlywheelParamSources.ParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
@@ -281,7 +280,8 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("      public double kS() { return ")
                 .append(names.contains("kS") ? "kS.getValue()" : "0.0").append("; }\n")
                 .append("      public double velocityAtGoalToleranceRPS() { return ")
-                .append(names.contains("velocityAtGoalToleranceRPS") ? "velocityAtGoalToleranceRPS.getValue()" : "1.0").append("; }\n")
+                .append(names.contains("velocityAtGoalToleranceRPS") ? "velocityAtGoalToleranceRPS.getValue()" : "1.0")
+                .append("; }\n")
                 .append("      public boolean isBrake() { return ")
                 .append(names.contains("isBrake") ? "isBrake.getValue()" : "false").append("; }\n")
                 .append("      public boolean hasChanged() { return ")
@@ -304,7 +304,6 @@ public class NTParameterProcessor extends AbstractProcessor {
         }
     }
 
-
     /**
      * Entry method for generating corresponding network table method for the class.
      *
@@ -319,8 +318,10 @@ public class NTParameterProcessor extends AbstractProcessor {
         StringBuilder builder = new StringBuilder();
         builder.append("package ").append(pkgName).append(";\n\n").append(
                 "import edu.wpi.first.networktables.NetworkTableEntry;\n").append(
-                "import edu.wpi.first.networktables.NetworkTableInstance;\n\n").append(
-                "import lib.ntext.NTParameterWrapper;\n\n").append("public class ").append(className).append(" {\n");
+                        "import edu.wpi.first.networktables.NetworkTableInstance;\n\n")
+                .append(
+                        "import lib.ntext.NTParameterWrapper;\n\n")
+                .append("public class ").append(className).append(" {\n");
 
         // do recursive adding
         buildClassContent(rootClass, tableName, builder, "  ", "");
@@ -332,8 +333,10 @@ public class NTParameterProcessor extends AbstractProcessor {
             names.add(f.getSimpleName().toString());
         }
 
-        // Append ServoMotorSubsystem.ParamSources adapter factory (top-level fields only)
-        builder.append("\n  public static lib.ironpulse.subsystem.servo.ServoParamSources asServoMotorParamSources() {\n")
+        // Append ServoMotorSubsystem.ParamSources adapter factory (top-level fields
+        // only)
+        builder.append(
+                "\n  public static lib.ironpulse.subsystem.servo.ServoParamSources asServoMotorParamSources() {\n")
                 .append("    return new lib.ironpulse.subsystem.servo.ServoParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
@@ -352,11 +355,14 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("      public double motionMagicVelRPS() { return ")
                 .append(names.contains("motionMagicVelRPS") ? "motionMagicVelRPS.getValue()" : "0.0").append("; }\n")
                 .append("      public double motionMagicAccelRPS2() { return ")
-                .append(names.contains("motionMagicAccelRPS2") ? "motionMagicAccelRPS2.getValue()" : "0.0").append("; }\n")
+                .append(names.contains("motionMagicAccelRPS2") ? "motionMagicAccelRPS2.getValue()" : "0.0")
+                .append("; }\n")
                 .append("      public double motionMagicJerkRPS3() { return ")
-                .append(names.contains("motionMagicJerkRPS3") ? "motionMagicJerkRPS3.getValue()" : "0.0").append("; }\n")
+                .append(names.contains("motionMagicJerkRPS3") ? "motionMagicJerkRPS3.getValue()" : "0.0")
+                .append("; }\n")
                 .append("      public double positionAtGoalToleranceDegrees() { return ")
-                .append(names.contains("atGoalToleranceDegrees") ? "atGoalToleranceDegrees.getValue()" : "1.0").append("; }\n")
+                .append(names.contains("atGoalToleranceDegrees") ? "atGoalToleranceDegrees.getValue()" : "1.0")
+                .append("; }\n")
                 .append("      public double positionAtGoalToleranceMeters() { return 0.005; }\n")
                 .append("      public boolean isBrake() { return ")
                 .append(names.contains("isBrake") ? "isBrake.getValue()" : "true").append("; }\n")
@@ -367,7 +373,8 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("  }\n");
 
         // FlywheelSubsystem adapter
-        builder.append("\n  public static lib.ironpulse.subsystem.flywheel.FlywheelParamSources asFlywheelParamSources() {\n")
+        builder.append(
+                "\n  public static lib.ironpulse.subsystem.flywheel.FlywheelParamSources asFlywheelParamSources() {\n")
                 .append("    return new lib.ironpulse.subsystem.flywheel.FlywheelParamSources() {\n")
                 .append("      public double kP() { return ")
                 .append(names.contains("kP") ? "kP.getValue()" : "0.0").append("; }\n")
@@ -382,7 +389,8 @@ public class NTParameterProcessor extends AbstractProcessor {
                 .append("      public double kS() { return ")
                 .append(names.contains("kS") ? "kS.getValue()" : "0.0").append("; }\n")
                 .append("      public double velocityAtGoalToleranceRPS() { return ")
-                .append(names.contains("velocityAtGoalToleranceRPS") ? "velocityAtGoalToleranceRPS.getValue()" : "1.0").append("; }\n")
+                .append(names.contains("velocityAtGoalToleranceRPS") ? "velocityAtGoalToleranceRPS.getValue()" : "1.0")
+                .append("; }\n")
                 .append("      public boolean isBrake() { return ")
                 .append(names.contains("isBrake") ? "isBrake.getValue()" : "false").append("; }\n")
                 .append("      public boolean hasChanged() { return ")
@@ -454,16 +462,18 @@ public class NTParameterProcessor extends AbstractProcessor {
     }
 
     /**
-     * Recursive method for generating NTParameterWrapper fields and isAnyChanged() methods.
+     * Recursive method for generating NTParameterWrapper fields and isAnyChanged()
+     * methods.
      *
      * @param classElement current class
      * @param tablePath    base NetworkTable path
      * @param builder      output builder
      * @param indent       indentation for current scope
-     * @param prefix       NetworkTable key prefix for nested fields (e.g., "Outer/Inner/")
+     * @param prefix       NetworkTable key prefix for nested fields (e.g.,
+     *                     "Outer/Inner/")
      */
     private void buildClassContent(TypeElement classElement, String tablePath, StringBuilder builder,
-                                   String indent, String prefix) {
+            String indent, String prefix) {
         List<VariableElement> fields = ElementFilter.fieldsIn(classElement.getEnclosedElements());
         List<String> fieldNames = new ArrayList<>();
 
@@ -511,7 +521,8 @@ public class NTParameterProcessor extends AbstractProcessor {
 
             builder.append(indent).append("public static final NTParameterWrapper<").append(typeName).append(
                     "> ").append(fieldName).append(" = new NTParameterWrapper<>(").append("\"").append(
-                    tableName).append("/").append(fieldName).append("\", ").append(defaultLiteral).append(");\n");
+                            tableName)
+                    .append("/").append(fieldName).append("\", ").append(defaultLiteral).append(");\n");
 
         }
     }

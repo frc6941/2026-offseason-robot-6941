@@ -1,10 +1,9 @@
 package lib.ironpulse.subsystem.servo;
 
-
 import org.littletonrobotics.junction.AutoLog;
 
 @AutoLog
-public class ServoOutputs{
+public class ServoOutputs {
     public String currentMode = "VOLTAGE";
     public double setpointDegrees = 0.0;
     public double openLoopValue = 0.0;
