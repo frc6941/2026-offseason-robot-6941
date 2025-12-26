@@ -17,8 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 
-import java.util.Optional;
-
 /**
  * Builder-style configuration container for a TalonFX-based MotorIO
  * implementation.
@@ -61,12 +59,7 @@ public class SubsystemConfig {
   public final int filterSize = 1;
   @Default
   public final double SensorToMechanismRatio = 1.0;
-  /**
-   * ONLY used when a linear mechenism meters-per-rotation for linear mechanisms
-   * (0.0 disables linear mode).
-   */
-  @Default
-  public final double metersPerRotation = 0.0;
+
 
   @Default
   public final boolean updateOutputs = true;
@@ -86,8 +79,11 @@ public class SubsystemConfig {
   @Default
   public final boolean enableReverseSoftLimit = false;
 
+  /**
+   * ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos
+   */
   @Default
-  public final Angle ctreOffset = Degree.of(0.0);
+  public final Angle zeroOffset = Degree.of(0.0);
 
   @Default
   public final SysidConfig sysidConfig = SysidConfig.builder().sysIdDynamicVoltage(5).sysIdRampRateVoltsPerSec(1)

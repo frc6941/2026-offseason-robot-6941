@@ -58,8 +58,6 @@ public class RobotContainer {
     // intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
     // driver.y().onTrue(Commands.runOnce(() ->
     // intakePivot.setPositionSetpoint(Degrees.of(40.0))));
-    driver.b().onTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(1)));
-    driver.a().onTrue(Commands.run(() -> elevatorSubsystem.zeroSubsystem(false)));
 
   }
 
