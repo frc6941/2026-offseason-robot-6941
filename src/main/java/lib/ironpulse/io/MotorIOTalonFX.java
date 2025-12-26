@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -52,6 +53,8 @@ public class MotorIOTalonFX implements MotorIO {
   private final BaseStatusSignal[] signals;
   private boolean connected = false;
   private final TalonFXConfiguration fx;
+
+  private final Angle ctreOffset;
 
   // TODO: static ArrayList<MotorIOTalonFX> instances
   // Reply: Possibly impossible lol? Tried but seemed can't work on real, although
@@ -109,6 +112,8 @@ public class MotorIOTalonFX implements MotorIO {
     supplySig.setUpdateFrequency(100.0);
     PhoenixUtils.registerSignals(true, signals);
     main.optimizeBusUtilization();
+
+    ctreOffset = cfg.ctreOffset;
   }
 
   private void configureCANcoder(SubsystemConfig.RemoteCANcoder rc) {
@@ -123,7 +128,7 @@ public class MotorIOTalonFX implements MotorIO {
   @Override
   public void readInputs(MotorInputs inputs) {
     connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig);
-    inputs.positionRot = posSig.getValueAsDouble();
+    inputs.positionRot = posSig.getValueAsDouble() + (ctreOffset.in(Degrees) / 360);
     inputs.velocityRotPerSecond = velSig.getValueAsDouble();
     inputs.motorVolts = motorVoltSig.getValueAsDouble();
     inputs.appliedVolts = supplyVoltSig.getValueAsDouble();
@@ -144,7 +149,7 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void setPositionSetpoint(Angle position) {
-    main.setControl(positionCtrl.withPosition(position));
+    main.setControl(positionCtrl.withPosition(position.minus(ctreOffset)));
   }
 
   @Override
@@ -153,7 +158,7 @@ public class MotorIOTalonFX implements MotorIO {
     dynamicMotionMagicCtrl.Acceleration = acceleration;
     dynamicMotionMagicCtrl.Jerk = jerk;
     main.setControl(dynamicMotionMagicCtrl
-        .withPosition(position));
+        .withPosition(position.minus(ctreOffset)));
   }
 
   @Override
@@ -179,7 +184,7 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void setCurrentPosition(Angle positionRad) {
-    main.setPosition(positionRad);
+    main.setPosition(positionRad.minus(ctreOffset));
   }
 
   @Override

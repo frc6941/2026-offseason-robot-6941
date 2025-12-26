@@ -1,5 +1,6 @@
 package lib.ironpulse.subsystem;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -10,10 +11,13 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
+
+import java.util.Optional;
 
 /**
  * Builder-style configuration container for a TalonFX-based MotorIO
@@ -83,9 +87,13 @@ public class SubsystemConfig {
   public final boolean enableReverseSoftLimit = false;
 
   @Default
-  public final SysidConfig sysidConfig = SysidConfig.builder().sysIdDynamicVoltage(5).sysIdRampRateVoltsPerSec(1).build();
+  public final Angle ctreOffset = Degree.of(0.0);
 
-    /** Optional remote CANcoder configuration summary. */
+  @Default
+  public final SysidConfig sysidConfig = SysidConfig.builder().sysIdDynamicVoltage(5).sysIdRampRateVoltsPerSec(1)
+      .build();
+
+  /** Optional remote CANcoder configuration summary. */
   @Builder
   @AllArgsConstructor
   public static class RemoteCANcoder {

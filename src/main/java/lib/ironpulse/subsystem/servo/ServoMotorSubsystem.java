@@ -29,7 +29,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private final LinearFilter currentFilter;
   private final ServoOutputsAutoLogged outputs = new ServoOutputsAutoLogged();
   private boolean zeroing = false;
-  private boolean runningCharacterization, reverse = false;
+  private boolean runningCharacterization = false;
 
   public double currentFilterValue = 0.0;
 
@@ -81,7 +81,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   @Override
   public void periodic() {
-    
+
     Logger.recordOutput("BBB", inputs.positionRot);
     Logger.recordOutput("CCC", inputs.positionRot * config.metersPerRotation);
     Logger.recordOutput("DDD", getMechanismPositionFromMotor());
@@ -105,7 +105,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       switch (currSetpoint.modeServo) {
         case MOTIONMAGIC:
           io.setMotionMagicSetpoint(currSetpoint.setPoint, motionMagicConfigs.MotionMagicCruiseVelocity,
-                  motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
+              motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
           break;
         case POSITION:
           io.setPositionSetpoint(currSetpoint.setPoint);
@@ -120,7 +120,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
           break;
       }
     }
-    
+
     Logger.processInputs("Subsystem/" + config.name + "/output", outputs);
     prevSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
 
@@ -205,31 +205,30 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   public void zeroSubsystem(boolean isReverse) {
 
-          zeroing = true;
-          tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
+    zeroing = true;
+    tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
 
-          if (RobotBase.isReal()) {
-            currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
-            if (currentFilterValue <= params.zeroingCurrentLimit()) {
-              currSetpoint.openLoop = isReverse ? () -> 1 : () -> -1;
-              currSetpoint.modeServo = ModeServo.VOLTAGE;
-            }
-            if (currentFilterValue > params.zeroingCurrentLimit()) {
-              currSetpoint.openLoop = () -> 0;
-              currSetpoint.modeServo = ModeServo.VOLTAGE;
-              setCurrentPositionAsZero();
-              zeroing = false;
-            }
-          } else {
-            setMotionMagicSetpoint(Rotations.of(0));
-            if (Math.abs(inputs.positionRot) < 0.01) {
-              zeroing = false;
-            }
-          }
+    if (RobotBase.isReal()) {
+      currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
+      if (currentFilterValue <= params.zeroingCurrentLimit()) {
+        currSetpoint.openLoop = isReverse ? () -> 1 : () -> -1;
+        currSetpoint.modeServo = ModeServo.VOLTAGE;
+      }
+      if (currentFilterValue > params.zeroingCurrentLimit()) {
+        currSetpoint.openLoop = () -> 0;
+        currSetpoint.modeServo = ModeServo.VOLTAGE;
+        setCurrentPositionAsZero();
+        zeroing = false;
+      }
+    } else {
+      setMotionMagicSetpoint(Rotations.of(0));
+      if (Math.abs(inputs.positionRot) < 0.01) {
+        zeroing = false;
+      }
+    }
 
-
-          zeroing = false;
-          currSetpoint = tempSetpoint;
+    zeroing = false;
+    currSetpoint = tempSetpoint;
 
   }
 
@@ -302,12 +301,12 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   public Distance getMechanismPositionFromMotor() {
     double position = inputs.positionRot * config.metersPerRotation;
-    return Meters.of(reverse ? -position : position);
+    return Meters.of(position);
   }
 
   public LinearVelocity getMechanismVelocityFromMotor() {
     double velocity = inputs.velocityRotPerSecond * config.metersPerRotation;
-    return MetersPerSecond.of(reverse ? -velocity : velocity);
+    return MetersPerSecond.of(velocity);
   }
 
   private enum ModeServo {
@@ -318,9 +317,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   }
 
   private boolean setPointHasChanged() {
-    return currSetpoint.modeServo != prevSetpoint.modeServo || 
-           !currSetpoint.setPoint.equals(prevSetpoint.setPoint) ||
-           currSetpoint.openLoop != prevSetpoint.openLoop;
+    return currSetpoint.modeServo != prevSetpoint.modeServo ||
+        !currSetpoint.setPoint.equals(prevSetpoint.setPoint) ||
+        currSetpoint.openLoop != prevSetpoint.openLoop;
   }
 
   public static class ServoSetpoint {
