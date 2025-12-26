@@ -27,9 +27,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
   private final LinearFilter currentFilter;
-  private ServoOutputsAutoLogged outputs = new ServoOutputsAutoLogged();
-  private boolean zeroing;
-  private boolean runningCharacterization;
+  private final ServoOutputsAutoLogged outputs = new ServoOutputsAutoLogged();
+  private boolean zeroing = false;
+  private boolean runningCharacterization, reverse = false;
 
   public double currentFilterValue = 0.0;
 
@@ -81,6 +81,10 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   @Override
   public void periodic() {
+    
+    Logger.recordOutput("BBB", inputs.positionRot);
+    Logger.recordOutput("CCC", inputs.positionRot * config.metersPerRotation);
+    Logger.recordOutput("DDD", getMechanismPositionFromMotor());
     super.periodic();
     if (params.hasChanged()) {
       this.slot0Configs.kP = params.kP();
@@ -93,31 +97,31 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       io.setNeutralMode(params.isBrake());
       io.updateGains(slot0Configs);
     }
-    if (config.updateOutputs) {
-      updateOutputs();
-    }
+
+    updateOutputs();
+    Logger.recordOutput("AAA", setPointHasChanged());
 
     if (setPointHasChanged()) {
       switch (currSetpoint.modeServo) {
         case MOTIONMAGIC:
           io.setMotionMagicSetpoint(currSetpoint.setPoint, motionMagicConfigs.MotionMagicCruiseVelocity,
-              motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
+                  motionMagicConfigs.MotionMagicAcceleration, motionMagicConfigs.MotionMagicJerk);
           break;
         case POSITION:
           io.setPositionSetpoint(currSetpoint.setPoint);
           break;
         case DUTY_CYCLE:
-          runDutyCycle(currSetpoint.openLoop);
+          io.setOpenLoopDutyCycle(currSetpoint.openLoop.getAsDouble());
           break;
         case VOLTAGE:
-          runVoltage(currSetpoint.openLoop);
+          io.setVoltage(currSetpoint.openLoop.getAsDouble());
           break;
         default:
           break;
       }
-
-      Logger.processInputs(config.name + "output", outputs);
     }
+    
+    Logger.processInputs("Subsystem/" + config.name + "/output", outputs);
     prevSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
 
     if (runningCharacterization) {
@@ -199,17 +203,15 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     motionMagicConfigs.MotionMagicJerk = jerk;
   }
 
-  public Command zeroSubsystem() {
-    return Commands.startRun(
-        () -> {
+  public void zeroSubsystem(boolean isReverse) {
+
           zeroing = true;
           tempSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
-        },
-        () -> {
+
           if (RobotBase.isReal()) {
             currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
             if (currentFilterValue <= params.zeroingCurrentLimit()) {
-              currSetpoint.openLoop = () -> -1;
+              currSetpoint.openLoop = isReverse ? () -> 1 : () -> -1;
               currSetpoint.modeServo = ModeServo.VOLTAGE;
             }
             if (currentFilterValue > params.zeroingCurrentLimit()) {
@@ -224,18 +226,17 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
               zeroing = false;
             }
           }
-        })
-        .until(() -> !zeroing)
-        .finallyDo(() -> {
+
+
           zeroing = false;
           currSetpoint = tempSetpoint;
-        });
+
   }
 
   // SysId characterization commands
   /**
    * Returns a command that runs a quasistatic test in the given direction.
-   * 
+   *
    * @param direction The direction to run the test (kForward = up, kReverse =
    *                  down)
    * @return The SysId quasistatic command
@@ -252,7 +253,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
 
   /**
    * Returns a command that runs a dynamic test in the given direction.
-   * 
+   *
    * @param direction The direction to run the test (kForward = up, kReverse =
    *                  down)
    * @return The SysId dynamic command
@@ -271,7 +272,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
    * Returns a command that runs the complete SysId characterization sequence.
    * Automatically starts SignalLogger, pauses climber, runs all 4 tests, then
    * stops logging.
-   * 
+   *
    * @return Complete SysId characterization command sequence
    */
   public Command sysIdComplete() {
@@ -300,11 +301,13 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   }
 
   public Distance getMechanismPositionFromMotor() {
-    return Meters.of(inputs.positionRot * config.metersPerRotation);
+    double position = inputs.positionRot * config.metersPerRotation;
+    return Meters.of(reverse ? -position : position);
   }
 
   public LinearVelocity getMechanismVelocityFromMotor() {
-    return MetersPerSecond.of(inputs.velocityRotPerSecond * config.metersPerRotation);
+    double velocity = inputs.velocityRotPerSecond * config.metersPerRotation;
+    return MetersPerSecond.of(reverse ? -velocity : velocity);
   }
 
   private enum ModeServo {
@@ -315,7 +318,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   }
 
   private boolean setPointHasChanged() {
-    return !(currSetpoint.setPoint == prevSetpoint.setPoint) && currSetpoint.modeServo == prevSetpoint.modeServo;
+    return currSetpoint.modeServo != prevSetpoint.modeServo || 
+           !currSetpoint.setPoint.equals(prevSetpoint.setPoint) ||
+           currSetpoint.openLoop != prevSetpoint.openLoop;
   }
 
   public static class ServoSetpoint {

@@ -33,9 +33,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     @AutoLogOutput(key = "Elevator/isGoingUp")
     private boolean isGoingUp = false;
 
-    @AutoLogOutput(key = "Elevator/stopDueToLimit")
-    private boolean stopDueToLimit = false;
-
     private double previousWantedPosition = 0.16;
 
     public ElevatorSubsystem() {
@@ -61,12 +58,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     public void periodic() {
         super.periodic();
 
-        if (wantedPosition > ElevatorParamsNT.maxExtensionMeters.getValue()) {
-            stopDueToLimit = true;
-        } else if (stopDueToLimit) {
-            stopDueToLimit = false;
-        }
-
         atGoal = positionAtGoal(Rotations
                 .of(ElevatorParamsNT.atGoalToleranceMeters.getValue() / ElevatorConfig.CONFIG.metersPerRotation));
 
@@ -83,7 +74,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
 
     public void setElevatorPosition(double meters) {
         double currentPos = getMechanismPositionFromMotor().in(Meters);
-        boolean goingUp = meters > currentPos;
+        boolean goingUp = Math.abs(meters) > Math.abs(currentPos);
         this.wantedPosition = meters;
         if (goingUp) {
             setMotionMagicSetpoint(

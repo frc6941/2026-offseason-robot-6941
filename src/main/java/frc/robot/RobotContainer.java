@@ -22,8 +22,8 @@ import lib.ironpulse.swerve.sjtu6.SwerveModuleIOSJTU6;
 
 public class RobotContainer {
   private Swerve swerve;
-  private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
-  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+//  private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
+//  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
   private final CommandXboxController driver = new CommandXboxController(0);
 
@@ -54,10 +54,10 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    driver.x().onTrue(Commands.runOnce(() -> intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
-    driver.y().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
-    driver.b().whileTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(1)));
-    driver.a().whileTrue(elevatorSubsystem.zeroSubsystem());
+//    driver.x().onTrue(Commands.runOnce(() -> intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
+//    driver.y().onTrue(Commands.runOnce(() -> intakePivot.setPositionSetpoint(Degrees.of(40.0))));
+    driver.b().onTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(1)));
+    driver.a().onTrue(Commands.run(()->elevatorSubsystem.zeroSubsystem(false)));
 
   }
 

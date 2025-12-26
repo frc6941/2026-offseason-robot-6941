@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
+import static frc.robot.RobotConstants.*;
 import lib.ntext.NTParameter;
 
 import static edu.wpi.first.units.Units.*;
@@ -14,8 +15,6 @@ public final class ElevatorConfig {
   }
 
   public static final String NAME = "Elevator";
-  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
-
   // Local hardware constants
   private static final int ELEVATOR_MOTOR_MAIN_ID = 50;
   private static final int ELEVATOR_MOTOR_FOLLOWER_ID = 51;
@@ -86,7 +85,7 @@ public final class ElevatorConfig {
     public static final double safeHeightFlip = 0.5;
 
     // Zeroing
-    public static final double zeroingCurrent = 50.0;
+    public static final double zeroingCurrentLimit = 50.0;
 
     // SysId characterization
     public static final double sysIdRampRateVoltsPerSec = 1.0;

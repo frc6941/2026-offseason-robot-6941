@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 import lib.ntext.NTParameter;
+import static frc.robot.RobotConstants.*;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -13,7 +14,6 @@ public final class FlywheelConfig {
   }
 
   public static final String NAME = "Flywheel";
-  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
 
   // Local hardware constants (copied/adapted from provided snippet)
   private static final int INTAKE_PIVOT_MOTOR_ID = 22;

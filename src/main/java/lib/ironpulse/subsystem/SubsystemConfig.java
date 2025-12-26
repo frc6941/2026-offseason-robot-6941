@@ -46,7 +46,6 @@ public class SubsystemConfig {
   public final boolean enableRemoteCANcoder = false;
   public final RemoteCANcoder remoteCANcoder; // nullable unless enableRemoteCANcoder is true
 
-  public final SysidConfig sysidConfig;
   // Optional followers
   @Default
   public final FollowerConfig[] followers = new FollowerConfig[0];
@@ -83,7 +82,10 @@ public class SubsystemConfig {
   @Default
   public final boolean enableReverseSoftLimit = false;
 
-  /** Optional remote CANcoder configuration summary. */
+  @Default
+  public final SysidConfig sysidConfig = SysidConfig.builder().sysIdDynamicVoltage(5).sysIdRampRateVoltsPerSec(1).build();
+
+    /** Optional remote CANcoder configuration summary. */
   @Builder
   @AllArgsConstructor
   public static class RemoteCANcoder {

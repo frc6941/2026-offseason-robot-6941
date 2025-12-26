@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 import lib.ntext.NTParameter;
+import static frc.robot.RobotConstants.*;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -16,7 +17,6 @@ public final class IntakePivotConfig {
   }
 
   public static final String NAME = "IntakePivot";
-  public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
 
   // Local hardware constants (from RobotConstants.IntakeConstants)
   private static final int INTAKE_PIVOT_MOTOR_ID = 16;
@@ -28,6 +28,11 @@ public final class IntakePivotConfig {
       .MOI(KilogramSquareMeters.of(1))
       .gearRatio(1)
       .stdvs(new double[] { 0.02, 0.02 })
+      .build();
+
+  public static final SubsystemConfig.SysidConfig SYSID_CONFIG = SubsystemConfig.SysidConfig.builder()
+      .sysIdDynamicVoltage(5.0)
+      .sysIdRampRateVoltsPerSec(1.0)
       .build();
   // Mechanism config
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
