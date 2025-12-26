@@ -65,9 +65,12 @@ public class RobotContainer {
 
   public void robotPeriodic() {
     var now = Seconds.of(Timer.getTimestamp());
-        swerve.getEstimatedPoseAt(now).ifPresent(
-                pose -> RobotStateRecorder.getInstance().putTransform(
-                        pose, now, RobotStateRecorder.kFrameWorld, RobotStateRecorder.kFrameRobot));
+    RobotStateRecorder.getInstance().putTransform(
+        swerve.getEstimatedPose(), now,
+        TransformRecorder.kFrameWorld, TransformRecorder.kFrameRobot
+    );
+    RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
+    RobotStateRecorder.periodic();
   }
 
   private void configureBindings() {
@@ -79,8 +82,10 @@ public class RobotContainer {
             swerve,
             () -> -driver.getLeftY(),
             () -> -driver.getLeftX(),
+            //() -> 0.0,
             () -> driver.getRightX(),
             RobotStateRecorder::getPoseDriverRobotCurrent,
+            //() -> new Pose3d(),
             MetersPerSecond.of(0.04),
             DegreesPerSecond.of(3.0)));
 

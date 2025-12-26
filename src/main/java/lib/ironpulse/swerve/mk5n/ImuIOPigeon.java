@@ -118,7 +118,7 @@ public class ImuIOPigeon implements ImuIO {
         inputs.yawVelocityRadPerSec = yawVelocity.getValue().in(Units.RadiansPerSecond);
         inputs.pitchPosition = Rotation2d.fromDegrees(pitch.getValueAsDouble());
         inputs.pitchVelocityRadPerSec = pitchVelocity.getValue().in(Units.RadiansPerSecond);
-        inputs.rollPosition = Rotation2d.fromDegrees(roll.getValueAsDouble());
+        inputs.rollPosition = Rotation2d.fromDegrees (roll.getValueAsDouble());
         inputs.rollVelocityRadPerSec = rollVelocity.getValue().in(Units.RadiansPerSecond);
         
         // Process odometry queues (same pattern as swerve modules)
