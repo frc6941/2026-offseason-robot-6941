@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import lib.ironpulse.io.MotorIO;
@@ -20,11 +21,12 @@ import java.util.function.DoubleSupplier;
  * Elevator mechanism using ServoMotorSubsystem with custom functionality for
  * zeroing and characterization.
  */
+//TODO: overriding set and get setpoints for clarity
 public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
 
     @AutoLogOutput(key = "Elevator/setPoint")
     @Getter
-    double wantedPosition = 0.0;
+    double setPtMeter = 0.0;
 
     @Getter
     @AutoLogOutput(key = "Elevator/atGoal")
@@ -34,7 +36,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     @AutoLogOutput(key = "Elevator/isGoingUp")
     private boolean isGoingUp = false;
 
-    private double previousWantedPosition = 0.16;
+    private double previousSetPtMeter = 0.16;
 
     public ElevatorSubsystem() {
         super(
@@ -60,18 +62,18 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
         super.periodic();
 
         atGoal = positionAtGoal();
-        if (wantedPosition != previousWantedPosition) {
-            isGoingUp = wantedPosition > previousWantedPosition;
-            previousWantedPosition = wantedPosition;
+        if (setPtMeter != previousSetPtMeter) {
+            isGoingUp = setPtMeter > previousSetPtMeter;
+            previousSetPtMeter = setPtMeter;
         }
 
     }
 
 
     public void setElevatorPosition(Distance meters) {
-        double currentPos = getServoAngleRot();
+        double currentPos = getCurrPos().in(Rotations)*ElevatorConfig.METERS_PER_ROTATION;
         boolean goingUp = Math.abs(meters.in(Meters)) > Math.abs(currentPos);
-        this.wantedPosition = meters.in(Meters);
+        this.setPtMeter = meters.in(Meters);
         if (goingUp) {
             setMotionMagicSetpoint(
                     Rotations.of(meters.in(Meters) / ElevatorConfig.METERS_PER_ROTATION),
@@ -86,6 +88,12 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
                     ElevatorParamsNT.motionMagicJerkRPS3Down.getValue());
         }
     }
+
+    @Override
+    public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
+        super.setMotionMagicSetpoint(position, velocity, acceleration, jerk);
+        this.setPtMeter = position.in(Rotations)*ElevatorConfig.METERS_PER_ROTATION;
+    }                                                                                                                                                                                                                                               
 
  
 

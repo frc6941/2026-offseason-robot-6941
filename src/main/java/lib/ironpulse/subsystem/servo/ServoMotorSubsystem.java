@@ -21,7 +21,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends MotorSubsystem<T, U> {
-  private final ServoOutputsAutoLogged outputs = new ServoOutputsAutoLogged();
   @Getter
   @AutoLogOutput(key = "ServoMotorSubsystem/currSetpoint")
   private ServoSetpoint currSetpoint = new ServoSetpoint(ModeServo.VOLTAGE, Degrees.of(0), () -> 0.0);
@@ -87,14 +86,13 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       }
     }
 
-    Logger.processInputs("Subsystem/" + config.name + "/output", outputs);
     prevSetpoint = new ServoSetpoint(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
 
     LoggedTracer.record(config.name);
   }
 
   public boolean positionAtGoal(Angle tolerance) {
-    return Rotations.of(getServoAngleRot()).isNear(currSetpoint.setPoint, tolerance);
+    return getCurrPos().isNear(currSetpoint.setPoint, tolerance);
   }
 
   public boolean positionAtGoal() {
@@ -132,8 +130,8 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
     currSetpoint.setPoint = position;
   }
 
-  public double getServoAngleRot() {
-    return inputs.positionRot + zeroOffset.in(Rotations);
+  public Angle getCurrPos() {
+    return Rotations.of(inputs.positionRot + zeroOffset.in(Rotations));
   }
 
   private enum ModeServo {

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,6 +55,8 @@ public class RobotContainer {
 
   private void configureBindings() {
 
+    driver.a().onTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(Meters.of(1))));
+    driver.b().onTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(Meters.of(0))));
     // driver.x().onTrue(Commands.runOnce(() ->
     // intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
     // driver.y().onTrue(Commands.runOnce(() ->
