@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import lib.ironpulse.io.MotorIO;
@@ -15,21 +14,16 @@ import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import java.util.function.DoubleSupplier;
-
 /**
  * Elevator mechanism using ServoMotorSubsystem with custom functionality for
  * zeroing and characterization.
  */
-//TODO: overriding set and get setpoints for clarity
-public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
+public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> {
 
-    @AutoLogOutput(key = "Elevator/setPoint")
     @Getter
     double setPtMeter = 0.0;
 
     @Getter
-    @AutoLogOutput(key = "Elevator/atGoal")
     private boolean atGoal = false;
 
     @Getter
@@ -43,7 +37,9 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
                 ElevatorConfig.CONFIG,
                 new MotorInputsAutoLogged(),
                 createIO(),
-                ElevatorParamsNT.asServoMotorParamSources());
+                ElevatorParamsNT.asServoMotorParamSources(),
+                Meters.of(0),
+                Meters.of(ElevatorConfig.METERS_PER_ROTATION));
     }
 
     private static MotorIO createIO() {
@@ -62,6 +58,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
         super.periodic();
 
         atGoal = positionAtGoal();
+        setPtMeter = getCurrSetpoint().getSetPoint().in(Meters);
         if (setPtMeter != previousSetPtMeter) {
             isGoingUp = setPtMeter > previousSetPtMeter;
             previousSetPtMeter = setPtMeter;
@@ -70,31 +67,25 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     }
 
 
-    public void setElevatorPosition(Distance meters) {
-        double currentPos = getCurrPos().in(Rotations)*ElevatorConfig.METERS_PER_ROTATION;
-        boolean goingUp = Math.abs(meters.in(Meters)) > Math.abs(currentPos);
-        this.setPtMeter = meters.in(Meters);
+    @Override
+    public void setMotionMagicSetpoint(Distance meters) {
+        boolean goingUp = meters.in(Meters) > getCurrPos().in(Meters);
         if (goingUp) {
-            setMotionMagicSetpoint(
-                    Rotations.of(meters.in(Meters) / ElevatorConfig.METERS_PER_ROTATION),
+            super.setMotionMagicSetpoint(
+                    meters,
                     ElevatorParamsNT.motionMagicVelRPSUp.getValue(),
                     ElevatorParamsNT.motionMagicAccelRPS2Up.getValue(),
                     ElevatorParamsNT.motionMagicJerkRPS3Up.getValue());
         } else {
-            setMotionMagicSetpoint(
-                    Rotations.of(meters.in(Meters) / ElevatorConfig.METERS_PER_ROTATION),
+            super.setMotionMagicSetpoint(
+                    meters,
                     ElevatorParamsNT.motionMagicVelRPSDown.getValue(),
                     ElevatorParamsNT.motionMagicAccelRPS2Down.getValue(),
                     ElevatorParamsNT.motionMagicJerkRPS3Down.getValue());
         }
     }
 
-    @Override
-    public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
-        super.setMotionMagicSetpoint(position, velocity, acceleration, jerk);
-        this.setPtMeter = position.in(Rotations)*ElevatorConfig.METERS_PER_ROTATION;
-    }                                                                                                                                                                                                                                               
-
- 
-
+    public void setElevatorPosition(Distance meters) {
+        setMotionMagicSetpoint(meters);
+    }
 }
