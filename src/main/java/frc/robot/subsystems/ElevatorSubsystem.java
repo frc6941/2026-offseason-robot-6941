@@ -24,9 +24,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     double setPtMeter = 0.0;
 
     @Getter
-    private boolean atGoal = false;
-
-    @Getter
     @AutoLogOutput(key = "Elevator/isGoingUp")
     private boolean isGoingUp = false;
 
@@ -57,7 +54,6 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     public void periodic() {
         super.periodic();
 
-        atGoal = positionAtGoal();
         setPtMeter = getCurrSetpoint().getSetPoint().in(Meters);
         if (setPtMeter != previousSetPtMeter) {
             isGoingUp = setPtMeter > previousSetPtMeter;

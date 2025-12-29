@@ -128,6 +128,7 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
       }
     }
 
+    Logger.recordOutput(config.name + "/atGoal", positionAtGoal());
     Logger.recordOutput(config.name + "/currPosition", ((Measure)getCurrPos()).in((Unit) mechanismUnitPerRotation.unit()));
 
     prevSetpoint = new ServoSetpoint<>(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
