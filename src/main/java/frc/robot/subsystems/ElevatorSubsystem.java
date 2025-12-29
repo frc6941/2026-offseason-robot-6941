@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
@@ -54,7 +55,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     public void periodic() {
         super.periodic();
 
-        setPtMeter = getCurrSetpoint().getSetPoint().in(Meters);
+        setPtMeter = getCurrSetpoint().in(Meters);
         if (setPtMeter != previousSetPtMeter) {
             isGoingUp = setPtMeter > previousSetPtMeter;
             previousSetPtMeter = setPtMeter;
@@ -64,24 +65,22 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
 
 
     @Override
-    public void setMotionMagicSetpoint(Distance meters) {
-        boolean goingUp = meters.in(Meters) > getCurrPos().in(Meters);
-        if (goingUp) {
-            super.setMotionMagicSetpoint(
+    public Command runMotionMagic(Distance meters) {
+        return meters.in(Meters) > getCurrPos().in(Meters)?
+            super.runMotionMagic( //going up
                     meters,
                     ElevatorParamsNT.motionMagicVelRPSUp.getValue(),
                     ElevatorParamsNT.motionMagicAccelRPS2Up.getValue(),
-                    ElevatorParamsNT.motionMagicJerkRPS3Up.getValue());
-        } else {
-            super.setMotionMagicSetpoint(
+                    ElevatorParamsNT.motionMagicJerkRPS3Up.getValue()):
+            super.runMotionMagic( //going down
                     meters,
                     ElevatorParamsNT.motionMagicVelRPSDown.getValue(),
                     ElevatorParamsNT.motionMagicAccelRPS2Down.getValue(),
                     ElevatorParamsNT.motionMagicJerkRPS3Down.getValue());
-        }
+
     }
 
-    public void setElevatorPosition(Distance meters) {
-        setMotionMagicSetpoint(meters);
+    public Command setElevatorPosition(Distance meters) {
+        return runMotionMagic(meters);
     }
 }

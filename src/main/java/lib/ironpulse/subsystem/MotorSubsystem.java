@@ -5,6 +5,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -48,7 +49,7 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
    * Open-loop duty cycle command,([-1.0, 1.0] where 1.0 = 100%).
    */
   public Command runDutyCycle(DoubleSupplier dutyCycle) {
-    return run(
+    return Commands.run(
         () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()));
   }
 
@@ -56,7 +57,7 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
    * Open-loop duty cycle command, -12-12V.
    */
   public Command runVoltage(DoubleSupplier voltage) {
-    return run(
+    return Commands.run(
         () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0)));
   }
 
@@ -64,14 +65,14 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
    * Stop command
    */
   public Command runStop() {
-    return run(() -> io.setOpenLoopDutyCycle(0.0));
+    return Commands.run(() -> io.setOpenLoopDutyCycle(0.0));
   }
 
   /**
    * Set neutral mode command.
    */
   public Command setNeutralMode(boolean wantsBreak) {
-    return run(() -> io.setNeutralMode(wantsBreak));
+    return Commands.run(() -> io.setNeutralMode(wantsBreak),this);
   }
 
   public Current getStatorCurrent() {
