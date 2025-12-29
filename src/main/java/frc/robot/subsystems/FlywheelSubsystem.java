@@ -13,14 +13,14 @@ import lib.ironpulse.io.MotorInputsAutoLogged;
  * hardware abstraction.
  */
 public class FlywheelSubsystem
-    extends lib.ironpulse.subsystem.flywheel.FlywheelSubsystem<MotorInputsAutoLogged, MotorIO> {
+    extends lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
 
   public FlywheelSubsystem() {
     super(
         FlywheelConfig.CONFIG,
         new MotorInputsAutoLogged(),
         createIO(),
-        FlywheelParamsNT.asFlywheelParamSources());
+        FlywheelParamsNT.asVelocityParamSources());
   }
 
   private static MotorIO createIO() {
