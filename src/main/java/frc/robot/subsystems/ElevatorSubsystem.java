@@ -30,7 +30,7 @@ public class ElevatorSubsystem extends ServoMotorSubsystem<MotorInputsAutoLogged
     @AutoLogOutput(key = "Elevator/isGoingUp")
     private boolean isGoingUp = false;
 
-    private double previousSetPtMeter = 0.16;
+    private double previousSetPtMeter = 0;
 
     public ElevatorSubsystem() {
         super(

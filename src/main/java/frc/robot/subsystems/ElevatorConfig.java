@@ -40,6 +40,11 @@ public final class ElevatorConfig {
     .motorInvertedValue(InvertedValue.Clockwise_Positive)
     .SensorToMechanismRatio(ELEVATOR_GEAR_RATIO)
     .gravityType(GravityTypeValue.Elevator_Static)
+    .zeroingConfig(SubsystemConfig.ZeroingConfig.builder()
+        .zeroingCurrentLimit(ElevatorParams.zeroingCurrent)
+        .zeroingVoltage(-3.5)
+        .zeroingFilterSize(ELEVATOR_ZEROING_FILTER_SIZE)
+        .build())
     .followers(new SubsystemConfig.FollowerConfig[] {
       SubsystemConfig.FollowerConfig.builder()
         .bus(CANIVORE_CAN_BUS_NAME)
@@ -53,7 +58,7 @@ public final class ElevatorConfig {
 
   @NTParameter(tableName = "Params/" + NAME)
   public static final class ElevatorParams {
-    // PID/FF gains (from RobotConstants.ElevatorGainsClass)
+
     public static final double kP = 3.75;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
@@ -75,18 +80,8 @@ public final class ElevatorConfig {
     // Tolerances / behavior
     public static final double atGoalToleranceDegrees = 3.5;
     public static final double atGoalToleranceMeters = 0.03;
-    public static final boolean isBrake = true;
-    
-    // Limits and safety
-    public static final double maxExtensionMeters = 1.475;
-    public static final double safeHeightFlip = 0.5;
-    
     // Zeroing
     public static final double zeroingCurrent = 50.0;
-    
-    // SysId characterization
-    public static final double sysIdRampRateVoltsPerSec = 1.0;
-    public static final double sysIdDynamicVoltage = 5.0;
   }
 }
 

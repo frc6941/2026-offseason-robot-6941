@@ -55,12 +55,18 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    driver.a().onTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(Meters.of(1))));
-    driver.b().onTrue(Commands.runOnce(() -> elevatorSubsystem.setElevatorPosition(Meters.of(0))));
+    driver.a().onTrue(Commands.runOnce(() -> elevatorSubsystem.setVoltage(2)));
+    driver.b().onTrue(elevatorSubsystem.runVoltage(() -> 2));
+    driver.leftBumper().onTrue(elevatorSubsystem.runStop());
+
+    driver.x().onTrue(Commands.runOnce(() -> elevatorSubsystem.setMotionMagicSetpoint(Meters.of(1.2))));
+    driver.y().onTrue(Commands.runOnce(() -> elevatorSubsystem.setMotionMagicSetpoint(Meters.of(0.2))));
+
+    driver.start().whileTrue(elevatorSubsystem.zeroCommand());
     // driver.x().onTrue(Commands.runOnce(() ->
     // intakePivot.setMotionMagicSetpoint(Degrees.of(0))));
     // driver.y().onTrue(Commands.runOnce(() ->
-    // intakePivot.setPositionSetpoint(Degrees.of(40.0))));
+    // intakePivot.setPositionSetpoint(Degrees.of(40\[]\[].0))));
 
   }
 

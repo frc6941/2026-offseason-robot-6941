@@ -86,8 +86,7 @@ public class SubsystemConfig {
   public final Angle zeroOffset = Degree.of(0.0);
 
   @Default
-  public final SysidConfig sysidConfig = SysidConfig.builder().sysIdDynamicVoltage(5).sysIdRampRateVoltsPerSec(1)
-      .build();
+  public final ZeroingConfig zeroingConfig = ZeroingConfig.builder().build();
 
   /** Optional remote CANcoder configuration summary. */
   @Builder
@@ -108,11 +107,13 @@ public class SubsystemConfig {
 
   @Builder
   @AllArgsConstructor
-  public static class SysidConfig {
+  public static class ZeroingConfig {
     @Default
-    public double sysIdRampRateVoltsPerSec = 1.0;
+    public double zeroingCurrentLimit = 40.0;
     @Default
-    public double sysIdDynamicVoltage = 5.0;
+    public double zeroingVoltage = -2.0;
+    @Default
+    public int zeroingFilterSize = 5;
   }
 
   /** Optional follower TalonFX configuration. */

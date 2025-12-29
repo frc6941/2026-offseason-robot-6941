@@ -16,8 +16,6 @@ public interface MotorIO {
   // Write (mechanism units)
   default void setOpenLoopDutyCycle(double dutyCycle) {};
 
-  default void setInputVoltage(double voltage) {};
-
   default void setPositionSetpoint(Angle position) {};
 
   default void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {};

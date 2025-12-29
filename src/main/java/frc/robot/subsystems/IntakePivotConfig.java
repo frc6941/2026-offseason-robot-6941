@@ -30,10 +30,6 @@ public final class IntakePivotConfig {
       .stdvs(new double[] { 0.02, 0.02 })
       .build();
 
-  public static final SubsystemConfig.SysidConfig SYSID_CONFIG = SubsystemConfig.SysidConfig.builder()
-      .sysIdDynamicVoltage(5.0)
-      .sysIdRampRateVoltsPerSec(1.0)
-      .build();
   // Mechanism config
   public static final SubsystemConfig CONFIG = SubsystemConfig.builder()
       .name(NAME)

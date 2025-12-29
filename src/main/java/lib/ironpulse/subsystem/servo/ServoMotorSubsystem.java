@@ -2,6 +2,10 @@ package lib.ironpulse.subsystem.servo;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.units.Measure;
@@ -19,6 +23,7 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lombok.Getter;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO, M extends Measure<?>> extends MotorSubsystem<T, U> {
@@ -26,6 +31,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   private ServoSetpoint<M> currSetpoint;
   @Getter
   private ServoSetpoint<M> prevSetpoint;
+  private boolean zeroing = false;
+  private LinearFilter currentFilter = LinearFilter.movingAverage(5);
+  private double currentFilterValue = 0.0;
 
   private final SubsystemConfig config;
   protected final ServoParamSources params;
@@ -118,8 +126,9 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
         default:
           break;
       }
-      Logger.recordOutput(config.name + "/currPosition", ((Measure)getCurrPos()).in(mechanismUnit));
     }
+
+    Logger.recordOutput(config.name + "/currPosition", ((Measure)getCurrPos()).in((Unit) mechanismUnitPerRotation.unit()));
 
     prevSetpoint = new ServoSetpoint<>(currSetpoint.modeServo, currSetpoint.setPoint, currSetpoint.openLoop);
 
@@ -170,6 +179,46 @@ public class ServoMotorSubsystem<T extends MotorInputsAutoLogged, U extends Moto
   public void setPositionSetpoint(M position) {
     currSetpoint.modeServo = SetptTyp.POSITION;
     currSetpoint.setPoint = position;
+  }
+
+  /**
+   * Returns a command that zeroes the mechanism by driving it until a current spike is detected.
+   *
+   * @return The zeroing command.
+   */
+  public Command zeroCommand() {
+    Command zeroCommand = Commands.startRun(
+            () -> {
+              zeroing = true;
+              currentFilter = LinearFilter.movingAverage(config.zeroingConfig.zeroingFilterSize);
+            },
+            () -> {
+              if (RobotBase.isReal()) {
+                currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps);
+                if (currentFilterValue <= config.zeroingConfig.zeroingCurrentLimit) {
+                  setVoltage(config.zeroingConfig.zeroingVoltage);
+                } else {
+                  setVoltage(0);
+                  io.setCurrentPositionAsZero();
+                  zeroing = false;
+                }
+              } else {
+                // In simulation, just set target to 0 (going down)
+                setMotionMagicSetpoint(fromAngle(Rotations.of(0)));
+                if (Math.abs(inputs.positionRot) < 0.01) {
+                  zeroing = false;
+                }
+              }
+            },
+            this)
+        .until(() -> !zeroing)
+        .finallyDo(
+            () -> {
+              zeroing = false;
+              setVoltage(0);
+            });
+    zeroCommand.addRequirements(this);
+    return zeroCommand;
   }
 
   public M getCurrPos() {

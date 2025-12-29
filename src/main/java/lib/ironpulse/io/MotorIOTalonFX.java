@@ -53,9 +53,7 @@ public class MotorIOTalonFX implements MotorIO {
   private boolean connected = false;
   private final TalonFXConfiguration fx;
 
-  // TODO: static ArrayList<MotorIOTalonFX> instances
-  // Reply: Possibly impossible lol? Tried but seemed can't work on real, although
-  // will work for simulation.
+
   public MotorIOTalonFX(SubsystemConfig cfg) {
     this.main = new TalonFX(cfg.mainId, cfg.mainBus);
 
@@ -157,8 +155,8 @@ public class MotorIOTalonFX implements MotorIO {
   }
 
   @Override
-  public void setInputVoltage(double voltage) {
-    main.setControl(new VoltageOut(MathUtil.clamp(voltage, -12.0f, 12.0f)));
+  public void setVoltage(double voltage) {
+    main.setControl(new VoltageOut(voltage));
   }
 
   @Override

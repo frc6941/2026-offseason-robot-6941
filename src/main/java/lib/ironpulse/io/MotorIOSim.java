@@ -88,7 +88,7 @@ public class MotorIOSim implements MotorIO {
     }
 
     @Override
-    public void setInputVoltage(double voltage) {
+    public void setVoltage(double voltage) {
         isCloseLoop = false;
         appliedVolts = MathUtil.clamp(voltage, -12.0f, 12.0f);
     }
