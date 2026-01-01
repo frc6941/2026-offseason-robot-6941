@@ -4,102 +4,76 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.SwerveConstants;
-import frc.robot.util.AllianceFlipUtil;
-import lib.ironpulse.math.rbd.TransformRecorder;
-import lib.ironpulse.swerve.Swerve;
-import lib.ironpulse.swerve.SwerveCommands;
-import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
-import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
-import lib.ironpulse.swerve.sim.ImuIOSim;
-import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
+import frc.robot.subsystems.*;
+import lib.ironpulse.io.MotorIO;
+import lib.ironpulse.io.MotorIOSim;
+import lib.ironpulse.io.MotorIOTalonFX;
+import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
+import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
-    private Swerve swerve;
-    // private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
     private final CommandXboxController driver = new CommandXboxController(0);
 
+    private final ElevatorSubsystem elevator;
+    private final VelocityMotorSubsystem flywheel;
+    private final PositionMotorSubsystem intakePivot;
+
     public RobotContainer() {
-        if (RobotBase.isReal()) {
-            swerve =
-                    new Swerve(
-                            SwerveConstants.kRealConfig,
-                            new ImuIOPigeon(SwerveConstants.kRealConfig),
-                            new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 0),
-                            new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 1),
-                            new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 2),
-                            new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 3));
+        MotorIO elevatorIO;
+        MotorIO flywheelIO;
+        MotorIO intakePivotIO;
+
+        if (Logger.hasReplaySource()) {
+            elevatorIO = new MotorIO() {};
+            flywheelIO = new MotorIO() {};
+            intakePivotIO = new MotorIO() {};
+        } else if (RobotBase.isReal()) {
+            elevatorIO = new MotorIOTalonFX(ElevatorConfig.CONFIG);
+            flywheelIO = new MotorIOTalonFX(FlywheelConfig.CONFIG);
+            intakePivotIO = new MotorIOTalonFX(IntakePivotConfig.CONFIG);
         } else {
-            swerve =
-                    new Swerve(
-                            SwerveConstants.kSimConfig,
-                            new ImuIOSim(),
-                            new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 0),
-                            new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 1),
-                            new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 2),
-                            new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 3));
+            elevatorIO = new MotorIOSim(ElevatorConfig.CONFIG);
+            flywheelIO = new MotorIOSim(FlywheelConfig.CONFIG);
+            intakePivotIO = new MotorIOSim(IntakePivotConfig.CONFIG);
         }
+
+        elevator =
+                new ElevatorSubsystem(
+                        ElevatorConfig.CONFIG,
+                        new MotorInputsAutoLogged(),
+                        elevatorIO,
+                        ElevatorParamsNT.asPositionParamSources(),
+                        Meters.of(0),
+                        Meters.of(ElevatorConfig.METERS_PER_ROTATION));
+        flywheel =
+                new VelocityMotorSubsystem(
+                        FlywheelConfig.CONFIG,
+                        new MotorInputsAutoLogged(),
+                        flywheelIO,
+                        FlywheelParamsNT.asVelocityParamSources());
+        intakePivot =
+                new PositionMotorSubsystem(
+                        IntakePivotConfig.CONFIG,
+                        new MotorInputsAutoLogged(),
+                        intakePivotIO,
+                        IntakePivotParamsNT.asPositionParamSources(),
+                        Degrees.of(0),
+                        Degrees.of(360));
+
         configureBindings();
     }
 
-    public void robotPeriodic() {
-        var now = Seconds.of(Timer.getTimestamp());
-        RobotStateRecorder.getInstance()
-                .putTransform(
-                        swerve.getEstimatedPose(),
-                        now,
-                        TransformRecorder.kFrameWorld,
-                        TransformRecorder.kFrameRobot);
-        RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
-        RobotStateRecorder.periodic();
-    }
+    public void robotPeriodic() {}
 
-    private void configureBindings() {
-        // Intake Pivot: A -> 0 degrees, B -> 100 degrees
-        // driver.a().onTrue(Commands.runOnce(() ->
-        // intakePivot.setPositionSetpoint(Degrees.of(0.0)), intakePivot));
-        // driver.b().onTrue(Commands.runOnce(() ->
-        // intakePivot.setPositionSetpoint(Degrees.of(40.0)), intakePivot));
-        swerve.setDefaultCommand(
-                SwerveCommands.driveWithJoystick(
-                        swerve,
-                        () -> -driver.getLeftY(),
-                        () -> -driver.getLeftX(),
-                        // () -> 0.0,
-                        () -> driver.getRightX(),
-                        RobotStateRecorder::getPoseDriverRobotCurrent,
-                        // () -> new Pose3d(),
-                        MetersPerSecond.of(0.04),
-                        DegreesPerSecond.of(3.0)));
-
-        driver.start()
-                .onTrue(
-                        SwerveCommands.resetAngle(
-                                        swerve,
-                                        () ->
-                                                AllianceFlipUtil.shouldFlip()
-                                                        ? Rotation2d.kZero
-                                                        : Rotation2d.k180deg)
-                                .alongWith(
-                                        Commands.runOnce(
-                                                () -> {
-                                                    RobotStateRecorder.getInstance()
-                                                            .resetTransform(
-                                                                    TransformRecorder.kFrameWorld,
-                                                                    TransformRecorder.kFrameRobot);
-                                                }))
-                                .ignoringDisable(true));
-    }
+    private void configureBindings() {}
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");

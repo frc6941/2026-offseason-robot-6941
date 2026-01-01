@@ -3,16 +3,14 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import lib.ironpulse.io.MotorIO;
-import lib.ironpulse.io.MotorIOSim;
-import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
+import lib.ironpulse.subsystem.position.PositionParamSources;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Elevator mechanism using ServoMotorSubsystem with custom functionality for zeroing and
@@ -29,24 +27,14 @@ public class ElevatorSubsystem
 
     private double previousSetPtMeter = 0;
 
-    public ElevatorSubsystem() {
-        super(
-                ElevatorConfig.CONFIG,
-                new MotorInputsAutoLogged(),
-                createIO(),
-                ElevatorParamsNT.asPositionParamSources(),
-                Meters.of(0),
-                Meters.of(ElevatorConfig.METERS_PER_ROTATION));
-    }
-
-    private static MotorIO createIO() {
-        if (Logger.hasReplaySource()) {
-            return new MotorIO() {};
-        } else if (RobotBase.isReal()) {
-            return new MotorIOTalonFX(ElevatorConfig.CONFIG);
-        } else {
-            return new MotorIOSim(ElevatorConfig.CONFIG);
-        }
+    public ElevatorSubsystem(
+            SubsystemConfig config,
+            MotorInputsAutoLogged inputs,
+            MotorIO io,
+            PositionParamSources params,
+            Distance initialSetpoint,
+            Distance mechanismUnitPerRotation) {
+        super(config, inputs, io, params, initialSetpoint, mechanismUnitPerRotation);
     }
 
     @Override
