@@ -49,30 +49,30 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
    * Open-loop duty cycle command,([-1.0, 1.0] where 1.0 = 100%).
    */
   public Command runDutyCycle(DoubleSupplier dutyCycle) {
-    return run(
-        () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()));
+    return Commands.run(
+        () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()),this);
   }
 
   /**
    * Open-loop duty cycle command, -12-12V.
    */
   public Command runVoltage(DoubleSupplier voltage) {
-    return run(
-        () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0)));
+    return Commands.run(
+        () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0)),this);
   }
 
   /**
    * Stop command
    */
   public Command runStop() {
-    return run(() -> io.setOpenLoopDutyCycle(0.0));
+    return Commands.run(() -> io.setOpenLoopDutyCycle(0.0),this);
   }
 
   /**
    * Set neutral mode command.
    */
   public Command setNeutralMode(boolean wantsBreak) {
-    return Commands.run(() -> io.setNeutralMode(wantsBreak),this);
+    return Commands.run(() -> io.setNeutralMode(wantsBreak));
   }
 
   public Current getStatorCurrent() {
