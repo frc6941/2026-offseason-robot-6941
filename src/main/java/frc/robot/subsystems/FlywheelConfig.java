@@ -10,18 +10,7 @@ import lib.ntext.NTParameter;
 
 /** Constants and NT-backed params for {@link FlywheelSubsystem}. */
 public final class FlywheelConfig {
-    private FlywheelConfig() {}
-
     public static final String NAME = "Flywheel";
-
-    // Local hardware constants (copied/adapted from provided snippet)
-    private static final int INTAKE_PIVOT_MOTOR_ID = 22;
-    // private static final int INTAKE_PIVOT_ENCODER_ID = 17;
-    // private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818;
-    // // (45/11)*(56/20)*(56/8)
-    // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; //
-    // -0.132568 - 0.25
-
     // Mechanism config
     public static final SimConfig SIM_CONFIG =
             SubsystemConfig.SimConfig.builder()
@@ -29,11 +18,17 @@ public final class FlywheelConfig {
                     .gearRatio(6.75)
                     .stdvs(new double[] {0.02, 0.02})
                     .build();
-
+    // Local hardware constants (copied/adapted from provided snippet)
+    private static final int INTAKE_ROLLER_MOTOR_ID = 15;
+    // private static final int INTAKE_PIVOT_ENCODER_ID = 17;
+    // private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO = 80.1818181818;
+    // // (45/11)*(56/20)*(56/8)
+    // private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; //
+    // -0.132568 - 0.25
     public static final SubsystemConfig CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainId(INTAKE_PIVOT_MOTOR_ID)
+                    .mainId(INTAKE_ROLLER_MOTOR_ID)
                     .mainBus(CANIVORE_CAN_BUS_NAME)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .SensorToMechanismRatio(1.0)
@@ -49,6 +44,8 @@ public final class FlywheelConfig {
                     // .build())
                     .simConfig(SIM_CONFIG)
                     .build();
+
+    private FlywheelConfig() {}
 
     @NTParameter(tableName = "Params/" + NAME)
     public static final class FlywheelParams {

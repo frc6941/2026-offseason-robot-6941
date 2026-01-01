@@ -13,24 +13,20 @@ import lib.ntext.NTParameter;
 
 /** Constants and NT-backed params for {@link IntakePivotSubsystem}. */
 public final class IntakePivotConfig {
-    private IntakePivotConfig() {}
-
     public static final String NAME = "IntakePivot";
-
-    // Local hardware constants (from RobotConstants.IntakeConstants)
-    private static final int INTAKE_PIVOT_MOTOR_ID = 16;
-    private static final int INTAKE_PIVOT_ENCODER_ID = 17;
-    private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO =
-            80.1818181818; // (45/11)*(56/20)*(56/8)
-    private static final double INTAKE_PIVOT_ENCODER_OFFSET = -0.382568; // -0.132568 - 0.25
-
     public static final SimConfig SIM_CONFIG =
             SubsystemConfig.SimConfig.builder()
                     .MOI(KilogramSquareMeters.of(1))
                     .gearRatio(1)
                     .stdvs(new double[] {0.02, 0.02})
                     .build();
-
+    // Local hardware constants (from RobotConstants.IntakeConstants)
+    private static final int INTAKE_PIVOT_MOTOR_ID = 16;
+    private static final int INTAKE_PIVOT_ENCODER_ID = 17;
+    private static final double INTAKE_PIVOT_ROTOR_ENCODER_RATIO =
+            80.1818181818; // (45/11)*(56/20)*(56/8)
+    private static final double INTAKE_PIVOT_ENCODER_OFFSET =
+            -0.466552734375; // -0.132568 - 0.25; // -0.132568; /
     // Mechanism config
     public static final SubsystemConfig CONFIG =
             SubsystemConfig.builder()
@@ -53,7 +49,10 @@ public final class IntakePivotConfig {
                                     .build())
                     .filterSize(5)
                     .simConfig(SIM_CONFIG)
+                    .zeroOffset(Revolution.of(0.25))
                     .build();
+
+    private IntakePivotConfig() {}
 
     @NTParameter(tableName = "Params/" + NAME)
     public static final class IntakePivotParams {

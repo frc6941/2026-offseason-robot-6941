@@ -11,9 +11,10 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -159,14 +160,15 @@ public class PositionMotorSubsystem<
 
     public Command runPosition(M setPoint) {
         return Commands.run(
-                () -> {
-                    Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
-                    Logger.recordOutput(config.name + "/mode", "POSITION");
-                    Logger.recordOutput(
-                            config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
-                    io.setPositionSetpoint(toAngle(setPoint).minus(zeroOffset));
-                    currSetpoint = setPoint;
-                },
+                        () -> {
+                            Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
+                            Logger.recordOutput(config.name + "/mode", "POSITION");
+                            Logger.recordOutput(
+                                    config.name + "/setPoint",
+                                    ((Measure) setPoint).in(mechanismUnit));
+                            io.setPositionSetpoint(toAngle(setPoint).minus(zeroOffset));
+                            currSetpoint = setPoint;
+                        },
                 this);
     }
 
@@ -210,25 +212,16 @@ public class PositionMotorSubsystem<
     public Command zeroCommand() {
         double zeroVoltage = MathUtil.clamp(config.zeroingConfig.zeroingVoltage, -12.0d, 12.0d);
 
-        Command init =
-                Commands.runOnce(
-                        () -> {
-                            currentFilter =
-                                    LinearFilter.movingAverage(
-                                            config.zeroingConfig.zeroingFilterSize);
-                            currentFilterValue = 0.0;
-                        },
-                        this);
-
-        Runnable stop =
-                () -> {
-                    Logger.recordOutput(config.name + "/mode", "VOLTAGE");
-                    Logger.recordOutput(config.name + "/setPoint", 0.0);
-                    io.setVoltage(0.0);
-                };
-
         Command realZero =
-                init.andThen(
+                Commands.runOnce(
+                                () -> {
+                                    currentFilter =
+                                            LinearFilter.movingAverage(
+                                                    config.zeroingConfig.zeroingFilterSize);
+                                    currentFilterValue = 0.0;
+                                },
+                                this)
+                        .andThen(
                                 Commands.deadline(
                                         Commands.run(
                                                         () ->
@@ -242,14 +235,16 @@ public class PositionMotorSubsystem<
                                                                                 .zeroingCurrentLimit),
                                         runVoltage(zeroVoltage)))
                         .andThen(Commands.runOnce(() -> io.setCurrentPositionAsZero(), this))
-                        .finallyDo(stop);
+                        .finallyDo(
+                                () -> {
+                                    Logger.recordOutput(config.name + "/mode", "VOLTAGE");
+                                    Logger.recordOutput(config.name + "/setPoint", 0.0);
+                                    io.setVoltage(0.0);
+                                });
 
-        Command simZero =
-                init.andThen(runMotionMagic(fromAngle(Rotations.of(0))))
-                        .until(() -> Math.abs(inputs.positionRot) < 0.01)
-                        .finallyDo(stop);
+        Command simZero = Commands.runOnce(() -> io.setCurrentPositionAsZero(), this);
 
-        return RobotBase.isReal() ? realZero : simZero;
+        return new ConditionalCommand(realZero, simZero, Robot::isReal);
     }
 
     public M getCurrPos() {

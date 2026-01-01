@@ -73,7 +73,13 @@ public class RobotContainer {
 
     public void robotPeriodic() {}
 
-    private void configureBindings() {}
+    private void configureBindings() {
+        driver.a().onTrue(elevator.zeroCommand());
+        driver.b().onTrue(elevator.runPosition(Meters.of(0.4)));
+        driver.x().onTrue(elevator.runPosition(Meters.of(0.1)));
+        driver.leftBumper().whileTrue(intakePivot.runPosition(Revolution.of(0.25)));
+        driver.y().onTrue(intakePivot.zeroCommand());
+    }
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
