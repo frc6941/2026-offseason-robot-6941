@@ -14,7 +14,6 @@ import lib.ironpulse.utils.PhoenixUtils;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ImuIOPigeon implements ImuIO {
     // Use the SAME sync thread and lock as swerve modules to ensure synchronized sampling
@@ -31,14 +30,14 @@ public class ImuIOPigeon implements ImuIO {
     private final StatusSignal<AngularVelocity> pitchVelocity;
     private final StatusSignal<Angle> roll;
     private final StatusSignal<AngularVelocity> rollVelocity;
-    
+
     // Odometry queues (only for yaw since that's what's needed for pose estimation)
     private Queue<Double> yawPositionQueue;
     private Queue<Double> timestampQueue;
 
     public ImuIOPigeon(SwerveMK5NConfig config) {
         this.config = config;
-        
+
         System.out.println("ImuIOPigeon: Initializing Pigeon2 with ID " + config.pigeonId);
         
         // Get the shared sync thread from swerve modules (it should already be created by now)
@@ -46,7 +45,7 @@ public class ImuIOPigeon implements ImuIO {
         
         // Initialize Pigeon2
         pigeon = new Pigeon2(config.pigeonId, config.canivoreCanBusName);
-        
+
         // Get status signals
         yaw = pigeon.getYaw();
         yawVelocity = pigeon.getAngularVelocityZWorld();
@@ -54,11 +53,12 @@ public class ImuIOPigeon implements ImuIO {
         pitchVelocity = pigeon.getAngularVelocityYWorld();
         roll = pigeon.getRoll();
         rollVelocity = pigeon.getAngularVelocityXWorld();
-        
+
         // Configure signal update frequencies
         configureSignalFrequencies();
-        
-        // Register signals with PhoenixUtils for automatic refresh (same as swerve modules)
+
+        // Register signals with PhoenixUtils for automatic refresh (same as swerve
+        // modules)
         PhoenixUtils.registerSignals(
                 true,
                 yaw,
@@ -66,15 +66,14 @@ public class ImuIOPigeon implements ImuIO {
                 pitch,
                 pitchVelocity,
                 roll,
-                rollVelocity
-        );
-        
+                rollVelocity);
+
         // Register yaw signal for odometry queue (same pattern as swerve modules)
         if (syncThread != null) {
             yawPositionQueue = syncThread.registerSignal(yaw.clone());
             timestampQueue = syncThread.makeTimestampQueue();
         }
-        
+
         // Fallback queues if sync thread registration fails
         if (yawPositionQueue == null) {
             yawPositionQueue = new ArrayDeque<>();
@@ -82,19 +81,19 @@ public class ImuIOPigeon implements ImuIO {
         if (timestampQueue == null) {
             timestampQueue = new ArrayDeque<>();
         }
-        
+
         pigeon.clearStickyFaults();
         pigeon.optimizeBusUtilization();
-        
+
         System.out.println("ImuIOPigeon: Pigeon2 initialized successfully");
     }
-    
+
     private void configureSignalFrequencies() {
         // High priority signals for control (100Hz = 10ms)
         yaw.setUpdateFrequency(config.odometryFrequency);
         yawVelocity.setUpdateFrequency(config.odometryFrequency);
-        
-        // Medium priority signals for telemetry (50Hz = 20ms) 
+
+        // Medium priority signals for telemetry (50Hz = 20ms)
         pitch.setUpdateFrequency(50.0);
         pitchVelocity.setUpdateFrequency(50.0);
         roll.setUpdateFrequency(50.0);
@@ -112,7 +111,7 @@ public class ImuIOPigeon implements ImuIO {
     public void updateInputs(ImuIOInputs inputs) {
         // Phoenix utils handles refreshing automatically, so we just read values
         inputs.connected = BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
-        
+
         // Current positions and velocities
         inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
         inputs.yawVelocityRadPerSec = yawVelocity.getValue().in(Units.RadiansPerSecond);
@@ -120,43 +119,41 @@ public class ImuIOPigeon implements ImuIO {
         inputs.pitchVelocityRadPerSec = pitchVelocity.getValue().in(Units.RadiansPerSecond);
         inputs.rollPosition = Rotation2d.fromDegrees (roll.getValueAsDouble());
         inputs.rollVelocityRadPerSec = rollVelocity.getValue().in(Units.RadiansPerSecond);
-        
+
         // Process odometry queues (same pattern as swerve modules)
         if (!yawPositionQueue.isEmpty() && !timestampQueue.isEmpty()) {
             // Convert queue data to arrays
             int queueSize = Math.min(yawPositionQueue.size(), timestampQueue.size());
-            
+
             inputs.odometryYawTimestamps = new double[queueSize];
             inputs.odometryYawPositions = new Rotation2d[queueSize];
             inputs.odometryRotations = new Rotation3d[queueSize];
-            
+
             for (int i = 0; i < queueSize; i++) {
                 double timestamp = timestampQueue.poll();
                 double yawDegrees = yawPositionQueue.poll();
-                
+
                 inputs.odometryYawTimestamps[i] = timestamp;
                 inputs.odometryYawPositions[i] = Rotation2d.fromDegrees(yawDegrees);
                 inputs.odometryRotations[i] = new Rotation3d(
-                    inputs.rollPosition.getRadians(),
-                    inputs.pitchPosition.getRadians(),
-                    Rotation2d.fromDegrees(yawDegrees).getRadians()
-                );
+                        inputs.rollPosition.getRadians(),
+                        inputs.pitchPosition.getRadians(),
+                        Rotation2d.fromDegrees(yawDegrees).getRadians());
             }
-            
+
             // Clear any remaining queue items to stay synchronized
             yawPositionQueue.clear();
             timestampQueue.clear();
         } else {
             // Fallback to current values if no queue data
-            inputs.odometryYawTimestamps = new double[]{yaw.getTimestamp().getTime()};
-            inputs.odometryYawPositions = new Rotation2d[]{inputs.yawPosition};
-            inputs.odometryRotations = new Rotation3d[]{
-                new Rotation3d(
-                    inputs.rollPosition.getRadians(),
-                    inputs.pitchPosition.getRadians(),
-                    inputs.yawPosition.getRadians()
-                )
+            inputs.odometryYawTimestamps = new double[] { yaw.getTimestamp().getTime() };
+            inputs.odometryYawPositions = new Rotation2d[] { inputs.yawPosition };
+            inputs.odometryRotations = new Rotation3d[] {
+                    new Rotation3d(
+                            inputs.rollPosition.getRadians(),
+                            inputs.pitchPosition.getRadians(),
+                            inputs.yawPosition.getRadians())
             };
         }
     }
-} 
+}

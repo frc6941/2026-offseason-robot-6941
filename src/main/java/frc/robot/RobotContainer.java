@@ -24,12 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveConstants;
-import frc.robot.subsystems.IntakePivotSubsystem;
-import lib.ironpulse.io.MotorIOTalonFX;
-import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.rbd.TransformRecorder;
-import lib.ironpulse.subsystem.ServoMotorSubsystem;
-import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.sim.ImuIOSim;
@@ -102,7 +97,7 @@ public class RobotContainer {
         
   }
 
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+    public Command getAutonomousCommand() {
+        return Commands.print("No autonomous command configured");
+    }
 }

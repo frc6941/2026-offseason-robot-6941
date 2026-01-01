@@ -1,6 +1,5 @@
 package lib.ironpulse.swerve;
 
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -29,7 +28,8 @@ public class SwerveModule {
     }
 
     /**
-     * Helper method to update drive controller parameters (PID + FF) by reading current TunableNumber values
+     * Helper method to update drive controller parameters (PID + FF) by reading
+     * current TunableNumber values
      */
     private void updateDriveController() {
         double kp = SwerveModuleParamsNT.Drive.kP.getValue();
@@ -42,7 +42,8 @@ public class SwerveModule {
     }
 
     /**
-     * Helper method to update steer controller parameters (PID + static friction) by reading current TunableNumber values
+     * Helper method to update steer controller parameters (PID + static friction)
+     * by reading current TunableNumber values
      */
     private void updateSteerController() {
         double kp = SwerveModuleParamsNT.Steer.kP.getValue();
@@ -65,8 +66,7 @@ public class SwerveModule {
         for (int i = 0; i < sampleCount; i++)
             odometryPositions[i] = new SwerveModulePosition(
                     data.driveMotorPositionRadSamples[i] * swerveConfig.wheelDiameter.in(Meter) * 0.5,
-                    new Rotation2d(data.steerMotorPositionRadSamples[i])
-            );
+                    new Rotation2d(data.steerMotorPositionRadSamples[i]));
 
         // run dynamic parameter updates
         if (SwerveModuleParamsNT.Drive.isAnyChanged())
@@ -111,7 +111,6 @@ public class SwerveModule {
         return RadiansPerSecond.of(data.steerMotorVelocityRadPerSec);
     }
 
-
     public SwerveModuleState getSwerveModuleState() {
         return new SwerveModuleState(getDriveVelocity(), new Rotation2d(unwrapAngle(0.0, getSteerAngle().in(Radian))));
     }
@@ -126,8 +125,7 @@ public class SwerveModule {
         for (int i = 0; i < sampleCount; i++)
             positions[i] = new SwerveModulePosition(
                     swerveConfig.wheelDiameter.times(data.driveMotorPositionRadSamples[i] * 0.5),
-                    new Rotation2d(data.steerMotorPositionRadSamples[i])
-            );
+                    new Rotation2d(data.steerMotorPositionRadSamples[i]));
         return positions;
     }
 }

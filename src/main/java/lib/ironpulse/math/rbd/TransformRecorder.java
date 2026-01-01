@@ -24,11 +24,9 @@ public class TransformRecorder {
     public static final Distance kFieldLength = Feet.of(54).plus(Inch.of(3));
     public static final Distance kFieldWidth = Feet.of(26).plus(Inch.of(3));
     public static final Pose3d kTransformWorldDriverStationBlue = new Pose3d(
-            new Pose2d(0, 0, Rotation2d.kZero)
-    );
+            new Pose2d(0, 0, Rotation2d.kZero));
     public static final Pose3d kTransformWorldDriverStationRed = new Pose3d(
-            new Pose2d(kFieldLength, kFieldWidth, Rotation2d.k180deg)
-    );
+            new Pose2d(kFieldLength, kFieldWidth, Rotation2d.k180deg));
 
     private final TreeMap<String, TransformNode> frameTree;
 
@@ -57,8 +55,7 @@ public class TransformRecorder {
             // Add dynamic transform from -> to
             double timeSec = time.in(Seconds);
             DynamicTransform dynTransform = fromNode.dynamicChildren.computeIfAbsent(
-                    to, k -> new DynamicTransform(bufferDuration)
-            );
+                    to, k -> new DynamicTransform(bufferDuration));
             dynTransform.addSample(timeSec, transform);
             // Set parent relationship for dynamic transforms too
             if (toNode.parent == null) {
@@ -90,7 +87,6 @@ public class TransformRecorder {
         fromNode.staticChildren.remove(to);
     }
 
-
     public void resetDynamicTransform(String from, String to) {
         frameTree.computeIfAbsent(from, TransformNode::new);
         frameTree.computeIfAbsent(to, TransformNode::new);
@@ -98,11 +94,9 @@ public class TransformRecorder {
         fromNode.dynamicChildren.remove(to);
     }
 
-
     public void putTransformWorldRobot(Pose2d transform, Time time) {
         putTransform(new Pose3d(transform), time, kFrameWorld, kFrameRobot);
     }
-
 
     public Pose2d getTransformWorldRobot(Time time) {
         return getTransform(time, kFrameWorld, kFrameRobot).orElseThrow().toPose2d();

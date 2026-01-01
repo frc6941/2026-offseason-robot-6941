@@ -15,7 +15,8 @@ public class MathTools {
     public static double TOLERANCE = 1e-5;
 
     /**
-     * Normalize a vector safely, returning the original if its magnitude is below tolerance.
+     * Normalize a vector safely, returning the original if its magnitude is below
+     * tolerance.
      *
      * @param input the vector to normalize.
      * @return a unit vector with same direction, or the original if too small.
@@ -29,10 +30,12 @@ public class MathTools {
     }
 
     /**
-     * Get the angle of a vector safely, return kZero if its magnitude is below tolerance.
+     * Get the angle of a vector safely, return kZero if its magnitude is below
+     * tolerance.
      *
      * @param input the vector to take angle of.
-     * @return an {@link Rotation2d} with the correct direction, or kZero if too small.
+     * @return an {@link Rotation2d} with the correct direction, or kZero if too
+     *         small.
      */
     public static Rotation2d toAngle(Translation2d input) {
         double norm = input.getNorm();
@@ -48,7 +51,8 @@ public class MathTools {
      * @param input        the vector to clamp.
      * @param minMagnitude the minimum allowed magnitude.
      * @param maxMagnitude the maximum allowed magnitude.
-     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the original.
+     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the
+     *         original.
      */
     public static Translation2d clampMagnitude(Translation2d input, double minMagnitude, double maxMagnitude) {
         double norm = input.getNorm();
@@ -61,7 +65,8 @@ public class MathTools {
      *
      * @param input        the vector to clamp.
      * @param maxMagnitude the maximum allowed magnitude.
-     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the original.
+     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the
+     *         original.
      */
     public static Translation2d clampMagnitude(Translation2d input, double maxMagnitude) {
         return clampMagnitude(input, 0.0, maxMagnitude);
@@ -157,7 +162,8 @@ public class MathTools {
     }
 
     /**
-     * Converts a Transform2d to a Pose2d to be used as a position or as the start of a kinematic
+     * Converts a Transform2d to a Pose2d to be used as a position or as the start
+     * of a kinematic
      * chain
      *
      * @param transform The transform that will represent the pose
@@ -170,8 +176,7 @@ public class MathTools {
     public static Pose2d toPose2d(ChassisSpeeds speed) {
         return new Pose2d(
                 new Translation2d(speed.vxMetersPerSecond, speed.vyMetersPerSecond),
-                new Rotation2d(speed.omegaRadiansPerSecond)
-        );
+                new Rotation2d(speed.omegaRadiansPerSecond));
     }
 
     /**
@@ -216,7 +221,8 @@ public class MathTools {
     }
 
     /**
-     * Converts a Transform3d to a Pose3d to be used as a position or as the start of a kinematic
+     * Converts a Transform3d to a Pose3d to be used as a position or as the start
+     * of a kinematic
      * chain
      *
      * @param transform The transform that will represent the pose
@@ -227,7 +233,8 @@ public class MathTools {
     }
 
     /**
-     * Converts a ChassisSpeeds to a Twist2d by extracting two dimensions (Y and Z). chain
+     * Converts a ChassisSpeeds to a Twist2d by extracting two dimensions (Y and Z).
+     * chain
      *
      * @param speeds The original translation
      * @return The resulting translation
@@ -257,7 +264,6 @@ public class MathTools {
     public static Pose2d withRotation(Pose2d pose, Rotation2d rotation) {
         return new Pose2d(pose.getTranslation(), rotation);
     }
-
 
     /**
      * Unwrap an angle to be within ±π of a from.

@@ -31,13 +31,15 @@ public class Logging {
     }
 
     public static void log(Level level, String tag, String format, Object... arguments) {
-        if (!shouldLog(level)) return;
+        if (!shouldLog(level))
+            return;
 
         String formattedMessage = String.format(format, arguments);
         String threadName = Thread.currentThread().getName();
         double rioTime = Timer.getFPGATimestamp();
         double matchTime = Timer.getMatchTime();
-        String matchStage = DriverStation.isAutonomousEnabled() ? "Auto" : DriverStation.isTeleopEnabled() ? "Tele" : "Prep";
+        String matchStage = DriverStation.isAutonomousEnabled() ? "Auto"
+                : DriverStation.isTeleopEnabled() ? "Tele" : "Prep";
 
         String output = printFormat
                 .replace("%matchStage%", matchStage)

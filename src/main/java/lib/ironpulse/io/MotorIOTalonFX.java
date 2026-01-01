@@ -10,12 +10,14 @@ import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -23,17 +25,21 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.PhoenixUtils;
 
 /**
- * TalonFX implementation of MotorIO, with optional remote CANcoder feedback and followers.
+ * TalonFX implementation of MotorIO, with optional remote CANcoder feedback and
+ * followers.
  *
- * Note: Mechanism units returned by getPosition()/getVelocity() depend on Phoenix Feedback
- * ratios (SensorToMechanismRatio, RotorToSensorRatio) configured via SubsystemConfig.
+ * Note: Mechanism units returned by getPosition()/getVelocity() depend on
+ * Phoenix Feedback
+ * ratios (SensorToMechanismRatio, RotorToSensorRatio) configured via
+ * SubsystemConfig.
  */
 public class MotorIOTalonFX implements MotorIO {
   private final TalonFX main;
   private final TalonFX[] followers;
 
   private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
-  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0).withEnableFOC(true);
+  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0)
+      .withEnableFOC(true);
   private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
   private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
@@ -46,12 +52,13 @@ public class MotorIOTalonFX implements MotorIO {
   private final BaseStatusSignal[] signals;
   private boolean connected = false;
   private final TalonFXConfiguration fx;
-  //TODO: static ArrayList<MotorIOTalonFX> instances
+
+
   public MotorIOTalonFX(SubsystemConfig cfg) {
     this.main = new TalonFX(cfg.mainId, cfg.mainBus);
 
     this.fx = cfg.fxConfig;
-    
+
     fx.MotorOutput.Inverted = cfg.motorInvertedValue;
     // Optional: remote CANcoder feedback configuration
     if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
@@ -89,6 +96,7 @@ public class MotorIOTalonFX implements MotorIO {
     supplyVoltSig = main.getSupplyVoltage();
     statorSig = main.getStatorCurrent();
     supplySig = main.getSupplyCurrent();
+
     signals = new BaseStatusSignal[] { posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig };
     // configure update frequencies and register signals
     posSig.setUpdateFrequency(100.0);
@@ -112,15 +120,16 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void readInputs(MotorInputs inputs) {
-    connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig,supplyVoltSig, statorSig, supplySig);
+    connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig);
     inputs.positionRot = posSig.getValueAsDouble();
     inputs.velocityRotPerSecond = velSig.getValueAsDouble();
     inputs.motorVolts = motorVoltSig.getValueAsDouble();
-    inputs.motorVolts = supplyVoltSig.getValueAsDouble();
+    inputs.appliedVolts = supplyVoltSig.getValueAsDouble();
     inputs.currentStatorAmps = statorSig.getValueAsDouble();
     inputs.currentSupplyAmps = supplySig.getValueAsDouble();
   }
 
+  @Override
   /** Whether all primary signals are reporting without errors. */
   public boolean isConnected() {
     return connected;
@@ -142,7 +151,12 @@ public class MotorIOTalonFX implements MotorIO {
     dynamicMotionMagicCtrl.Acceleration = acceleration;
     dynamicMotionMagicCtrl.Jerk = jerk;
     main.setControl(dynamicMotionMagicCtrl
-      .withPosition(position));
+        .withPosition(position));
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    main.setControl(new VoltageOut(voltage));
   }
 
   @Override

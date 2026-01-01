@@ -47,9 +47,9 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
     private Queue<Event> eventQueue = new LinkedList<>();
 
     public SwerveFollowPathPlannerTrajectory(Swerve swerve, Supplier<Pose3d> poseWorldRobotSupplier,
-                                             PathPlannerTrajectory trajectory, PIDController translationController,
-                                             PIDController rotationController, Distance translationTolerance,
-                                             Angle rotationTolerance, Consumer<Event> eventConsumer
+            PathPlannerTrajectory trajectory, PIDController translationController,
+            PIDController rotationController, Distance translationTolerance,
+            Angle rotationTolerance, Consumer<Event> eventConsumer
 
     ) {
         // initialize
@@ -66,10 +66,13 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
         // sort through the events by time, so at runtime polling is easy
         var events = trajectory.getEvents();
         events.sort((x, y) -> {
-            double t1 = x.getTimestampSeconds();;
+            double t1 = x.getTimestampSeconds();
+            ;
             double t2 = y.getTimestampSeconds();
-            if (t1 < t2) return -1;
-            else if (t1 > t2) return 1;
+            if (t1 < t2)
+                return -1;
+            else if (t1 > t2)
+                return 1;
             return 0;
         });
         eventQueue = new LinkedList<>(events);
@@ -79,11 +82,10 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
             Swerve swerve, Supplier<Pose3d> poseWorldRobotSupplier,
             PathPlannerTrajectory trajectory, PIDController translationController,
             PIDController rotationController, Distance translationTolerance,
-            Angle rotationTolerance
-    ) {
-        this(swerve, poseWorldRobotSupplier, trajectory, translationController, rotationController, translationTolerance, rotationTolerance, null);
+            Angle rotationTolerance) {
+        this(swerve, poseWorldRobotSupplier, trajectory, translationController, rotationController,
+                translationTolerance, rotationTolerance, null);
     }
-
 
     @Override
     public void initialize() {
@@ -112,7 +114,8 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
         double pRT_norm = pRT.getNorm();
         Rotation2d pRT_dir = toAngle(pRT);
         // NOTE: as pRT_norm is always positive, then vRT_norm is always negative.
-        // to make the robot move along but not opposite to pRT_dir, we take the minus sign before vRT_norm
+        // to make the robot move along but not opposite to pRT_dir, we take the minus
+        // sign before vRT_norm
         double vRT_norm = translationController.calculate(pRT_norm, 0.0);
         Translation2d vRT = new Translation2d(-vRT_norm, pRT_dir);
         // compute rotation err, turn into angular velocity scalar
@@ -125,7 +128,7 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
         swerve.runTwistWithTorque(V_FF.plus(V_FB), tau_FF);
 
         // handle events
-        while (eventConsumer !=null && !eventQueue.isEmpty() && eventQueue.peek().getTimestampSeconds() <= t)
+        while (eventConsumer != null && !eventQueue.isEmpty() && eventQueue.peek().getTimestampSeconds() <= t)
             eventConsumer.accept(eventQueue.poll());
     }
 
@@ -143,11 +146,10 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
             Pose2d poseWorldTrajectoryEnd = trajectory.getEndState().pose;
             boolean isOnTarget = epsilonEquals(
                     poseWorldRobotCurrent.getTranslation(), poseWorldTrajectoryEnd.getTranslation(),
-                    translationTolerance.in(Meters)
-            ) && epsilonEquals(
-                    poseWorldRobotCurrent.getRotation(), poseWorldTrajectoryEnd.getRotation(),
-                    rotationTolerance.in(Radians)
-            );
+                    translationTolerance.in(Meters))
+                    && epsilonEquals(
+                            poseWorldRobotCurrent.getRotation(), poseWorldTrajectoryEnd.getRotation(),
+                            rotationTolerance.in(Radians));
             return isTimeout && isOnTarget;
         }
 

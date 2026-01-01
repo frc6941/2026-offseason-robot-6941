@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.VoltageUnit;
 import frc.robot.RobotConstants;
 import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveLimit;
@@ -13,9 +15,9 @@ import lib.ironpulse.swerve.mk5n.SwerveMK5NConfig;
 import lib.ntext.NTParameter;
 
 /**
-   * Constants specific to the swerve drivetrain configuration.
-   */
-  public final class SwerveConstants {
+ * Constants specific to the swerve drivetrain configuration.
+ */
+public final class SwerveConstants {
     public static final String kSwerveTag = "Swerve";
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
     public static final double kSwerveHalfWidth = 0.6/ 2.0;
@@ -41,7 +43,6 @@ import lib.ntext.NTParameter;
         // accelerate in 0.2s, also must be smaller than the defined module limit to be actually effective
         .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0))
         .build();
-
 
     public static SwerveConfig.SwerveModuleConfig kModuleCompFL = SwerveConfig.SwerveModuleConfig.builder()
         .name("FL")
@@ -130,8 +131,8 @@ import lib.ntext.NTParameter;
         .pigeonId(RobotConstants.PIGEON_ID)
         .build();
 
-
     @NTParameter(tableName = "Params" + "/" + kSwerveModuleTag)
+    @SuppressWarnings("unused")
     private final static class SwerveModuleParams {
       private final static class Drive {
         static final double kP = 4;
@@ -153,4 +154,4 @@ import lib.ntext.NTParameter;
         static final boolean isBrake = true;
       }
     }
-  }
+}

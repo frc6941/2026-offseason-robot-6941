@@ -30,7 +30,8 @@ public class DecisionTree {
 
   public void registerCallback() {
     CommandScheduler.getInstance().onCommandFinish(command -> {
-      if(command == currentCommand) shouldAdvanceCurrent = true;
+      if (command == currentCommand)
+        shouldAdvanceCurrent = true;
     });
   }
 

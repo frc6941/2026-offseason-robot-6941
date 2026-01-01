@@ -16,8 +16,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
- * The {@link ReloadableChooser} class is a useful tool for presenting a selection of options to the
- * {@link SmartDashboard}. Options can be added, removed, or cleared dynamically.
+ * The {@link ReloadableChooser} class is a useful tool for presenting a
+ * selection of options to the
+ * {@link SmartDashboard}. Options can be added, removed, or cleared
+ * dynamically.
  *
  * @param <V> The type of the values to be stored
  */
@@ -51,7 +53,7 @@ public class ReloadableChooser<V> implements Sendable, AutoCloseable {
   /**
    * Adds the given object to the list of options.
    *
-   * @param name the name of the option
+   * @param name   the name of the option
    * @param object the option
    */
   public void addOption(String name, V object) {
@@ -61,7 +63,7 @@ public class ReloadableChooser<V> implements Sendable, AutoCloseable {
   /**
    * Adds the given object and marks it as the default.
    *
-   * @param name the name of the option
+   * @param name   the name of the option
    * @param object the option
    */
   public void setDefaultOption(String name, V object) {

@@ -16,21 +16,25 @@ import static edu.wpi.first.units.Units.*;
  * Enforces velocity and acceleration at the chassis level.
  *
  * <p>
- * The {@code SwerveLimit} class defines maximum linear and angular speeds and accelerations for swerve chassis.
- * Use the {@link #apply(ChassisSpeeds, ChassisSpeeds, double)} method to clamp and integrate desired speeds based on the current state
+ * The {@code SwerveLimit} class defines maximum linear and angular speeds and
+ * accelerations for swerve chassis.
+ * Use the {@link #apply(ChassisSpeeds, ChassisSpeeds, double)} method to clamp
+ * and integrate desired speeds based on the current state
  * and a time step.
  * </p>
  */
 @Builder
 public record SwerveLimit(LinearVelocity maxLinearVelocity, LinearAcceleration maxSkidAcceleration,
-                          AngularVelocity maxAngularVelocity, AngularAcceleration maxAngularAcceleration) {
+        AngularVelocity maxAngularVelocity, AngularAcceleration maxAngularAcceleration) {
     /**
-     * Apply linear and angular velocity and acceleration limits to the desired chassis speeds.
+     * Apply linear and angular velocity and acceleration limits to the desired
+     * chassis speeds.
      *
      * @param curr current chassis speeds.
      * @param des  desired chassis speeds.
      * @param dt   delta time in seconds.
-     * @return a new {@link ChassisSpeeds} instance with velocities limited and discretized.
+     * @return a new {@link ChassisSpeeds} instance with velocities limited and
+     *         discretized.
      */
     public ChassisSpeeds apply(ChassisSpeeds curr, ChassisSpeeds des, double dt) {
         // go from continuous to discrete

@@ -1,4 +1,5 @@
 package lib.ironpulse.io;
+
 import org.littletonrobotics.junction.AutoLog;
 
 @AutoLog
@@ -10,5 +11,3 @@ public class MotorInputs {
   public double currentStatorAmps = 0.0;
   public double currentSupplyAmps = 0.0;
 }
-
-

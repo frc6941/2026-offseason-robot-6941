@@ -26,13 +26,19 @@ import java.util.function.DoubleSupplier;
 import static edu.wpi.first.units.Units.Hertz;
 
 /**
- * Adapted from https://github.com/Mechanical-Advantage/RobotCode2025Public/blob/main/src/main/java/org/littletonrobotics/frc2025/subsystems/drive/PhoenixOdometryThread.java
+ * Adapted from
+ * https://github.com/Mechanical-Advantage/RobotCode2025Public/blob/main/src/main/java/org/littletonrobotics/frc2025/subsystems/drive/PhoenixOdometryThread.java
  * <p>
- * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
+ * Provides an interface for asynchronously reading high-frequency measurements
+ * to a set of queues.
  *
- * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore buses. When using
- * a CANivore, the thread uses the "waitForAll" blocking method to enable more consistent sampling.
- * This also allows Phoenix Pro users to benefit from lower latency between devices using CANivore
+ * <p>
+ * This version is intended for Phoenix 6 devices on both the RIO and CANivore
+ * buses. When using
+ * a CANivore, the thread uses the "waitForAll" blocking method to enable more
+ * consistent sampling.
+ * This also allows Phoenix Pro users to benefit from lower latency between
+ * devices using CANivore
  * time synchronization.
  */
 public class PhoenixSynchronizationThread extends Thread {
@@ -128,7 +134,8 @@ public class PhoenixSynchronizationThread extends Thread {
                     // that is not CAN FD, regardless of Pro licensing. No reasoning for this
                     // behavior is provided by the documentation.
                     Thread.sleep((long) (1000.0 / frequency));
-                    if (phoenixSignals.length > 0) BaseStatusSignal.refreshAll(phoenixSignals);
+                    if (phoenixSignals.length > 0)
+                        BaseStatusSignal.refreshAll(phoenixSignals);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -140,8 +147,8 @@ public class PhoenixSynchronizationThread extends Thread {
             userLock.lock();
             try {
                 // Sample timestamp is current FPGA time minus average CAN latency
-                //     Default timestamps from Phoenix are NOT compatible with
-                //     FPGA timestamps, this solution is imperfect but close
+                // Default timestamps from Phoenix are NOT compatible with
+                // FPGA timestamps, this solution is imperfect but close
                 double timestamp = RobotController.getFPGATime() / 1e6;
                 double totalLatency = 0.0;
                 for (BaseStatusSignal signal : phoenixSignals) {
@@ -166,4 +173,4 @@ public class PhoenixSynchronizationThread extends Thread {
             }
         }
     }
-} 
+}

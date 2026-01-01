@@ -19,14 +19,13 @@ public class ImuIOSim implements ImuIO {
         inputs.pitchVelocityRadPerSec = 0.0;
         inputs.rollPosition = new Rotation2d();
         inputs.rollVelocityRadPerSec = 0.0;
-        inputs.odometryYawTimestamps = new double[]{Timer.getTimestamp()};
-        inputs.odometryYawPositions = new Rotation2d[]{inputs.yawPosition};
-        inputs.odometryRotations = new Rotation3d[]{
+        inputs.odometryYawTimestamps = new double[] { Timer.getTimestamp() };
+        inputs.odometryYawPositions = new Rotation2d[] { inputs.yawPosition };
+        inputs.odometryRotations = new Rotation3d[] {
                 new Rotation3d(
                         inputs.rollPosition.getMeasure(),
                         inputs.pitchPosition.getMeasure(),
-                        inputs.yawPosition.getMeasure()
-                )
+                        inputs.yawPosition.getMeasure())
         };
     }
 }

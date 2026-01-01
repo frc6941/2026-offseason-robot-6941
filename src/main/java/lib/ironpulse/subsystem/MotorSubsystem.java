@@ -1,11 +1,11 @@
 package lib.ironpulse.subsystem;
 
-import edu.wpi.first.units.Units;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -20,14 +20,14 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.DoubleSupplier;
 
 /**
- * Skeleton base for single-motor mechanisms following the AdvantageKit IO style.
+ * Skeleton base for single-motor mechanisms following the AdvantageKit IO
+ * style.
  *
  * - Owns IO and AutoLogged inputs
  * - Reads inputs and logs in periodic()
  * - Provides minimal open-loop helper command
  */
 public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> extends SubsystemBase {
-  //TODO: perhaps this is not a very good place to extend SubsystemBase, considering impliment subsystem instead?
   protected final U io;
   protected final T inputs;
   protected final SubsystemConfig config;
@@ -46,32 +46,48 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO> 
   }
 
   /**
-   * Open-loop duty cycle command, exits instantly ([-1.0, 1.0] where 1.0 = 100%).
+   * Open-loop duty cycle command,([-1.0, 1.0] where 1.0 = 100%).
    */
   public Command runDutyCycle(DoubleSupplier dutyCycle) {
-    return run(
-        () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()));
+    return Commands.run(
+        () -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()),this);
   }
 
   /**
-   * Stop command, exits instantly.
+   * Open-loop duty cycle command, -12-12V.
+   */
+  public Command runVoltage(DoubleSupplier voltage) {
+    return Commands.run(
+        () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0)),this);
+  }
+
+  /**
+   * Stop command
    */
   public Command runStop() {
-    return run(() -> io.setOpenLoopDutyCycle(0.0));
+    return Commands.run(() -> io.setOpenLoopDutyCycle(0.0),this);
   }
 
   /**
-   * Set neutral mode command, exits instantly.
+   * Set neutral mode command.
    */
   public Command setNeutralMode(boolean wantsBreak) {
-    return run(() -> io.setNeutralMode(wantsBreak));
+    return Commands.run(() -> io.setNeutralMode(wantsBreak));
   }
 
-  public Current getStatorCurrent() { return Amps.of(inputs.currentStatorAmps); }
-  public Current getSupplyCurrent() { return Amps.of(inputs.currentSupplyAmps); }
-  public Voltage getMotorVoltage() { return Volts.of(inputs.motorVolts); }
-  public AngularVelocity getVelocityUnitsPerSecond() { 
-    return Rotations.of(inputs.velocityRotPerSecond).div(Seconds.of(1)); }
+  public Current getStatorCurrent() {
+    return Amps.of(inputs.currentStatorAmps);
+  }
+
+  public Current getSupplyCurrent() {
+    return Amps.of(inputs.currentSupplyAmps);
+  }
+
+  public Voltage getMotorVoltage() {
+    return Volts.of(inputs.motorVolts);
+  }
+
+  public AngularVelocity getVelocityUnitsPerSecond() {
+    return Rotations.of(inputs.velocityRotPerSecond).div(Seconds.of(1));
+  }
 }
-
-

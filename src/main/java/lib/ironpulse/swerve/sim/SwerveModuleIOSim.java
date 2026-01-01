@@ -35,16 +35,14 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
                 LinearSystemId.createDCMotorSystem(
                         config.driveMotor,
                         config.driveMomentOfInertia.in(KilogramSquareMeters),
-                        config.driveGearRatio
-                ), config.driveMotor, config.driveStdDevPos, config.driveStdDevVel
-        );
+                        config.driveGearRatio),
+                config.driveMotor, config.driveStdDevPos, config.driveStdDevVel);
         steerMotorSim = new DCMotorSim(
                 LinearSystemId.createDCMotorSystem(
                         config.steerMotor,
                         config.steerMomentOfInertia.in(KilogramSquareMeters),
-                        config.steerGearRatio
-                ), config.steerMotor, config.steerStdDevPos, config.steerStdDevVel
-        );
+                        config.steerGearRatio),
+                config.steerMotor, config.steerStdDevPos, config.steerStdDevVel);
     }
 
     private void initializeControllers() {
@@ -57,7 +55,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
     public void updateInputs(SwerveModuleIOInputs data) {
         data.driveMotorConnected = true;
         data.driveMotorPositionRad = driveMotorSim.getAngularPositionRad();
-        data.driveMotorPositionRadSamples = new double[]{data.driveMotorPositionRad};
+        data.driveMotorPositionRadSamples = new double[] { data.driveMotorPositionRad };
         data.driveMotorVelocityRadPerSec = driveMotorSim.getAngularVelocityRadPerSec();
         data.driveMotorTemperatureCel = 25.0;
         data.driveMotorVoltageVolt = driveMotorAppliedVoltage;
@@ -66,7 +64,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 
         data.steerMotorConnected = true;
         data.steerMotorPositionRad = steerMotorSim.getAngularPositionRad();
-        data.steerMotorPositionRadSamples = new double[]{data.steerMotorPositionRad};
+        data.steerMotorPositionRadSamples = new double[] { data.steerMotorPositionRad };
         data.steerMotorVelocityRadPerSec = steerMotorSim.getAngularVelocityRadPerSec();
         data.steerMotorTemperatureCel = 25.0;
         data.steerMotorVoltageVolt = steerMotorAppliedVoltage;
@@ -124,15 +122,14 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
         driveFB.setP(kp);
         driveFB.setI(ki);
         driveFB.setD(kd);
-            
+
         // Configure FF
         driveFF = new SimpleMotorFeedforward(ks, kv, ka);
 
         Logging.info(
                 config.name + "Module",
                 "Module drive controller updated! kp: %.2f, ki: %.2f, kd: %.2f",
-                kp, ki, kd
-        );
+                kp, ki, kd);
     }
 
     @Override
@@ -144,8 +141,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
         Logging.info(
                 config.name + "Module",
                 "Module steer controller updated! kp: %.2f, ki: %.2f, kd: %.2f",
-                kp, ki, kd
-        );
+                kp, ki, kd);
     }
 
 }

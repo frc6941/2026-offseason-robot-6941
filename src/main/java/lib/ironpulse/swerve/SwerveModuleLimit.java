@@ -11,6 +11,6 @@ import lombok.Builder;
  */
 @Builder
 public record SwerveModuleLimit(
-        LinearVelocity maxDriveVelocity, LinearAcceleration maxDriveAcceleration,
-        AngularVelocity maxSteerAngularVelocity, AngularAcceleration maxSteerAngularAcceleration) {
+                LinearVelocity maxDriveVelocity, LinearAcceleration maxDriveAcceleration,
+                AngularVelocity maxSteerAngularVelocity, AngularAcceleration maxSteerAngularAcceleration) {
 }
