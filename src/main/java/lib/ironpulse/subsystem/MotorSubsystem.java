@@ -29,6 +29,9 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
     protected final T inputs;
     protected final SubsystemConfig config;
 
+    protected ControlMode mode = ControlMode.STOP;
+    protected double setpoint = 0.0;
+
     public MotorSubsystem(SubsystemConfig config, T inputs, U io) {
         super(config.name);
         this.config = config;
@@ -40,22 +43,65 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
     public void periodic() {
         io.readInputs(inputs);
         Logger.processInputs("Subsystem/" + getName(), inputs);
+        logState();
+    }
+
+    protected void logState() {
+        Logger.recordOutput(config.name + "/mode", mode.name());
+        Logger.recordOutput(config.name + "/setPoint", setpoint);
+    }
+
+    /** Open-loop duty cycle command,([-1.0, 1.0] where 1.0 = 100%). */
+    public Command runDutyCycle(double dutyCycle) {
+        return Commands.run(() -> {
+                    setpoint = MathUtil.clamp(dutyCycle, -1.0, 1.0);
+                    io.setOpenLoopDutyCycle(setpoint);
+                    mode = ControlMode.DUTY_CYCLE;
+                },
+                this);
     }
 
     /** Open-loop duty cycle command,([-1.0, 1.0] where 1.0 = 100%). */
     public Command runDutyCycle(DoubleSupplier dutyCycle) {
-        return Commands.run(() -> io.setOpenLoopDutyCycle(dutyCycle.getAsDouble()), this);
+        return Commands.run(
+                () -> {
+                    setpoint = MathUtil.clamp(dutyCycle.getAsDouble(), -1.0, 1.0);
+                    io.setOpenLoopDutyCycle(setpoint);
+                    mode = ControlMode.DUTY_CYCLE;
+                },
+                this);
+    }
+
+    /** Open-loop duty cycle command, -12-12V. */
+    public Command runVoltage(double voltage) {
+        return Commands.run(() -> {
+                    setpoint = MathUtil.clamp(voltage, -12.0, 12.0);
+                    io.setVoltage(setpoint);
+                    mode = ControlMode.VOLTAGE;
+                },
+                this);
     }
 
     /** Open-loop duty cycle command, -12-12V. */
     public Command runVoltage(DoubleSupplier voltage) {
         return Commands.run(
-                () -> io.setVoltage(MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0)), this);
+                () -> {
+                    setpoint = MathUtil.clamp(voltage.getAsDouble(), -12.0, 12.0);
+                    io.setVoltage(setpoint);
+                    mode = ControlMode.VOLTAGE;
+                },
+                this);
     }
 
     /** Stop command */
     public Command runStop() {
-        return Commands.run(() -> io.setOpenLoopDutyCycle(0.0), this);
+        return Commands.run(
+                () -> {
+                    io.setOpenLoopDutyCycle(0.0);
+                    mode = ControlMode.STOP;
+                    setpoint = 0.0;
+                },
+                this);
     }
 
     /** Set neutral mode command. */

@@ -11,7 +11,6 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.position.PositionParamSources;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Elevator mechanism using ServoMotorSubsystem with custom functionality for zeroing and
@@ -47,7 +46,6 @@ public class ElevatorSubsystem
             isGoingUp = setPtMeter > previousSetPtMeter;
             previousSetPtMeter = setPtMeter;
         }
-
     }
 
     @Override
