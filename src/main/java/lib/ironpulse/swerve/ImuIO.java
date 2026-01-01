@@ -6,11 +6,9 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ImuIO {
     // read
-    default void updateInputs(ImuIOInputs inputs) {
-    }
+    default void updateInputs(ImuIOInputs inputs) {}
 
-    default void reset() {
-    }
+    default void reset() {}
 
     @AutoLog
     class ImuIOInputs {
@@ -26,5 +24,4 @@ public interface ImuIO {
         public Rotation2d[] odometryYawPositions = new Rotation2d[0];
         public Rotation3d[] odometryRotations = new Rotation3d[0];
     }
-
 }

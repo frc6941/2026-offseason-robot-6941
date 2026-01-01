@@ -1,19 +1,18 @@
 package lib.ironpulse.math.rbd;
 
+import static edu.wpi.first.units.Units.*;
+import static lib.ironpulse.math.rbd.TransformTools.inverse;
+import static lib.ironpulse.math.rbd.TransformTools.toTransform3d;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.*;
-
-import static edu.wpi.first.units.Units.*;
-import static lib.ironpulse.math.rbd.TransformTools.inverse;
-import static lib.ironpulse.math.rbd.TransformTools.toTransform3d;
 
 public class TransformRecorder {
     public static final String kFrameWorld = "World";
@@ -23,22 +22,21 @@ public class TransformRecorder {
 
     public static final Distance kFieldLength = Feet.of(54).plus(Inch.of(3));
     public static final Distance kFieldWidth = Feet.of(26).plus(Inch.of(3));
-    public static final Pose3d kTransformWorldDriverStationBlue = new Pose3d(
-            new Pose2d(0, 0, Rotation2d.kZero));
-    public static final Pose3d kTransformWorldDriverStationRed = new Pose3d(
-            new Pose2d(kFieldLength, kFieldWidth, Rotation2d.k180deg));
+    public static final Pose3d kTransformWorldDriverStationBlue =
+            new Pose3d(new Pose2d(0, 0, Rotation2d.kZero));
+    public static final Pose3d kTransformWorldDriverStationRed =
+            new Pose3d(new Pose2d(kFieldLength, kFieldWidth, Rotation2d.k180deg));
 
     private final TreeMap<String, TransformNode> frameTree;
 
-    @Getter
-    @Setter
-    private double bufferDuration = 3.0;
+    @Getter @Setter private double bufferDuration = 3.0;
 
     public TransformRecorder() {
         frameTree = new TreeMap<>();
     }
 
-    public void putTransform(Pose3d transform, Time time, String from, String to, boolean isStatic) {
+    public void putTransform(
+            Pose3d transform, Time time, String from, String to, boolean isStatic) {
         // Ensure both frames exist in the tree
         frameTree.computeIfAbsent(from, TransformNode::new);
         frameTree.computeIfAbsent(to, TransformNode::new);
@@ -54,8 +52,9 @@ public class TransformRecorder {
         } else {
             // Add dynamic transform from -> to
             double timeSec = time.in(Seconds);
-            DynamicTransform dynTransform = fromNode.dynamicChildren.computeIfAbsent(
-                    to, k -> new DynamicTransform(bufferDuration));
+            DynamicTransform dynTransform =
+                    fromNode.dynamicChildren.computeIfAbsent(
+                            to, k -> new DynamicTransform(bufferDuration));
             dynTransform.addSample(timeSec, transform);
             // Set parent relationship for dynamic transforms too
             if (toNode.parent == null) {

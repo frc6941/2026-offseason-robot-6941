@@ -9,7 +9,6 @@ package lib.ironpulse.utils;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
-
 import java.util.function.Supplier;
 
 public class PhoenixUtils {
@@ -17,8 +16,7 @@ public class PhoenixUtils {
     public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
         for (int i = 0; i < maxAttempts; i++) {
             var error = command.get();
-            if (error.isOK())
-                break;
+            if (error.isOK()) break;
         }
     }
 
@@ -30,12 +28,14 @@ public class PhoenixUtils {
     /** Registers a set of signals for synchronized refresh. */
     public static void registerSignals(boolean canivore, BaseStatusSignal... signals) {
         if (canivore) {
-            BaseStatusSignal[] newSignals = new BaseStatusSignal[canivoreSignals.length + signals.length];
+            BaseStatusSignal[] newSignals =
+                    new BaseStatusSignal[canivoreSignals.length + signals.length];
             System.arraycopy(canivoreSignals, 0, newSignals, 0, canivoreSignals.length);
             System.arraycopy(signals, 0, newSignals, canivoreSignals.length, signals.length);
             canivoreSignals = newSignals;
         } else {
-            BaseStatusSignal[] newSignals = new BaseStatusSignal[rioSignals.length + signals.length];
+            BaseStatusSignal[] newSignals =
+                    new BaseStatusSignal[rioSignals.length + signals.length];
             System.arraycopy(rioSignals, 0, newSignals, 0, rioSignals.length);
             System.arraycopy(signals, 0, newSignals, rioSignals.length, signals.length);
             rioSignals = newSignals;

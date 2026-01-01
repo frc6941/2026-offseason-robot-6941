@@ -2,7 +2,6 @@ package lib.ntext;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
     id "com.peterabeles.gversion" version "1.10"
+    id "com.diffplug.spotless" version "6.25.0"
 }
 
 java {
@@ -157,7 +158,20 @@ tasks.withType(JavaCompile) {
 }
 
 // Create version file
-project.compileJava.dependsOn(createVersionFile)
+project.compileJava.dependsOn('spotlessApply')
+tasks.named('spotlessApply') {
+    dependsOn('createVersionFile')
+}
+spotless {
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.17.0').aosp()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
 gversion {
     srcDir = "src/main/java/"
     classPackage = "frc.robot"

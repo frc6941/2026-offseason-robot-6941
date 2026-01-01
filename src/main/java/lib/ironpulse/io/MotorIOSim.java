@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,12 +16,11 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import java.util.Random;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 
-import java.util.Random;
-
-//TODO:NOT Working
+// TODO:NOT Working
 public class MotorIOSim implements MotorIO {
 
     private DCMotorSim dcMotorSim;
@@ -48,9 +46,12 @@ public class MotorIOSim implements MotorIO {
         this.cfg = cfg.simConfig;
         this.subsystemConfig = cfg;
         this.dcMotor = DCMotor.getKrakenX60Foc(1);
-        this.dcMotorSim = new DCMotorSim(
-                LinearSystemId.createDCMotorSystem(dcMotor, this.cfg.MOI.magnitude(), this.cfg.gearRatio), dcMotor,
-                this.cfg.stdvs);
+        this.dcMotorSim =
+                new DCMotorSim(
+                        LinearSystemId.createDCMotorSystem(
+                                dcMotor, this.cfg.MOI.magnitude(), this.cfg.gearRatio),
+                        dcMotor,
+                        this.cfg.stdvs);
         initializeControllers();
     }
 
@@ -60,9 +61,8 @@ public class MotorIOSim implements MotorIO {
 
         // ProfiledPID for position control with trajectory generation
         // Use constraints from SimConfig, or default if not set
-        TrapezoidProfile.Constraints constraints = (cfg.profile != null)
-                ? cfg.profile
-                : new TrapezoidProfile.Constraints(50.0, 100.0);
+        TrapezoidProfile.Constraints constraints =
+                (cfg.profile != null) ? cfg.profile : new TrapezoidProfile.Constraints(50.0, 100.0);
         profiledPidController = new ProfiledPIDController(0, 0, 0, constraints);
     }
 
@@ -77,8 +77,11 @@ public class MotorIOSim implements MotorIO {
         inputs.currentSupplyAmps = dcMotorSim.getCurrentDrawAmps();
         inputs.positionRot = dcMotorSim.getAngularPositionRotations();
         inputs.velocityRotPerSecond = dcMotorSim.getAngularVelocityRadPerSec() / (2 * Math.PI);
-        inputs.motorVolts = dcMotor.getVoltage(dcMotorSim.getTorqueNewtonMeters(),
-                dcMotorSim.getAngularVelocityRadPerSec()) * cfg.gearRatio;
+        inputs.motorVolts =
+                dcMotor.getVoltage(
+                                dcMotorSim.getTorqueNewtonMeters(),
+                                dcMotorSim.getAngularVelocityRadPerSec())
+                        * cfg.gearRatio;
     }
 
     @Override
@@ -99,8 +102,10 @@ public class MotorIOSim implements MotorIO {
             isCloseLoop = true;
             pidController.reset();
         }
-        double fb = pidController.calculate(dcMotorSim.getAngularVelocityRadPerSec() / (2 * Math.PI),
-                velocity.in(RotationsPerSecond));
+        double fb =
+                pidController.calculate(
+                        dcMotorSim.getAngularVelocityRadPerSec() / (2 * Math.PI),
+                        velocity.in(RotationsPerSecond));
         double ff = feedforward.calculate(velocity.in(RotationsPerSecond));
         appliedVolts = MathUtil.clamp(fb + ff, -12.0, 12.0);
     }
@@ -127,7 +132,8 @@ public class MotorIOSim implements MotorIO {
     }
 
     @Override
-    public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
+    public void setMotionMagicSetpoint(
+            Angle position, double velocity, double acceleration, double jerk) {
         if (!isCloseLoop) {
             isCloseLoop = true;
             pidController.reset();
@@ -137,14 +143,17 @@ public class MotorIOSim implements MotorIO {
         double currentPosition = dcMotorSim.getAngularPositionRotations();
         double currentVelocity = dcMotorSim.getAngularVelocityRadPerSec() / (2 * Math.PI);
 
-        TrapezoidProfile.State currentState = new TrapezoidProfile.State(currentPosition, currentVelocity);
+        TrapezoidProfile.State currentState =
+                new TrapezoidProfile.State(currentPosition, currentVelocity);
 
-        boolean needsNewProfile = motionProfile == null ||
-                !(motionProfileGoal.position - (position.in(Rotations)) == 0.0003) ||
-                motionProfileStartTime < 0;
+        boolean needsNewProfile =
+                motionProfile == null
+                        || !(motionProfileGoal.position - (position.in(Rotations)) == 0.0003)
+                        || motionProfileStartTime < 0;
 
         if (needsNewProfile) {
-            TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(velocity, acceleration);
+            TrapezoidProfile.Constraints constraints =
+                    new TrapezoidProfile.Constraints(velocity, acceleration);
             motionProfile = new TrapezoidProfile(constraints);
             motionProfileGoal = new TrapezoidProfile.State(position.in(Rotations), 0.0);
             motionProfileStartTime = currentTime;
@@ -152,7 +161,8 @@ public class MotorIOSim implements MotorIO {
         }
 
         double elapsedTime = currentTime - motionProfileStartTime;
-        TrapezoidProfile.State setpoint = motionProfile.calculate(elapsedTime, lastSetpoint, motionProfileGoal);
+        TrapezoidProfile.State setpoint =
+                motionProfile.calculate(elapsedTime, lastSetpoint, motionProfileGoal);
 
         double fb = pidController.calculate(currentPosition, setpoint.position);
 
@@ -197,5 +207,4 @@ public class MotorIOSim implements MotorIO {
 
         // kg is stored separately and added in position/motion magic control
     }
-
 }

@@ -11,18 +11,17 @@ import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lombok.Getter;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * Elevator mechanism using ServoMotorSubsystem with custom functionality for
- * zeroing and characterization.
+ * Elevator mechanism using ServoMotorSubsystem with custom functionality for zeroing and
+ * characterization.
  */
-public class ElevatorSubsystem extends PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> {
+public class ElevatorSubsystem
+        extends PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> {
 
-    @Getter
-    double setPtMeter = 0.0;
+    @Getter double setPtMeter = 0.0;
 
     @Getter
     @AutoLogOutput(key = "Elevator/isGoingUp")
@@ -42,8 +41,7 @@ public class ElevatorSubsystem extends PositionMotorSubsystem<MotorInputsAutoLog
 
     private static MotorIO createIO() {
         if (Logger.hasReplaySource()) {
-            return new MotorIO() {
-            };
+            return new MotorIO() {};
         } else if (RobotBase.isReal()) {
             return new MotorIOTalonFX(ElevatorConfig.CONFIG);
         } else {
@@ -60,24 +58,21 @@ public class ElevatorSubsystem extends PositionMotorSubsystem<MotorInputsAutoLog
             isGoingUp = setPtMeter > previousSetPtMeter;
             previousSetPtMeter = setPtMeter;
         }
-
     }
-
 
     @Override
     public Command runMotionMagic(Distance meters) {
-        return meters.in(Meters) > getCurrPos().in(Meters)?
-            super.runMotionMagic( //going up
-                    meters,
-                    ElevatorParamsNT.motionMagicVelRPSUp.getValue(),
-                    ElevatorParamsNT.motionMagicAccelRPS2Up.getValue(),
-                    ElevatorParamsNT.motionMagicJerkRPS3Up.getValue()):
-            super.runMotionMagic( //going down
-                    meters,
-                    ElevatorParamsNT.motionMagicVelRPSDown.getValue(),
-                    ElevatorParamsNT.motionMagicAccelRPS2Down.getValue(),
-                    ElevatorParamsNT.motionMagicJerkRPS3Down.getValue());
-
+        return meters.in(Meters) > getCurrPos().in(Meters)
+                ? super.runMotionMagic( // going up
+                        meters,
+                        ElevatorParamsNT.motionMagicVelRPSUp.getValue(),
+                        ElevatorParamsNT.motionMagicAccelRPS2Up.getValue(),
+                        ElevatorParamsNT.motionMagicJerkRPS3Up.getValue())
+                : super.runMotionMagic( // going down
+                        meters,
+                        ElevatorParamsNT.motionMagicVelRPSDown.getValue(),
+                        ElevatorParamsNT.motionMagicAccelRPS2Down.getValue(),
+                        ElevatorParamsNT.motionMagicJerkRPS3Down.getValue());
     }
 
     public Command setElevatorPosition(Distance meters) {

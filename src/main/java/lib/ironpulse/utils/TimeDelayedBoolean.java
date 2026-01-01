@@ -4,20 +4,17 @@ import edu.wpi.first.wpilibj.Timer;
 import lombok.Setter;
 
 /**
- * TimeDelayedBoolean is a wrapper around normal boolean with a timer.
- * TimeDelayedBoolean returns true whenever a value is hold true for more than a
- * period of time specified.
+ * TimeDelayedBoolean is a wrapper around normal boolean with a timer. TimeDelayedBoolean returns
+ * true whenever a value is hold true for more than a period of time specified.
  */
 public class TimeDelayedBoolean {
     private final Timer timer;
-    @Setter
-    private double delaySeconds;
+    @Setter private double delaySeconds;
 
     /**
      * Constructor.
      *
-     * @param delaySeconds required time period for value to be continuously true,
-     *                     in seconds.
+     * @param delaySeconds required time period for value to be continuously true, in seconds.
      */
     public TimeDelayedBoolean(double delaySeconds) {
         this.delaySeconds = delaySeconds;
@@ -26,9 +23,7 @@ public class TimeDelayedBoolean {
         timer.start();
     }
 
-    /**
-     * Force-reset the internal timer.
-     */
+    /** Force-reset the internal timer. */
     public void reset() {
         timer.reset();
     }

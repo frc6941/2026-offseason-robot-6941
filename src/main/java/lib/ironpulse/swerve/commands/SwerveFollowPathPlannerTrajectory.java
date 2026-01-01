@@ -1,5 +1,10 @@
 package lib.ironpulse.swerve.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static lib.ironpulse.math.MathTools.epsilonEquals;
+import static lib.ironpulse.math.MathTools.toAngle;
+
 import com.pathplanner.lib.events.Event;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
@@ -14,18 +19,12 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import lib.ironpulse.swerve.Swerve;
-import lombok.Setter;
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-import static lib.ironpulse.math.MathTools.epsilonEquals;
-import static lib.ironpulse.math.MathTools.toAngle;
+import lib.ironpulse.swerve.Swerve;
+import lombok.Setter;
 
 public class SwerveFollowPathPlannerTrajectory extends Command {
     private final Swerve swerve;
@@ -33,25 +32,24 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
     private final Supplier<Pose3d> poseWorldRobotSupplier;
     private final Consumer<Event> eventConsumer;
     private final Timer trajectoryTimer = new Timer();
-    @Setter
-    private PIDController translationController;
-    @Setter
-    private PIDController rotationController;
-    @Setter
-    private Distance translationTolerance;
-    @Setter
-    private Angle rotationTolerance;
-    @Setter
-    private EndStrategy endStrategy = EndStrategy.EndWithTime;
+    @Setter private PIDController translationController;
+    @Setter private PIDController rotationController;
+    @Setter private Distance translationTolerance;
+    @Setter private Angle rotationTolerance;
+    @Setter private EndStrategy endStrategy = EndStrategy.EndWithTime;
 
     private Queue<Event> eventQueue = new LinkedList<>();
 
-    public SwerveFollowPathPlannerTrajectory(Swerve swerve, Supplier<Pose3d> poseWorldRobotSupplier,
-            PathPlannerTrajectory trajectory, PIDController translationController,
-            PIDController rotationController, Distance translationTolerance,
-            Angle rotationTolerance, Consumer<Event> eventConsumer
+    public SwerveFollowPathPlannerTrajectory(
+            Swerve swerve,
+            Supplier<Pose3d> poseWorldRobotSupplier,
+            PathPlannerTrajectory trajectory,
+            PIDController translationController,
+            PIDController rotationController,
+            Distance translationTolerance,
+            Angle rotationTolerance,
+            Consumer<Event> eventConsumer) {
 
-    ) {
         // initialize
         this.swerve = swerve;
         this.trajectory = trajectory;
@@ -65,26 +63,35 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
 
         // sort through the events by time, so at runtime polling is easy
         var events = trajectory.getEvents();
-        events.sort((x, y) -> {
-            double t1 = x.getTimestampSeconds();
-            ;
-            double t2 = y.getTimestampSeconds();
-            if (t1 < t2)
-                return -1;
-            else if (t1 > t2)
-                return 1;
-            return 0;
-        });
+        events.sort(
+                (x, y) -> {
+                    double t1 = x.getTimestampSeconds();
+                    ;
+                    double t2 = y.getTimestampSeconds();
+                    if (t1 < t2) return -1;
+                    else if (t1 > t2) return 1;
+                    return 0;
+                });
         eventQueue = new LinkedList<>(events);
     }
 
     public SwerveFollowPathPlannerTrajectory(
-            Swerve swerve, Supplier<Pose3d> poseWorldRobotSupplier,
-            PathPlannerTrajectory trajectory, PIDController translationController,
-            PIDController rotationController, Distance translationTolerance,
+            Swerve swerve,
+            Supplier<Pose3d> poseWorldRobotSupplier,
+            PathPlannerTrajectory trajectory,
+            PIDController translationController,
+            PIDController rotationController,
+            Distance translationTolerance,
             Angle rotationTolerance) {
-        this(swerve, poseWorldRobotSupplier, trajectory, translationController, rotationController,
-                translationTolerance, rotationTolerance, null);
+        this(
+                swerve,
+                poseWorldRobotSupplier,
+                trajectory,
+                translationController,
+                rotationController,
+                translationTolerance,
+                rotationTolerance,
+                null);
     }
 
     @Override
@@ -128,7 +135,9 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
         swerve.runTwistWithTorque(V_FF.plus(V_FB), tau_FF);
 
         // handle events
-        while (eventConsumer != null && !eventQueue.isEmpty() && eventQueue.peek().getTimestampSeconds() <= t)
+        while (eventConsumer != null
+                && !eventQueue.isEmpty()
+                && eventQueue.peek().getTimestampSeconds() <= t)
             eventConsumer.accept(eventQueue.poll());
     }
 
@@ -144,12 +153,15 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
         if (endStrategy.equals(EndStrategy.EndWithTimeAndPose)) {
             Pose2d poseWorldRobotCurrent = poseWorldRobotSupplier.get().toPose2d();
             Pose2d poseWorldTrajectoryEnd = trajectory.getEndState().pose;
-            boolean isOnTarget = epsilonEquals(
-                    poseWorldRobotCurrent.getTranslation(), poseWorldTrajectoryEnd.getTranslation(),
-                    translationTolerance.in(Meters))
-                    && epsilonEquals(
-                            poseWorldRobotCurrent.getRotation(), poseWorldTrajectoryEnd.getRotation(),
-                            rotationTolerance.in(Radians));
+            boolean isOnTarget =
+                    epsilonEquals(
+                                    poseWorldRobotCurrent.getTranslation(),
+                                    poseWorldTrajectoryEnd.getTranslation(),
+                                    translationTolerance.in(Meters))
+                            && epsilonEquals(
+                                    poseWorldRobotCurrent.getRotation(),
+                                    poseWorldTrajectoryEnd.getRotation(),
+                                    rotationTolerance.in(Radians));
             return isTimeout && isOnTarget;
         }
 
@@ -157,6 +169,7 @@ public class SwerveFollowPathPlannerTrajectory extends Command {
     }
 
     public enum EndStrategy {
-        EndWithTime, EndWithTimeAndPose
+        EndWithTime,
+        EndWithTimeAndPose
     }
 }

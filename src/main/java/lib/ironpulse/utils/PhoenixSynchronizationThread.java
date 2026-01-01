@@ -7,6 +7,8 @@
 
 package lib.ironpulse.utils;
 
+import static edu.wpi.first.units.Units.Hertz;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
@@ -14,7 +16,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -23,27 +24,22 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 
-import static edu.wpi.first.units.Units.Hertz;
-
 /**
  * Adapted from
  * https://github.com/Mechanical-Advantage/RobotCode2025Public/blob/main/src/main/java/org/littletonrobotics/frc2025/subsystems/drive/PhoenixOdometryThread.java
- * <p>
- * Provides an interface for asynchronously reading high-frequency measurements
- * to a set of queues.
  *
- * <p>
- * This version is intended for Phoenix 6 devices on both the RIO and CANivore
- * buses. When using
- * a CANivore, the thread uses the "waitForAll" blocking method to enable more
- * consistent sampling.
- * This also allows Phoenix Pro users to benefit from lower latency between
- * devices using CANivore
+ * <p>Provides an interface for asynchronously reading high-frequency measurements to a set of
+ * queues.
+ *
+ * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore buses. When using
+ * a CANivore, the thread uses the "waitForAll" blocking method to enable more consistent sampling.
+ * This also allows Phoenix Pro users to benefit from lower latency between devices using CANivore
  * time synchronization.
  */
 public class PhoenixSynchronizationThread extends Thread {
     private static boolean isCANFD = new CANBus("*").isNetworkFD();
-    private final Lock signalsLock = new ReentrantLock(); // Prevents conflicts when registering signals
+    private final Lock signalsLock =
+            new ReentrantLock(); // Prevents conflicts when registering signals
     private final Lock userLock;
     private final double frequency;
     private final List<DoubleSupplier> genericSignals = new ArrayList<>();
@@ -66,9 +62,7 @@ public class PhoenixSynchronizationThread extends Thread {
         }
     }
 
-    /**
-     * Registers a Phoenix signal to be read from the thread.
-     */
+    /** Registers a Phoenix signal to be read from the thread. */
     public Queue<Double> registerSignal(StatusSignal<Angle> signal) {
         Queue<Double> queue = new ArrayBlockingQueue<>(20);
         signalsLock.lock();
@@ -86,9 +80,7 @@ public class PhoenixSynchronizationThread extends Thread {
         return queue;
     }
 
-    /**
-     * Registers a generic signal to be read from the thread.
-     */
+    /** Registers a generic signal to be read from the thread. */
     public Queue<Double> registerSignal(DoubleSupplier signal) {
         Queue<Double> queue = new ArrayBlockingQueue<>(20);
         signalsLock.lock();
@@ -103,9 +95,7 @@ public class PhoenixSynchronizationThread extends Thread {
         return queue;
     }
 
-    /**
-     * Returns a new queue that returns timestamp values for each sample.
-     */
+    /** Returns a new queue that returns timestamp values for each sample. */
     public Queue<Double> makeTimestampQueue() {
         Queue<Double> queue = new ArrayBlockingQueue<>(20);
         userLock.lock();
@@ -134,8 +124,7 @@ public class PhoenixSynchronizationThread extends Thread {
                     // that is not CAN FD, regardless of Pro licensing. No reasoning for this
                     // behavior is provided by the documentation.
                     Thread.sleep((long) (1000.0 / frequency));
-                    if (phoenixSignals.length > 0)
-                        BaseStatusSignal.refreshAll(phoenixSignals);
+                    if (phoenixSignals.length > 0) BaseStatusSignal.refreshAll(phoenixSignals);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

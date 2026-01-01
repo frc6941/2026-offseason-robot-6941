@@ -1,5 +1,10 @@
 package lib.ironpulse.swerve.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static lib.ironpulse.math.MathTools.epsilonEquals;
+import static lib.ironpulse.math.MathTools.toAngle;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -11,40 +16,32 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
 import lib.ironpulse.swerve.Swerve;
 import lombok.Setter;
-
-import java.util.function.Supplier;
-
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-import static lib.ironpulse.math.MathTools.epsilonEquals;
-import static lib.ironpulse.math.MathTools.toAngle;
 
 public class SwerveFollowTrajectory extends Command {
     private final Swerve swerve;
     private final Trajectory trajectory;
     private final Supplier<Pose3d> poseWorldRobotSupplier;
     private final Timer trajectoryTimer = new Timer();
-    @Setter
-    private PIDController translationController;
-    @Setter
-    private PIDController rotationController;
-    @Setter
-    private Distance translationTolerance;
-    @Setter
-    private Angle rotationTolerance;
-    @Setter
-    private EndStrategy endStrategy = EndStrategy.EndWithTime;
+    @Setter private PIDController translationController;
+    @Setter private PIDController rotationController;
+    @Setter private Distance translationTolerance;
+    @Setter private Angle rotationTolerance;
+    @Setter private EndStrategy endStrategy = EndStrategy.EndWithTime;
 
     // private Queue<Event> eventQueue = new LinkedList<>();
 
-    public SwerveFollowTrajectory(Swerve swerve, Supplier<Pose3d> poseWorldRobotSupplier,
-            Trajectory trajectory, PIDController translationController,
-            PIDController rotationController, Distance translationTolerance,
-            Angle rotationTolerance
+    public SwerveFollowTrajectory(
+            Swerve swerve,
+            Supplier<Pose3d> poseWorldRobotSupplier,
+            Trajectory trajectory,
+            PIDController translationController,
+            PIDController rotationController,
+            Distance translationTolerance,
+            Angle rotationTolerance) {
 
-    ) {
         // initialize
         this.swerve = swerve;
         this.trajectory = trajectory;
@@ -104,13 +101,17 @@ public class SwerveFollowTrajectory extends Command {
 
         if (endStrategy.equals(EndStrategy.EndWithTimeAndPose)) {
             Pose2d poseWorldRobotCurrent = poseWorldRobotSupplier.get().toPose2d();
-            Pose2d poseWorldTrajectoryEnd = trajectory.getStates().get(trajectory.getStates().size()).poseMeters;
-            boolean isOnTarget = epsilonEquals(
-                    poseWorldRobotCurrent.getTranslation(), poseWorldTrajectoryEnd.getTranslation(),
-                    translationTolerance.in(Meters))
-                    && epsilonEquals(
-                            poseWorldRobotCurrent.getRotation(), poseWorldTrajectoryEnd.getRotation(),
-                            rotationTolerance.in(Radians));
+            Pose2d poseWorldTrajectoryEnd =
+                    trajectory.getStates().get(trajectory.getStates().size()).poseMeters;
+            boolean isOnTarget =
+                    epsilonEquals(
+                                    poseWorldRobotCurrent.getTranslation(),
+                                    poseWorldTrajectoryEnd.getTranslation(),
+                                    translationTolerance.in(Meters))
+                            && epsilonEquals(
+                                    poseWorldRobotCurrent.getRotation(),
+                                    poseWorldTrajectoryEnd.getRotation(),
+                                    rotationTolerance.in(Radians));
             return isTimeout && isOnTarget;
         }
 
@@ -118,6 +119,7 @@ public class SwerveFollowTrajectory extends Command {
     }
 
     public enum EndStrategy {
-        EndWithTime, EndWithTimeAndPose
+        EndWithTime,
+        EndWithTimeAndPose
     }
 }

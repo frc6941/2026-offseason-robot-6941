@@ -23,226 +23,240 @@ import lib.ironpulse.utils.LoggedTracer;
 import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class PositionMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO, M extends Measure<?>>
-    extends MotorSubsystem<T, U> {
+public class PositionMotorSubsystem<
+                T extends MotorInputsAutoLogged, U extends MotorIO, M extends Measure<?>>
+        extends MotorSubsystem<T, U> {
 
-  protected final PositionParamSources params;
-  private final Angle zeroOffset;
-  private final Slot0Configs slot0Configs;
-  private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
-  private final M mechanismUnitPerRotation;
-  private M currSetpoint;
-  private LinearFilter currentFilter = LinearFilter.movingAverage(5);
-  private double currentFilterValue = 0.0;
+    protected final PositionParamSources params;
+    private final Angle zeroOffset;
+    private final Slot0Configs slot0Configs;
+    private final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
+    private final M mechanismUnitPerRotation;
+    private M currSetpoint;
+    private LinearFilter currentFilter = LinearFilter.movingAverage(5);
+    private double currentFilterValue = 0.0;
 
-  /**
-   * Creates a new generic PositionMotorSubsystem.
-   *
-   * @param config The subsystem configuration (IDs, buses, ratios).
-   * @param inputs The autologged inputs for the mechanism.
-   * @param io The IO interface for the hardware.
-   * @param params The parameter sources (PID, MotionMagic limits).
-   * @param initialSetpoint The starting position in mechanism units (M).
-   * @param mechanismUnitPerRotation The amount of mechanism movement per ONE motor rotation.
-   *     Example (Elevator): Meters.of(METERS_PER_ROTATION) Example (Pivot): Degrees.of(360)
-   */
-  public PositionMotorSubsystem(
-      SubsystemConfig config,
-      T inputs,
-      U io,
-      PositionParamSources params,
-      M initialSetpoint,
-      M mechanismUnitPerRotation) {
-    super(config, inputs, io);
-    this.params = params;
-    this.zeroOffset = config.zeroOffset;
-    this.mechanismUnitPerRotation = mechanismUnitPerRotation;
-    this.currSetpoint = initialSetpoint;
-    slot0Configs = new Slot0Configs();
-    slot0Configs.kP = params.kP();
-    slot0Configs.kI = params.kI();
-    slot0Configs.kD = params.kD();
-    slot0Configs.kA = params.kA();
-    slot0Configs.kV = params.kV();
-    slot0Configs.kS = params.kS();
-    slot0Configs.kG = params.kG();
-    io.updateGains(slot0Configs);
-  }
-
-  private Angle toAngle(M mechanismValue) {
-    Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
-    return Rotations.of(
-        ((Measure) mechanismValue).in(mechanismUnit) / ((Measure) mechanismUnitPerRotation).in(mechanismUnit));
-  }
-
-  private M fromAngle(Angle motorAngle) {
-    return (M) mechanismUnitPerRotation.times(motorAngle.in(Rotations));
-  }
-
-  @Override
-  public void periodic() {
-    super.periodic();
-    if (params.hasChanged()) {
-      this.slot0Configs.kP = params.kP();
-      this.slot0Configs.kI = params.kI();
-      this.slot0Configs.kD = params.kD();
-      this.slot0Configs.kA = params.kA();
-      this.slot0Configs.kV = params.kV();
-      this.slot0Configs.kS = params.kS();
-      this.slot0Configs.kG = params.kG();
-      io.setNeutralMode(params.isBrake());
-      io.updateGains(slot0Configs);
+    /**
+     * Creates a new generic PositionMotorSubsystem.
+     *
+     * @param config The subsystem configuration (IDs, buses, ratios).
+     * @param inputs The autologged inputs for the mechanism.
+     * @param io The IO interface for the hardware.
+     * @param params The parameter sources (PID, MotionMagic limits).
+     * @param initialSetpoint The starting position in mechanism units (M).
+     * @param mechanismUnitPerRotation The amount of mechanism movement per ONE motor rotation.
+     *     Example (Elevator): Meters.of(METERS_PER_ROTATION) Example (Pivot): Degrees.of(360)
+     */
+    public PositionMotorSubsystem(
+            SubsystemConfig config,
+            T inputs,
+            U io,
+            PositionParamSources params,
+            M initialSetpoint,
+            M mechanismUnitPerRotation) {
+        super(config, inputs, io);
+        this.params = params;
+        this.zeroOffset = config.zeroOffset;
+        this.mechanismUnitPerRotation = mechanismUnitPerRotation;
+        this.currSetpoint = initialSetpoint;
+        slot0Configs = new Slot0Configs();
+        slot0Configs.kP = params.kP();
+        slot0Configs.kI = params.kI();
+        slot0Configs.kD = params.kD();
+        slot0Configs.kA = params.kA();
+        slot0Configs.kV = params.kV();
+        slot0Configs.kS = params.kS();
+        slot0Configs.kG = params.kG();
+        io.updateGains(slot0Configs);
     }
 
-    Logger.recordOutput(config.name + "/atGoal", positionAtGoal());
-    Logger.recordOutput(
-        config.name + "/currPosition", ((Measure) getCurrPos()).in((Unit) mechanismUnitPerRotation.unit()));
-
-    LoggedTracer.record(config.name);
-  }
-
-  public boolean positionAtGoal(M tolerance) {
-    // Cast to raw Measure to bypass generic issues with isNear in some WPILib versions
-    return ((Measure) getCurrPos()).isNear((Measure) currSetpoint, (Measure) tolerance);
-  }
-
-  public boolean positionAtGoal() {
-    try {
-      return positionAtGoal((M) Degrees.of(params.positionAtGoalToleranceDegrees()));
-    } catch (ClassCastException e) {
-      return positionAtGoal((M) Meters.of(params.positionAtGoalToleranceMeters()));
+    private Angle toAngle(M mechanismValue) {
+        Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
+        return Rotations.of(
+                ((Measure) mechanismValue).in(mechanismUnit)
+                        / ((Measure) mechanismUnitPerRotation).in(mechanismUnit));
     }
-  }
 
-  public Command runMotionMagic(M setPoint) {
-    return Commands.run(
-        () -> {
-          motionMagicConfigs.MotionMagicAcceleration = params.motionMagicAccelRPS2();
-          motionMagicConfigs.MotionMagicCruiseVelocity = params.motionMagicVelRPS();
-          motionMagicConfigs.MotionMagicJerk = params.motionMagicJerkRPS3();
-          Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
-          Logger.recordOutput(config.name + "/mode", "MOTIONMAGIC");
-          Logger.recordOutput(config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
-          io.setMotionMagicSetpoint(
-              toAngle(setPoint).minus(zeroOffset),
-              motionMagicConfigs.MotionMagicCruiseVelocity,
-              motionMagicConfigs.MotionMagicAcceleration,
-              motionMagicConfigs.MotionMagicJerk);
-          currSetpoint = setPoint;
-        },
-        this);
-  }
+    private M fromAngle(Angle motorAngle) {
+        return (M) mechanismUnitPerRotation.times(motorAngle.in(Rotations));
+    }
 
-  public Command runMotionMagic(M setPoint, double velocity, double acceleration, double jerk) {
-    return Commands.run(
-        () -> {
-          motionMagicConfigs.MotionMagicAcceleration = acceleration;
-          motionMagicConfigs.MotionMagicCruiseVelocity = velocity;
-          motionMagicConfigs.MotionMagicJerk = jerk;
-          Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
-          Logger.recordOutput(config.name + "/mode", "MOTIONMAGIC");
-          Logger.recordOutput(config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
-          io.setMotionMagicSetpoint(
-              toAngle(setPoint).minus(zeroOffset),
-              motionMagicConfigs.MotionMagicCruiseVelocity,
-              motionMagicConfigs.MotionMagicAcceleration,
-              motionMagicConfigs.MotionMagicJerk);
-          currSetpoint = setPoint;
-        },
-        this);
-  }
+    @Override
+    public void periodic() {
+        super.periodic();
+        if (params.hasChanged()) {
+            this.slot0Configs.kP = params.kP();
+            this.slot0Configs.kI = params.kI();
+            this.slot0Configs.kD = params.kD();
+            this.slot0Configs.kA = params.kA();
+            this.slot0Configs.kV = params.kV();
+            this.slot0Configs.kS = params.kS();
+            this.slot0Configs.kG = params.kG();
+            io.setNeutralMode(params.isBrake());
+            io.updateGains(slot0Configs);
+        }
 
-  public Command runPosition(M setPoint) {
-    return Commands.run(
-        () -> {
-          Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
-          Logger.recordOutput(config.name + "/mode", "POSITION");
-          Logger.recordOutput(config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
-          io.setPositionSetpoint(toAngle(setPoint).minus(zeroOffset));
-          currSetpoint = setPoint;
-        },
-        this);
-  }
+        Logger.recordOutput(config.name + "/atGoal", positionAtGoal());
+        Logger.recordOutput(
+                config.name + "/currPosition",
+                ((Measure) getCurrPos()).in((Unit) mechanismUnitPerRotation.unit()));
 
-  @Override
-  public Command runDutyCycle(DoubleSupplier dutyCycle) {
-    return Commands.run(
-        () -> {
-          double out = MathUtil.clamp(dutyCycle.getAsDouble(), -1.0d, 1.0d);
-          Logger.recordOutput(config.name + "/mode", "DUTY_CYCLE");
-          Logger.recordOutput(config.name + "/setPoint", out);
-          io.setOpenLoopDutyCycle(out);
-        },
-        this);
-  }
+        LoggedTracer.record(config.name);
+    }
 
-  public Command runDutyCycle(double dutyCycle) {
-    return runDutyCycle(() -> dutyCycle);
-  }
+    public boolean positionAtGoal(M tolerance) {
+        // Cast to raw Measure to bypass generic issues with isNear in some WPILib versions
+        return ((Measure) getCurrPos()).isNear((Measure) currSetpoint, (Measure) tolerance);
+    }
 
-  @Override
-  public Command runVoltage(DoubleSupplier voltage) {
-    return Commands.run(
-        () -> {
-          double out = MathUtil.clamp(voltage.getAsDouble(), -12.0d, 12.0d);
-          Logger.recordOutput(config.name + "/mode", "VOLTAGE");
-          Logger.recordOutput(config.name + "/setPoint", out);
-          io.setVoltage(out);
-        },
-        this);
-  }
+    public boolean positionAtGoal() {
+        try {
+            return positionAtGoal((M) Degrees.of(params.positionAtGoalToleranceDegrees()));
+        } catch (ClassCastException e) {
+            return positionAtGoal((M) Meters.of(params.positionAtGoalToleranceMeters()));
+        }
+    }
 
-  public Command runVoltage(double voltage) {
-    return runVoltage(() -> voltage);
-  }
+    public Command runMotionMagic(M setPoint) {
+        return Commands.run(
+                () -> {
+                    motionMagicConfigs.MotionMagicAcceleration = params.motionMagicAccelRPS2();
+                    motionMagicConfigs.MotionMagicCruiseVelocity = params.motionMagicVelRPS();
+                    motionMagicConfigs.MotionMagicJerk = params.motionMagicJerkRPS3();
+                    Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
+                    Logger.recordOutput(config.name + "/mode", "MOTIONMAGIC");
+                    Logger.recordOutput(
+                            config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
+                    io.setMotionMagicSetpoint(
+                            toAngle(setPoint).minus(zeroOffset),
+                            motionMagicConfigs.MotionMagicCruiseVelocity,
+                            motionMagicConfigs.MotionMagicAcceleration,
+                            motionMagicConfigs.MotionMagicJerk);
+                    currSetpoint = setPoint;
+                },
+                this);
+    }
 
-  /**
-   * Returns a command that zeroes the mechanism by driving it until a current spike is detected.
-   *
-   * @return The zeroing command.
-   */
-  public Command zeroCommand() {
-    double zeroVoltage = MathUtil.clamp(config.zeroingConfig.zeroingVoltage, -12.0d, 12.0d);
+    public Command runMotionMagic(M setPoint, double velocity, double acceleration, double jerk) {
+        return Commands.run(
+                () -> {
+                    motionMagicConfigs.MotionMagicAcceleration = acceleration;
+                    motionMagicConfigs.MotionMagicCruiseVelocity = velocity;
+                    motionMagicConfigs.MotionMagicJerk = jerk;
+                    Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
+                    Logger.recordOutput(config.name + "/mode", "MOTIONMAGIC");
+                    Logger.recordOutput(
+                            config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
+                    io.setMotionMagicSetpoint(
+                            toAngle(setPoint).minus(zeroOffset),
+                            motionMagicConfigs.MotionMagicCruiseVelocity,
+                            motionMagicConfigs.MotionMagicAcceleration,
+                            motionMagicConfigs.MotionMagicJerk);
+                    currSetpoint = setPoint;
+                },
+                this);
+    }
 
-    Command init =
-        Commands.runOnce(
-            () -> {
-              currentFilter = LinearFilter.movingAverage(config.zeroingConfig.zeroingFilterSize);
-              currentFilterValue = 0.0;
-            },
-            this);
+    public Command runPosition(M setPoint) {
+        return Commands.run(
+                () -> {
+                    Unit mechanismUnit = (Unit) mechanismUnitPerRotation.unit();
+                    Logger.recordOutput(config.name + "/mode", "POSITION");
+                    Logger.recordOutput(
+                            config.name + "/setPoint", ((Measure) setPoint).in(mechanismUnit));
+                    io.setPositionSetpoint(toAngle(setPoint).minus(zeroOffset));
+                    currSetpoint = setPoint;
+                },
+                this);
+    }
 
-    Runnable stop =
-        () -> {
-          Logger.recordOutput(config.name + "/mode", "VOLTAGE");
-          Logger.recordOutput(config.name + "/setPoint", 0.0);
-          io.setVoltage(0.0);
-        };
+    @Override
+    public Command runDutyCycle(DoubleSupplier dutyCycle) {
+        return Commands.run(
+                () -> {
+                    double out = MathUtil.clamp(dutyCycle.getAsDouble(), -1.0d, 1.0d);
+                    Logger.recordOutput(config.name + "/mode", "DUTY_CYCLE");
+                    Logger.recordOutput(config.name + "/setPoint", out);
+                    io.setOpenLoopDutyCycle(out);
+                },
+                this);
+    }
 
-    Command realZero =
-        init.andThen(
-                Commands.deadline(
-                    Commands.run(() -> currentFilterValue = currentFilter.calculate(inputs.currentStatorAmps))
-                        .until(() -> currentFilterValue > config.zeroingConfig.zeroingCurrentLimit),
-                    runVoltage(zeroVoltage)))
-            .andThen(Commands.runOnce(() -> io.setCurrentPositionAsZero(), this))
-            .finallyDo(stop);
+    public Command runDutyCycle(double dutyCycle) {
+        return runDutyCycle(() -> dutyCycle);
+    }
 
-    Command simZero =
-        init.andThen(runMotionMagic(fromAngle(Rotations.of(0))))
-            .until(() -> Math.abs(inputs.positionRot) < 0.01)
-            .finallyDo(stop);
+    @Override
+    public Command runVoltage(DoubleSupplier voltage) {
+        return Commands.run(
+                () -> {
+                    double out = MathUtil.clamp(voltage.getAsDouble(), -12.0d, 12.0d);
+                    Logger.recordOutput(config.name + "/mode", "VOLTAGE");
+                    Logger.recordOutput(config.name + "/setPoint", out);
+                    io.setVoltage(out);
+                },
+                this);
+    }
 
-    return RobotBase.isReal() ? realZero : simZero;
-  }
+    public Command runVoltage(double voltage) {
+        return runVoltage(() -> voltage);
+    }
 
-  public M getCurrPos() {
-    return fromAngle(Rotations.of(inputs.positionRot + zeroOffset.in(Rotations)));
-  }
+    /**
+     * Returns a command that zeroes the mechanism by driving it until a current spike is detected.
+     *
+     * @return The zeroing command.
+     */
+    public Command zeroCommand() {
+        double zeroVoltage = MathUtil.clamp(config.zeroingConfig.zeroingVoltage, -12.0d, 12.0d);
 
-  public M getCurrSetpoint() {
-    return currSetpoint;
-  }
+        Command init =
+                Commands.runOnce(
+                        () -> {
+                            currentFilter =
+                                    LinearFilter.movingAverage(
+                                            config.zeroingConfig.zeroingFilterSize);
+                            currentFilterValue = 0.0;
+                        },
+                        this);
+
+        Runnable stop =
+                () -> {
+                    Logger.recordOutput(config.name + "/mode", "VOLTAGE");
+                    Logger.recordOutput(config.name + "/setPoint", 0.0);
+                    io.setVoltage(0.0);
+                };
+
+        Command realZero =
+                init.andThen(
+                                Commands.deadline(
+                                        Commands.run(
+                                                        () ->
+                                                                currentFilterValue =
+                                                                        currentFilter.calculate(
+                                                                                inputs.currentStatorAmps))
+                                                .until(
+                                                        () ->
+                                                                currentFilterValue
+                                                                        > config.zeroingConfig
+                                                                                .zeroingCurrentLimit),
+                                        runVoltage(zeroVoltage)))
+                        .andThen(Commands.runOnce(() -> io.setCurrentPositionAsZero(), this))
+                        .finallyDo(stop);
+
+        Command simZero =
+                init.andThen(runMotionMagic(fromAngle(Rotations.of(0))))
+                        .until(() -> Math.abs(inputs.positionRot) < 0.01)
+                        .finallyDo(stop);
+
+        return RobotBase.isReal() ? realZero : simZero;
+    }
+
+    public M getCurrPos() {
+        return fromAngle(Rotations.of(inputs.positionRot + zeroOffset.in(Rotations)));
+    }
+
+    public M getCurrSetpoint() {
+        return currSetpoint;
+    }
 }
-
-

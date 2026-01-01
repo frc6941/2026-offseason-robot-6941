@@ -4,19 +4,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-/**
- * Common utils.
- * GeomUtils are from Team 6328 Mechanical Advantage.
- */
+/** Common utils. GeomUtils are from Team 6328 Mechanical Advantage. */
 public class MathTools {
-    /**
-     * Default tolerance for floating-point comparisons.
-     */
+    /** Default tolerance for floating-point comparisons. */
     public static double TOLERANCE = 1e-5;
 
     /**
-     * Normalize a vector safely, returning the original if its magnitude is below
-     * tolerance.
+     * Normalize a vector safely, returning the original if its magnitude is below tolerance.
      *
      * @param input the vector to normalize.
      * @return a unit vector with same direction, or the original if too small.
@@ -30,12 +24,10 @@ public class MathTools {
     }
 
     /**
-     * Get the angle of a vector safely, return kZero if its magnitude is below
-     * tolerance.
+     * Get the angle of a vector safely, return kZero if its magnitude is below tolerance.
      *
      * @param input the vector to take angle of.
-     * @return an {@link Rotation2d} with the correct direction, or kZero if too
-     *         small.
+     * @return an {@link Rotation2d} with the correct direction, or kZero if too small.
      */
     public static Rotation2d toAngle(Translation2d input) {
         double norm = input.getNorm();
@@ -48,13 +40,13 @@ public class MathTools {
     /**
      * Clamp a vector's magnitude to a maximum value.
      *
-     * @param input        the vector to clamp.
+     * @param input the vector to clamp.
      * @param minMagnitude the minimum allowed magnitude.
      * @param maxMagnitude the maximum allowed magnitude.
-     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the
-     *         original.
+     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the original.
      */
-    public static Translation2d clampMagnitude(Translation2d input, double minMagnitude, double maxMagnitude) {
+    public static Translation2d clampMagnitude(
+            Translation2d input, double minMagnitude, double maxMagnitude) {
         double norm = input.getNorm();
         double clamped = MathUtil.clamp(norm, minMagnitude, maxMagnitude);
         return input.div(norm == 0.0 ? 1.0 : norm).times(clamped);
@@ -63,10 +55,9 @@ public class MathTools {
     /**
      * Clamp a vector's magnitude to a maximum value.
      *
-     * @param input        the vector to clamp.
+     * @param input the vector to clamp.
      * @param maxMagnitude the maximum allowed magnitude.
-     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the
-     *         original.
+     * @return the scaled vector if its length exceeds maxMagnitude, otherwise the original.
      */
     public static Translation2d clampMagnitude(Translation2d input, double maxMagnitude) {
         return clampMagnitude(input, 0.0, maxMagnitude);
@@ -85,7 +76,8 @@ public class MathTools {
     }
 
     public static boolean epsilonEquals(Translation2d v1, Translation2d v2, double epsilon) {
-        return Math.abs(v1.getX() - v2.getX()) <= epsilon && Math.abs(v1.getY() - v2.getY()) <= epsilon;
+        return Math.abs(v1.getX() - v2.getX()) <= epsilon
+                && Math.abs(v1.getY() - v2.getY()) <= epsilon;
     }
 
     public static boolean epsilonEqualsNorm(Translation2d v1, Translation2d v2, double epsilon) {
@@ -107,8 +99,9 @@ public class MathTools {
     }
 
     public static boolean epsilonEquals(Twist2d t1, Twist2d t2, double epsilon) {
-        return Math.abs(t1.dx - t2.dx) <= epsilon && Math.abs(t1.dy - t2.dy) <= epsilon && Math.abs(
-                t1.dtheta - t2.dtheta) <= epsilon;
+        return Math.abs(t1.dx - t2.dx) <= epsilon
+                && Math.abs(t1.dy - t2.dy) <= epsilon
+                && Math.abs(t1.dtheta - t2.dtheta) <= epsilon;
     }
 
     public static boolean epsilonEquals(Twist2d t1, Twist2d t2) {
@@ -158,12 +151,12 @@ public class MathTools {
 
     public static Pose2d inverse(Pose2d pose) {
         Rotation2d rotationInverse = pose.getRotation().unaryMinus();
-        return new Pose2d(pose.getTranslation().unaryMinus().rotateBy(rotationInverse), rotationInverse);
+        return new Pose2d(
+                pose.getTranslation().unaryMinus().rotateBy(rotationInverse), rotationInverse);
     }
 
     /**
-     * Converts a Transform2d to a Pose2d to be used as a position or as the start
-     * of a kinematic
+     * Converts a Transform2d to a Pose2d to be used as a position or as the start of a kinematic
      * chain
      *
      * @param transform The transform that will represent the pose
@@ -202,7 +195,7 @@ public class MathTools {
     /**
      * Multiplies a twist by a scaling factor
      *
-     * @param twist  The twist to multiply
+     * @param twist The twist to multiply
      * @param factor The scaling factor for the twist components
      * @return The new twist
      */
@@ -221,8 +214,7 @@ public class MathTools {
     }
 
     /**
-     * Converts a Transform3d to a Pose3d to be used as a position or as the start
-     * of a kinematic
+     * Converts a Transform3d to a Pose3d to be used as a position or as the start of a kinematic
      * chain
      *
      * @param transform The transform that will represent the pose
@@ -233,20 +225,20 @@ public class MathTools {
     }
 
     /**
-     * Converts a ChassisSpeeds to a Twist2d by extracting two dimensions (Y and Z).
-     * chain
+     * Converts a ChassisSpeeds to a Twist2d by extracting two dimensions (Y and Z). chain
      *
      * @param speeds The original translation
      * @return The resulting translation
      */
     public static Twist2d toTwist2d(ChassisSpeeds speeds) {
-        return new Twist2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+        return new Twist2d(
+                speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
     }
 
     /**
      * Creates a new pose from an existing one using a different translation value.
      *
-     * @param pose        The original pose
+     * @param pose The original pose
      * @param translation The new translation to use
      * @return The new pose with the new translation and original rotation
      */
@@ -257,7 +249,7 @@ public class MathTools {
     /**
      * Creates a new pose from an existing one using a different rotation value.
      *
-     * @param pose     The original pose
+     * @param pose The original pose
      * @param rotation The new rotation to use
      * @return The new pose with the original translation and new rotation
      */
@@ -268,7 +260,7 @@ public class MathTools {
     /**
      * Unwrap an angle to be within ±π of a from.
      *
-     * @param ref   the from angle (radians).
+     * @param ref the from angle (radians).
      * @param angle the angle to unwrap (radians).
      * @return the unwrapped angle closest to the from.
      */

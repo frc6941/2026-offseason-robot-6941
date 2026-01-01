@@ -2,13 +2,9 @@ package lib.ironpulse.utils;
 
 import lombok.Setter;
 
-/**
- * EdgedBoolean is a wrapper around a boolean value that detects specific edge
- * transitions.
- */
+/** EdgedBoolean is a wrapper around a boolean value that detects specific edge transitions. */
 public class EdgedBoolean {
-    @Setter
-    private Edge edge;
+    @Setter private Edge edge;
     private boolean lastValue = false;
     private boolean seenRising = false;
 
@@ -22,8 +18,7 @@ public class EdgedBoolean {
     }
 
     /**
-     * Updates the internal state and returns true if the configured edge is
-     * detected.
+     * Updates the internal state and returns true if the configured edge is detected.
      *
      * @param value the current boolean input
      * @return true if the specified edge is detected
@@ -52,9 +47,7 @@ public class EdgedBoolean {
         return result;
     }
 
-    /**
-     * Resets the internal state.
-     */
+    /** Resets the internal state. */
     public void reset() {
         lastValue = false;
         seenRising = false;

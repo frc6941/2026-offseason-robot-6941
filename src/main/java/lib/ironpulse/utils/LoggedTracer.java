@@ -10,25 +10,18 @@ package lib.ironpulse.utils;
 import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
-/**
- * Utility class for logging code execution times.
- */
+/** Utility class for logging code execution times. */
 public class LoggedTracer {
     private static double startTime = -1.0;
 
-    private LoggedTracer() {
-    }
+    private LoggedTracer() {}
 
-    /**
-     * Reset the clock.
-     */
+    /** Reset the clock. */
     public static void reset() {
         startTime = Timer.getFPGATimestamp();
     }
 
-    /**
-     * Save the time elapsed since the last reset or record.
-     */
+    /** Save the time elapsed since the last reset or record. */
     public static void record(String epochName) {
         double now = Timer.getFPGATimestamp();
         Logger.recordOutput("LoggedTracer/" + epochName + "MS", (now - startTime) * 1000.0);

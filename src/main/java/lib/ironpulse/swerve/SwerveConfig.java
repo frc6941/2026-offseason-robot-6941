@@ -30,8 +30,7 @@ public class SwerveConfig {
 
     public Translation2d[] moduleLocations() {
         Translation2d[] locations = new Translation2d[moduleCount()];
-        for (int i = 0; i < moduleCount(); i++)
-            locations[i] = moduleConfigs[i].location;
+        for (int i = 0; i < moduleCount(); i++) locations[i] = moduleConfigs[i].location;
         return locations;
     }
 

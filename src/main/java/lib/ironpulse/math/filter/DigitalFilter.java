@@ -21,8 +21,6 @@ public interface DigitalFilter<T> {
      */
     T compute();
 
-    /**
-     * Resets the filter.
-     */
+    /** Resets the filter. */
     void reset(T initVal);
 }

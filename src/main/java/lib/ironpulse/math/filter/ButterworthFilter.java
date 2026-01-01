@@ -32,8 +32,12 @@ public class ButterworthFilter implements DigitalFilter<Double> {
     public void input(Double value, double dt_s) {
         configureCoefficients(dt_s);
         input[0] = value;
-        double result = b[0] * input[0] + b[1] * input[1] + b[2] * input[2]
-                - a[1] * output[1] - a[2] * output[2];
+        double result =
+                b[0] * input[0]
+                        + b[1] * input[1]
+                        + b[2] * input[2]
+                        - a[1] * output[1]
+                        - a[2] * output[2];
 
         input[2] = input[1];
         input[1] = input[0];

@@ -11,10 +11,12 @@ public class Logging {
     private static final String YELLOW = "\u001B[33m";
     private static final String RED = "\u001B[31m";
     private static final String PURPLE = "\u001B[35m";
+
     @Setter
-    private static String printFormat = "[MT %matchStage% %matchTime%][RT %rioTime%][%level%][%tag%] %msg%\n";
-    @Setter
-    private static Level filterLevel = Level.DEBUG;
+    private static String printFormat =
+            "[MT %matchStage% %matchTime%][RT %rioTime%][%level%][%tag%] %msg%\n";
+
+    @Setter private static Level filterLevel = Level.DEBUG;
 
     private static boolean shouldLog(Level level) {
         return level.ordinal() >= filterLevel.ordinal();
@@ -31,24 +33,26 @@ public class Logging {
     }
 
     public static void log(Level level, String tag, String format, Object... arguments) {
-        if (!shouldLog(level))
-            return;
+        if (!shouldLog(level)) return;
 
         String formattedMessage = String.format(format, arguments);
         String threadName = Thread.currentThread().getName();
         double rioTime = Timer.getFPGATimestamp();
         double matchTime = Timer.getMatchTime();
-        String matchStage = DriverStation.isAutonomousEnabled() ? "Auto"
-                : DriverStation.isTeleopEnabled() ? "Tele" : "Prep";
+        String matchStage =
+                DriverStation.isAutonomousEnabled()
+                        ? "Auto"
+                        : DriverStation.isTeleopEnabled() ? "Tele" : "Prep";
 
-        String output = printFormat
-                .replace("%matchStage%", matchStage)
-                .replace("%matchTime%", String.format("%.4f", matchTime))
-                .replace("%rioTime%", String.format("%.4f", rioTime))
-                .replace("%level%", colorize(level, level.name()))
-                .replace("%tag%", colorize(level, tag))
-                .replace("%thread%", threadName)
-                .replace("%msg%", formattedMessage);
+        String output =
+                printFormat
+                        .replace("%matchStage%", matchStage)
+                        .replace("%matchTime%", String.format("%.4f", matchTime))
+                        .replace("%rioTime%", String.format("%.4f", rioTime))
+                        .replace("%level%", colorize(level, level.name()))
+                        .replace("%tag%", colorize(level, tag))
+                        .replace("%thread%", threadName)
+                        .replace("%msg%", formattedMessage);
 
         System.out.print(output);
     }

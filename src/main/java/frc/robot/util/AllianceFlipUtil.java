@@ -21,7 +21,7 @@ public class AllianceFlipUtil {
     public static Translation2d apply(Translation2d t) {
         if (shouldFlip()) {
             double x = FieldConstants.fieldLength - t.getX();
-            double y = FieldConstants.fieldWidth  - t.getY();
+            double y = FieldConstants.fieldWidth - t.getY();
             return new Translation2d(x, y);
         }
         return t;
@@ -44,7 +44,7 @@ public class AllianceFlipUtil {
     public static Pose2d apply(Pose2d p) {
         if (shouldFlip()) {
             Translation2d t = apply(p.getTranslation());
-            Rotation2d  r = apply(p.getRotation());
+            Rotation2d r = apply(p.getRotation());
             return new Pose2d(t, r);
         }
         return p;
@@ -53,7 +53,7 @@ public class AllianceFlipUtil {
     public static Translation3d apply(Translation3d t3) {
         if (shouldFlip()) {
             double x = FieldConstants.fieldLength - t3.getX();
-            double y = FieldConstants.fieldWidth  - t3.getY();
+            double y = FieldConstants.fieldWidth - t3.getY();
             return new Translation3d(x, y, t3.getZ());
         }
         return t3;
@@ -61,6 +61,6 @@ public class AllianceFlipUtil {
 
     public static boolean shouldFlip() {
         return !DriverStation.getAlliance().isPresent()
-            || DriverStation.getAlliance().get() == Alliance.Red;
+                || DriverStation.getAlliance().get() == Alliance.Red;
     }
 }

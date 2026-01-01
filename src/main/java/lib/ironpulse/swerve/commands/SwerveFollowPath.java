@@ -6,31 +6,26 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
 import lib.ironpulse.swerve.Swerve;
 import lombok.Setter;
-
-import java.util.function.Supplier;
 
 public class SwerveFollowPath extends Command {
     private final Swerve swerve;
     private final PathPlannerPath path;
-    @Setter
-    private Supplier<Pose3d> poseWorldRobotSupplier;
-    @Setter
-    private Supplier<Pose3d> poseWorldTargetSupplier;
-    @Setter
-    private Distance translationTolerance;
-    @Setter
-    private Angle rotationTolerance;
+    @Setter private Supplier<Pose3d> poseWorldRobotSupplier;
+    @Setter private Supplier<Pose3d> poseWorldTargetSupplier;
+    @Setter private Distance translationTolerance;
+    @Setter private Angle rotationTolerance;
 
-    @Setter
-    private PIDController translationController;
-    @Setter
-    private PIDController rotationController;
-    @Setter
-    private Strategy strategy = Strategy.PurePursuit;
+    @Setter private PIDController translationController;
+    @Setter private PIDController rotationController;
+    @Setter private Strategy strategy = Strategy.PurePursuit;
 
-    public SwerveFollowPath(Swerve swerve, PathPlannerPath path, PIDController translationController,
+    public SwerveFollowPath(
+            Swerve swerve,
+            PathPlannerPath path,
+            PIDController translationController,
             PIDController rotationController) {
         this.swerve = swerve;
         this.path = path;

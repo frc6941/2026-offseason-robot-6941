@@ -1,8 +1,8 @@
 package frc.robot;
 
 /**
- * Robot-wide constants that are used across multiple subsystems.
- * Constants that need tuning are using NTParameter annotation.
+ * Robot-wide constants that are used across multiple subsystems. Constants that need tuning are
+ * using NTParameter annotation.
  */
 public final class RobotConstants {
     // Robot timing constants
@@ -13,6 +13,8 @@ public final class RobotConstants {
 
     // Hardware device IDs
     public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID
+
+    public static final boolean disableHAL = true;
 
     private RobotConstants() {
         // Prevent instantiation

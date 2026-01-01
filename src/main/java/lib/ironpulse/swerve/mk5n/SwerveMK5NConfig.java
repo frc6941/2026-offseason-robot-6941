@@ -7,14 +7,10 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * MK5n Swerve Module Configuration.
- * 
- * MK5n SPECIFICATIONS:
- * - Drive gear ratio: R2 = 6.03:1 (14/54 * 32/25 * 15/30)
- * - Steer gear ratio: 287:11 (≈26.09:1)
- * - Steer motor: Kraken X44
- * - Drive motor: Kraken X60
- * - Drive stator current limit: 80A (Kraken X60)
- * - Steer stator current limit: 40A (Kraken X44)
+ *
+ * <p>MK5n SPECIFICATIONS: - Drive gear ratio: R2 = 6.03:1 (14/54 * 32/25 * 15/30) - Steer gear
+ * ratio: 287:11 (≈26.09:1) - Steer motor: Kraken X44 - Drive motor: Kraken X60 - Drive stator
+ * current limit: 80A (Kraken X60) - Steer stator current limit: 40A (Kraken X44)
  */
 @SuperBuilder
 public class SwerveMK5NConfig extends SwerveConfig {

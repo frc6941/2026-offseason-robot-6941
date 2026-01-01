@@ -14,8 +14,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -25,172 +23,174 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.PhoenixUtils;
 
 /**
- * TalonFX implementation of MotorIO, with optional remote CANcoder feedback and
- * followers.
+ * TalonFX implementation of MotorIO, with optional remote CANcoder feedback and followers.
  *
- * Note: Mechanism units returned by getPosition()/getVelocity() depend on
- * Phoenix Feedback
- * ratios (SensorToMechanismRatio, RotorToSensorRatio) configured via
- * SubsystemConfig.
+ * <p>Note: Mechanism units returned by getPosition()/getVelocity() depend on Phoenix Feedback
+ * ratios (SensorToMechanismRatio, RotorToSensorRatio) configured via SubsystemConfig.
  */
 public class MotorIOTalonFX implements MotorIO {
-  private final TalonFX main;
-  private final TalonFX[] followers;
+    private final TalonFX main;
+    private final TalonFX[] followers;
 
-  private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
-  private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl = new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0)
-      .withEnableFOC(true);
-  private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
-  private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
+    private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
+    private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl =
+            new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0).withEnableFOC(true);
+    private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
+    private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
-  private final StatusSignal<Angle> posSig;
-  private final StatusSignal<AngularVelocity> velSig;
-  private final StatusSignal<Voltage> motorVoltSig;
-  private final StatusSignal<Voltage> supplyVoltSig;
-  private final StatusSignal<Current> statorSig;
-  private final StatusSignal<Current> supplySig;
-  private final BaseStatusSignal[] signals;
-  private boolean connected = false;
-  private final TalonFXConfiguration fx;
+    private final StatusSignal<Angle> posSig;
+    private final StatusSignal<AngularVelocity> velSig;
+    private final StatusSignal<Voltage> motorVoltSig;
+    private final StatusSignal<Voltage> supplyVoltSig;
+    private final StatusSignal<Current> statorSig;
+    private final StatusSignal<Current> supplySig;
+    private final BaseStatusSignal[] signals;
+    private boolean connected = false;
+    private final TalonFXConfiguration fx;
 
+    public MotorIOTalonFX(SubsystemConfig cfg) {
+        this.main = new TalonFX(cfg.mainId, cfg.mainBus);
 
-  public MotorIOTalonFX(SubsystemConfig cfg) {
-    this.main = new TalonFX(cfg.mainId, cfg.mainBus);
+        this.fx = cfg.fxConfig;
 
-    this.fx = cfg.fxConfig;
+        fx.MotorOutput.Inverted = cfg.motorInvertedValue;
+        // Optional: remote CANcoder feedback configuration
+        if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
+            configureCANcoder(cfg.remoteCANcoder);
+            // Bind motor feedback to remote CANcoder
+            fx.Feedback.FeedbackSensorSource = cfg.remoteCANcoder.feedbackSensorSource;
+            fx.Feedback.FeedbackRemoteSensorID = cfg.remoteCANcoder.id;
+            fx.Feedback.RotorToSensorRatio = cfg.remoteCANcoder.rotorToSensorRatio;
+            fx.ClosedLoopGeneral.ContinuousWrap = cfg.remoteCANcoder.useContinousWrap;
+        }
 
-    fx.MotorOutput.Inverted = cfg.motorInvertedValue;
-    // Optional: remote CANcoder feedback configuration
-    if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
-      configureCANcoder(cfg.remoteCANcoder);
-      // Bind motor feedback to remote CANcoder
-      fx.Feedback.FeedbackSensorSource = cfg.remoteCANcoder.feedbackSensorSource;
-      fx.Feedback.FeedbackRemoteSensorID = cfg.remoteCANcoder.id;
-      fx.Feedback.RotorToSensorRatio = cfg.remoteCANcoder.rotorToSensorRatio;
-      fx.ClosedLoopGeneral.ContinuousWrap = cfg.remoteCANcoder.useContinousWrap;
+        // Soft limit enables per config (thresholds should be in fxConfig)
+        fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = cfg.enableForwardSoftLimit;
+        fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = cfg.enableReverseSoftLimit;
+
+        fx.Feedback.SensorToMechanismRatio = cfg.SensorToMechanismRatio;
+
+        fx.Slot0.GravityType = cfg.gravityType;
+        fx.Slot0.StaticFeedforwardSign = cfg.kSValue;
+
+        PhoenixUtils.tryUntilOk(5, () -> main.getConfigurator().apply(fx));
+
+        // Followers
+        this.followers = new TalonFX[cfg.followers.length];
+        for (int i = 0; i < followers.length; i++) {
+            var f = cfg.followers[i];
+            followers[i] = new TalonFX(f.id, f.bus);
+            followers[i].setControl(new Follower(cfg.mainId, f.opposeMain));
+        }
+
+        // Signals
+        posSig = main.getPosition();
+        velSig = main.getVelocity();
+        motorVoltSig = main.getMotorVoltage();
+        supplyVoltSig = main.getSupplyVoltage();
+        statorSig = main.getStatorCurrent();
+        supplySig = main.getSupplyCurrent();
+
+        signals =
+                new BaseStatusSignal[] {
+                    posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig
+                };
+        // configure update frequencies and register signals
+        posSig.setUpdateFrequency(100.0);
+        velSig.setUpdateFrequency(100.0);
+        motorVoltSig.setUpdateFrequency(100.0);
+        supplyVoltSig.setUpdateFrequency(30.0);
+        statorSig.setUpdateFrequency(100.0);
+        supplySig.setUpdateFrequency(100.0);
+        PhoenixUtils.registerSignals(true, signals);
+        main.optimizeBusUtilization();
     }
 
-    // Soft limit enables per config (thresholds should be in fxConfig)
-    fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = cfg.enableForwardSoftLimit;
-    fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = cfg.enableReverseSoftLimit;
-
-    fx.Feedback.SensorToMechanismRatio = cfg.SensorToMechanismRatio;
-
-    fx.Slot0.GravityType = cfg.gravityType;
-    fx.Slot0.StaticFeedforwardSign = cfg.kSValue;
-
-    PhoenixUtils.tryUntilOk(5, () -> main.getConfigurator().apply(fx));
-
-    // Followers
-    this.followers = new TalonFX[cfg.followers.length];
-    for (int i = 0; i < followers.length; i++) {
-      var f = cfg.followers[i];
-      followers[i] = new TalonFX(f.id, f.bus);
-      followers[i].setControl(new Follower(cfg.mainId, f.opposeMain));
+    private void configureCANcoder(SubsystemConfig.RemoteCANcoder rc) {
+        CANcoder coder = new CANcoder(rc.id, rc.bus);
+        // Build a CANcoderConfiguration from rc fields
+        CANcoderConfiguration c = new CANcoderConfiguration();
+        c.MagnetSensor.MagnetOffset = rc.magnetOffset;
+        c.MagnetSensor.SensorDirection = rc.sensorDirection;
+        coder.getConfigurator().apply(c);
     }
 
-    // Signals
-    posSig = main.getPosition();
-    velSig = main.getVelocity();
-    motorVoltSig = main.getMotorVoltage();
-    supplyVoltSig = main.getSupplyVoltage();
-    statorSig = main.getStatorCurrent();
-    supplySig = main.getSupplyCurrent();
+    @Override
+    public void readInputs(MotorInputs inputs) {
+        connected =
+                BaseStatusSignal.isAllGood(
+                        posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig);
+        inputs.positionRot = posSig.getValueAsDouble();
+        inputs.velocityRotPerSecond = velSig.getValueAsDouble();
+        inputs.motorVolts = motorVoltSig.getValueAsDouble();
+        inputs.appliedVolts = supplyVoltSig.getValueAsDouble();
+        inputs.currentStatorAmps = statorSig.getValueAsDouble();
+        inputs.currentSupplyAmps = supplySig.getValueAsDouble();
+    }
 
-    signals = new BaseStatusSignal[] { posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig };
-    // configure update frequencies and register signals
-    posSig.setUpdateFrequency(100.0);
-    velSig.setUpdateFrequency(100.0);
-    motorVoltSig.setUpdateFrequency(100.0);
-    supplyVoltSig.setUpdateFrequency(30.0);
-    statorSig.setUpdateFrequency(100.0);
-    supplySig.setUpdateFrequency(100.0);
-    PhoenixUtils.registerSignals(true, signals);
-    main.optimizeBusUtilization();
-  }
+    @Override
+    /** Whether all primary signals are reporting without errors. */
+    public boolean isConnected() {
+        return connected;
+    }
 
-  private void configureCANcoder(SubsystemConfig.RemoteCANcoder rc) {
-    CANcoder coder = new CANcoder(rc.id, rc.bus);
-    // Build a CANcoderConfiguration from rc fields
-    CANcoderConfiguration c = new CANcoderConfiguration();
-    c.MagnetSensor.MagnetOffset = rc.magnetOffset;
-    c.MagnetSensor.SensorDirection = rc.sensorDirection;
-    coder.getConfigurator().apply(c);
-  }
+    @Override
+    public void setOpenLoopDutyCycle(double dutyCycle) {
+        main.setControl(dutyCtrl.withOutput(dutyCycle));
+    }
 
-  @Override
-  public void readInputs(MotorInputs inputs) {
-    connected = BaseStatusSignal.isAllGood(posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig);
-    inputs.positionRot = posSig.getValueAsDouble();
-    inputs.velocityRotPerSecond = velSig.getValueAsDouble();
-    inputs.motorVolts = motorVoltSig.getValueAsDouble();
-    inputs.appliedVolts = supplyVoltSig.getValueAsDouble();
-    inputs.currentStatorAmps = statorSig.getValueAsDouble();
-    inputs.currentSupplyAmps = supplySig.getValueAsDouble();
-  }
+    @Override
+    public void setPositionSetpoint(Angle position) {
+        main.setControl(positionCtrl.withPosition(position));
+    }
 
-  @Override
-  /** Whether all primary signals are reporting without errors. */
-  public boolean isConnected() {
-    return connected;
-  }
+    @Override
+    public void setMotionMagicSetpoint(
+            Angle position, double velocity, double acceleration, double jerk) {
+        dynamicMotionMagicCtrl.Velocity = velocity;
+        dynamicMotionMagicCtrl.Acceleration = acceleration;
+        dynamicMotionMagicCtrl.Jerk = jerk;
+        main.setControl(dynamicMotionMagicCtrl.withPosition(position));
+    }
 
-  @Override
-  public void setOpenLoopDutyCycle(double dutyCycle) {
-    main.setControl(dutyCtrl.withOutput(dutyCycle));
-  }
+    @Override
+    public void setVoltage(double voltage) {
+        main.setControl(new VoltageOut(voltage));
+    }
 
-  @Override
-  public void setPositionSetpoint(Angle position) {
-    main.setControl(positionCtrl.withPosition(position));
-  }
+    @Override
+    public void setNeutralMode(boolean wantsBreak) {
+        this.fx.MotorOutput.NeutralMode =
+                wantsBreak ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        main.getConfigurator().apply(this.fx);
+    }
 
-  @Override
-  public void setMotionMagicSetpoint(Angle position, double velocity, double acceleration, double jerk) {
-    dynamicMotionMagicCtrl.Velocity = velocity;
-    dynamicMotionMagicCtrl.Acceleration = acceleration;
-    dynamicMotionMagicCtrl.Jerk = jerk;
-    main.setControl(dynamicMotionMagicCtrl
-        .withPosition(position));
-  }
+    @Override
+    public void setVelocitySetpoint(AngularVelocity velocity) {
+        main.setControl(velocityCtrl.withVelocity(velocity));
+    }
 
-  @Override
-  public void setVoltage(double voltage) {
-    main.setControl(new VoltageOut(voltage));
-  }
+    @Override
+    public void setCurrentPositionAsZero() {
+        setCurrentPosition(Units.Rotations.of(0.0));
+    }
 
-  @Override
-  public void setNeutralMode(boolean wantsBreak) {
-    this.fx.MotorOutput.NeutralMode = wantsBreak ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    main.getConfigurator().apply(this.fx);
-  }
+    @Override
+    public void setCurrentPosition(Angle positionRad) {
+        main.setPosition(positionRad);
+    }
 
-  @Override
-  public void setVelocitySetpoint(AngularVelocity velocity) {
-    main.setControl(velocityCtrl.withVelocity(velocity));
-  }
+    @Override
+    public void setEnableSoftLimits(boolean forward, boolean reverse) {
+        this.fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
+        this.fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+        main.getConfigurator().apply(this.fx);
+    }
 
-  @Override
-  public void setCurrentPositionAsZero() {
-    setCurrentPosition(Units.Rotations.of(0.0));
-  }
-
-  @Override
-  public void setCurrentPosition(Angle positionRad) {
-    main.setPosition(positionRad);
-  }
-
-  @Override
-  public void setEnableSoftLimits(boolean forward, boolean reverse) {
-    this.fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
-    this.fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
-    main.getConfigurator().apply(this.fx);
-  }
-
-  @Override
-  public void updateGains(Slot0Configs slot0) {
-    this.fx.Slot0 = slot0;
-    fx.withSlot0(slot0);
-    main.getConfigurator().apply(this.fx);
-  }
+    @Override
+    public void updateGains(Slot0Configs slot0) {
+        this.fx.Slot0 = slot0;
+        fx.withSlot0(slot0);
+        main.getConfigurator().apply(this.fx);
+    }
 }

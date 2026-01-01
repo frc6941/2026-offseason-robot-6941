@@ -1,5 +1,7 @@
 package lib.ironpulse.swerve.mk5n;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -14,16 +16,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.concurrent.locks.ReentrantLock;
 import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveModuleIO;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
 import lib.ironpulse.utils.PhoenixUtils;
-
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static edu.wpi.first.units.Units.*;
 
 public class SwerveModuleIOMK5N implements SwerveModuleIO {
     // sync thread for all modules
@@ -101,8 +100,7 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     }
 
     public static void startSyncThread() {
-        if (syncThread != null && !syncThread.isAlive())
-            syncThread.start();
+        if (syncThread != null && !syncThread.isAlive()) syncThread.start();
     }
 
     // Getters for shared sync resources (used by IMU to ensure synchronized
@@ -117,16 +115,20 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
     private void configureDriveMotor() {
         // motor output
-        driveControlConfig.MotorOutput.Inverted = moduleConfig.driveInverted ? InvertedValue.Clockwise_Positive
-                : InvertedValue.CounterClockwise_Positive;
+        driveControlConfig.MotorOutput.Inverted =
+                moduleConfig.driveInverted
+                        ? InvertedValue.Clockwise_Positive
+                        : InvertedValue.CounterClockwise_Positive;
         driveControlConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // current limits - reasonable defaults for MK5n (assume Kraken X60 drive motor)
         driveControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        driveControlConfig.CurrentLimits.StatorCurrentLimit = config.driveStatorCurrentLimit.in(Amp);
+        driveControlConfig.CurrentLimits.StatorCurrentLimit =
+                config.driveStatorCurrentLimit.in(Amp);
 
         // apply configuration
-        PhoenixUtils.tryUntilOk(5, () -> driveMotor.getConfigurator().apply(driveControlConfig, 0.25));
+        PhoenixUtils.tryUntilOk(
+                5, () -> driveMotor.getConfigurator().apply(driveControlConfig, 0.25));
         driveMotor.getConfigurator().apply(driveControlConfig);
         driveMotor.optimizeBusUtilization();
 
@@ -163,14 +165,17 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     private void configureSteerMotor() {
         CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
-        encoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderInverted
-                ? SensorDirectionValue.Clockwise_Positive
-                : SensorDirectionValue.CounterClockwise_Positive;
+        encoderConfig.MagnetSensor.SensorDirection =
+                moduleConfig.encoderInverted
+                        ? SensorDirectionValue.Clockwise_Positive
+                        : SensorDirectionValue.CounterClockwise_Positive;
         encoderConfig.MagnetSensor.MagnetOffset = moduleConfig.steerMotorEncoderOffset.magnitude();
 
         // motor output direction
-        steerControlConfig.MotorOutput.Inverted = moduleConfig.steerInverted ? InvertedValue.Clockwise_Positive
-                : InvertedValue.CounterClockwise_Positive;
+        steerControlConfig.MotorOutput.Inverted =
+                moduleConfig.steerInverted
+                        ? InvertedValue.Clockwise_Positive
+                        : InvertedValue.CounterClockwise_Positive;
         steerControlConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // encoder settings
@@ -180,16 +185,19 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
         // current limits - MK5n uses Kraken X44 for steering (smaller motor, typically ~40A limit)
         steerControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        steerControlConfig.CurrentLimits.StatorCurrentLimit = config.steerStatorCurrentLimit.in(Amp);
+        steerControlConfig.CurrentLimits.StatorCurrentLimit =
+                config.steerStatorCurrentLimit.in(Amp);
 
         // PID configuration - use defaults, will be updated by periodic calls
-        steerControlConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+        steerControlConfig.Slot0.StaticFeedforwardSign =
+                StaticFeedforwardSignValue.UseClosedLoopSign;
 
         // continuous wrap for steering
         steerControlConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
         // apply configuration
-        PhoenixUtils.tryUntilOk(5, () -> steerMotor.getConfigurator().apply(steerControlConfig, 0.25));
+        PhoenixUtils.tryUntilOk(
+                5, () -> steerMotor.getConfigurator().apply(steerControlConfig, 0.25));
         steerMotor.getConfigurator().apply(steerControlConfig);
         encoder.getConfigurator().apply(encoderConfig);
 
@@ -233,12 +241,17 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     @Override
     public void updateInputs(SwerveModuleIOInputs inputs) {
         // drive motor inputs
-        inputs.driveMotorConnected = BaseStatusSignal.isAllGood(
-                drivePosition, driveVelocity, driveVoltage,
-                driveSupplyCurrentAmps, driveTorqueCurrentAmps);
-        inputs.driveMotorPositionRad = driveMotorRotationsToMechanismRad(drivePosition.getValueAsDouble());
-        inputs.driveMotorVelocityRadPerSec = driveMotorRotationsPerSecToMechanismRadPerSec(
-                driveVelocity.getValueAsDouble());
+        inputs.driveMotorConnected =
+                BaseStatusSignal.isAllGood(
+                        drivePosition,
+                        driveVelocity,
+                        driveVoltage,
+                        driveSupplyCurrentAmps,
+                        driveTorqueCurrentAmps);
+        inputs.driveMotorPositionRad =
+                driveMotorRotationsToMechanismRad(drivePosition.getValueAsDouble());
+        inputs.driveMotorVelocityRadPerSec =
+                driveMotorRotationsPerSecToMechanismRadPerSec(driveVelocity.getValueAsDouble());
         inputs.driveMotorVoltageVolt = driveVoltage.getValueAsDouble();
         inputs.driveMotorSupplyCurrentAmpere = driveSupplyCurrentAmps.getValueAsDouble();
         inputs.driveMotorTorqueCurrentAmpere = driveTorqueCurrentAmps.getValueAsDouble();
@@ -246,23 +259,30 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
         // drive position samples
         if (drivePositionQueue != null && !drivePositionQueue.isEmpty()) {
-            inputs.driveMotorPositionRadSamples = drivePositionQueue.stream().mapToDouble(
-                    this::driveMotorRotationsToMechanismRad).toArray();
+            inputs.driveMotorPositionRadSamples =
+                    drivePositionQueue.stream()
+                            .mapToDouble(this::driveMotorRotationsToMechanismRad)
+                            .toArray();
             drivePositionQueue.clear();
         } else {
-            inputs.driveMotorPositionRadSamples = new double[] { inputs.driveMotorPositionRad };
+            inputs.driveMotorPositionRadSamples = new double[] {inputs.driveMotorPositionRad};
         }
 
         // Logger.recordOutput("steerPosition" + moduleID,
         // steerMotorRotationsToMechanismRad(steerMotor.getPosition().getValueAsDouble()));
 
         // steer motor inputs
-        inputs.steerMotorConnected = BaseStatusSignal.isAllGood(
-                steerPosition, steerVelocity, steerVoltage,
-                steerSupplyCurrentAmps, steerTorqueCurrentAmps);
-        inputs.steerMotorPositionRad = steerMotorRotationsToMechanismRad(steerPosition.getValueAsDouble());
-        inputs.steerMotorVelocityRadPerSec = steerMotorRotationsPerSecToMechanismRadPerSec(
-                steerVelocity.getValueAsDouble());
+        inputs.steerMotorConnected =
+                BaseStatusSignal.isAllGood(
+                        steerPosition,
+                        steerVelocity,
+                        steerVoltage,
+                        steerSupplyCurrentAmps,
+                        steerTorqueCurrentAmps);
+        inputs.steerMotorPositionRad =
+                steerMotorRotationsToMechanismRad(steerPosition.getValueAsDouble());
+        inputs.steerMotorVelocityRadPerSec =
+                steerMotorRotationsPerSecToMechanismRadPerSec(steerVelocity.getValueAsDouble());
         inputs.steerMotorVoltageVolt = steerVoltage.getValueAsDouble();
         inputs.steerMotorSupplyCurrentAmpere = steerSupplyCurrentAmps.getValueAsDouble();
         inputs.steerMotorTorqueCurrentAmpere = steerTorqueCurrentAmps.getValueAsDouble();
@@ -270,11 +290,13 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
         // steer motor samples
         if (steerPositionQueue != null && !steerPositionQueue.isEmpty()) {
-            inputs.steerMotorPositionRadSamples = steerPositionQueue.stream().mapToDouble(
-                    this::steerMotorRotationsToMechanismRad).toArray();
+            inputs.steerMotorPositionRadSamples =
+                    steerPositionQueue.stream()
+                            .mapToDouble(this::steerMotorRotationsToMechanismRad)
+                            .toArray();
             steerPositionQueue.clear();
         } else {
-            inputs.steerMotorPositionRadSamples = new double[] { inputs.steerMotorPositionRad };
+            inputs.steerMotorPositionRadSamples = new double[] {inputs.steerMotorPositionRad};
         }
 
         // Ensure both sample arrays have the same length for safety
@@ -282,17 +304,18 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         int steerLength = inputs.steerMotorPositionRadSamples.length;
         if (driveLength != steerLength) {
             // Use the current position for both if lengths don't match
-            inputs.driveMotorPositionRadSamples = new double[] { inputs.driveMotorPositionRad };
-            inputs.steerMotorPositionRadSamples = new double[] { inputs.steerMotorPositionRad };
+            inputs.driveMotorPositionRadSamples = new double[] {inputs.driveMotorPositionRad};
+            inputs.steerMotorPositionRadSamples = new double[] {inputs.steerMotorPositionRad};
         }
-
     }
 
     @Override
     public void setSwerveModuleState(SwerveModuleState state) {
         // Set drive velocity
-        double velocityRps = linearVelocityToWheelRPS(MathUtil.applyDeadband(state.speedMetersPerSecond, 0.02));
-        driveMotor.setControl(driveVelocityRequest.withVelocity(velocityRps * config.driveGearRatio));
+        double velocityRps =
+                linearVelocityToWheelRPS(MathUtil.applyDeadband(state.speedMetersPerSecond, 0.02));
+        driveMotor.setControl(
+                driveVelocityRequest.withVelocity(velocityRps * config.driveGearRatio));
 
         // Set steer angle
         double positionRotations = mechanismRadToSteerMotorRotations(state.angle.getRadians());
@@ -305,8 +328,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
             recordSteerCommand = null;
         }
 
-        steerMotor.setControl(steerPositionRequest.withPosition(
-                recordSteerCommand != null ? recordSteerCommand : positionRotations));
+        steerMotor.setControl(
+                steerPositionRequest.withPosition(
+                        recordSteerCommand != null ? recordSteerCommand : positionRotations));
     }
 
     @Override
@@ -317,14 +341,17 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     @Override
     public void setDriveVelocity(LinearVelocity velocity) {
         double velocityRps = linearVelocityToWheelRPS(velocity.in(MetersPerSecond));
-        driveMotor.setControl(driveVelocityRequest.withVelocity(velocityRps * config.driveGearRatio));
+        driveMotor.setControl(
+                driveVelocityRequest.withVelocity(velocityRps * config.driveGearRatio));
     }
 
     @Override
     public void setDriveVelocity(LinearVelocity velocity, Current ff) {
         double velocityRps = linearVelocityToWheelRPS(velocity.in(MetersPerSecond));
         driveMotor.setControl(
-                driveVelocityRequest.withVelocity(velocityRps * config.driveGearRatio).withFeedForward(ff.in(Amp)));
+                driveVelocityRequest
+                        .withVelocity(velocityRps * config.driveGearRatio)
+                        .withFeedForward(ff.in(Amp)));
     }
 
     @Override
@@ -339,7 +366,8 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     }
 
     @Override
-    public void configDriveController(double kp, double ki, double kd, double ks, double kv, double ka) {
+    public void configDriveController(
+            double kp, double ki, double kd, double ks, double kv, double ka) {
         // Configure both PID and FF parameters in single config to avoid overwriting
         driveControlConfig.Slot0.kP = kp;
         driveControlConfig.Slot0.kI = ki;
@@ -355,7 +383,8 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     @Override
     public void configDriveBrake(boolean isBrake) {
         // Brake/coast setting is separate from PID/FF
-        driveControlConfig.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        driveControlConfig.MotorOutput.NeutralMode =
+                isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         driveMotor.getConfigurator().apply(driveControlConfig);
     }
 
@@ -372,7 +401,8 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     @Override
     public void configSteerBrake(boolean isBrake) {
         // Brake/coast setting is separate from PID
-        steerControlConfig.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        steerControlConfig.MotorOutput.NeutralMode =
+                isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         steerMotor.getConfigurator().apply(steerControlConfig);
     }
 
@@ -402,9 +432,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
     /**
      * Convert drive motor rotations to wheel position in radians.
-     * <p>
-     * Flow: Motor rotations -> Wheel radians
-     * Math: motor_rot * (2π rad/rot) / gear_ratio = wheel_rad
+     *
+     * <p>Flow: Motor rotations -> Wheel radians Math: motor_rot * (2π rad/rot) / gear_ratio =
+     * wheel_rad
      *
      * @param motorRotations Raw motor encoder rotations
      * @return Wheel position in radians
@@ -415,9 +445,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
     /**
      * Convert drive motor rotations per second to wheel angular velocity in rad/s.
-     * <p>
-     * Flow: Motor RPS -> Wheel rad/s
-     * Math: motor_rps * (2π rad/rot) / gear_ratio = wheel_rad_per_sec
+     *
+     * <p>Flow: Motor RPS -> Wheel rad/s Math: motor_rps * (2π rad/rot) / gear_ratio =
+     * wheel_rad_per_sec
      *
      * @param motorRotationsPerSec Raw motor velocity in rotations per second
      * @return Wheel angular velocity in rad/s
@@ -428,12 +458,11 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
     /**
      * Convert linear velocity to wheel rotations per second.
-     * <p>
-     * Flow: Linear velocity (m/s) -> Wheel RPS
-     * Math: linear_vel / (wheel_diameter * π) = wheel_rps
-     * <p>
-     * This is used at the interface level - gear ratio is applied when commanding
-     * motors.
+     *
+     * <p>Flow: Linear velocity (m/s) -> Wheel RPS Math: linear_vel / (wheel_diameter * π) =
+     * wheel_rps
+     *
+     * <p>This is used at the interface level - gear ratio is applied when commanding motors.
      *
      * @param linearVelocityMPS Linear velocity in meters per second
      * @return Wheel rotations per second
@@ -447,13 +476,12 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
     /**
      * Convert steer motor rotations to mechanism angle in radians.
-     * <p>
-     * Flow: Motor rotations -> Module angle radians
-     * Math: motor_rot * (2π rad/rot) = mechanism_rad
-     * <p>
-     * Note: MK5N typically uses 1:1 gearing (direct drive), so no gear ratio
-     * needed.
-     * The CANcoder is fused with the motor encoder to provide absolute positioning.
+     *
+     * <p>Flow: Motor rotations -> Module angle radians Math: motor_rot * (2π rad/rot) =
+     * mechanism_rad
+     *
+     * <p>Note: MK5N typically uses 1:1 gearing (direct drive), so no gear ratio needed. The
+     * CANcoder is fused with the motor encoder to provide absolute positioning.
      *
      * @param motorRotations Raw motor encoder rotations
      * @return Module angle in radians
@@ -463,11 +491,10 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
     }
 
     /**
-     * Convert steer motor rotations per second to mechanism angular velocity in
-     * rad/s.
-     * <p>
-     * Flow: Motor RPS -> Module angular velocity rad/s
-     * Math: motor_rps * (2π rad/rot) = mechanism_rad_per_sec
+     * Convert steer motor rotations per second to mechanism angular velocity in rad/s.
+     *
+     * <p>Flow: Motor RPS -> Module angular velocity rad/s Math: motor_rps * (2π rad/rot) =
+     * mechanism_rad_per_sec
      *
      * @param motorRotationsPerSec Raw motor velocity in rotations per second
      * @return Module angular velocity in rad/s
@@ -478,9 +505,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
 
     /**
      * Convert mechanism angle in radians to steer motor rotations.
-     * <p>
-     * Flow: Module angle radians -> Motor rotations
-     * Math: mechanism_rad / (2π rad/rot) = motor_rot
+     *
+     * <p>Flow: Module angle radians -> Motor rotations Math: mechanism_rad / (2π rad/rot) =
+     * motor_rot
      *
      * @param mechanismRad Desired module angle in radians
      * @return Motor position in rotations

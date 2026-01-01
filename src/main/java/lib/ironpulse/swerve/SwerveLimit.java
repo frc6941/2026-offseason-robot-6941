@@ -1,5 +1,7 @@
 package lib.ironpulse.swerve;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -10,31 +12,26 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import lib.ironpulse.math.MathTools;
 import lombok.Builder;
 
-import static edu.wpi.first.units.Units.*;
-
 /**
  * Enforces velocity and acceleration at the chassis level.
  *
- * <p>
- * The {@code SwerveLimit} class defines maximum linear and angular speeds and
- * accelerations for swerve chassis.
- * Use the {@link #apply(ChassisSpeeds, ChassisSpeeds, double)} method to clamp
- * and integrate desired speeds based on the current state
- * and a time step.
- * </p>
+ * <p>The {@code SwerveLimit} class defines maximum linear and angular speeds and accelerations for
+ * swerve chassis. Use the {@link #apply(ChassisSpeeds, ChassisSpeeds, double)} method to clamp and
+ * integrate desired speeds based on the current state and a time step.
  */
 @Builder
-public record SwerveLimit(LinearVelocity maxLinearVelocity, LinearAcceleration maxSkidAcceleration,
-        AngularVelocity maxAngularVelocity, AngularAcceleration maxAngularAcceleration) {
+public record SwerveLimit(
+        LinearVelocity maxLinearVelocity,
+        LinearAcceleration maxSkidAcceleration,
+        AngularVelocity maxAngularVelocity,
+        AngularAcceleration maxAngularAcceleration) {
     /**
-     * Apply linear and angular velocity and acceleration limits to the desired
-     * chassis speeds.
+     * Apply linear and angular velocity and acceleration limits to the desired chassis speeds.
      *
      * @param curr current chassis speeds.
-     * @param des  desired chassis speeds.
-     * @param dt   delta time in seconds.
-     * @return a new {@link ChassisSpeeds} instance with velocities limited and
-     *         discretized.
+     * @param des desired chassis speeds.
+     * @param dt delta time in seconds.
+     * @return a new {@link ChassisSpeeds} instance with velocities limited and discretized.
      */
     public ChassisSpeeds apply(ChassisSpeeds curr, ChassisSpeeds des, double dt) {
         // go from continuous to discrete

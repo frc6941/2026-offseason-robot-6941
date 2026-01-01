@@ -9,41 +9,32 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface SwerveModuleIO {
     // read
-    default void updateInputs(SwerveModuleIOInputs inputs) {
-    }
+    default void updateInputs(SwerveModuleIOInputs inputs) {}
 
     // set
-    default void setSwerveModuleState(SwerveModuleState state) {
-    }
+    default void setSwerveModuleState(SwerveModuleState state) {}
 
-    default void setDriveOpenLoop(Voltage des) {
-    }
+    default void setDriveOpenLoop(Voltage des) {}
 
-    default void setDriveVelocity(LinearVelocity des) {
-    }
+    default void setDriveVelocity(LinearVelocity des) {}
 
     default void setDriveVelocity(LinearVelocity des, Current ff) {
         setDriveVelocity(des);
     }
 
-    default void setSteerOpenLoop(Voltage des) {
-    }
+    default void setSteerOpenLoop(Voltage des) {}
 
-    default void setSteerAngleAbsolute(Angle des) {
-    }
+    default void setSteerAngleAbsolute(Angle des) {}
 
     // config
-    default void configDriveController(double kp, double ki, double kd, double ks, double kv, double ka) {
-    }
+    default void configDriveController(
+            double kp, double ki, double kd, double ks, double kv, double ka) {}
 
-    default void configDriveBrake(boolean isBreak) {
-    }
+    default void configDriveBrake(boolean isBreak) {}
 
-    default void configSteerController(double kp, double ki, double kd, double ks) {
-    }
+    default void configSteerController(double kp, double ki, double kd, double ks) {}
 
-    default void configSteerBrake(boolean isBreak) {
-    }
+    default void configSteerBrake(boolean isBreak) {}
 
     @AutoLog
     class SwerveModuleIOInputs {

@@ -8,21 +8,18 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import lib.ironpulse.swerve.ImuIO;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
 import lib.ironpulse.utils.PhoenixUtils;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
 public class ImuIOPigeon implements ImuIO {
-    // Use the SAME sync thread and lock as swerve modules to ensure synchronized sampling
-    private static final ReentrantLock syncLock = SwerveModuleIOMK5N.getSyncLock();
     private static PhoenixSynchronizationThread syncThread = SwerveModuleIOMK5N.getSyncThread();
-    
+
     private final Pigeon2 pigeon;
     private final SwerveMK5NConfig config;
-    
+
     // Status signals
     private final StatusSignal<Angle> yaw;
     private final StatusSignal<AngularVelocity> yawVelocity;
@@ -39,10 +36,10 @@ public class ImuIOPigeon implements ImuIO {
         this.config = config;
 
         System.out.println("ImuIOPigeon: Initializing Pigeon2 with ID " + config.pigeonId);
-        
+
         // Get the shared sync thread from swerve modules (it should already be created by now)
         syncThread = SwerveModuleIOMK5N.getSyncThread();
-        
+
         // Initialize Pigeon2
         pigeon = new Pigeon2(config.pigeonId, config.canivoreCanBusName);
 
@@ -60,13 +57,7 @@ public class ImuIOPigeon implements ImuIO {
         // Register signals with PhoenixUtils for automatic refresh (same as swerve
         // modules)
         PhoenixUtils.registerSignals(
-                true,
-                yaw,
-                yawVelocity,
-                pitch,
-                pitchVelocity,
-                roll,
-                rollVelocity);
+                true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
 
         // Register yaw signal for odometry queue (same pattern as swerve modules)
         if (syncThread != null) {
@@ -105,19 +96,22 @@ public class ImuIOPigeon implements ImuIO {
         pigeon.reset();
     }
 
-    // Note: No need for startSyncThread() method since we use the shared sync thread from SwerveModuleIOMK5N
+    // Note: No need for startSyncThread() method since we use the shared sync thread from
+    // SwerveModuleIOMK5N
 
     @Override
     public void updateInputs(ImuIOInputs inputs) {
         // Phoenix utils handles refreshing automatically, so we just read values
-        inputs.connected = BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
+        inputs.connected =
+                BaseStatusSignal.isAllGood(
+                        yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
 
         // Current positions and velocities
         inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
         inputs.yawVelocityRadPerSec = yawVelocity.getValue().in(Units.RadiansPerSecond);
         inputs.pitchPosition = Rotation2d.fromDegrees(pitch.getValueAsDouble());
         inputs.pitchVelocityRadPerSec = pitchVelocity.getValue().in(Units.RadiansPerSecond);
-        inputs.rollPosition = Rotation2d.fromDegrees (roll.getValueAsDouble());
+        inputs.rollPosition = Rotation2d.fromDegrees(roll.getValueAsDouble());
         inputs.rollVelocityRadPerSec = rollVelocity.getValue().in(Units.RadiansPerSecond);
 
         // Process odometry queues (same pattern as swerve modules)
@@ -135,10 +129,11 @@ public class ImuIOPigeon implements ImuIO {
 
                 inputs.odometryYawTimestamps[i] = timestamp;
                 inputs.odometryYawPositions[i] = Rotation2d.fromDegrees(yawDegrees);
-                inputs.odometryRotations[i] = new Rotation3d(
-                        inputs.rollPosition.getRadians(),
-                        inputs.pitchPosition.getRadians(),
-                        Rotation2d.fromDegrees(yawDegrees).getRadians());
+                inputs.odometryRotations[i] =
+                        new Rotation3d(
+                                inputs.rollPosition.getRadians(),
+                                inputs.pitchPosition.getRadians(),
+                                Rotation2d.fromDegrees(yawDegrees).getRadians());
             }
 
             // Clear any remaining queue items to stay synchronized
@@ -146,14 +141,15 @@ public class ImuIOPigeon implements ImuIO {
             timestampQueue.clear();
         } else {
             // Fallback to current values if no queue data
-            inputs.odometryYawTimestamps = new double[] { yaw.getTimestamp().getTime() };
-            inputs.odometryYawPositions = new Rotation2d[] { inputs.yawPosition };
-            inputs.odometryRotations = new Rotation3d[] {
-                    new Rotation3d(
-                            inputs.rollPosition.getRadians(),
-                            inputs.pitchPosition.getRadians(),
-                            inputs.yawPosition.getRadians())
-            };
+            inputs.odometryYawTimestamps = new double[] {yaw.getTimestamp().getTime()};
+            inputs.odometryYawPositions = new Rotation2d[] {inputs.yawPosition};
+            inputs.odometryRotations =
+                    new Rotation3d[] {
+                        new Rotation3d(
+                                inputs.rollPosition.getRadians(),
+                                inputs.pitchPosition.getRadians(),
+                                inputs.yawPosition.getRadians())
+                    };
         }
     }
 }
