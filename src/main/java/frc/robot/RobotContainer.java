@@ -8,6 +8,9 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,6 +26,7 @@ import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
+import lib.ironpulse.utils.LimelightHelpers;
 
 public class RobotContainer {
     private Swerve swerve;
@@ -50,6 +54,7 @@ public class RobotContainer {
                             new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 3));
         }
         configureBindings();
+        LimelightHelpers.SetIMUMode("limelight", 1);
     }
 
     public void robotPeriodic() {
@@ -62,6 +67,10 @@ public class RobotContainer {
                         TransformRecorder.kFrameRobot);
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.periodic();
+        LimelightHelpers.SetRobotOrientation("limelight", swerve.getEstimatedPose().getRotation().getAngle(),
+            Math.toDegrees(swerve.getChassisSpeeds().omegaRadiansPerSecond), 0, 0, 0, 0);
+        Logger.recordOutput("Limelight/Pose", LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
+
     }
 
     private void configureBindings() {
