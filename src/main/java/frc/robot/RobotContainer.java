@@ -69,8 +69,8 @@ public class RobotContainer {
         RobotStateRecorder.periodic();
         LimelightHelpers.SetRobotOrientation(
                 "limelight",
-                Math.toDegrees(swerve.getEstimatedPose().getRotation().getAngle()),
-                Math.toDegrees(swerve.getChassisSpeeds().omegaRadiansPerSecond),
+                RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
+                RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
                 0,
                 0,
                 0,
