@@ -8,9 +8,8 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -27,6 +26,7 @@ import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.LimelightHelpers;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     private Swerve swerve;
@@ -67,10 +67,21 @@ public class RobotContainer {
                         TransformRecorder.kFrameRobot);
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.periodic();
-        LimelightHelpers.SetRobotOrientation("limelight", swerve.getEstimatedPose().getRotation().getAngle(),
-            Math.toDegrees(swerve.getChassisSpeeds().omegaRadiansPerSecond), 0, 0, 0, 0);
-        Logger.recordOutput("Limelight/Pose", LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
-
+        LimelightHelpers.SetRobotOrientation(
+                "limelight",
+                swerve.getEstimatedPose().getRotation().getAngle(),
+                Math.toDegrees(swerve.getChassisSpeeds().omegaRadiansPerSecond),
+                0,
+                0,
+                0,
+                0);
+        Logger.recordOutput(
+                "Limelight/Pose",
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
+        swerve.addVisionMeasurement(
+                new Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
+                now.in(Seconds),
+                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
     }
 
     private void configureBindings() {
