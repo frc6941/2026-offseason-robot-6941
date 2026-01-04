@@ -1,5 +1,6 @@
 package lib.ironpulse.subsystem.position;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
@@ -226,7 +227,7 @@ public class PositionMotorSubsystem<
                                                         () ->
                                                                 currentFilterValue =
                                                                         currentFilter.calculate(
-                                                                                inputs.currentStatorAmps))
+                                                                                getStatorCurrent().in(Amps)))
                                                 .until(
                                                         () ->
                                                                 currentFilterValue
