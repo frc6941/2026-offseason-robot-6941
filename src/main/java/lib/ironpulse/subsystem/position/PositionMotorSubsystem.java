@@ -117,8 +117,7 @@ public class PositionMotorSubsystem<
 
         Logger.recordOutput(config.name + "/atGoal", positionAtGoal());
         Logger.recordOutput(
-                config.name + "/currPosition",
-                ((Measure) getCurrPos()).in(mechanismUnit));
+                config.name + "/currPosition", ((Measure) getCurrPos()).in(mechanismUnit));
     }
 
     public boolean positionAtGoal(M tolerance) {

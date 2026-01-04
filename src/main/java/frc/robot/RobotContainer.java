@@ -74,11 +74,11 @@ public class RobotContainer {
     public void robotPeriodic() {}
 
     private void configureBindings() {
-        driver.a().onTrue(elevator.zeroCommand());
+        driver.a().onTrue(elevator.runVoltage(0.2));
         driver.b().onTrue(elevator.runPosition(Meters.of(0.4)));
         driver.x().onTrue(elevator.runPosition(Meters.of(0.1)));
         driver.leftBumper().whileTrue(intakePivot.runPosition(Revolution.of(0.25)));
-        driver.y().onTrue(intakePivot.zeroCommand());
+        driver.y().onTrue(elevator.runStop());
     }
 
     public Command getAutonomousCommand() {

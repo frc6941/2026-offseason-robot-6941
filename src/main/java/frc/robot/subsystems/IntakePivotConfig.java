@@ -15,11 +15,7 @@ import lib.ntext.NTParameter;
 public final class IntakePivotConfig {
     public static final String NAME = "IntakePivot";
     public static final SimConfig SIM_CONFIG =
-            SubsystemConfig.SimConfig.builder()
-                    .MOI(KilogramSquareMeters.of(1))
-                    .gearRatio(1)
-                    .stdvs(new double[] {0.02, 0.02})
-                    .build();
+            SubsystemConfig.SimConfig.builder().gearRatio(1).build();
     // Local hardware constants (from RobotConstants.IntakeConstants)
     private static final int INTAKE_PIVOT_MOTOR_ID = 16;
     private static final int INTAKE_PIVOT_ENCODER_ID = 17;

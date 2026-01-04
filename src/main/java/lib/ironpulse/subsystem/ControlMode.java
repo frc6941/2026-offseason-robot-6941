@@ -8,4 +8,3 @@ public enum ControlMode {
     MOTION_MAGIC,
     VELOCITY
 }
-

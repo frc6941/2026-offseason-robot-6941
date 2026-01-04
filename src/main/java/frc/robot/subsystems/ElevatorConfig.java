@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
@@ -26,11 +24,7 @@ public final class ElevatorConfig {
     public static final int ELEVATOR_ZEROING_FILTER_SIZE = 5;
     public static final double METERS_PER_ROTATION = Math.PI * ELEVATOR_SPOOL_DIAMETER;
     public static final SimConfig SIM_CONFIG =
-            SubsystemConfig.SimConfig.builder()
-                    .MOI(KilogramSquareMeters.of(1))
-                    .gearRatio(1)
-                    .stdvs(new double[] {0.02, 0.02})
-                    .build();
+            SubsystemConfig.SimConfig.builder().gearRatio(1).build();
     // Mechanism config
     public static final SubsystemConfig CONFIG =
             SubsystemConfig.builder()

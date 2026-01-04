@@ -53,7 +53,8 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
 
     /** Open-loop duty cycle command,([-1.0, 1.0] where 1.0 = 100%). */
     public Command runDutyCycle(double dutyCycle) {
-        return Commands.run(() -> {
+        return Commands.run(
+                () -> {
                     setpoint = MathUtil.clamp(dutyCycle, -1.0, 1.0);
                     io.setOpenLoopDutyCycle(setpoint);
                     mode = ControlMode.DUTY_CYCLE;
@@ -74,7 +75,8 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
 
     /** Open-loop duty cycle command, -12-12V. */
     public Command runVoltage(double voltage) {
-        return Commands.run(() -> {
+        return Commands.run(
+                () -> {
                     setpoint = MathUtil.clamp(voltage, -12.0, 12.0);
                     io.setVoltage(setpoint);
                     mode = ControlMode.VOLTAGE;
