@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,8 +24,8 @@ public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
 
     private final ElevatorSubsystem elevator;
-    private final VelocityMotorSubsystem flywheel;
-    private final PositionMotorSubsystem intakePivot;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> flywheel;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> intakePivot;
 
     public RobotContainer() {
         MotorIO elevatorIO;
@@ -54,13 +55,13 @@ public class RobotContainer {
                         Meters.of(0),
                         Meters.of(ElevatorConfig.METERS_PER_ROTATION));
         flywheel =
-                new VelocityMotorSubsystem(
+                new VelocityMotorSubsystem<>(
                         FlywheelConfig.CONFIG,
                         new MotorInputsAutoLogged(),
                         flywheelIO,
                         FlywheelParamsNT.asVelocityParamSources());
         intakePivot =
-                new PositionMotorSubsystem(
+                new PositionMotorSubsystem<>(
                         IntakePivotConfig.CONFIG,
                         new MotorInputsAutoLogged(),
                         intakePivotIO,
@@ -74,11 +75,9 @@ public class RobotContainer {
     public void robotPeriodic() {}
 
     private void configureBindings() {
-        driver.a().onTrue(elevator.zeroCommand());
-        driver.b().onTrue(elevator.runPosition(Meters.of(0.4)));
-        driver.x().onTrue(elevator.runPosition(Meters.of(0.1)));
-        driver.leftBumper().whileTrue(intakePivot.runPosition(Revolution.of(0.25)));
-        driver.y().onTrue(intakePivot.zeroCommand());
+        driver.a().onTrue(intakePivot.runPosition(Degrees.of(180)));
+        driver.b().onTrue(intakePivot.runPosition(Degrees.of(90)));
+        driver.y().onTrue(intakePivot.runPosition(Degrees.of(0)));
     }
 
     public Command getAutonomousCommand() {

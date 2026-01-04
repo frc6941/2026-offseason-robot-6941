@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.*;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -13,11 +12,7 @@ public final class FlywheelConfig {
     public static final String NAME = "Flywheel";
     // Mechanism config
     public static final SimConfig SIM_CONFIG =
-            SubsystemConfig.SimConfig.builder()
-                    .MOI(KilogramSquareMeters.of(0.00035))
-                    .gearRatio(6.75)
-                    .stdvs(new double[] {0.02, 0.02})
-                    .build();
+            SubsystemConfig.SimConfig.builder().gearRatio(6.75).build();
     // Local hardware constants (copied/adapted from provided snippet)
     private static final int INTAKE_ROLLER_MOTOR_ID = 15;
     // private static final int INTAKE_PIVOT_ENCODER_ID = 17;

@@ -1,7 +1,6 @@
 package lib.ironpulse.subsystem;
 
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -11,7 +10,6 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.MomentOfInertia;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -63,7 +61,10 @@ public class SubsystemConfig {
 
     @Default public final boolean enableReverseSoftLimit = false;
 
-    /** ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos */
+    /** ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos
+     * This will offset the "Zero Position" Larger certain degress compared to what the harware thinks it is.
+     * Example: zeroOffset = Degree.of(0.25), Subsystem Pos = Degree.of(0.0), TalonPos = Degree.of(-0.25)
+     */
     @Default public final Angle zeroOffset = Degree.of(0.0);
 
     @Default public final ZeroingConfig zeroingConfig = ZeroingConfig.builder().build();
@@ -110,14 +111,12 @@ public class SubsystemConfig {
     @Builder
     @AllArgsConstructor
     public static class SimConfig {
-        @Default public final MomentOfInertia MOI = KilogramSquareMeters.of(0);
         @Default public final double gearRatio = 1.0d;
-        @Default public final double[] stdvs = new double[] {0.0d, 0.0d};
 
         @Default
         public final TrapezoidProfile.Constraints profile =
                 new TrapezoidProfile.Constraints(50.0, 100.0);
     }
 
-    @Default public SimConfig simConfig = new SimConfig(null, 0, null, null);
+    @Default public SimConfig simConfig = SimConfig.builder().build();
 }

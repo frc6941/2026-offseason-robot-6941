@@ -24,6 +24,13 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.LoggedTracer;
 import org.littletonrobotics.junction.Logger;
 
+/**
+ * Generic position-based motor subsystem.
+ *
+ * @param <T> The type of autologged inputs.
+ * @param <U> The type of IO interface.
+ * @param <M> The type of measure for the mechanism.
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PositionMotorSubsystem<
                 T extends MotorInputsAutoLogged, U extends MotorIO, M extends Measure<?>>
@@ -40,6 +47,9 @@ public class PositionMotorSubsystem<
 
     /**
      * Creates a new generic PositionMotorSubsystem.
+     *
+     * <p>NOTE: This class must be parameterized when used (e.g., {@code PositionMotorSubsystem<...,
+     * Angle>}) to avoid type safety warnings
      *
      * @param config The subsystem configuration (IDs, buses, ratios).
      * @param inputs The autologged inputs for the mechanism.
@@ -117,8 +127,7 @@ public class PositionMotorSubsystem<
 
         Logger.recordOutput(config.name + "/atGoal", positionAtGoal());
         Logger.recordOutput(
-                config.name + "/currPosition",
-                ((Measure) getCurrPos()).in(mechanismUnit));
+                config.name + "/currPosition", ((Measure) getCurrPos()).in(mechanismUnit));
     }
 
     public boolean positionAtGoal(M tolerance) {
