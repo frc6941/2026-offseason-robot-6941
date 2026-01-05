@@ -47,9 +47,11 @@ public class MotorIOTalonFX implements MotorIO {
     private final BaseStatusSignal[] signals;
     private boolean connected = false;
     private final TalonFXConfiguration fx;
+    private final SubsystemConfig config;
 
     public MotorIOTalonFX(SubsystemConfig cfg) {
         this.main = new TalonFX(cfg.mainId, cfg.mainBus);
+        this.config = cfg;
 
         this.fx = cfg.fxConfig;
 
@@ -191,6 +193,8 @@ public class MotorIOTalonFX implements MotorIO {
     public void updateGains(Slot0Configs slot0) {
         this.fx.Slot0 = slot0;
         fx.withSlot0(slot0);
+        slot0.GravityType = config.gravityType;
+        slot0.StaticFeedforwardSign = config.kSValue;
         main.getConfigurator().apply(this.fx);
     }
 }
