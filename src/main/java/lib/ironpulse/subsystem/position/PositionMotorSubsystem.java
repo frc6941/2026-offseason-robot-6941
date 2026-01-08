@@ -227,7 +227,8 @@ public class PositionMotorSubsystem<
                                                         () ->
                                                                 currentFilterValue =
                                                                         currentFilter.calculate(
-                                                                                getStatorCurrent().in(Amps)))
+                                                                                getStatorCurrent()
+                                                                                        .in(Amps)))
                                                 .until(
                                                         () ->
                                                                 currentFilterValue

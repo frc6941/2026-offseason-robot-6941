@@ -12,10 +12,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.*;
+import lib.ironpulse.io.BeamBreakIO;
+import lib.ironpulse.io.BeamBreakIOAnalog;
+import lib.ironpulse.io.BeamBreakIOSim;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.subsystem.BeamBreak;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -26,25 +30,32 @@ public class RobotContainer {
     private final ElevatorSubsystem elevator;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> flywheel;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> intakePivot;
+    private final BeamBreak beamBreak;
 
     public RobotContainer() {
         MotorIO elevatorIO;
         MotorIO flywheelIO;
         MotorIO intakePivotIO;
+        BeamBreakIO beamBreakIO;
 
         if (Logger.hasReplaySource()) {
             elevatorIO = new MotorIO() {};
             flywheelIO = new MotorIO() {};
             intakePivotIO = new MotorIO() {};
+            beamBreakIO = new BeamBreakIO() {};
         } else if (RobotBase.isReal()) {
             elevatorIO = new MotorIOTalonFX(ElevatorConfig.CONFIG);
             flywheelIO = new MotorIOTalonFX(FlywheelConfig.CONFIG);
             intakePivotIO = new MotorIOTalonFX(IntakePivotConfig.CONFIG);
+            beamBreakIO = new BeamBreakIOAnalog(0);
         } else {
             elevatorIO = new MotorIOSim(ElevatorConfig.CONFIG);
             flywheelIO = new MotorIOSim(FlywheelConfig.CONFIG);
             intakePivotIO = new MotorIOSim(IntakePivotConfig.CONFIG);
+            beamBreakIO = new BeamBreakIOSim();
         }
+
+        beamBreak = new BeamBreak(beamBreakIO, Seconds.of(0.01));
 
         elevator =
                 new ElevatorSubsystem(

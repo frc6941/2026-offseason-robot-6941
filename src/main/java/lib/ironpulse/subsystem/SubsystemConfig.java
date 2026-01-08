@@ -61,9 +61,11 @@ public class SubsystemConfig {
 
     @Default public final boolean enableReverseSoftLimit = false;
 
-    /** ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos
-     * This will offset the "Zero Position" Larger certain degress compared to what the harware thinks it is.
-     * Example: zeroOffset = Degree.of(0.25), Subsystem Pos = Degree.of(0.0), TalonPos = Degree.of(-0.25)
+    /**
+     * ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos This will
+     * offset the "Zero Position" Larger certain degress compared to what the harware thinks it is.
+     * Example: zeroOffset = Degree.of(0.25), Subsystem Pos = Degree.of(0.0), TalonPos =
+     * Degree.of(-0.25)
      */
     @Default public final Angle zeroOffset = Degree.of(0.0);
 

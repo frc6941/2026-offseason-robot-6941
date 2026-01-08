@@ -107,6 +107,7 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
     public boolean isConnected() {
         return io.isConnected();
     }
+
     public AngularVelocity getCurrSetpoint() {
         return currSetpoint;
     }
