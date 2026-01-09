@@ -13,7 +13,7 @@ import lib.ironpulse.swerve.sim.SwerveSimConfig;
 import lib.ntext.NTParameter;
 
 /** Constants specific to the swerve drivetrain configuration. */
-public final class SwerveConstants {
+public final class SwerveMK5Config {
     public static final String kSwerveTag = "Swerve";
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
     public static final double kSwerveHalfWidth = 0.6 / 2.0;

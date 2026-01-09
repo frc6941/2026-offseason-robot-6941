@@ -43,7 +43,6 @@ public final class IntakePivotConfig {
                                     .feedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
                                     .useContinousWrap(false)
                                     .build())
-                    .filterSize(5)
                     .simConfig(SIM_CONFIG)
                     .zeroOffset(Revolution.of(0.25))
                     .build();

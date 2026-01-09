@@ -56,6 +56,8 @@ public class MotorIOTalonFX implements MotorIO {
         this.fx = cfg.fxConfig;
 
         fx.MotorOutput.Inverted = cfg.motorInvertedValue;
+        fx.MotorOutput.NeutralMode =
+                cfg.defaultBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         // Optional: remote CANcoder feedback configuration
         if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
             configureCANcoder(cfg.remoteCANcoder);

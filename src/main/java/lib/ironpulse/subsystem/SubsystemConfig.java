@@ -44,10 +44,9 @@ public class SubsystemConfig {
     @Default
     public final InvertedValue motorInvertedValue = InvertedValue.CounterClockwise_Positive;
 
-    @Default public final int filterSize = 1;
-    @Default public final double SensorToMechanismRatio = 1.0;
+    @Default public final boolean defaultBrake = true;
 
-    @Default public final boolean updateOutputs = true;
+    @Default public final double SensorToMechanismRatio = 1.0;
 
     // other close loop configs
     @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;
@@ -121,4 +120,24 @@ public class SubsystemConfig {
     }
 
     @Default public SimConfig simConfig = SimConfig.builder().build();
+
+    /**
+     * Creates a simple SubsystemConfig with only the essential parameters for a basic motor
+     * subsystem.
+     *
+     * @param name The name of the subsystem (for logging/diagnostics)
+     * @param mainId The CAN ID of the main motor
+     * @param mainBus The CAN bus name (e.g., "rio" or "canivore")
+     * @param motorInvertedValue The motor inversion setting
+     * @return A SubsystemConfig with default values for all other parameters
+     */
+    public static SubsystemConfig simpleMotorCfg(
+            String name, int mainId, String mainBus, InvertedValue motorInvertedValue) {
+        return SubsystemConfig.builder()
+                .name(name)
+                .mainId(mainId)
+                .mainBus(mainBus)
+                .motorInvertedValue(motorInvertedValue)
+                .build();
+    }
 }
