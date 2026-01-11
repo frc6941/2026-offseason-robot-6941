@@ -20,15 +20,11 @@ public final class SwerveMK5Config {
 
     public static SwerveModuleLimit kDefaultSwerveModuleLimit =
             SwerveModuleLimit.builder()
-                    // MK5n L2 defaults (drive = 6.03, steer = 287/11 ≈ 26.09, wheel = 4.0in)
-                    // This matters most when translating while rotating: if this is too optimistic,
-                    // azimuth lag makes
-                    // the net velocity vector feel “disoriented” during rotation even with
-                    // open-loop drive.
+                    // MK5n L2 defaults (drive ~= 6.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
                     // v (mps) = 6000rpm / 60 / 6.03 * pi * 4.0in
                     .maxDriveVelocity(MetersPerSecond.of(5.29329707470519))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(17.0))
-                    // omega (rps) = 6000rpm / 60 / (287/11) ≈ 3.8333 rps
+                    // omega (rps) = 6000rpm / 60 / (287/11) ~= 3.8333 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(6000.0 / 60.0 / (287.0 / 11.0)))
                     // accelerate in 0.1s
                     .maxSteerAngularAcceleration(
