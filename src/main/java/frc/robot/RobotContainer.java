@@ -12,10 +12,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.shooter.ShooterConfig;
+import frc.robot.subsystems.shooter.ShootingParametersTable;
+import lib.ironpulse.utils.PhoenixUtils;
+import lib.ntext.NTParameterRegistry;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
+    private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
+    private final ShooterConfig shooterConfig = new ShooterConfig();
 
     public RobotContainer() {
 
@@ -29,7 +35,11 @@ public class RobotContainer {
         configureBindings();
     }
 
-    public void robotPeriodic() {}
+    public void robotPeriodic() {
+        PhoenixUtils.refreshAll();
+        NTParameterRegistry.refresh();
+        shootingParametersTable.updateFromNT();
+    }
 
     private void configureBindings() {}
 
