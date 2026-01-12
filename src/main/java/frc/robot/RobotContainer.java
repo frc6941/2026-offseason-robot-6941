@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -86,29 +85,20 @@ public class RobotContainer {
 
     private void configureBindings() {
         driver.a()
-                .onTrue(
+                .whileTrue(
                         new VisualizeProjectileShot(
-                                () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                                () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .getRotation()
-                                                .toRotation2d(),
-                                () -> new Rotation2d(45),
-                                () -> 10,
-                                () -> new Translation2d(0, 0),
-                                true));
-        driver.b()
-                .onTrue(
-                        new VisualizeProjectileShot(
-                                () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                                () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .getRotation()
-                                                .toRotation2d(),
-                                () -> new Rotation2d(45),
-                                () -> 15,
-                                () -> new Translation2d(0, 0),
-                                true));
+                                        RobotStateRecorder::getPoseWorldRobotCurrent,
+                                        () ->
+                                                RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .toRotation2d(),
+                                        () -> new Rotation2d(45),
+                                        () -> 10,
+                                        () ->
+                                                RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getTranslation(),
+                                        true)
+                                .repeatedly());
     }
 
     public Command getAutonomousCommand() {

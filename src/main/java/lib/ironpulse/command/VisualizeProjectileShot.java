@@ -32,7 +32,7 @@ public class VisualizeProjectileShot extends Command {
     private final Supplier<Pose3d> releasePoseWorldSupplier;
     private final Supplier<Rotation2d> yawWorldSupplier;
     private final Supplier<Rotation2d> pitchSupplier;
-    private final Supplier<Double> muzzleSpeedMpsSupplier;
+    private final DoubleSupplier muzzleSpeedMpsSupplier;
     private final Supplier<Translation2d> addedVelocityWorldMpsSupplier;
     private final boolean useGravity;
 
@@ -58,7 +58,7 @@ public class VisualizeProjectileShot extends Command {
             Supplier<Pose3d> releasePoseWorldSupplier,
             Supplier<Rotation2d> yawWorldSupplier,
             Supplier<Rotation2d> pitchSupplier,
-            Supplier<Double> muzzleSpeedMpsSupplier,
+            DoubleSupplier muzzleSpeedMpsSupplier,
             Supplier<Translation2d> addedVelocityWorldMpsSupplier,
             boolean useGravity) {
         this.releasePoseWorldSupplier =
@@ -74,27 +74,12 @@ public class VisualizeProjectileShot extends Command {
         this.useGravity = useGravity;
     }
 
-    public VisualizeProjectileShot(
-            Supplier<Pose3d> releasePoseWorldSupplier,
-            Supplier<Rotation2d> yawWorldSupplier,
-            Supplier<Rotation2d> pitchSupplier,
-            DoubleSupplier muzzleSpeedMpsSupplier,
-            Supplier<Translation2d> addedVelocityWorldMpsSupplier,
-            boolean useGravity) {
-        this(
-                releasePoseWorldSupplier,
-                yawWorldSupplier,
-                pitchSupplier,
-                (Supplier<Double>) () -> muzzleSpeedMpsSupplier.getAsDouble(),
-                addedVelocityWorldMpsSupplier,
-                useGravity);
-    }
 
     public VisualizeProjectileShot(
             Supplier<Pose3d> releasePoseWorldSupplier,
             Supplier<Rotation2d> yawWorldSupplier,
             Supplier<Rotation2d> pitchSupplier,
-            Supplier<Double> muzzleSpeedMpsSupplier,
+            DoubleSupplier muzzleSpeedMpsSupplier,
             boolean useGravity) {
         this(
                 releasePoseWorldSupplier,
@@ -110,25 +95,16 @@ public class VisualizeProjectileShot extends Command {
             Rotation2d yawWorld,
             Rotation2d pitch,
             double muzzleSpeedMps,
-            Translation2d addedVelocityWorldMps,
             boolean useGravity) {
         this(
                 () -> releasePoseWorld,
                 () -> yawWorld,
                 () -> pitch,
                 () -> muzzleSpeedMps,
-                () -> addedVelocityWorldMps,
+                () -> new Translation2d(),
                 useGravity);
     }
-
-    public VisualizeProjectileShot(
-            Pose3d releasePoseWorld,
-            Rotation2d yawWorld,
-            Rotation2d pitch,
-            double muzzleSpeedMps,
-            boolean useGravity) {
-        this(releasePoseWorld, yawWorld, pitch, muzzleSpeedMps, new Translation2d(), useGravity);
-    }
+    
 
     @Override
     public void initialize() {
@@ -140,11 +116,11 @@ public class VisualizeProjectileShot extends Command {
                 Objects.requireNonNull(yawWorldSupplier.get(), "yawWorldSupplier.get()");
         Rotation2d pitchSnapshot =
                 Objects.requireNonNull(pitchSupplier.get(), "pitchSupplier.get()");
-        Double muzzleSpeedMpsBoxed =
+        double muzzleSpeedMps =
                 Objects.requireNonNull(
-                        muzzleSpeedMpsSupplier.get(), "muzzleSpeedMpsSupplier.get()");
+                        muzzleSpeedMpsSupplier.getAsDouble(), "muzzleSpeedMpsSupplier.get()");
 
-        muzzleSpeedMpsSnapshot = muzzleSpeedMpsBoxed;
+        muzzleSpeedMpsSnapshot = muzzleSpeedMps;
         Translation2d vAdded = addedVelocityWorldMpsSupplier.get();
         addedVelocityWorldMpsSnapshot = (vAdded != null) ? vAdded : new Translation2d();
 
