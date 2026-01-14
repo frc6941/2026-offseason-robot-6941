@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.shooter.ShooterConfig;
-import frc.robot.subsystems.shooter.ShootingParametersTable;
+import frc.robot.subsystems.ShootingSubsystem.ShootingConfig;
+import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
 import lib.ironpulse.command.VisualizeProjectileShot;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.swerve.Swerve;
@@ -30,7 +30,7 @@ import lib.ntext.NTParameterRegistry;
 public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
-    private final ShooterConfig shooterConfig = new ShooterConfig();
+    private final ShootingConfig shooterConfig = new ShootingConfig();
     private final Swerve swerve;
 
     public RobotContainer() {

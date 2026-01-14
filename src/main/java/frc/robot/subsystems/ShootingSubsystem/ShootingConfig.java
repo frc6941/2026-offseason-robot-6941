@@ -1,9 +1,9 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.ShootingSubsystem;
 
 import lib.ntext.NTParameter;
 
-public final class ShooterConfig {
-    public ShooterConfig() {}
+public final class ShootingConfig {
+    public ShootingConfig() {}
 
     // Standalone presets (not part of distance interpolation)
     @NTParameter(tableName = "Params/ShooterTable")

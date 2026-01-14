@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.ShootingSubsystem;
 
 import edu.wpi.first.math.interpolation.Interpolatable;
 import lombok.AllArgsConstructor;
