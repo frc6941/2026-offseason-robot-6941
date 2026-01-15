@@ -98,6 +98,14 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
         return velocityAtGoal(RotationsPerSecond.of(params.velocityAtGoalToleranceRPS()));
     }
 
+    public Command waitUntilAtGoal(AngularVelocity tolerance) {
+        return Commands.waitUntil(() -> velocityAtGoal(tolerance));
+    }
+
+    public Command waitUntilAtGoal() {
+        return Commands.waitUntil(this::velocityAtGoal);
+    }
+
     /** Get current velocity in rotations per second. */
     public AngularVelocity getVelocity() {
         return RotationsPerSecond.of(inputs.velocityRotPerSecond);

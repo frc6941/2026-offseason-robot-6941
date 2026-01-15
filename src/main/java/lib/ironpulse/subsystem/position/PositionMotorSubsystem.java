@@ -144,6 +144,14 @@ public class PositionMotorSubsystem<
         }
     }
 
+    public Command waitUntilAtGoal(M tolerance) {
+        return Commands.waitUntil(() -> positionAtGoal(tolerance));
+    }
+
+    public Command waitUntilAtGoal() {
+        return Commands.waitUntil(this::positionAtGoal);
+    }
+
     public Command runMotionMagic(M setPoint) {
         return runMotionMagic(() -> setPoint);
     }

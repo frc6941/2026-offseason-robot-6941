@@ -106,9 +106,9 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
                 this);
     }
 
-    /** Set neutral mode command. */
+    /** Set neutral mode command,exits instantly */
     public Command setNeutralMode(boolean wantsBreak) {
-        return Commands.run(() -> io.setNeutralMode(wantsBreak));
+        return Commands.runOnce(() -> io.setNeutralMode(wantsBreak));
     }
 
     public Current getStatorCurrent() {
