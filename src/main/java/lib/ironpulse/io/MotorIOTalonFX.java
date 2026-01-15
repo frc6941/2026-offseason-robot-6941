@@ -83,14 +83,16 @@ public class MotorIOTalonFX implements MotorIO {
         // Soft limit enables per config (thresholds should be in fxConfig)
         if (!Double.isNaN(cfg.forwardSoftLimitDegrees.magnitude())) {
             fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-            fx.SoftwareLimitSwitch.ForwardSoftLimitThreshold = cfg.forwardSoftLimitDegrees.magnitude();
-        }else{
+            fx.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+                    cfg.forwardSoftLimitDegrees.magnitude();
+        } else {
             fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
         }
         if (!Double.isNaN(cfg.reverseSoftLimitDegrees.magnitude())) {
             fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-            fx.SoftwareLimitSwitch.ReverseSoftLimitThreshold = cfg.reverseSoftLimitDegrees.magnitude();
-        }else{
+            fx.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+                    cfg.reverseSoftLimitDegrees.magnitude();
+        } else {
             fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
         }
 

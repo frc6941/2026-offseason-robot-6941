@@ -1,12 +1,9 @@
 package lib.ironpulse.subsystem;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -110,7 +107,6 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
     public Command setNeutralMode(boolean wantsBreak) {
         return Commands.runOnce(() -> io.setNeutralMode(wantsBreak));
     }
-
 
     /** Set stator + supply current limits command, exits instantly */
     public Command setCurrentLimits(double statorCurrentLimitAmps, double supplyCurrentLimitAmps) {

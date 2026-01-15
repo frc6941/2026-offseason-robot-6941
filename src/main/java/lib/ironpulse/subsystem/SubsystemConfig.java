@@ -62,6 +62,7 @@ public class SubsystemConfig {
 
     /** Soft-limit, set to NaN to disable */
     @Default public final Angle forwardSoftLimitDegrees = Degree.of(Double.NaN);
+
     @Default public final Angle reverseSoftLimitDegrees = Degree.of(Double.NaN);
 
     /**

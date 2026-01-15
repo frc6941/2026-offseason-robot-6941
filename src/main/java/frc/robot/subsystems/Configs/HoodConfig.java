@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Configs;
 
 import com.ctre.phoenix6.signals.InvertedValue;
-
 import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
