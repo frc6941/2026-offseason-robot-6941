@@ -1,14 +1,16 @@
-package frc.robot.subsystems.ShootingSubsystem;
+package frc.robot.subsystems.Configs;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+
+import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 
 public class ShooterConfig {
     private ShooterConfig() {}
 
     public static final String NAME = "Shooter";
-    public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
+    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
     private static final int SHOOTER_MOTOR_MAIN_ID = 98;
     private static final int SHOOTER_MOTOR_FOLLOWER_ID = 97;

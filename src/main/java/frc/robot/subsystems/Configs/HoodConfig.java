@@ -1,6 +1,8 @@
-package frc.robot.subsystems.ShootingSubsystem;
+package frc.robot.subsystems.Configs;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+
+import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -8,7 +10,7 @@ public class HoodConfig {
     private HoodConfig() {}
 
     public static final String NAME = "Hood";
-    public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
+    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
     // Local hardware constants
     private static final int HOOD_MOTOR_MAIN_ID = 99;

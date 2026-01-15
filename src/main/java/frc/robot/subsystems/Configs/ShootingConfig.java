@@ -1,4 +1,4 @@
-package frc.robot.subsystems.ShootingSubsystem;
+package frc.robot.subsystems.Configs;
 
 import lib.ntext.NTParameter;
 

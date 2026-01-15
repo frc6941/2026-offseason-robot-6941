@@ -1,10 +1,11 @@
-package frc.robot.subsystems.ShootingSubsystem;
+package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -12,10 +13,14 @@ public class TurretConfig {
     private TurretConfig() {}
 
     public static final String NAME = "Turret";
-    public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
+    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
     private static final int TURRET_MOTOR_MAIN_ID = 96;
     private static final double TURRET_GEAR_RATIO = 40.0;
+
+    private static final int G1_GEAR_TOOTH_COUNT = 70;
+    private static final int G2_GEAR_TOOTH_COUNT = 36;
+    private static final int G3_GEAR_TOOTH_COUNT = 34;
 
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
@@ -27,6 +32,8 @@ public class TurretConfig {
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .forwardSoftLimitDegrees(Degrees.of(0))
                     .reverseSoftLimitDegrees(Degrees.of(0))
+                    .statorCurrentLimitAmps(80)
+                    .supplyCurrentLimitAmps(80)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(TURRET_GEAR_RATIO)
@@ -34,14 +41,30 @@ public class TurretConfig {
                     .build();
 
         @NTParameter(tableName = "Params/" + NAME)
-        public static final class TurretParams {        
+        public static final class TurretParams {    
+            //velocity gains
+            //IMPORTANT: Makesure we tune these first before tuning the position gains
+            //Velocity trackeing should be clean and accurate
             public static final double kP = 3.75;
             public static final double kI = 0.0;
             public static final double kD = 0.0;
             public static final double kV = 0.1308;
             public static final double kA = 0.0068;
-            public static final double kS = 0.13;       
+            public static final double kS = 0.13;
+            
+            //shold be small
+            public static final double kpPos = 0.01;
+            public static final double kiPos = 0.0;
+            public static final double kdPos = 0.0;
+
+            public static final double maxVelocityRPS = 5;
+            public static final double maxAccelerationRPS2 = 10;
+
+            public static final double kchassisVelCompensation = 1;
+
             // Tolerances / behavior
             public static final double velocityAtGoalToleranceRPS = 1;
+            public static final double positionAtGoalToleranceDegrees = 1;
+
         }
 }

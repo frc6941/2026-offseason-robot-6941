@@ -1,8 +1,11 @@
 package lib.ironpulse.subsystem.velocity;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -109,6 +112,10 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
     /** Get current velocity in rotations per second. */
     public AngularVelocity getVelocity() {
         return RotationsPerSecond.of(inputs.velocityRotPerSecond);
+    }
+
+    public Angle getPosition() {
+        return Rotations.of(inputs.positionRot);
     }
 
     /** Check if motor is connected. */
