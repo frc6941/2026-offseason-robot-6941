@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
@@ -18,9 +18,13 @@ public class TurretConfig {
     private static final int TURRET_MOTOR_MAIN_ID = 96;
     private static final double TURRET_GEAR_RATIO = 40.0;
 
-    private static final int G1_GEAR_TOOTH_COUNT = 70;
-    private static final int G2_GEAR_TOOTH_COUNT = 36;
-    private static final int G3_GEAR_TOOTH_COUNT = 34;
+    // Zeroing Coder constants
+    public static final int G0_TOOTH_COUNT = 70;
+    public static final int G1_TOOTH_COUNT = 36;
+    public static final int G2_TOOTH_COUNT = 34;
+
+    public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(250.0);
+    public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(100.0);
 
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
@@ -40,31 +44,30 @@ public class TurretConfig {
                                     .build())
                     .build();
 
-        @NTParameter(tableName = "Params/" + NAME)
-        public static final class TurretParams {    
-            //velocity gains
-            //IMPORTANT: Makesure we tune these first before tuning the position gains
-            //Velocity trackeing should be clean and accurate
-            public static final double kP = 3.75;
-            public static final double kI = 0.0;
-            public static final double kD = 0.0;
-            public static final double kV = 0.1308;
-            public static final double kA = 0.0068;
-            public static final double kS = 0.13;
-            
-            //shold be small
-            public static final double kpPos = 0.01;
-            public static final double kiPos = 0.0;
-            public static final double kdPos = 0.0;
+    @NTParameter(tableName = "Params/" + NAME)
+    public static final class TurretParams {
+        // velocity gains
+        // IMPORTANT: Makesure we tune these first before tuning the position gains
+        // Velocity trackeing should be clean and accurate
+        public static final double kP = 3.75;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kV = 0.1308;
+        public static final double kA = 0.0068;
+        public static final double kS = 0.13;
 
-            public static final double maxVelocityRPS = 5;
-            public static final double maxAccelerationRPS2 = 10;
+        // shold be small
+        public static final double kpPos = 0.01;
+        public static final double kiPos = 0.0;
+        public static final double kdPos = 0.0;
 
-            public static final double kchassisVelCompensation = 1;
+        public static final double maxVelocityRPS = 5;
+        public static final double maxAccelerationRPS2 = 10;
 
-            // Tolerances / behavior
-            public static final double velocityAtGoalToleranceRPS = 1;
-            public static final double positionAtGoalToleranceDegrees = 1;
+        public static final double kchassisVelCompensation = 1;
 
-        }
+        // Tolerances / behavior
+        public static final double velocityAtGoalToleranceRPS = 1;
+        public static final double positionAtGoalToleranceDegrees = 1;
+    }
 }
