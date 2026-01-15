@@ -53,8 +53,8 @@ public class MotorIOSim implements MotorIO {
         this.dcMotor = DCMotor.getKrakenX60Foc(1);
         this.maxVelocityRPS = (dcMotor.freeSpeedRadPerSec / (2 * Math.PI)) / this.cfg.gearRatio;
 
-        this.forwardSoftLimitEnabled = cfg.enableForwardSoftLimit;
-        this.reverseSoftLimitEnabled = cfg.enableReverseSoftLimit;
+        this.forwardSoftLimitEnabled = !Double.isNaN(cfg.forwardSoftLimitDegrees.magnitude());
+        this.reverseSoftLimitEnabled = !Double.isNaN(cfg.reverseSoftLimitDegrees.magnitude());
 
         currentConstraints =
                 (this.cfg.profile != null)

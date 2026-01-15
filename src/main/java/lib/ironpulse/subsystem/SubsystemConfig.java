@@ -48,17 +48,21 @@ public class SubsystemConfig {
 
     @Default public final double SensorToMechanismRatio = 1.0;
 
+    /** Optional stator current limit in amps, set to NaN to disable. */
+    @Default public final double statorCurrentLimitAmps = Double.NaN;
+
+    /** Optional supply current limit in amps, set to NaN to disable. */
+    @Default public final double supplyCurrentLimitAmps = Double.NaN;
+
     // other close loop configs
     @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;
 
     @Default
     public final StaticFeedforwardSignValue kSValue = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-    /** Soft-limit enables at init; thresholds should be part of fxConfig if used. */
-    // TODO: soft limit
-    @Default public final boolean enableForwardSoftLimit = false;
-
-    @Default public final boolean enableReverseSoftLimit = false;
+    /** Soft-limit, set to NaN to disable */
+    @Default public final Angle forwardSoftLimitDegrees = Degree.of(Double.NaN);
+    @Default public final Angle reverseSoftLimitDegrees = Degree.of(Double.NaN);
 
     /**
      * ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos This will

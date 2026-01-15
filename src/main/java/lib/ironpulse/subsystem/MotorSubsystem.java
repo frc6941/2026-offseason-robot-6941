@@ -111,6 +111,13 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
         return Commands.runOnce(() -> io.setNeutralMode(wantsBreak));
     }
 
+
+    /** Set stator + supply current limits command, exits instantly */
+    public Command setCurrentLimits(double statorCurrentLimitAmps, double supplyCurrentLimitAmps) {
+        return Commands.runOnce(
+                () -> io.setCurrentLimits(statorCurrentLimitAmps, supplyCurrentLimitAmps));
+    }
+
     public Current getStatorCurrent() {
         return Amps.of(inputs.currentStatorAmps);
     }

@@ -58,6 +58,18 @@ public class MotorIOTalonFX implements MotorIO {
         fx.MotorOutput.Inverted = cfg.motorInvertedValue;
         fx.MotorOutput.NeutralMode =
                 cfg.defaultBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        if (!Double.isNaN(cfg.statorCurrentLimitAmps)) {
+            fx.CurrentLimits.StatorCurrentLimitEnable = true;
+            fx.CurrentLimits.StatorCurrentLimit = cfg.statorCurrentLimitAmps;
+        } else {
+            fx.CurrentLimits.StatorCurrentLimitEnable = false;
+        }
+        if (!Double.isNaN(cfg.supplyCurrentLimitAmps)) {
+            fx.CurrentLimits.SupplyCurrentLimitEnable = true;
+            fx.CurrentLimits.SupplyCurrentLimit = cfg.supplyCurrentLimitAmps;
+        } else {
+            fx.CurrentLimits.SupplyCurrentLimitEnable = false;
+        }
         // Optional: remote CANcoder feedback configuration
         if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
             configureCANcoder(cfg.remoteCANcoder);
@@ -69,8 +81,18 @@ public class MotorIOTalonFX implements MotorIO {
         }
 
         // Soft limit enables per config (thresholds should be in fxConfig)
-        fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = cfg.enableForwardSoftLimit;
-        fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = cfg.enableReverseSoftLimit;
+        if (!Double.isNaN(cfg.forwardSoftLimitDegrees.magnitude())) {
+            fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+            fx.SoftwareLimitSwitch.ForwardSoftLimitThreshold = cfg.forwardSoftLimitDegrees.magnitude();
+        }else{
+            fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        }
+        if (!Double.isNaN(cfg.reverseSoftLimitDegrees.magnitude())) {
+            fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+            fx.SoftwareLimitSwitch.ReverseSoftLimitThreshold = cfg.reverseSoftLimitDegrees.magnitude();
+        }else{
+            fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+        }
 
         fx.Feedback.SensorToMechanismRatio = cfg.SensorToMechanismRatio;
 
@@ -100,8 +122,8 @@ public class MotorIOTalonFX implements MotorIO {
                     posSig, velSig, motorVoltSig, supplyVoltSig, statorSig, supplySig
                 };
         // configure update frequencies and register signals
-        posSig.setUpdateFrequency(100.0);
-        velSig.setUpdateFrequency(100.0);
+        posSig.setUpdateFrequency(1000.0);
+        velSig.setUpdateFrequency(1000.0);
         motorVoltSig.setUpdateFrequency(100.0);
         supplyVoltSig.setUpdateFrequency(30.0);
         statorSig.setUpdateFrequency(100.0);
@@ -188,6 +210,23 @@ public class MotorIOTalonFX implements MotorIO {
     public void setEnableSoftLimits(boolean forward, boolean reverse) {
         this.fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
         this.fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+        main.getConfigurator().apply(this.fx);
+    }
+
+    @Override
+    public void setCurrentLimits(double statorCurrentLimitAmps, double supplyCurrentLimitAmps) {
+        if (!Double.isNaN(statorCurrentLimitAmps)) {
+            this.fx.CurrentLimits.StatorCurrentLimitEnable = true;
+            this.fx.CurrentLimits.StatorCurrentLimit = statorCurrentLimitAmps;
+        } else {
+            this.fx.CurrentLimits.StatorCurrentLimitEnable = false;
+        }
+        if (!Double.isNaN(supplyCurrentLimitAmps)) {
+            this.fx.CurrentLimits.SupplyCurrentLimitEnable = true;
+            this.fx.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimitAmps;
+        } else {
+            this.fx.CurrentLimits.SupplyCurrentLimitEnable = false;
+        }
         main.getConfigurator().apply(this.fx);
     }
 
