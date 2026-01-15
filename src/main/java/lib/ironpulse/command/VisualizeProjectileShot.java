@@ -74,7 +74,6 @@ public class VisualizeProjectileShot extends Command {
         this.useGravity = useGravity;
     }
 
-
     public VisualizeProjectileShot(
             Supplier<Pose3d> releasePoseWorldSupplier,
             Supplier<Rotation2d> yawWorldSupplier,
@@ -104,7 +103,6 @@ public class VisualizeProjectileShot extends Command {
                 () -> new Translation2d(),
                 useGravity);
     }
-    
 
     @Override
     public void initialize() {

@@ -10,8 +10,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import frc.robot.subsystems.shooter.ShootingPresetParamsNT;
 import lib.ntext.NTParameterWrapper;
 
 /**
