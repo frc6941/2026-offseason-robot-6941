@@ -15,8 +15,14 @@ public class TurretConfig {
     public static final String NAME = "Turret";
     public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
-    private static final int TURRET_MOTOR_MAIN_ID = 96;
-    private static final double TURRET_GEAR_RATIO = 40.0;
+    public static final int TURRET_MOTOR_MAIN_ID = 96;
+    public static final double TURRET_GEAR_RATIO = 40.0;
+
+    public static final int TURRET_ENCODER_G1_ID = 95;
+    public static final int TURRET_ENCODER_G2_ID = 94;
+
+    public static final Angle TURRET_ENCODER_G1_OFFSET = Degrees.of(0.0);
+    public static final Angle TURRET_ENCODER_G2_OFFSET = Degrees.of(0.0);
 
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 70;
@@ -34,8 +40,8 @@ public class TurretConfig {
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-                    .forwardSoftLimitDegrees(Degrees.of(0))
-                    .reverseSoftLimitDegrees(Degrees.of(0))
+                    .forwardSoftLimitDegrees(Degrees.of(360))
+                    .reverseSoftLimitDegrees(Degrees.of(-360.0))
                     .statorCurrentLimitAmps(80)
                     .supplyCurrentLimitAmps(80)
                     .simConfig(

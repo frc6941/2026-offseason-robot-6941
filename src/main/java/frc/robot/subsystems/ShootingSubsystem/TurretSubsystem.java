@@ -1,11 +1,20 @@
 package frc.robot.subsystems.ShootingSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static frc.robot.subsystems.Configs.TurretConfig.*;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Configs.TurretConfig;
+import frc.robot.subsystems.Configs.TurretParamsNT;
+import java.util.function.Supplier;
 import lib.ironpulse.io.CANCoderIO;
 import lib.ironpulse.io.CANCoderIOInputsAutoLogged;
 import lib.ironpulse.io.MotorIO;
@@ -16,6 +25,7 @@ import lib.ironpulse.subsystem.velocity.VelocityParamSources;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
+    private static final Angle FULL_ROTATION = Degrees.of(360.0);
     private static final double DIFFERENTIAL_SLOPE =
             (TurretConfig.G2_TOOTH_COUNT * TurretConfig.G1_TOOTH_COUNT)
                     / ((TurretConfig.G1_TOOTH_COUNT - TurretConfig.G2_TOOTH_COUNT)
@@ -28,6 +38,14 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     private final CANCoderIOInputsAutoLogged encoderG2Inputs = new CANCoderIOInputsAutoLogged();
     private final Alert wrappingAlert =
             new Alert("Turret unwrapping difference is huge", Alert.AlertType.kError);
+    private final ProfiledPIDController outerLoopController =
+            new ProfiledPIDController(
+                    TurretParamsNT.kpPos.getValue(),
+                    TurretParamsNT.kiPos.getValue(),
+                    TurretParamsNT.kdPos.getValue(),
+                    new TrapezoidProfile.Constraints(
+                            TurretParamsNT.maxVelocityRPS.getValue() * 360.0,
+                            TurretParamsNT.maxAccelerationRPS2.getValue() * 360.0));
 
     public TurretSubsystem(
             SubsystemConfig config,
@@ -45,22 +63,64 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     @Override
     public void periodic() {
-        super.periodic();
         updateUnwrappedTurretAngle();
+        super.periodic();
         wrappingAlert.set(!getPosition().isNear(unwrappedTurretAngle, Degrees.of(1.0)));
+    }
+
+    @Override
+    protected void logState() {
+        super.logState();
+        Logger.processInputs(getName() + "/encoderG1", encoderG1Inputs);
+        Logger.processInputs(getName() + "/encoderG2", encoderG2Inputs);
+        Logger.recordOutput(getName() + "/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
+        Logger.recordOutput(getName() + "/atGoal", false); // wip
+        Logger.recordOutput(getName() + "/currPosition", getPosition().in(Degrees));
+    }
+
+    public Command runTurretPosition(Supplier<Angle> targetAngleSupplier) {
+        return Commands.runOnce(this::resetOuterLoop, this)
+                .andThen(runVelocity(() -> updateOuterLoopVelocity(targetAngleSupplier.get())));
     }
 
     private void updateUnwrappedTurretAngle() {
         encoderG1.readInputs(encoderG1Inputs);
         encoderG2.readInputs(encoderG2Inputs);
-        Logger.processInputs("Subsystem/" + getName() + "/encoderG1", encoderG1Inputs);
-        Logger.processInputs("Subsystem/" + getName() + "/encoderG2", encoderG2Inputs);
+
         Angle encoderG1Angle = Degrees.of(encoderG1Inputs.positionRotations * 360.0);
         Angle encoderG2Angle = Degrees.of(encoderG2Inputs.positionRotations * 360.0);
         unwrappedTurretAngle = unwrapDifferentialAngle(encoderG1Angle, encoderG2Angle);
-        Logger.recordOutput(
-                "Subsystem/" + getName() + "/unwrappedTurretAngle",
-                unwrappedTurretAngle.in(Degrees));
+    }
+
+    private AngularVelocity updateOuterLoopVelocity(Angle targetAngle) {
+        Angle currentAngle = getPosition();
+        Angle shortestTargetAngle = getShortestTargetAngle(targetAngle, currentAngle);
+        Angle targetPosition = shortestTargetAngle;
+        outerLoopController.setP(TurretParamsNT.kpPos.getValue());
+        outerLoopController.setI(TurretParamsNT.kiPos.getValue());
+        outerLoopController.setD(TurretParamsNT.kdPos.getValue());
+        outerLoopController.setConstraints(
+                new TrapezoidProfile.Constraints(
+                        TurretParamsNT.maxVelocityRPS.getValue() * 360.0,
+                        TurretParamsNT.maxAccelerationRPS2.getValue() * 360.0));
+        double desiredVelocity =
+                outerLoopController.calculate(currentAngle.in(Degrees), targetPosition.in(Degrees));
+        return DegreesPerSecond.of(desiredVelocity);
+    }
+
+    private void resetOuterLoop() {
+        outerLoopController.reset(getPosition().in(Degrees));
+    }
+
+    private Angle getShortestTargetAngle(Angle targetAngle, Angle currentAngle) {
+        double targetPosition = targetAngle.in(Degrees);
+        double currentPosition = currentAngle.in(Degrees);
+        double offset =
+                MathUtil.inputModulus(
+                        targetPosition - currentPosition,
+                        -FULL_ROTATION.in(Degrees) / 2.0,
+                        FULL_ROTATION.in(Degrees) / 2.0);
+        return Degrees.of(currentPosition + offset);
     }
 
     private static Angle unwrapDifferentialAngle(Angle encoderGearAAngle, Angle encoderGearBAngle) {

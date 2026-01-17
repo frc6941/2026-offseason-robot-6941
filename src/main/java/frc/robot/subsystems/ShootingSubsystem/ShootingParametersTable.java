@@ -29,6 +29,9 @@ public class ShootingParametersTable {
 
     /** Rebuilds the interpolating table from the latest NTParameter wrapper values. */
     public synchronized void updateFromNT() {
+        if (!ShootingPresetParamsNT.isAnyChanged()) {
+            return;
+        }
         interpolatingTable.clear();
 
         // Avoid having to duplicate the point list here: discover all P#_(DIS|FWV|BBA) fields on

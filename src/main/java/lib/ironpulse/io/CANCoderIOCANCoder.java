@@ -1,5 +1,7 @@
 package lib.ironpulse.io;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -13,11 +15,11 @@ public class CANCoderIOCANCoder implements CANCoderIO {
     private final CANcoder encoder;
     private StatusSignal<Angle> positionSig;
 
-    public CANCoderIOCANCoder(int canDeviceId, double offsetRotations, boolean inverted) {
+    public CANCoderIOCANCoder(int canDeviceId, Angle offset, boolean inverted) {
         encoder = new CANcoder(canDeviceId, RobotConstants.CANIVORE_CAN_BUS_NAME);
 
         var cancoderConfigs = new CANcoderConfiguration();
-        cancoderConfigs.MagnetSensor.MagnetOffset = offsetRotations;
+        cancoderConfigs.MagnetSensor.MagnetOffset = offset.in(Rotations);
         cancoderConfigs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         cancoderConfigs.MagnetSensor.SensorDirection =
                 inverted

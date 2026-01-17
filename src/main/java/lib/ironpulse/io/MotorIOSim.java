@@ -92,8 +92,7 @@ public class MotorIOSim implements MotorIO {
 
         // Apply soft limits
         if (forwardSoftLimitEnabled) {
-            double threshold =
-                    subsystemConfig.fxConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold;
+            double threshold = subsystemConfig.forwardSoftLimitDegrees.in(Rotations);
             if (currentPositionRot >= threshold) {
                 currentPositionRot = threshold;
                 currentVelocityRPS = Math.min(0, currentVelocityRPS);
@@ -102,8 +101,7 @@ public class MotorIOSim implements MotorIO {
             }
         }
         if (reverseSoftLimitEnabled) {
-            double threshold =
-                    subsystemConfig.fxConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold;
+            double threshold = subsystemConfig.reverseSoftLimitDegrees.in(Rotations);
             if (currentPositionRot <= threshold) {
                 currentPositionRot = threshold;
                 currentVelocityRPS = Math.max(0, currentVelocityRPS);
