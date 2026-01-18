@@ -119,6 +119,11 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                         TurretParamsNT.maxAccelerationRPS2.getValue() * 360.0));
         double desiredVelocity =
                 posVelCtl.calculate(currentAngle.in(Degrees), targetPosition.in(Degrees));
+        //compansate for the chassis rotation
+        double chassisOmegaDegPerSec =
+                RobotStateRecorder.getVelocityRobotCurrent().getRotation().getDegrees();
+        desiredVelocity -=
+                TurretParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;
         return DegreesPerSecond.of(desiredVelocity);
     }
 

@@ -33,7 +33,7 @@ public class TurretConfig {
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(100.0);
 
     public static final Angle TURRET_SOFT_LIMIT = Degrees.of(200.0);
-    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(3.0);
+    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(5.0);
 
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
