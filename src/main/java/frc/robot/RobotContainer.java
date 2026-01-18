@@ -98,9 +98,7 @@ public class RobotContainer {
                         // () -> new Pose3d(),
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-
-        turret.setDefaultCommand(
-                turret.runTurretPosition(() -> Degrees.of(driver.getRightTriggerAxis() * 180)));
+        turret.setDefaultCommand(turret.runStop());
     }
 
     public void robotPeriodic() {
@@ -147,6 +145,11 @@ public class RobotContainer {
                                                         .getTranslation(),
                                         true)
                                 .repeatedly());
+
+        driver.povUp().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(0)));
+        driver.povRight().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(90)));
+        driver.povDown().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(180)));
+        driver.povLeft().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(270)));
     }
 
     public Command getAutonomousCommand() {

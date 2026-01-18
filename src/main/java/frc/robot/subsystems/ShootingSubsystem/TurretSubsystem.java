@@ -6,12 +6,14 @@ import static frc.robot.subsystems.Configs.TurretConfig.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretParamsNT;
 import java.util.function.Supplier;
@@ -78,18 +80,14 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         Logger.recordOutput(getName() + "/currPosition", getPosition().in(Degrees));
     }
 
-    public Command runTurretPosition(Supplier<Angle> targetAngleSupplier) {
-        return Commands.runOnce(this::resetOuterLoop, this)
-                .andThen(runVelocity(() -> updateOuterLoopVelocity(targetAngleSupplier.get())));
+    public Command runTurretPoseWorld(Supplier<Angle> targetWorldAngleSupplier) {
+        return runTurretPoseRobot(() -> toRobotRelativeFromWorld(targetWorldAngleSupplier.get()));
     }
 
-    private void updateUnwrappedTurretAngle() {
-        encoderG1.readInputs(encoderG1Inputs);
-        encoderG2.readInputs(encoderG2Inputs);
-
-        Angle encoderG1Angle = Degrees.of(encoderG1Inputs.positionRotations * 360.0);
-        Angle encoderG2Angle = Degrees.of(encoderG2Inputs.positionRotations * 360.0);
-        unwrappedTurretAngle = unwrapDifferentialAngle(encoderG1Angle, encoderG2Angle);
+    public Command runTurretPoseRobot(Supplier<Angle> targetRobotAngleSupplier) {
+        return Commands.runOnce(this::resetOuterLoop, this)
+                .andThen(
+                        runVelocity(() -> updateOuterLoopVelocity(targetRobotAngleSupplier.get())));
     }
 
     private AngularVelocity updateOuterLoopVelocity(Angle targetAngle) {
@@ -112,6 +110,14 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         outerLoopController.reset(getPosition().in(Degrees));
     }
 
+    private Angle toRobotRelativeFromWorld(Angle worldAngle) {
+        Rotation2d worldRotation = Rotation2d.fromDegrees(worldAngle.in(Degrees));
+        Rotation2d robotRotation =
+                RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation();
+        Rotation2d robotRelative = worldRotation.rotateBy(robotRotation.unaryMinus());
+        return Degrees.of(robotRelative.getDegrees());
+    }
+
     private Angle getShortestTargetAngle(Angle targetAngle, Angle currentAngle) {
         double targetPosition = targetAngle.in(Degrees);
         double currentPosition = currentAngle.in(Degrees);
@@ -121,6 +127,15 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                         -FULL_ROTATION.in(Degrees) / 2.0,
                         FULL_ROTATION.in(Degrees) / 2.0);
         return Degrees.of(currentPosition + offset);
+    }
+
+    private void updateUnwrappedTurretAngle() {
+        encoderG1.readInputs(encoderG1Inputs);
+        encoderG2.readInputs(encoderG2Inputs);
+
+        Angle encoderG1Angle = Degrees.of(encoderG1Inputs.positionRotations * 360.0);
+        Angle encoderG2Angle = Degrees.of(encoderG2Inputs.positionRotations * 360.0);
+        unwrappedTurretAngle = unwrapDifferentialAngle(encoderG1Angle, encoderG2Angle);
     }
 
     private static Angle unwrapDifferentialAngle(Angle encoderGearAAngle, Angle encoderGearBAngle) {

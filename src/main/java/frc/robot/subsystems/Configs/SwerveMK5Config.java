@@ -43,6 +43,13 @@ public final class SwerveMK5Config {
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0))
                     .build();
 
+    public static SwerveLimit kSimSwerveLimit =
+            SwerveLimit.builder()
+                    .maxLinearVelocity(MetersPerSecond.of(4.5))
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(30))
+                    .maxAngularVelocity(DegreesPerSecond.of(200.0))
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(100.0))
+                    .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("FL")
@@ -110,7 +117,7 @@ public final class SwerveMK5Config {
                     .steerMomentOfInertia(KilogramSquareMeters.of(0.01))
                     .steerStdDevPos(0.0000001)
                     .steerStdDevVel(0.000001)
-                    .defaultSwerveLimit(kDefaultSwerveLimit)
+                    .defaultSwerveLimit(kSimSwerveLimit)
                     .defaultSwerveModuleLimit(kDefaultSwerveModuleLimit)
                     .moduleConfigs(
                             new SwerveConfig.SwerveModuleConfig[] {

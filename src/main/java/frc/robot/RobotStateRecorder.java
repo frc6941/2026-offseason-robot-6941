@@ -68,8 +68,7 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/poseTurret",
-                RobotStateRecorder.getPoseWorldTurretCurrent());
+                "RobotStateRecorder/poseTurret", RobotStateRecorder.getPoseWorldTurretCurrent());
     }
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
