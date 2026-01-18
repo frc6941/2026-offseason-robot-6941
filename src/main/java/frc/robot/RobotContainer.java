@@ -6,7 +6,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -96,12 +98,18 @@ public class RobotContainer {
                         // () -> new Pose3d(),
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
+
+        turret.setDefaultCommand(
+                turret.runTurretPosition(() -> Degrees.of(driver.getRightTriggerAxis() * 180)));
     }
 
     public void robotPeriodic() {
+        // update IO inputs
         PhoenixUtils.refreshAll();
+        // update NTparameters
         NTParameterRegistry.refresh();
         shootingParametersTable.updateFromNT();
+        // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
         RobotStateRecorder.getInstance()
                 .putTransform(
@@ -109,6 +117,16 @@ public class RobotContainer {
                         now,
                         TransformRecorder.kFrameWorld,
                         TransformRecorder.kFrameRobot);
+
+        RobotStateRecorder.getInstance()
+                .putTransform(
+                        new Pose3d(
+                                RobotStateRecorder.kRobotToTurret,
+                                new Rotation3d(0.0, 0.0, turret.getPosition().in(Radians))),
+                        now,
+                        TransformRecorder.kFrameRobot,
+                        RobotStateRecorder.kFrameTurret);
+
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.periodic();
     }

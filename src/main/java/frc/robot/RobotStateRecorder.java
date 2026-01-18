@@ -1,11 +1,14 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static lib.ironpulse.math.MathTools.toPose2d;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Time;
@@ -17,6 +20,10 @@ import org.littletonrobotics.junction.Logger;
 public class RobotStateRecorder extends TransformRecorder {
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
+
+    public static final String kFrameTurret = "Turret";
+    public static final Translation3d kRobotToTurret =
+            new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
     private RobotStateRecorder() {
         setBufferDuration(2.0);
@@ -36,6 +43,11 @@ public class RobotStateRecorder extends TransformRecorder {
                 Seconds.of(0.0),
                 kFrameWorld,
                 kFrameRobot); // dynamic TWorldRobot at origin
+        putTransform(
+                new Pose3d(kRobotToTurret, Rotation3d.kZero),
+                Seconds.of(0.0),
+                kFrameRobot,
+                kFrameTurret); // dynamic TRobotTurret
     }
 
     public static RobotStateRecorder getInstance() {
@@ -55,6 +67,9 @@ public class RobotStateRecorder extends TransformRecorder {
         Logger.recordOutput(
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/poseTurret",
+                RobotStateRecorder.getPoseWorldTurretCurrent());
     }
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
@@ -87,6 +102,15 @@ public class RobotStateRecorder extends TransformRecorder {
                         Seconds.of(Timer.getTimestamp()),
                         TransformRecorder.kFrameWorld,
                         TransformRecorder.kFrameRobot)
+                .orElse(new Pose3d());
+    }
+
+    public static Pose3d getPoseWorldTurretCurrent() {
+        return RobotStateRecorder.getInstance()
+                .getTransform(
+                        Seconds.of(Timer.getTimestamp()),
+                        TransformRecorder.kFrameWorld,
+                        RobotStateRecorder.kFrameTurret)
                 .orElse(new Pose3d());
     }
 
