@@ -26,6 +26,22 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityParamSources;
 import org.littletonrobotics.junction.Logger;
 
+/*
+TurretSubsystem
+Flow:
+systemConstructor
+    -> claculate absolute position using differential encoder
+    -> sets the position of the embedded encoder ONLY when the syste is constructed
+    @see updateUnwrappedTurretAngle
+Exposed Commands:
+    runTurretPoseWorld : convert the world angle to a robot relative angle and set the position in the system
+    runTurretPoseRobot : set the position of the turret
+        -> get the shortest target angle
+        -> calculate the desired velocity using profiled PID controller
+        -> (optional) add the chassis rotation to the desired velocity to compansate for the chassis rotation
+        -> sets the desired velocity to the motorio
+ */
+
 public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
     private static final Angle FULL_ROTATION = Degrees.of(360.0);
     private static final double DIFFERENTIAL_SLOPE =
@@ -40,7 +56,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     private final CANCoderIOInputsAutoLogged encoderG2Inputs = new CANCoderIOInputsAutoLogged();
     private final Alert wrappingAlert =
             new Alert("Turret unwrapping difference is huge", Alert.AlertType.kError);
-    private final ProfiledPIDController outerLoopController =
+    private final ProfiledPIDController posVelCtl =
             new ProfiledPIDController(
                     TurretParamsNT.kpPos.getValue(),
                     TurretParamsNT.kiPos.getValue(),
@@ -85,29 +101,59 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     }
 
     public Command runTurretPoseRobot(Supplier<Angle> targetRobotAngleSupplier) {
-        return Commands.runOnce(this::resetOuterLoop, this)
+        return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees)), this)
                 .andThen(
-                        runVelocity(() -> updateOuterLoopVelocity(targetRobotAngleSupplier.get())));
+                        runVelocity(() -> calculateTargetVelocity(targetRobotAngleSupplier.get())));
     }
 
-    private AngularVelocity updateOuterLoopVelocity(Angle targetAngle) {
+    private AngularVelocity calculateTargetVelocity(Angle targetAngle) {
         Angle currentAngle = getPosition();
         Angle shortestTargetAngle = getShortestTargetAngle(targetAngle, currentAngle);
         Angle targetPosition = shortestTargetAngle;
-        outerLoopController.setP(TurretParamsNT.kpPos.getValue());
-        outerLoopController.setI(TurretParamsNT.kiPos.getValue());
-        outerLoopController.setD(TurretParamsNT.kdPos.getValue());
-        outerLoopController.setConstraints(
+        posVelCtl.setP(TurretParamsNT.kpPos.getValue());
+        posVelCtl.setI(TurretParamsNT.kiPos.getValue());
+        posVelCtl.setD(TurretParamsNT.kdPos.getValue());
+        posVelCtl.setConstraints(
                 new TrapezoidProfile.Constraints(
                         TurretParamsNT.maxVelocityRPS.getValue() * 360.0,
                         TurretParamsNT.maxAccelerationRPS2.getValue() * 360.0));
         double desiredVelocity =
-                outerLoopController.calculate(currentAngle.in(Degrees), targetPosition.in(Degrees));
+                posVelCtl.calculate(currentAngle.in(Degrees), targetPosition.in(Degrees));
         return DegreesPerSecond.of(desiredVelocity);
     }
 
-    private void resetOuterLoop() {
-        outerLoopController.reset(getPosition().in(Degrees));
+    private Angle getShortestTargetAngle(Angle targetAngle, Angle currentAngle) {
+        double currentContinuous = currentAngle.in(Degrees);
+        double targetPosition = targetAngle.in(Degrees);
+        double currentWrapped = Rotation2d.fromDegrees(currentContinuous).getDegrees();
+        double closestOffset = targetPosition - currentWrapped;
+        if (closestOffset > FULL_ROTATION.in(Degrees) / 2.0) {
+            closestOffset -= FULL_ROTATION.in(Degrees);
+        } else if (closestOffset < -FULL_ROTATION.in(Degrees) / 2.0) {
+            closestOffset += FULL_ROTATION.in(Degrees);
+        }
+
+        double finalOffset = currentContinuous + closestOffset;
+        if (MathUtil.inputModulus(currentContinuous + closestOffset, 0.0, FULL_ROTATION.in(Degrees))
+                == MathUtil.inputModulus(
+                        currentContinuous - closestOffset, 0.0, FULL_ROTATION.in(Degrees))) {
+            if (finalOffset > 0.0) {
+                finalOffset = currentContinuous - Math.abs(closestOffset);
+            } else {
+                finalOffset = currentContinuous + Math.abs(closestOffset);
+            }
+        }
+
+        double forwardLimit = TURRET_SOFT_LIMIT.in(Degrees) - TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
+        double reverseLimit =
+                TURRET_SOFT_LIMIT.unaryMinus().in(Degrees) + TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
+        if (!Double.isNaN(forwardLimit) && finalOffset > forwardLimit) {
+            finalOffset -= FULL_ROTATION.in(Degrees);
+        } else if (!Double.isNaN(reverseLimit) && finalOffset < reverseLimit) {
+            finalOffset += FULL_ROTATION.in(Degrees);
+        }
+
+        return Degrees.of(finalOffset);
     }
 
     private Angle toRobotRelativeFromWorld(Angle worldAngle) {
@@ -116,17 +162,6 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation();
         Rotation2d robotRelative = worldRotation.rotateBy(robotRotation.unaryMinus());
         return Degrees.of(robotRelative.getDegrees());
-    }
-
-    private Angle getShortestTargetAngle(Angle targetAngle, Angle currentAngle) {
-        double targetPosition = targetAngle.in(Degrees);
-        double currentPosition = currentAngle.in(Degrees);
-        double offset =
-                MathUtil.inputModulus(
-                        targetPosition - currentPosition,
-                        -FULL_ROTATION.in(Degrees) / 2.0,
-                        FULL_ROTATION.in(Degrees) / 2.0);
-        return Degrees.of(currentPosition + offset);
     }
 
     private void updateUnwrappedTurretAngle() {

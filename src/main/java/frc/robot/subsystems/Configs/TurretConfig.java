@@ -32,6 +32,9 @@ public class TurretConfig {
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(250.0);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(100.0);
 
+    public static final Angle TURRET_SOFT_LIMIT = Degrees.of(200.0);
+    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(3.0);
+
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
@@ -40,8 +43,8 @@ public class TurretConfig {
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-                    .forwardSoftLimitDegrees(Degrees.of(360))
-                    .reverseSoftLimitDegrees(Degrees.of(-360.0))
+                    .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT)
+                    .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT.unaryMinus())
                     .statorCurrentLimitAmps(80)
                     .supplyCurrentLimitAmps(80)
                     .simConfig(
