@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.subsystems.Configs.IndexerConfig;
+import frc.robot.subsystems.Configs.IndexerParamsNT;
 import frc.robot.subsystems.Configs.ShooterConfig;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
@@ -28,6 +30,7 @@ public class RobotContainer {
     private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
     // private final Swerve swerve;
     private final VelocityMotorSubsystem shooter;
+    private final VelocityMotorSubsystem indexer;
 
     public RobotContainer() {
 
@@ -46,6 +49,13 @@ public class RobotContainer {
                             new MotorInputsAutoLogged(),
                             new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG),
                             ShooterParamsNT.asVelocityParamSources());
+            indexer =
+                    new VelocityMotorSubsystem(
+                            IndexerConfig.INDEXER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(IndexerConfig.INDEXER_CONFIG),
+                            IndexerParamsNT.asVelocityParamSources());
+
         } else {
             //     swerve =
             //             new Swerve(
@@ -61,6 +71,12 @@ public class RobotContainer {
                             new MotorInputsAutoLogged(),
                             new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
                             ShooterParamsNT.asVelocityParamSources());
+            indexer =
+                    new VelocityMotorSubsystem(
+                            IndexerConfig.INDEXER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IndexerConfig.INDEXER_CONFIG),
+                            IndexerParamsNT.asVelocityParamSources());
         }
         configureBindings();
         // swerve.setDefaultCommand(
@@ -95,11 +111,16 @@ public class RobotContainer {
 
     private void configureBindings() {
         driver.leftBumper()
-                .whileTrue(
+                .onTrue(
                         shooter.runVelocity(
-                                RotationsPerSecond.of(ShooterParamsNT.testVelRPS.getValue())));
-        driver.rightBumper().whileTrue(shooter.runDutyCycle(1));
-        driver.a().onTrue(shooter.runStop());
+                                        RotationsPerSecond.of(
+                                                ShooterParamsNT.testVelRPS.getValue()))
+                                .alongWith(
+                                        indexer.runVelocity(
+                                                RotationsPerSecond.of(
+                                                        IndexerParamsNT.testVelRPS.getValue()))));
+        driver.rightBumper().whileTrue(shooter.runDutyCycle(1).alongWith(indexer.runDutyCycle(1)));
+        driver.a().onTrue(shooter.runStop().alongWith(indexer.runStop()));
         driver.povUp()
                 .whileTrue(new SysIdCommand(shooter).quasistatic(SysIdRoutine.Direction.kForward));
         driver.povDown()
