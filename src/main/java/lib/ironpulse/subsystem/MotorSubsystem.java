@@ -81,6 +81,13 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
                 this);
     }
 
+    /** Open-loop voltage setter, used currently only for sysid, otherwise use runVoltage */
+    public void setVoltage(Voltage voltage) {
+        setpoint = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+        io.setVoltage(setpoint);
+        mode = ControlMode.SYSID;
+    }
+
     /** Open-loop duty cycle command, -12-12V. */
     public Command runVoltage(DoubleSupplier voltage) {
         return Commands.run(

@@ -34,7 +34,7 @@ public class MotorIOTalonFX implements MotorIO {
 
     private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
     private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl =
-            new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0).withEnableFOC(true);
+            new DynamicMotionMagicVoltage(0.0, 0.0, 0.0).withEnableFOC(true);
     private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
     private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
