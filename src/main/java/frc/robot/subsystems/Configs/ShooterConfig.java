@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
@@ -29,7 +30,7 @@ public class ShooterConfig {
                                 SubsystemConfig.FollowerConfig.builder()
                                         .id(SHOOTER_MOTOR_FOLLOWER_ID)
                                         .bus(CANIVORE_CAN_BUS_NAME)
-                                        .opposeMain(true)
+                                        .opposeMain(MotorAlignmentValue.Opposed)
                                         .build()
                             })
                     .SensorToMechanismRatio(SHOOTER_GEAR_RATIO)

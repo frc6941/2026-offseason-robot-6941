@@ -6,32 +6,32 @@ import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
-public class IndexerConfig {
-    private IndexerConfig() {}
+public class IntakerConfig {
+    private IntakerConfig() {}
 
-    public static final String NAME = "Indexer";
+    public static final String NAME = "Intaker";
     public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
-    private static final int INDEXER_MOTOR_MAIN_ID = 50;
-    private static final double INDEXER_GEAR_RATIO = 3;
+    private static final int INTAKER_MOTOR_MAIN_ID = 50;
+    private static final double INTAKER_GEAR_RATIO = 3;
 
-    public static final SubsystemConfig INDEXER_CONFIG =
+    public static final SubsystemConfig INTAKER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
                     .mainBus(CANIVORE_CAN_BUS_NAME)
-                    .mainId(INDEXER_MOTOR_MAIN_ID)
+                    .mainId(INTAKER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(false)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-                    .SensorToMechanismRatio(INDEXER_GEAR_RATIO)
+                    .SensorToMechanismRatio(INTAKER_GEAR_RATIO)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
-                                    .gearRatio(INDEXER_GEAR_RATIO)
+                                    .gearRatio(INTAKER_GEAR_RATIO)
                                     .build())
                     .build();
 
     @NTParameter(tableName = "Params/" + NAME)
-    public static final class IndexerParams {
+    public static final class IntakerParams {
         // velocity gains
         public static final double kP = 1;
         public static final double kI = 0.0;
