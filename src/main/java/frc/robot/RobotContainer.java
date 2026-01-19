@@ -22,8 +22,15 @@ import frc.robot.subsystems.Configs.IntakerParamsNT;
 import frc.robot.subsystems.Configs.ShooterConfig;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
+import frc.robot.subsystems.Configs.TurretConfig;
+import frc.robot.subsystems.Configs.TurretVelParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import lib.ironpulse.command.SysIdCommand;
+import lib.ironpulse.command.VisualizeProjectileShot;
+import lib.ironpulse.io.CANCoderIOCANCoder;
+import lib.ironpulse.io.CANCoderIOSim;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -43,11 +50,11 @@ public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
     private final Swerve swerve;
-    private final VelocityMotorSubsystem shooter;
-    private final VelocityMotorSubsystem indexer;
-    private final VelocityMotorSubsystem intaker;
+    private final TurretSubsystem turret;
+    private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
+    private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
-    @SuppressWarnings("unchecked")
+@SuppressWarnings("unchecked")
 public RobotContainer() {
 
         if (RobotBase.isReal()) {
@@ -59,24 +66,20 @@ public RobotContainer() {
                             new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
                             new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
                             new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
-                shooter =
-                        new VelocityMotorSubsystem(
-                                ShooterConfig.SHOOTER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG),
-                                ShooterParamsNT.asVelocityParamSources());
-                indexer =
-                        new VelocityMotorSubsystem(
-                                IndexerConfig.INDEXER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOTalonFX(IndexerConfig.INDEXER_CONFIG),
-                                IndexerParamsNT.asVelocityParamSources());
-                intaker =  
-                        new VelocityMotorSubsystem(
-                                IntakerConfig.INTAKER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOTalonFX(IntakerConfig.INTAKER_CONFIG),
-                                IntakerParamsNT.asVelocityParamSources());
+                            turret =
+                            new TurretSubsystem(
+                                    TurretConfig.TURRET_CONFIG,
+                                    new MotorInputsAutoLogged(),
+                                    new MotorIOTalonFX(TurretConfig.TURRET_CONFIG),
+                                    new CANCoderIOCANCoder(
+                                            TurretConfig.TURRET_ENCODER_G1_ID,
+                                            TurretConfig.TURRET_ENCODER_G1_OFFSET,
+                                            false),
+                                    new CANCoderIOCANCoder(
+                                            TurretConfig.TURRET_ENCODER_G2_ID,
+                                            TurretConfig.TURRET_ENCODER_G2_OFFSET,
+                                            false),
+                                    TurretVelParamsNT.asVelocityParamSources());
 
 
         } else {
@@ -88,24 +91,14 @@ public RobotContainer() {
                             new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
                             new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
                             new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
-                shooter =
-                        new VelocityMotorSubsystem(
-                                ShooterConfig.SHOOTER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
-                                ShooterParamsNT.asVelocityParamSources());
-                indexer =
-                        new VelocityMotorSubsystem(
-                                IndexerConfig.INDEXER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOSim(IndexerConfig.INDEXER_CONFIG),
-                                IndexerParamsNT.asVelocityParamSources());
-                intaker =
-                        new VelocityMotorSubsystem(
-                                IntakerConfig.INTAKER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOSim(IntakerConfig.INTAKER_CONFIG),
-                                IntakerParamsNT.asVelocityParamSources());
+        turret =
+                            new TurretSubsystem(
+                                    TurretConfig.TURRET_CONFIG,
+                                    new MotorInputsAutoLogged(),
+                                    new MotorIOSim(TurretConfig.TURRET_CONFIG),
+                                    encoderG1Sim,
+                                    encoderG2Sim,
+                                    TurretVelParamsNT.asVelocityParamSources());
         }
         configureBindings();
         swerve.setDefaultCommand(
@@ -119,7 +112,7 @@ public RobotContainer() {
                         // () -> new Pose3d(),
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-        turret.setDefaultCommand(turret.runStop());
+        turret.setDefaultCommand(turret.runTurretTargetLoop());
     }
 
     public void robotPeriodic() {
@@ -167,10 +160,10 @@ public RobotContainer() {
                                         true)
                                 .repeatedly());
 
-        driver.povUp().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(0)));
-        driver.povRight().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(90)));
-        driver.povDown().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(180)));
-        driver.povLeft().onTrue(turret.runTurretPoseWorld(() -> Degrees.of(270)));
+        driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0), TurretMode.SEEKING));
+        driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90), TurretMode.SEEKING));
+        driver.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
+        driver.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
     }
 
     public Command getAutonomousCommand() {
