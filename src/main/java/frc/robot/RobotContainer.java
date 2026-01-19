@@ -96,13 +96,13 @@ public RobotContainer() {
                                 IndexerConfig.INDEXER_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOSim(IndexerConfig.INDEXER_CONFIG),
-                                ShooterParamsNT.asVelocityParamSources());
+                                IndexerParamsNT.asVelocityParamSources());
                 intaker =
                         new VelocityMotorSubsystem(
                                 IntakerConfig.INTAKER_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOSim(IntakerConfig.INTAKER_CONFIG),
-                                IndexerParamsNT.asVelocityParamSources());
+                                IntakerParamsNT.asVelocityParamSources());
         }
         configureBindings();
         swerve.setDefaultCommand(
