@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -111,7 +112,7 @@ public class SubsystemConfig {
         public final String bus;
 
         /** If true, follower output is inverted (oppose main). */
-        @Default public final boolean opposeMain = false;
+        @Default public final MotorAlignmentValue opposeMain = MotorAlignmentValue.Aligned;
     }
 
     @Builder
