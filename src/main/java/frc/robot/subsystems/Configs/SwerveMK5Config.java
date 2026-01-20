@@ -47,8 +47,8 @@ public final class SwerveMK5Config {
             SwerveLimit.builder()
                     .maxLinearVelocity(MetersPerSecond.of(4.5))
                     .maxSkidAcceleration(MetersPerSecondPerSecond.of(30))
-                    .maxAngularVelocity(DegreesPerSecond.of(200.0))
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(100.0))
+                    .maxAngularVelocity(DegreesPerSecond.of(400.0))
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1000.0))
                     .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
             SwerveConfig.SwerveModuleConfig.builder()

@@ -10,6 +10,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Timer;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
 
@@ -22,6 +23,8 @@ public class MotorIOSim implements MotorIO {
     private final SubsystemConfig subsystemConfig;
     private final DCMotor dcMotor;
     private final double maxVelocityRPS;
+
+    private double lastTimestamp = Timer.getTimestamp();
 
     private double currentPositionRot = 0.0;
     private double currentVelocityRPS = 0.0;
@@ -65,7 +68,9 @@ public class MotorIOSim implements MotorIO {
 
     @Override
     public void readInputs(MotorInputs inputs) {
-        double dt = 0.02; // Standard loop time
+        double now = Timer.getTimestamp();
+        double dt = now - lastTimestamp;
+        lastTimestamp = now;
 
         switch (controlMode) {
             case VOLTAGE:
@@ -90,25 +95,25 @@ public class MotorIOSim implements MotorIO {
                 break;
         }
 
-        // Apply soft limits
-        if (forwardSoftLimitEnabled) {
-            double threshold = subsystemConfig.forwardSoftLimitDegrees.in(Rotations);
-            if (currentPositionRot >= threshold) {
-                currentPositionRot = threshold;
-                currentVelocityRPS = Math.min(0, currentVelocityRPS);
-                currentProfileState =
-                        new TrapezoidProfile.State(currentPositionRot, currentVelocityRPS);
-            }
-        }
-        if (reverseSoftLimitEnabled) {
-            double threshold = subsystemConfig.reverseSoftLimitDegrees.in(Rotations);
-            if (currentPositionRot <= threshold) {
-                currentPositionRot = threshold;
-                currentVelocityRPS = Math.max(0, currentVelocityRPS);
-                currentProfileState =
-                        new TrapezoidProfile.State(currentPositionRot, currentVelocityRPS);
-            }
-        }
+        // // Apply soft limits
+        // if (forwardSoftLimitEnabled) {
+        //     double threshold = subsystemConfig.forwardSoftLimitDegrees.in(Rotations);
+        //     if (currentPositionRot >= threshold) {
+        //         currentPositionRot = threshold;
+        //         currentVelocityRPS = Math.min(0, currentVelocityRPS);
+        //         currentProfileState =
+        //                 new TrapezoidProfile.State(currentPositionRot, currentVelocityRPS);
+        //     }
+        // }
+        // if (reverseSoftLimitEnabled) {
+        //     double threshold = subsystemConfig.reverseSoftLimitDegrees.in(Rotations);
+        //     if (currentPositionRot <= threshold) {
+        //         currentPositionRot = threshold;
+        //         currentVelocityRPS = Math.max(0, currentVelocityRPS);
+        //         currentProfileState =
+        //                 new TrapezoidProfile.State(currentPositionRot, currentVelocityRPS);
+        //     }
+        // }
 
         inputs.appliedVolts = appliedVolts;
         inputs.currentStatorAmps = 0.0; // Kinematic model doesn't simulate current

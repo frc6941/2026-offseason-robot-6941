@@ -74,6 +74,8 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     private TurretMode currentMode = TurretMode.SEEKING;
     private TurretMode lastControllerMode = null;
     private Supplier<Angle> targetAngleWorld = () -> Degrees.of(0.0);
+    private Angle targetAngleRobotWrapped = Degrees.of(0.0);
+    private Angle targetAngleRobot = Degrees.of(0.0);
 
     public TurretSubsystem(
             SubsystemConfig config,
@@ -94,16 +96,22 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     public void periodic() {
         updateUnwrappedTurretAngle();
         super.periodic();
+        targetAngleRobotWrapped = toRobotRelativeFromWorld(targetAngleWorld.get());
+        targetAngleRobot = getShortestTargetAngle(targetAngleRobotWrapped, getPosition());
         wrappingAlert.set(!getPosition().isNear(unwrappedTurretAngle, Degrees.of(1.0)));
     }
 
     @Override
     protected void logState() {
-        Logger.processInputs(getName() + "/encoderG1", encoderG1Inputs);
-        Logger.processInputs(getName() + "/encoderG2", encoderG2Inputs);
-        Logger.recordOutput(getName() + "/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
-        Logger.recordOutput(getName() + "/atGoal", false); // wip
+        Logger.processInputs(getName() + "/Absolute/encoderG1", encoderG1Inputs);
+        Logger.processInputs(getName() + "/Absolute/encoderG2", encoderG2Inputs);
+        Logger.recordOutput(getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleWorld", targetAngleWorld.get().in(Degrees));
+        Logger.recordOutput(getName() + "/targetAngleRobot", targetAngleRobot.in(Degrees));
+        Logger.recordOutput(getName() + "/targetVelocity", getCurrSetpoint().in(DegreesPerSecond));
+        Logger.recordOutput(getName() + "/atGoal/position", positionAtGoal());
+        Logger.recordOutput(getName() + "/atGoal/velocity", velocityAtGoal());
+        Logger.recordOutput(getName() + "/atGoal", atGoal());
         Logger.recordOutput(getName() + "/currPosition", getPosition().in(Degrees));
         Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(DegreesPerSecond));
     }
@@ -120,7 +128,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     public Command runTurretTargetLoop() {
         return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees))).andThen(
                 runVelocity(() -> 
-                    calculateTargetVelocity(toRobotRelativeFromWorld(targetAngleWorld.get()))));
+                    calculateTargetVelocity(targetAngleRobot)));
     }
         
 
@@ -150,23 +158,31 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     private AngularVelocity calculateTargetVelocity(Angle targetAngle) {
         updateController(currentMode);
-        Angle currentAngle = getPosition();
-        Angle shortestTargetAngle = getShortestTargetAngle(targetAngle, currentAngle);
-        Angle targetPosition = shortestTargetAngle;
 
         double desiredVelocity =
-                posVelCtl.calculate(currentAngle.in(Degrees), targetPosition.in(Degrees));
+                posVelCtl.calculate(getPosition().in(Degrees), targetAngle.in(Degrees));
         //compansate for the chassis rotation
         double chassisOmegaDegPerSec =
-                RobotStateRecorder.getVelocityRobotCurrent().getRotation().getDegrees();
+                RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
         desiredVelocity -=
                 TurretPosParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;
         return DegreesPerSecond.of(desiredVelocity);
     }
 
-    private Angle getShortestTargetAngle(Angle targetAngle, Angle currentAngle) {
-        double currentContinuous = currentAngle.in(Degrees);
-        double targetPosition = targetAngle.in(Degrees);
+    public boolean positionAtGoal() {
+        Angle currentAngle = getPosition();
+        return currentAngle.isNear(
+                targetAngleRobot,
+                Degrees.of(TurretPosParamsNT.positionAtGoalToleranceDegrees.getValue()));
+    }
+
+    public boolean atGoal() {
+        return positionAtGoal() && velocityAtGoal();
+    }
+
+    private Angle getShortestTargetAngle(Angle targetAngleWrapped, Angle currentAngleUnwrapped) {
+        double currentContinuous = currentAngleUnwrapped.in(Degrees);
+        double targetPosition = targetAngleWrapped.in(Degrees);
         double currentWrapped = Rotation2d.fromDegrees(currentContinuous).getDegrees();
         double closestOffset = targetPosition - currentWrapped;
         if (closestOffset > FULL_ROTATION.in(Degrees) / 2.0) {

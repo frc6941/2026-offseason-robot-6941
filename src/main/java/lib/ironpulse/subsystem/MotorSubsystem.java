@@ -39,7 +39,7 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
     @Override
     public void periodic() {
         io.readInputs(inputs);
-        Logger.processInputs("Subsystem/" + getName(), inputs);
+        Logger.processInputs(getName(), inputs);
         logState();
     }
 
