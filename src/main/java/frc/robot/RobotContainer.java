@@ -107,7 +107,7 @@ public RobotContainer() {
                         () -> -driver.getLeftY(),
                         () -> -driver.getLeftX(),
                         // () -> 0.0,
-                        () -> driver.getRightX(),
+                        () -> -driver.getRightX(),
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         // () -> new Pose3d(),
                         MetersPerSecond.of(0.04),

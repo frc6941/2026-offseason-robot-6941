@@ -97,7 +97,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         updateUnwrappedTurretAngle();
         super.periodic();
         targetAngleRobotWrapped = toRobotRelativeFromWorld(targetAngleWorld.get());
-        targetAngleRobot = getShortestTargetAngle(targetAngleRobotWrapped, getPosition());
+        targetAngleRobot = unwrapTargetAngle(targetAngleRobotWrapped, getPosition());
         wrappingAlert.set(!getPosition().isNear(unwrappedTurretAngle, Degrees.of(1.0)));
     }
 
@@ -180,7 +180,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         return positionAtGoal() && velocityAtGoal();
     }
 
-    private Angle getShortestTargetAngle(Angle targetAngleWrapped, Angle currentAngleUnwrapped) {
+    private Angle unwrapTargetAngle(Angle targetAngleWrapped, Angle currentAngleUnwrapped) {
         double currentContinuous = currentAngleUnwrapped.in(Degrees);
         double targetPosition = targetAngleWrapped.in(Degrees);
         double currentWrapped = Rotation2d.fromDegrees(currentContinuous).getDegrees();
@@ -223,6 +223,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     }
 
 
+    //absolute encoder angle, only used currently for starting pos
     private void updateUnwrappedTurretAngle() {
         encoderG1.readInputs(encoderG1Inputs);
         encoderG2.readInputs(encoderG2Inputs);
