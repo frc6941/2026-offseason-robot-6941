@@ -57,7 +57,7 @@ public class PositionMotorSubsystem<
      * @param io The IO interface for the hardware.
      * @param params The parameter sources (PID, MotionMagic limits).
      * @param initialSetpoint The starting position in mechanism units (M).
-     * @param mechanismUnitPerRotation The amount of mechanism movement per ONE motor rotation.
+     * @param mechanismUnitPerRotation The amount of mechanism movement per ONE IO rotation.
      *     Example (Elevator): Meters.of(METERS_PER_ROTATION) Example (Pivot): Degrees.of(360)
      */
     public PositionMotorSubsystem(
