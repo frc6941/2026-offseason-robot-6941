@@ -11,10 +11,9 @@ public class HoodConfig {
     public static final String NAME = "Hood";
     public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
-    // Local hardware constants
-    private static final int HOOD_MOTOR_MAIN_ID = 99;
+    public static final int HOOD_MOTOR_MAIN_ID = 99;
 
-    private static final int HOOD_GEAR_RATIO = 10;
+    public static final int HOOD_GEAR_RATIO = 10;
     public static final SubsystemConfig HOOD_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
