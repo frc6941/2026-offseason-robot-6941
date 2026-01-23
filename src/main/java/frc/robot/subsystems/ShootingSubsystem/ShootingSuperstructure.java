@@ -12,21 +12,23 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
+import lib.ironpulse.io.MotorIO;
+import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
-    private final PositionMotorSubsystem<?, ?, Angle> hood;
-    private final VelocityMotorSubsystem<?, ?> shooter;
-    private final VelocityMotorSubsystem<?, ?> indexer;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> indexer;
     private final ShootingParametersTable parametersTable;
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
-            PositionMotorSubsystem<?, ?, Angle> hood,
-            VelocityMotorSubsystem<?, ?> shooter,
-            VelocityMotorSubsystem<?, ?> indexer,
+            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
+            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
+            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> indexer,
             ShootingParametersTable parametersTable) {
         this.turret = turret;
         this.hood = hood;

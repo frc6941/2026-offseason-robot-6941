@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +35,7 @@ import lib.ironpulse.command.SysIdCommand;
 import lib.ironpulse.command.VisualizeProjectileShot;
 import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
+import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -49,22 +51,21 @@ import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 
-@SuppressWarnings({"unused","rawtypes"})
+@SuppressWarnings({"unused"})
 public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
     private final Swerve swerve;
     private final TurretSubsystem turret;
-    private final VelocityMotorSubsystem shooter;
-    private final VelocityMotorSubsystem indexer;
-    private final PositionMotorSubsystem hood;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> indexer;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final ShootingSuperstructure shootingSuperstructure;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
-@SuppressWarnings("unchecked")
-public RobotContainer() {
 
+public RobotContainer() {
         if (RobotBase.isReal()) {
                 swerve =
                         new Swerve(
@@ -89,19 +90,19 @@ public RobotContainer() {
                                 false),
                         TurretVelParamsNT.asVelocityParamSources());
                 shooter =
-                        new VelocityMotorSubsystem(
+                        new VelocityMotorSubsystem<>(
                                 ShooterConfig.SHOOTER_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG),
                                 ShooterParamsNT.asVelocityParamSources());
                 indexer =
-                        new VelocityMotorSubsystem(
+                        new VelocityMotorSubsystem<>(
                                 IndexerConfig.INDEXER_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOTalonFX(IndexerConfig.INDEXER_CONFIG),
                                 IndexerParamsNT.asVelocityParamSources());
                 hood =
-                        new PositionMotorSubsystem(
+                        new PositionMotorSubsystem<>(
                                 HoodConfig.HOOD_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOTalonFX(HoodConfig.HOOD_CONFIG),
@@ -128,19 +129,19 @@ public RobotContainer() {
                                     encoderG2Sim,
                                     TurretVelParamsNT.asVelocityParamSources());
         shooter =
-                        new VelocityMotorSubsystem(
+                        new VelocityMotorSubsystem<>(
                                 ShooterConfig.SHOOTER_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
                                 ShooterParamsNT.asVelocityParamSources());
         indexer =
-                        new VelocityMotorSubsystem(
+                        new VelocityMotorSubsystem<>(
                                 IndexerConfig.INDEXER_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOSim(IndexerConfig.INDEXER_CONFIG),
                                 IndexerParamsNT.asVelocityParamSources());
         hood =
-                        new PositionMotorSubsystem(
+                        new PositionMotorSubsystem<>(
                                 HoodConfig.HOOD_CONFIG,
                                 new MotorInputsAutoLogged(),
                                 new MotorIOSim(HoodConfig.HOOD_CONFIG),
