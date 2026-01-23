@@ -13,6 +13,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -34,7 +35,7 @@ public class MotorIOTalonFX implements MotorIO {
 
     private final PositionVoltage positionCtrl = new PositionVoltage(0.0).withEnableFOC(true);
     private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl =
-            new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0).withEnableFOC(true);
+            new DynamicMotionMagicVoltage(0.0, 0.0, 0.0).withEnableFOC(true);
     private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
     private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
@@ -80,7 +81,7 @@ public class MotorIOTalonFX implements MotorIO {
         for (int i = 0; i < followers.length; i++) {
             var f = cfg.followers[i];
             followers[i] = new TalonFX(f.id, f.bus);
-            followers[i].setControl(new Follower(cfg.mainId, f.opposeMain));
+            followers[i].setControl(new Follower(cfg.mainId, f.opposeMain ? MotorAlignmentValue.Aligned : MotorAlignmentValue.Opposed));
         }
 
         // Signals
