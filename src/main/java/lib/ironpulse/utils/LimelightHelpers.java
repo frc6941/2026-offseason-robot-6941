@@ -1,4 +1,5 @@
 // LimelightHelpers v1.12 (REQUIRES LLOS 2025.0 OR LATER)
+// TODO: Update to v1.13 (Compatible with 2026.0)
 
 package lib.ironpulse.utils;
 
@@ -8,18 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoubleArrayEntry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.networktables.*;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -28,8 +20,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import lib.ironpulse.utils.LimelightHelpers.LimelightResults;
-import lib.ironpulse.utils.LimelightHelpers.PoseEstimate;
 
 /**
  * LimelightHelpers provides static methods and classes for interfacing with Limelight vision
@@ -1222,8 +1212,8 @@ public class LimelightHelpers {
         return getLimelightNTStringArray(limelightName, "rawbarcodes");
     }
 
-    /////
-    /////
+    /// //
+    /// //
 
     public static Pose3d getBotPose3d(String limelightName) {
         double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose");
@@ -1411,8 +1401,8 @@ public class LimelightHelpers {
         return new IMUData(imuData);
     }
 
-    /////
-    /////
+    /// //
+    /// //
 
     public static void setPipelineIndex(String limelightName, int pipelineIndex) {
         setLimelightNTDouble(limelightName, "pipeline", pipelineIndex);
@@ -1684,8 +1674,8 @@ public class LimelightHelpers {
         setLimelightNTDoubleArray(limelightName, "camerapose_robotspace_set", entries);
     }
 
-    /////
-    /////
+    /// //
+    /// //
 
     public static void setPythonScriptData(String limelightName, double[] outgoingPythonData) {
         setLimelightNTDoubleArray(limelightName, "llrobot", outgoingPythonData);

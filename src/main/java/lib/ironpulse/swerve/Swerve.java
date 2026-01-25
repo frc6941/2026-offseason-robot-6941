@@ -24,11 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lib.ironpulse.limelight.LocalizationInterface;
 import lib.ironpulse.utils.LoggedTracer;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class Swerve extends SubsystemBase {
+public class Swerve extends SubsystemBase implements LocalizationInterface {
     // locks
     static final Lock odometryLock = new ReentrantLock();
     // config and io

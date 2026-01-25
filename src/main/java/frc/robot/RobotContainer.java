@@ -4,12 +4,8 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -18,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveConstants;
 import frc.robot.util.AllianceFlipUtil;
+import lib.ironpulse.limelight.LimelightIOReal;
+import lib.ironpulse.limelight.LimelightSubsystem;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
@@ -25,11 +23,10 @@ import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
-import lib.ironpulse.utils.LimelightHelpers;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
-    private Swerve swerve;
+    private final Swerve swerve;
+    private final LimelightSubsystem limelightSubsystem;
     // private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
     private final CommandXboxController driver = new CommandXboxController(0);
 
@@ -43,6 +40,21 @@ public class RobotContainer {
                             new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 1),
                             new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 2),
                             new SwerveModuleIOMK5N(SwerveConstants.kRealConfig, 3));
+            limelightSubsystem =
+                    new LimelightSubsystem(
+                            RobotConstants.LimelightConstants.limelightSubsystemConfig,
+                            swerve,
+                            () ->
+                                    RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                            .getRotation()
+                                            .getDegrees(),
+                            new LimelightIOReal(
+                                    RobotConstants.LimelightConstants.limelight1Config,
+                                    () ->
+                                            RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                    .toPose2d()
+                                                    .getRotation()
+                                                    .getDegrees()));
         } else {
             swerve =
                     new Swerve(
@@ -52,9 +64,17 @@ public class RobotContainer {
                             new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 1),
                             new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 2),
                             new SwerveModuleIOSimpleSim(SwerveConstants.kSimConfig, 3));
+            // TODO: limelight simulation
+            limelightSubsystem =
+                    new LimelightSubsystem(
+                            RobotConstants.LimelightConstants.limelightSubsystemConfig,
+                            swerve,
+                            () ->
+                                    RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                            .getRotation()
+                                            .getDegrees());
         }
         configureBindings();
-        LimelightHelpers.SetIMUMode("limelight", 1);
     }
 
     public void robotPeriodic() {
@@ -67,21 +87,6 @@ public class RobotContainer {
                         TransformRecorder.kFrameRobot);
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.periodic();
-        LimelightHelpers.SetRobotOrientation(
-                "limelight",
-                RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
-                RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
-                0,
-                0,
-                0,
-                0);
-        Logger.recordOutput(
-                "Limelight/Pose",
-                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
-        swerve.addVisionMeasurement(
-                new Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
-                now.in(Seconds),
-                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
     }
 
     private void configureBindings() {

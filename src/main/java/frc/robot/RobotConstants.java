@@ -1,5 +1,8 @@
 package frc.robot;
 
+import lib.ironpulse.limelight.LimelightIOConfig;
+import lib.ironpulse.limelight.LimelightSubsystemConfig;
+
 /**
  * Robot-wide constants that are used across multiple subsystems. Constants that need tuning are
  * using NTParameter annotation.
@@ -18,5 +21,12 @@ public final class RobotConstants {
 
     private RobotConstants() {
         // Prevent instantiation
+    }
+
+    public static class LimelightConstants {
+        public static final LimelightSubsystemConfig limelightSubsystemConfig =
+                LimelightSubsystemConfig.builder().build();
+        public static final LimelightIOConfig limelight1Config =
+                LimelightIOConfig.builder().name("limelight").isLimelight4(true).build();
     }
 }
