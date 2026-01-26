@@ -1,6 +1,7 @@
 package lib.ironpulse.io;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -50,7 +51,7 @@ public class MotorIOTalonFX implements MotorIO {
     private final TalonFXConfiguration fx;
 
     public MotorIOTalonFX(SubsystemConfig cfg) {
-        this.main = new TalonFX(cfg.mainId, cfg.mainBus);
+        this.main = new TalonFX(cfg.mainId, new CANBus(cfg.mainBus));
 
         this.fx = cfg.fxConfig;
 
@@ -80,7 +81,7 @@ public class MotorIOTalonFX implements MotorIO {
         this.followers = new TalonFX[cfg.followers.length];
         for (int i = 0; i < followers.length; i++) {
             var f = cfg.followers[i];
-            followers[i] = new TalonFX(f.id, f.bus);
+            followers[i] = new TalonFX(f.id, new CANBus(f.bus));
             followers[i].setControl(new Follower(cfg.mainId, f.opposeMain ? MotorAlignmentValue.Aligned : MotorAlignmentValue.Opposed));
         }
 
@@ -108,7 +109,8 @@ public class MotorIOTalonFX implements MotorIO {
     }
 
     private void configureCANcoder(SubsystemConfig.RemoteCANcoder rc) {
-        CANcoder coder = new CANcoder(rc.id, rc.bus);
+        @SuppressWarnings("resource")
+        CANcoder coder = new CANcoder(rc.id, new CANBus(rc.bus));
         // Build a CANcoderConfiguration from rc fields
         CANcoderConfiguration c = new CANcoderConfiguration();
         c.MagnetSensor.MagnetOffset = rc.magnetOffset;
