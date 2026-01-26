@@ -3,6 +3,7 @@ package lib.ironpulse.swerve.mk5n;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -70,9 +71,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
             syncThread = new PhoenixSynchronizationThread(syncLock, config.odometryFrequency);
 
         // initialize and config motors
-        driveMotor = new TalonFX(moduleConfig.driveMotorId, config.canivoreCanBusName);
-        steerMotor = new TalonFX(moduleConfig.steerMotorId, config.canivoreCanBusName);
-        encoder = new CANcoder(moduleConfig.encoderId, config.canivoreCanBusName);
+        driveMotor = new TalonFX(moduleConfig.driveMotorId, new CANBus(config.canivoreCanBusName));
+        steerMotor = new TalonFX(moduleConfig.steerMotorId, new CANBus(config.canivoreCanBusName));
+        encoder = new CANcoder(moduleConfig.encoderId, new CANBus(config.canivoreCanBusName));
         configureDriveMotor();
         configureSteerMotor();
 
