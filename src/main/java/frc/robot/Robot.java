@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.lang.reflect.Field;
-import lib.ironpulse.utils.PhoenixUtils;
-import lib.ntext.NTParameterRegistry;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -63,11 +61,9 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
-        PhoenixUtils.refreshAll();
-        CommandScheduler.getInstance().run();
-        NTParameterRegistry.refresh();
-
         robotContainer.robotPeriodic();
+        CommandScheduler.getInstance().run();
+
     }
 
     @Override

@@ -42,7 +42,9 @@ public class SwerveModuleIOSimpleSim implements SwerveModuleIO {
         data.driveMotorPositionRad =
                 simPosition.distanceMeters * 2.0 / config.wheelDiameter.in(Meter);
         data.driveMotorPositionRadSamples = new double[] {data.driveMotorPositionRad};
-        data.driveMotorVelocityRadPerSec = driveVel;
+        // Convert wheel linear velocity (m/s) to wheel angular velocity (rad/s).
+        // angle(rad) = distance / radius  =>  omega(rad/s) = v(m/s) / r(m) = v * 2 / diameter
+        data.driveMotorVelocityRadPerSec = driveVel * 2.0 / config.wheelDiameter.in(Meter);
 
         data.steerMotorConnected = true;
         data.steerMotorPositionRad = simPosition.angle.getRadians();

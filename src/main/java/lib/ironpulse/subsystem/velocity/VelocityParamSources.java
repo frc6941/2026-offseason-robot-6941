@@ -1,7 +1,9 @@
 package lib.ironpulse.subsystem.velocity;
 
 // hack to hook NTParameterProcessor to generate ParamSources for uses in subsystems
-// REMEMBER to update NTParameterProcessor when adding new fields to ParamSources
+/**
+ * REMEMBER to update {@link lib.ntext.NTParameterProcessor} when adding new fields to ParamSources
+ */
 public interface VelocityParamSources {
     double kP();
 

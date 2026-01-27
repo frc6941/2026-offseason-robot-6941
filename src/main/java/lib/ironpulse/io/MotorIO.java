@@ -42,6 +42,9 @@ public interface MotorIO {
     default void setEnableSoftLimits(boolean forward, boolean reverse) {}
     ;
 
+    default void setCurrentLimits(double statorCurrentLimitAmps, double supplyCurrentLimitAmps) {}
+    ;
+
     default void updateGains(Slot0Configs slot0) {}
     ;
 
