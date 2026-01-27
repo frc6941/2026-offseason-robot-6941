@@ -56,6 +56,11 @@ import lib.ntext.NTParameterRegistry;
 
 @SuppressWarnings({"unused"})
 public class RobotContainer {
+    private static final boolean HAS_TURRET_IO = false;
+    private static final boolean HAS_SHOOTER_IO = false;
+    private static final boolean HAS_HOOD_IO = false;
+    private static final boolean HAS_IDX_IO = true;
+
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
     private final Swerve swerve;
@@ -63,7 +68,7 @@ public class RobotContainer {
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final SpindexerSubsystem idx;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-    private final ShootingSuperstructure shootingSuperstructure;
+    //private final ShootingSuperstructure shootingSuperstructure;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -85,45 +90,61 @@ public class RobotContainer {
                     new TurretSubsystem(
                             TurretConfig.TURRET_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(TurretConfig.TURRET_CONFIG),
-                            new CANCoderIOCANCoder(
-                                    TurretConfig.TURRET_ENCODER_G1_ID,
-                                    TurretConfig.TURRET_ENCODER_G1_OFFSET,
-                                    false),
-                            new CANCoderIOCANCoder(
-                                    TurretConfig.TURRET_ENCODER_G2_ID,
-                                    TurretConfig.TURRET_ENCODER_G2_OFFSET,
-                                    false),
+                            HAS_TURRET_IO
+                                    ? new MotorIOTalonFX(TurretConfig.TURRET_CONFIG)
+                                    : new MotorIOSim(TurretConfig.TURRET_CONFIG),
+                            HAS_TURRET_IO
+                                    ? new CANCoderIOCANCoder(
+                                            TurretConfig.TURRET_ENCODER_G1_ID,
+                                            TurretConfig.TURRET_ENCODER_G1_OFFSET,
+                                            false)
+                                    : encoderG1Sim,
+                            HAS_TURRET_IO
+                                    ? new CANCoderIOCANCoder(
+                                            TurretConfig.TURRET_ENCODER_G2_ID,
+                                            TurretConfig.TURRET_ENCODER_G2_OFFSET,
+                                            false)
+                                    : encoderG2Sim,
                             TurretVelParamsNT.asVelocityParamSources());
             shooter =
                     new VelocityMotorSubsystem<>(
                             ShooterConfig.SHOOTER_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG),
+                            HAS_SHOOTER_IO
+                                    ? new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG)
+                                    : new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
                             ShooterParamsNT.asVelocityParamSources());
             spin =
                     new VelocityMotorSubsystem<>(
                             IdxConfig.SPIN_CFG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(IdxConfig.SPIN_CFG),
+                            HAS_IDX_IO
+                                    ? new MotorIOTalonFX(IdxConfig.SPIN_CFG)
+                                    : new MotorIOSim(IdxConfig.SPIN_CFG),
                             IdxSpinParamsNT.asVelocityParamSources());
             vert =
                     new VelocityMotorSubsystem<>(
                             IdxConfig.VERT_CFG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(IdxConfig.VERT_CFG),
+                            HAS_IDX_IO
+                                    ? new MotorIOTalonFX(IdxConfig.VERT_CFG)
+                                    : new MotorIOSim(IdxConfig.VERT_CFG),
                             IdxVertParamsNT.asVelocityParamSources());
             horiz =
                     new VelocityMotorSubsystem<>(
                             IdxConfig.HORIZ_CFG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(IdxConfig.HORIZ_CFG),
+                            HAS_IDX_IO
+                                    ? new MotorIOTalonFX(IdxConfig.HORIZ_CFG)
+                                    : new MotorIOSim(IdxConfig.HORIZ_CFG),
                             IdxHorizParamsNT.asVelocityParamSources());
             hood =
                     new PositionMotorSubsystem<>(
                             HoodConfig.HOOD_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(HoodConfig.HOOD_CONFIG),
+                            HAS_HOOD_IO
+                                    ? new MotorIOTalonFX(HoodConfig.HOOD_CONFIG)
+                                    : new MotorIOSim(HoodConfig.HOOD_CONFIG),
                             HoodParamsNT.asPositionParamSources(),
                             Degrees.of(0),
                             Degrees.of(360));
@@ -179,11 +200,11 @@ public class RobotContainer {
         }
 
         idx = new SpindexerSubsystem(spin, vert, horiz);
-        shootingSuperstructure =
-                new ShootingSuperstructure(turret, hood, shooter, idx, shootingParametersTable);
+        //shootingSuperstructure =
+        //        new ShootingSuperstructure(turret, hood, shooter, idx, shootingParametersTable);
         configureBindings();
-        shootingSuperstructure.setDefaultCommand();
-        //idx.setDefaultCommand();
+        //shootingSuperstructure.setDefaultCommand();
+        idx.setDefaultCommand();
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
@@ -224,26 +245,8 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        driver.a()
-                .whileTrue(
-                        new VisualizeProjectileShot(
-                                        RobotStateRecorder::getPoseWorldRobotCurrent,
-                                        () ->
-                                                RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                        .getRotation()
-                                                        .toRotation2d(),
-                                        () -> new Rotation2d(45),
-                                        () -> 10,
-                                        () ->
-                                                RobotStateRecorder.getVelocityWorldRobotCurrent()
-                                                        .getTranslation(),
-                                        true)
-                                .repeatedly());
 
-        driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0), TurretMode.SEEKING));
-        driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90), TurretMode.SEEKING));
-        driver.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
-        driver.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
+
     }
 
     public Command getAutonomousCommand() {

@@ -41,7 +41,7 @@ public class HoodConfig {
         public static final double kA = 0.0068;
         public static final double kS = 0.13;
 
-        // Motion Magic - Up (slower, controlled)
+        // Motion Magic 
         public static final double motionMagicVelRPS = 250.0;
         public static final double motionMagicAccelRPS2 = 600.0;
         public static final double motionMagicJerkRPS3 = 0.0;

@@ -14,10 +14,12 @@ public class IdxConfig {
     public static final String HORIZ = "IdxHoriz";
     public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
-    private static final int SPIN_ID = 52;
-    private static final int VERT_ID = 53;
-    private static final int HORIZ_ID = 54;
-    private static final double GEAR_RATIO = 3;
+    private static final int SPIN_ID = 2;
+    private static final int VERT_ID = 33;
+    private static final int HORIZ_ID = 3;
+    private static final double SPIN_GEAR_RATIO = 176.0 / 11.0 * 46.0 / 22.0;
+    private static final double VERT_GEAR_RATIO = 1;
+    private static final double HORIZ_GEAR_RATIO = 1;
 
     public static final SubsystemConfig SPIN_CFG =
             SubsystemConfig.builder()
@@ -27,9 +29,9 @@ public class IdxConfig {
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-                    .SensorToMechanismRatio(GEAR_RATIO)
+                    .SensorToMechanismRatio(SPIN_GEAR_RATIO)
                     .simConfig(
-                            SubsystemConfig.SimConfig.builder().gearRatio(GEAR_RATIO).build())
+                            SubsystemConfig.SimConfig.builder().gearRatio(SPIN_GEAR_RATIO).build())
                     .build();
 
     public static final SubsystemConfig VERT_CFG =
@@ -40,9 +42,9 @@ public class IdxConfig {
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-                    .SensorToMechanismRatio(GEAR_RATIO)
+                    .SensorToMechanismRatio(VERT_GEAR_RATIO)
                     .simConfig(
-                            SubsystemConfig.SimConfig.builder().gearRatio(GEAR_RATIO).build())
+                            SubsystemConfig.SimConfig.builder().gearRatio(VERT_GEAR_RATIO).build())
                     .build();
 
     public static final SubsystemConfig HORIZ_CFG =
@@ -53,9 +55,9 @@ public class IdxConfig {
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(false)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-                    .SensorToMechanismRatio(GEAR_RATIO)
+                    .SensorToMechanismRatio(HORIZ_GEAR_RATIO)
                     .simConfig(
-                            SubsystemConfig.SimConfig.builder().gearRatio(GEAR_RATIO).build())
+                            SubsystemConfig.SimConfig.builder().gearRatio(HORIZ_GEAR_RATIO).build())
                     .build();
 
     @NTParameter(tableName = "Params/IdxModes")
