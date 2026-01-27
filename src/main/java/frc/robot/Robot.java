@@ -58,7 +58,7 @@ public class Robot extends LoggedRobot {
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
         // warm-up path-following
-        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+        FollowPathCommand.warmupCommand().schedule();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class Robot extends LoggedRobot {
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
-            CommandScheduler.getInstance().schedule(autonomousCommand);
+            autonomousCommand.schedule();
         }
     }
 
