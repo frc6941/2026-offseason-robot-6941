@@ -3,6 +3,10 @@ description:
 globs: 
 alwaysApply: true
 ---
+<formatting>
+ALWAYS use google java format aosp formatting rule 
+<formatting>
+
 <debugging>
 When debugging, only make code changes if you are certain that you can solve the problem.
 Otherwise, follow debugging best practices:

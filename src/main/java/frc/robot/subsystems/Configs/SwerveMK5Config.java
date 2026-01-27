@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -13,22 +13,18 @@ import lib.ironpulse.swerve.sim.SwerveSimConfig;
 import lib.ntext.NTParameter;
 
 /** Constants specific to the swerve drivetrain configuration. */
-public final class SwerveConstants {
+public final class SwerveMK5Config {
     public static final String kSwerveTag = "Swerve";
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
     public static final double kSwerveHalfWidth = 0.6 / 2.0;
 
     public static SwerveModuleLimit kDefaultSwerveModuleLimit =
             SwerveModuleLimit.builder()
-                    // MK5n L2 defaults (drive = 6.03, steer = 287/11 ≈ 26.09, wheel = 4.0in)
-                    // This matters most when translating while rotating: if this is too optimistic,
-                    // azimuth lag makes
-                    // the net velocity vector feel “disoriented” during rotation even with
-                    // open-loop drive.
+                    // MK5n L2 defaults (drive ~= 6.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
                     // v (mps) = 6000rpm / 60 / 6.03 * pi * 4.0in
                     .maxDriveVelocity(MetersPerSecond.of(5.29329707470519))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(17.0))
-                    // omega (rps) = 6000rpm / 60 / (287/11) ≈ 3.8333 rps
+                    // omega (rps) = 6000rpm / 60 / (287/11) ~= 3.8333 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(6000.0 / 60.0 / (287.0 / 11.0)))
                     // accelerate in 0.1s
                     .maxSteerAngularAcceleration(
@@ -47,6 +43,13 @@ public final class SwerveConstants {
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0))
                     .build();
 
+    public static SwerveLimit kSimSwerveLimit =
+            SwerveLimit.builder()
+                    .maxLinearVelocity(MetersPerSecond.of(4.5))
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(30))
+                    .maxAngularVelocity(DegreesPerSecond.of(400.0))
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1000.0))
+                    .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("FL")
@@ -114,7 +117,7 @@ public final class SwerveConstants {
                     .steerMomentOfInertia(KilogramSquareMeters.of(0.01))
                     .steerStdDevPos(0.0000001)
                     .steerStdDevVel(0.000001)
-                    .defaultSwerveLimit(kDefaultSwerveLimit)
+                    .defaultSwerveLimit(kSimSwerveLimit)
                     .defaultSwerveModuleLimit(kDefaultSwerveModuleLimit)
                     .moduleConfigs(
                             new SwerveConfig.SwerveModuleConfig[] {
