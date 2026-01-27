@@ -22,6 +22,7 @@ public class RobotStateRecorder extends TransformRecorder {
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
 
     public static final String kFrameTurret = "Turret";
+    public static final String kFrameGoal = "Goal";
     public static final Translation3d kRobotToTurret =
             new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
@@ -48,6 +49,11 @@ public class RobotStateRecorder extends TransformRecorder {
                 Seconds.of(0.0),
                 kFrameRobot,
                 kFrameTurret); // dynamic TRobotTurret
+        putTransform(
+                new Pose3d(FieldConstants.Hub.innerCenterPoint, Rotation3d.kZero),
+                Seconds.of(0.0),
+                kFrameWorld,
+                kFrameGoal); // static TWorldGoal (blue reference)
     }
 
     public static RobotStateRecorder getInstance() {
@@ -124,5 +130,49 @@ public class RobotStateRecorder extends TransformRecorder {
                                 : RobotStateRecorder.kFrameDriverStationRed,
                         TransformRecorder.kFrameRobot)
                 .orElse(new Pose3d());
+    }
+
+    public static Pose3d getPoseWorldGoalCurrent() {
+        Pose3d goalBlue =
+                RobotStateRecorder.getInstance()
+                        .getTransform(
+                                Seconds.of(Timer.getTimestamp()),
+                                TransformRecorder.kFrameWorld,
+                                RobotStateRecorder.kFrameGoal)
+                        .orElse(new Pose3d());
+        boolean isBlue =
+                DriverStation.getAlliance()
+                        .orElse(DriverStation.Alliance.Blue)
+                        .equals(DriverStation.Alliance.Blue);
+        if (isBlue) {
+            return goalBlue;
+        }
+        return new Pose3d(
+                new Translation3d(
+                        FieldConstants.fieldLength - goalBlue.getX(),
+                        goalBlue.getY(),
+                        goalBlue.getZ()),
+                goalBlue.getRotation());
+    }
+
+    public static Translation2d getTranslationTurretToGoalCurrent() {
+        Pose3d turretPoseWorld = getPoseWorldTurretCurrent();
+        Pose3d goalPoseWorld = getPoseWorldGoalCurrent();
+        Translation3d delta =
+                goalPoseWorld.getTranslation().minus(turretPoseWorld.getTranslation());
+        return new Translation2d(delta.getX(), delta.getY());
+    }
+
+    public static Translation2d getVelocityGoalRobotCurrent() {
+        Translation2d turretToGoal = getTranslationTurretToGoalCurrent();
+        double dist = Math.hypot(turretToGoal.getX(), turretToGoal.getY());
+        if (dist < 1e-6) {
+            return new Translation2d();
+        }
+        Translation2d lineDir = new Translation2d(turretToGoal.getX() / dist, turretToGoal.getY() / dist);
+        Translation2d velWorld = getVelocityWorldRobotCurrent().getTranslation();
+        double vParallel = velWorld.getX() * lineDir.getX() + velWorld.getY() * lineDir.getY();
+        double vPerp = velWorld.getX() * (-lineDir.getY()) + velWorld.getY() * lineDir.getX();
+        return new Translation2d(vParallel, vPerp);
     }
 }

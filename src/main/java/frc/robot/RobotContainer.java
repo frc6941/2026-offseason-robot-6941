@@ -29,7 +29,7 @@ import frc.robot.subsystems.Configs.IdxVertParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretVelParamsNT;
-import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
+import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
@@ -62,7 +62,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
 
     private final CommandXboxController driver = new CommandXboxController(0);
-    private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
+    private final ShotCalculator shotCalculator = new ShotCalculator();
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -201,7 +201,7 @@ public class RobotContainer {
 
         idx = new SpindexerSubsystem(spin, vert, horiz);
         //shootingSuperstructure =
-        //        new ShootingSuperstructure(turret, hood, shooter, idx, shootingParametersTable);
+        //        new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
         configureBindings();
         //shootingSuperstructure.setDefaultCommand();
         idx.setDefaultCommand();
@@ -221,7 +221,7 @@ public class RobotContainer {
         PhoenixUtils.refreshAll();
         // update NTparameters
         NTParameterRegistry.refresh();
-        shootingParametersTable.updateFromNT();
+        shotCalculator.refreshTuningFromNetworkTables();
         // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
         RobotStateRecorder.getInstance()
