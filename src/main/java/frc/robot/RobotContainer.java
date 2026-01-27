@@ -18,17 +18,20 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.Configs.HoodConfig;
 import frc.robot.subsystems.Configs.HoodParamsNT;
-import frc.robot.subsystems.Configs.IndexerConfig;
-import frc.robot.subsystems.Configs.IndexerParamsNT;
 import frc.robot.subsystems.Configs.IntakerConfig;
 import frc.robot.subsystems.Configs.IntakerParamsNT;
 import frc.robot.subsystems.Configs.ShooterConfig;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.IdxConfig;
+import frc.robot.subsystems.Configs.IdxHorizParamsNT;
+import frc.robot.subsystems.Configs.IdxSpinParamsNT;
+import frc.robot.subsystems.Configs.IdxVertParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretVelParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
+import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import lib.ironpulse.command.SysIdCommand;
@@ -58,59 +61,72 @@ public class RobotContainer {
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> indexer;
+    private final SpindexerSubsystem idx;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final ShootingSuperstructure shootingSuperstructure;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
+    public RobotContainer() {
+        VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spin;
+        VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> vert;
+        VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> horiz;
 
-public RobotContainer() {
         if (RobotBase.isReal()) {
-                swerve =
-                        new Swerve(
-                                SwerveMK5Config.kRealConfig,
-                                new ImuIOPigeon(SwerveMK5Config.kRealConfig),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
-                turret =
-                new TurretSubsystem(
-                        TurretConfig.TURRET_CONFIG,
-                        new MotorInputsAutoLogged(),
-                        new MotorIOTalonFX(TurretConfig.TURRET_CONFIG),
-                        new CANCoderIOCANCoder(
-                                TurretConfig.TURRET_ENCODER_G1_ID,
-                                TurretConfig.TURRET_ENCODER_G1_OFFSET,
-                                false),
-                        new CANCoderIOCANCoder(
-                                TurretConfig.TURRET_ENCODER_G2_ID,
-                                TurretConfig.TURRET_ENCODER_G2_OFFSET,
-                                false),
-                        TurretVelParamsNT.asVelocityParamSources());
-                shooter =
-                        new VelocityMotorSubsystem<>(
-                                ShooterConfig.SHOOTER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG),
-                                ShooterParamsNT.asVelocityParamSources());
-                indexer =
-                        new VelocityMotorSubsystem<>(
-                                IndexerConfig.INDEXER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOTalonFX(IndexerConfig.INDEXER_CONFIG),
-                                IndexerParamsNT.asVelocityParamSources());
-                hood =
-                        new PositionMotorSubsystem<>(
-                                HoodConfig.HOOD_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOTalonFX(HoodConfig.HOOD_CONFIG),
-                                HoodParamsNT.asPositionParamSources(),
-                                Degrees.of(0),
-                                Degrees.of(360));
-
-
+            swerve =
+                    new Swerve(
+                            SwerveMK5Config.kRealConfig,
+                            new ImuIOPigeon(SwerveMK5Config.kRealConfig),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
+            turret =
+                    new TurretSubsystem(
+                            TurretConfig.TURRET_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(TurretConfig.TURRET_CONFIG),
+                            new CANCoderIOCANCoder(
+                                    TurretConfig.TURRET_ENCODER_G1_ID,
+                                    TurretConfig.TURRET_ENCODER_G1_OFFSET,
+                                    false),
+                            new CANCoderIOCANCoder(
+                                    TurretConfig.TURRET_ENCODER_G2_ID,
+                                    TurretConfig.TURRET_ENCODER_G2_OFFSET,
+                                    false),
+                            TurretVelParamsNT.asVelocityParamSources());
+            shooter =
+                    new VelocityMotorSubsystem<>(
+                            ShooterConfig.SHOOTER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG),
+                            ShooterParamsNT.asVelocityParamSources());
+            spin =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.SPIN_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(IdxConfig.SPIN_CFG),
+                            IdxSpinParamsNT.asVelocityParamSources());
+            vert =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.VERT_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(IdxConfig.VERT_CFG),
+                            IdxVertParamsNT.asVelocityParamSources());
+            horiz =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.HORIZ_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(IdxConfig.HORIZ_CFG),
+                            IdxHorizParamsNT.asVelocityParamSources());
+            hood =
+                    new PositionMotorSubsystem<>(
+                            HoodConfig.HOOD_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(HoodConfig.HOOD_CONFIG),
+                            HoodParamsNT.asPositionParamSources(),
+                            Degrees.of(0),
+                            Degrees.of(360));
         } else {
             swerve =
                     new Swerve(
@@ -120,38 +136,54 @@ public RobotContainer() {
                             new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
                             new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
                             new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
-        turret =
-                            new TurretSubsystem(
-                                    TurretConfig.TURRET_CONFIG,
-                                    new MotorInputsAutoLogged(),
-                                    new MotorIOSim(TurretConfig.TURRET_CONFIG),
-                                    encoderG1Sim,
-                                    encoderG2Sim,
-                                    TurretVelParamsNT.asVelocityParamSources());
-        shooter =
-                        new VelocityMotorSubsystem<>(
-                                ShooterConfig.SHOOTER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
-                                ShooterParamsNT.asVelocityParamSources());
-        indexer =
-                        new VelocityMotorSubsystem<>(
-                                IndexerConfig.INDEXER_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOSim(IndexerConfig.INDEXER_CONFIG),
-                                IndexerParamsNT.asVelocityParamSources());
-        hood =
-                        new PositionMotorSubsystem<>(
-                                HoodConfig.HOOD_CONFIG,
-                                new MotorInputsAutoLogged(),
-                                new MotorIOSim(HoodConfig.HOOD_CONFIG),
-                                HoodParamsNT.asPositionParamSources(),
-                                Degrees.of(0),
-                                Degrees.of(360));
+            turret =
+                    new TurretSubsystem(
+                            TurretConfig.TURRET_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(TurretConfig.TURRET_CONFIG),
+                            encoderG1Sim,
+                            encoderG2Sim,
+                            TurretVelParamsNT.asVelocityParamSources());
+            shooter =
+                    new VelocityMotorSubsystem<>(
+                            ShooterConfig.SHOOTER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
+                            ShooterParamsNT.asVelocityParamSources());
+            spin =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.SPIN_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IdxConfig.SPIN_CFG),
+                            IdxSpinParamsNT.asVelocityParamSources());
+            vert =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.VERT_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IdxConfig.VERT_CFG),
+                            IdxVertParamsNT.asVelocityParamSources());
+            horiz =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.HORIZ_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IdxConfig.HORIZ_CFG),
+                            IdxHorizParamsNT.asVelocityParamSources());
+            hood =
+                    new PositionMotorSubsystem<>(
+                            HoodConfig.HOOD_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(HoodConfig.HOOD_CONFIG),
+                            HoodParamsNT.asPositionParamSources(),
+                            Degrees.of(0),
+                            Degrees.of(360));
         }
-        shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, indexer, shootingParametersTable);
+
+        idx = new SpindexerSubsystem(spin, vert, horiz);
+        shootingSuperstructure =
+                new ShootingSuperstructure(turret, hood, shooter, idx, shootingParametersTable);
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
+        //idx.setDefaultCommand();
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
@@ -161,7 +193,6 @@ public RobotContainer() {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-
     }
 
     public void robotPeriodic() {
