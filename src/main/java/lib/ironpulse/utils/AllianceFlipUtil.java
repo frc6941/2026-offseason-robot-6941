@@ -1,27 +1,29 @@
-package frc.robot.util;
+package lib.ironpulse.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.FieldConstants;
 
 public class AllianceFlipUtil {
     private static final Rotation2d ROT180 = Rotation2d.fromDegrees(180.0);
+    public static final double fieldLength = Units.inchesToMeters(690.876);
+    public static final double fieldWidth = Units.inchesToMeters(317);
 
     public static double apply(double x) {
         if (shouldFlip()) {
-            return FieldConstants.fieldLength - x;
+            return fieldLength - x;
         }
         return x;
     }
 
     public static Translation2d apply(Translation2d t) {
         if (shouldFlip()) {
-            double x = FieldConstants.fieldLength - t.getX();
-            double y = FieldConstants.fieldWidth - t.getY();
+            double x = fieldLength - t.getX();
+            double y = fieldWidth - t.getY();
             return new Translation2d(x, y);
         }
         return t;
@@ -52,8 +54,8 @@ public class AllianceFlipUtil {
 
     public static Translation3d apply(Translation3d t3) {
         if (shouldFlip()) {
-            double x = FieldConstants.fieldLength - t3.getX();
-            double y = FieldConstants.fieldWidth - t3.getY();
+            double x = fieldLength - t3.getX();
+            double y = fieldWidth - t3.getY();
             return new Translation3d(x, y, t3.getZ());
         }
         return t3;

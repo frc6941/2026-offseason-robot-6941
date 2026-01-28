@@ -1,17 +1,16 @@
 package lib.ironpulse.subsystem;
 
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.MomentOfInertia;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -46,10 +45,15 @@ public class SubsystemConfig {
     @Default
     public final InvertedValue motorInvertedValue = InvertedValue.CounterClockwise_Positive;
 
-    @Default public final int filterSize = 1;
+    @Default public final boolean defaultBrake = true;
+
     @Default public final double SensorToMechanismRatio = 1.0;
 
-    @Default public final boolean updateOutputs = true;
+    /** Optional stator current limit in amps, set to NaN to disable. */
+    @Default public final double statorCurrentLimitAmps = Double.NaN;
+
+    /** Optional supply current limit in amps, set to NaN to disable. */
+    @Default public final double supplyCurrentLimitAmps = Double.NaN;
 
     // other close loop configs
     @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;
@@ -57,13 +61,17 @@ public class SubsystemConfig {
     @Default
     public final StaticFeedforwardSignValue kSValue = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-    /** Soft-limit enables at init; thresholds should be part of fxConfig if used. */
-    // TODO: soft limit
-    @Default public final boolean enableForwardSoftLimit = false;
+    /** Soft-limit, set to NaN to disable */
+    @Default public final Angle forwardSoftLimitDegrees = Degree.of(Double.NaN);
 
-    @Default public final boolean enableReverseSoftLimit = false;
+    @Default public final Angle reverseSoftLimitDegrees = Degree.of(Double.NaN);
 
-    /** ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos */
+    /**
+     * ONLY used when needing to offset the zero position to use the CTRE Kg for arm cos This will
+     * offset the "Zero Position" Larger certain degress compared to what the harware thinks it is.
+     * Example: zeroOffset = Degree.of(0.25), Subsystem Pos = Degree.of(0.0), TalonPos =
+     * Degree.of(-0.25)
+     */
     @Default public final Angle zeroOffset = Degree.of(0.0);
 
     @Default public final ZeroingConfig zeroingConfig = ZeroingConfig.builder().build();
@@ -104,20 +112,38 @@ public class SubsystemConfig {
         public final String bus;
 
         /** If true, follower output is inverted (oppose main). */
-        @Default public final boolean opposeMain = false;
+        @Default public final MotorAlignmentValue opposeMain = MotorAlignmentValue.Aligned;
     }
 
     @Builder
     @AllArgsConstructor
     public static class SimConfig {
-        @Default public final MomentOfInertia MOI = KilogramSquareMeters.of(0);
         @Default public final double gearRatio = 1.0d;
-        @Default public final double[] stdvs = new double[] {0.0d, 0.0d};
 
         @Default
         public final TrapezoidProfile.Constraints profile =
                 new TrapezoidProfile.Constraints(50.0, 100.0);
     }
 
-    @Default public SimConfig simConfig = new SimConfig(null, 0, null, null);
+    @Default public SimConfig simConfig = SimConfig.builder().build();
+
+    /**
+     * Creates a simple SubsystemConfig with only the essential parameters for a basic motor
+     * subsystem.
+     *
+     * @param name The name of the subsystem (for logging/diagnostics)
+     * @param mainId The CAN ID of the main motor
+     * @param mainBus The CAN bus name (e.g., "rio" or "canivore")
+     * @param motorInvertedValue The motor inversion setting
+     * @return A SubsystemConfig with default values for all other parameters
+     */
+    public static SubsystemConfig simpleMotorCfg(
+            String name, int mainId, String mainBus, InvertedValue motorInvertedValue) {
+        return SubsystemConfig.builder()
+                .name(name)
+                .mainId(mainId)
+                .mainBus(mainBus)
+                .motorInvertedValue(motorInvertedValue)
+                .build();
+    }
 }

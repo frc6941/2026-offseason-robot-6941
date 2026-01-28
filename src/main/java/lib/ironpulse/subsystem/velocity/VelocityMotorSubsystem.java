@@ -1,16 +1,21 @@
 package lib.ironpulse.subsystem.velocity;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.function.DoubleSupplier;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.subsystem.ControlMode;
 import lib.ironpulse.subsystem.MotorSubsystem;
 import lib.ironpulse.subsystem.SubsystemConfig;
-import lombok.Getter;
+import lib.ironpulse.utils.LoggedTracer;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Velocity subsystem for velocity-controlled mechanisms (shooters, intakes, etc.) Extends {@link
@@ -19,13 +24,7 @@ import lombok.Getter;
 public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
         extends MotorSubsystem<T, U> {
 
-    @Getter
-    private VelocitySetpoint currSetpoint =
-            new VelocitySetpoint(ModeVelocity.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
-
-    @Getter
-    private VelocitySetpoint prevSetpoint =
-            new VelocitySetpoint(ModeVelocity.VELOCITY, RotationsPerSecond.of(0.0), () -> 0.0);
+    private AngularVelocity currSetpoint = RotationsPerSecond.of(0.0);
 
     protected final VelocityParamSources params;
     private final Slot0Configs slot0Configs;
@@ -58,52 +57,42 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
             io.updateGains(slot0Configs);
         }
 
-        if (setPointHasChanged()) {
-            switch (currSetpoint.modeVelocity) {
-                case VELOCITY:
-                    io.setVelocitySetpoint(currSetpoint.velocitySetpt);
-                    break;
-                case DUTY_CYCLE:
-                    runDutyCycle(currSetpoint.openLoop);
-                    break;
-                case VOLTAGE:
-                    runVoltage(currSetpoint.openLoop);
-                    break;
-                default:
-                    io.setVelocitySetpoint(currSetpoint.velocitySetpt);
-                    break;
-            }
+        LoggedTracer.record(config.name);
+    }
+
+    @Override
+    protected void logState() {
+        Logger.recordOutput(config.name + "/mode", mode.name());
+        if (mode == ControlMode.VELOCITY) {
+            Logger.recordOutput(config.name + "/setPoint", currSetpoint.in(RotationsPerSecond));
+        } else {
+            Logger.recordOutput(config.name + "/setPoint", setpoint);
         }
-        prevSetpoint = currSetpoint;
+
+        Logger.recordOutput(config.name + "/atGoal", velocityAtGoal());
+        Logger.recordOutput(config.name + "/currVelocity", getVelocity().in(RotationsPerSecond));
     }
 
-    /** Set velocity setpoint in rotations per second (RPS). */
-    public void setVelocitySetpoint(AngularVelocity velocity) {
-        currSetpoint.modeVelocity = ModeVelocity.VELOCITY;
-        currSetpoint.velocitySetpt = velocity;
+    /** Set velocity setpoint command. */
+    public Command runVelocity(AngularVelocity velocity) {
+        return runVelocity(() -> velocity);
     }
 
-    /** Set velocity setpoint in rotations per second (RPS). */
-    public void setVelocitySetpoint(double velocityRPS) {
-        setVelocitySetpoint(RotationsPerSecond.of(velocityRPS));
-    }
-
-    /** Set open loop duty cycle [-1.0, 1.0]. */
-    public void setOpenLoopDutyCycle(double dutyCycle) {
-        currSetpoint.openLoop = () -> MathUtil.clamp(dutyCycle, -1.0d, 1.0d);
-        currSetpoint.modeVelocity = ModeVelocity.DUTY_CYCLE;
-    }
-
-    /** Set voltage [-12.0, 12.0]. */
-    public void setVoltage(double voltage) {
-        currSetpoint.openLoop = () -> MathUtil.clamp(voltage, -12.0d, 12.0d);
-        currSetpoint.modeVelocity = ModeVelocity.VOLTAGE;
+    /** Set velocity setpoint command. */
+    public Command runVelocity(Supplier<AngularVelocity> velocity) {
+        return Commands.run(
+                () -> {
+                    AngularVelocity sp = velocity.get();
+                    io.setVelocitySetpoint(sp);
+                    currSetpoint = sp;
+                    mode = ControlMode.VELOCITY;
+                },
+                this);
     }
 
     /** Check if velocity is within tolerance of setpoint. */
     public boolean velocityAtGoal(AngularVelocity tolerance) {
-        AngularVelocity current = RotationsPerSecond.of(inputs.velocityRotPerSecond);
-        return current.isNear(currSetpoint.velocitySetpt, tolerance);
+        return getVelocity().isNear(currSetpoint, tolerance);
     }
 
     /** Check if velocity is within default tolerance of setpoint. */
@@ -111,9 +100,21 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
         return velocityAtGoal(RotationsPerSecond.of(params.velocityAtGoalToleranceRPS()));
     }
 
+    public Command waitUntilAtGoal(AngularVelocity tolerance) {
+        return Commands.waitUntil(() -> velocityAtGoal(tolerance));
+    }
+
+    public Command waitUntilAtGoal() {
+        return Commands.waitUntil(this::velocityAtGoal);
+    }
+
     /** Get current velocity in rotations per second. */
     public AngularVelocity getVelocity() {
         return RotationsPerSecond.of(inputs.velocityRotPerSecond);
+    }
+
+    public Angle getPosition() {
+        return Rotations.of(inputs.positionRot);
     }
 
     /** Check if motor is connected. */
@@ -121,32 +122,7 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
         return io.isConnected();
     }
 
-    /** Stop the mechanism. */
-    public void stop() {
-        setVelocitySetpoint(0.0);
-    }
-
-    private enum ModeVelocity {
-        VELOCITY,
-        VOLTAGE,
-        DUTY_CYCLE
-    }
-
-    private boolean setPointHasChanged() {
-        return !(currSetpoint.velocitySetpt.equals(prevSetpoint.velocitySetpt)
-                && currSetpoint.modeVelocity == prevSetpoint.modeVelocity);
-    }
-
-    public static class VelocitySetpoint {
-        private ModeVelocity modeVelocity;
-        private AngularVelocity velocitySetpt;
-        private DoubleSupplier openLoop;
-
-        private VelocitySetpoint(
-                ModeVelocity modeVelocity, AngularVelocity velocitySetpt, DoubleSupplier openLoop) {
-            this.modeVelocity = modeVelocity;
-            this.velocitySetpt = velocitySetpt;
-            this.openLoop = openLoop;
-        }
+    public AngularVelocity getCurrSetpoint() {
+        return currSetpoint;
     }
 }

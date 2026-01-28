@@ -8,11 +8,17 @@ import lib.ironpulse.swerve.ImuIO;
 public class ImuIOSim implements ImuIO {
     public ImuIOSim() {}
 
+    private double lastTimestamp = Timer.getTimestamp();
+
     @Override
     public void updateInputs(ImuIOInputs inputs) {
+        double now = Timer.getTimestamp();
+        double dt = now - lastTimestamp;
+        lastTimestamp = now;
+
         inputs.connected = true;
         inputs.yawPosition =
-                inputs.yawPosition.plus(new Rotation2d(inputs.yawVelocityRadPerSecCmd * 0.3));
+                inputs.yawPosition.plus(new Rotation2d(inputs.yawVelocityRadPerSecCmd * dt));
         inputs.yawVelocityRadPerSec = inputs.yawVelocityRadPerSecCmd;
         inputs.pitchPosition = new Rotation2d();
         inputs.pitchVelocityRadPerSec = 0.0;
