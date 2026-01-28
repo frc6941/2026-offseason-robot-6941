@@ -44,17 +44,20 @@ public class RobotContainer {
                     new LimelightSubsystem(
                             RobotConstants.LimelightConstants.limelightSubsystemConfig,
                             swerve,
-                            () ->
-                                    RobotStateRecorder.getVelocityWorldRobotCurrent()
-                                            .getRotation()
-                                            .getDegrees(),
                             new LimelightIOReal(
                                     RobotConstants.LimelightConstants.limelight1Config,
                                     () ->
                                             RobotStateRecorder.getPoseWorldRobotCurrent()
                                                     .toPose2d()
                                                     .getRotation()
-                                                    .getDegrees()));
+                                                    .getDegrees(),
+                                    () -> {
+                                        // angular velocity > 360 deg per second
+                                        return RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .getDegrees()
+                                                > 360;
+                                    }));
         } else {
             swerve =
                     new Swerve(
@@ -67,12 +70,7 @@ public class RobotContainer {
             // TODO: limelight simulation
             limelightSubsystem =
                     new LimelightSubsystem(
-                            RobotConstants.LimelightConstants.limelightSubsystemConfig,
-                            swerve,
-                            () ->
-                                    RobotStateRecorder.getVelocityWorldRobotCurrent()
-                                            .getRotation()
-                                            .getDegrees());
+                            RobotConstants.LimelightConstants.limelightSubsystemConfig, swerve);
         }
         configureBindings();
     }

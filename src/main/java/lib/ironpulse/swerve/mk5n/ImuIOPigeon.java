@@ -96,6 +96,16 @@ public class ImuIOPigeon implements ImuIO {
         pigeon.reset();
     }
 
+    @Override
+    public void setYawDeg(double yaw) {
+        pigeon.setYaw(yaw);
+    }
+
+    @Override
+    public double getYawDeg() {
+        return yaw.getValueAsDouble();
+    }
+
     // Note: No need for startSyncThread() method since we use the shared sync thread from
     // SwerveModuleIOMK5N
 

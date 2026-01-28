@@ -27,6 +27,10 @@ public final class RobotConstants {
         public static final LimelightSubsystemConfig limelightSubsystemConfig =
                 LimelightSubsystemConfig.builder().build();
         public static final LimelightIOConfig limelight1Config =
-                LimelightIOConfig.builder().name("limelight").isLimelight4(true).build();
+                LimelightIOConfig.builder()
+                        .name("limelight")
+                        .isLimelight4(true)
+                        .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
+                        .build();
     }
 }

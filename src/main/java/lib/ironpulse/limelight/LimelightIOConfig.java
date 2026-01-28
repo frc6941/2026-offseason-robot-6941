@@ -5,6 +5,11 @@ import lombok.Builder;
 /** Builder-style configuration for limelight IO. */
 @Builder
 public class LimelightIOConfig {
+    public enum MountPosition {
+        ON_ROBOT,
+        ON_MECHANISM
+    }
+
     @Builder.Default public final boolean useMegaTag2 = true;
     // weight given to its estimation
     // ranges from 0-1 inclusive.
@@ -17,6 +22,7 @@ public class LimelightIOConfig {
 
     public final String name;
     public final boolean isLimelight4;
+    public final MountPosition mountPosition;
 
     @Builder.ObtainVia(field = "isLimelight4")
     public final boolean useInternalIMU;

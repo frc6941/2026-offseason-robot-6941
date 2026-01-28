@@ -7,26 +7,23 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.DoubleSupplier;
+import lib.ironpulse.math.MathTools;
 import org.littletonrobotics.junction.Logger;
 
 public class LimelightSubsystem extends SubsystemBase {
+    private final HashMap<String, LimelightIO> ioNames = new HashMap<>();
     private final HashMap<LimelightIO, LimelightIOInputsAutoLogged> ios = new HashMap<>();
     private final LimelightSubsystemConfig config;
-    private final LocalizationInterface localization;
-    private final DoubleSupplier yawVelocitySupplier;
+    private final Localizable localizationProvider;
 
     public LimelightSubsystem(
-            LimelightSubsystemConfig config,
-            LocalizationInterface localization,
-            DoubleSupplier yawVelocitySupplier,
-            LimelightIO... ios) {
+            LimelightSubsystemConfig config, Localizable localizationProvider, LimelightIO... ios) {
         super("Limelight");
         this.config = config;
-        this.localization = localization;
-        this.yawVelocitySupplier = yawVelocitySupplier;
+        this.localizationProvider = localizationProvider;
         for (LimelightIO io : ios) {
             this.ios.put(io, new LimelightIOInputsAutoLogged());
+            this.ioNames.put(io.getName(), io);
         }
     }
 
@@ -36,6 +33,7 @@ public class LimelightSubsystem extends SubsystemBase {
      * would be, at most, twice the default standard deviation.
      *
      * <p>For example, if default standard deviation is 0.7: score=0, final=1.4; score=1, final=0.7.
+     * Note that if score=0, we reject the update in the first place.
      *
      * @param reliability The reliability score from limelight input.
      * @return The standard deviation for localization.
@@ -49,12 +47,12 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     private void addVisionMeasurement() {
-        if (yawVelocitySupplier.getAsDouble() > 360) {
-            // angular velocity > 360 degrees per second, too high to have a reliable estimate
-            return;
-        }
         for (LimelightIOInputsAutoLogged input : ios.values()) {
-            localization.addVisionMeasurement(
+            if (MathTools.epsilonEquals(input.reliability, 0)) {
+                // reliability ~= zero, do not trust this limelight
+                continue;
+            }
+            localizationProvider.addVisionMeasurement(
                     input.pose, input.timestampSeconds, getVisionStdDev(input.reliability));
         }
     }
@@ -67,8 +65,51 @@ public class LimelightSubsystem extends SubsystemBase {
 
             io.updateInputs(inputs);
             Logger.processInputs("Subsystem/Limelight/" + io.getName(), inputs);
+
+            if (!io.canUseInternalIMU()) {
+                continue;
+            }
+
+            // IMU logging and correction
+            // FIXME: For debugging only, remove if not needed
+            Logger.recordOutput("Limelight/IMU/" + io.getName() + "_INT", io.getIMUYawInternal());
+            Logger.recordOutput("Limelight/IMU/" + io.getName() + "_ROBOT", io.getIMUYawRobot());
+            Logger.recordOutput("Limelight/IMU/Swerve", localizationProvider.getIMUYaw());
+
+            if (inputs.reliability >= config.imuCorrectionReliabilityThreshold) {
+                // trustworthy enough to correct the swerve's IMU perhaps?
+                localizationProvider.setIMUYaw(io.getIMUYawRobot());
+            }
         }
 
         addVisionMeasurement();
+    }
+
+    private LimelightIO getIoById(String id) {
+        LimelightIO io = ioNames.getOrDefault(id, null);
+        if (io == null) {
+            throw new IllegalArgumentException(id + " is not a valid limelight");
+        }
+        return io;
+    }
+
+    public void setPipeline(String id, int pipeline) {
+        getIoById(id).setPipeline(pipeline);
+    }
+
+    public int getPipeline(String id) {
+        return getIoById(id).getPipeline();
+    }
+
+    public void setLEDMode(String id, LimelightIO.LEDMode mode) {
+        getIoById(id).setLEDMode(mode);
+    }
+
+    public void setAprilTagIdFilter(String id, int[] tagIds) {
+        getIoById(id).setAprilTagIdFilter(tagIds);
+    }
+
+    public void clearAprilTagIdFilter(String id) {
+        getIoById(id).clearAprilTagIdFilter();
     }
 }

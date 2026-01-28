@@ -9,7 +9,29 @@ public interface LimelightIO {
     // reliability score: from 0 to 1
     double getReliabilityScore(LimelightHelpers.PoseEstimate poseEstimate);
 
+    default void setPipeline(int pipeline) {}
+
+    default int getPipeline() {
+        return 0;
+    }
+
+    default void setLEDMode(LEDMode mode) {}
+
+    default void setAprilTagIdFilter(int[] ids) {}
+
+    default void clearAprilTagIdFilter() {
+        setAprilTagIdFilter(new int[0]);
+    }
+
     default void updateInputs(LimelightIOInputs inputs) {}
+
+    // FIXME: leave only one function for yaw. This was to see that whether robotYaw equals to
+    // internal yaw.
+    double getIMUYawInternal();
+
+    double getIMUYawRobot();
+
+    boolean canUseInternalIMU();
 
     default String getName() {
         return "UNNAMED";
@@ -32,8 +54,8 @@ public interface LimelightIO {
         EXTERNAL_SEED(1),
         // only internal IMU used
         INTERNAL_ONLY(2),
-        // internal + external IMU for MegaTag1 - not recommended
-        INTERNAL_MT1_ASSIST_DO_NOT_USE(3),
+        // internal + MegaTag1 assisted IMU
+        INTERNAL_MT1_ASSIST(3),
         // internal + external IMU for MegaTag2
         INTERNAL_EXTERNAL_ASSIST(4);
 
@@ -42,5 +64,12 @@ public interface LimelightIO {
         InternalIMUMode(int value) {
             this.value = value;
         }
+    }
+
+    enum LEDMode {
+        PIPELINE_CONTROL,
+        ON,
+        OFF,
+        BLINK
     }
 }
