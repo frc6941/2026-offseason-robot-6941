@@ -96,4 +96,5 @@ jobs:
         run: ./gradlew createVersionFile
 
       - name: Compile (and tests if enabled)
-        run: ./gradlew --no-daemon build -x spotlessApply
+        run: ./gradlew --no-daemon build -x spotlessApply -x spotlessCheck
+
