@@ -40,6 +40,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Install Java
+        run: |
+          apt update
+          apt install -y openjdk-17-jdk
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
       - name: Run Spotless (same-repo)
         if: github.event.pull_request.head.repo.full_name == github.repository
         run: ./gradlew --no-daemon spotlessApply -x createVersionFile
@@ -77,6 +84,13 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Install Java
+        run: |
+          apt update
+          apt install -y openjdk-17-jdk
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Compile (and tests if enabled)
         run: ./gradlew --no-daemon build -x spotlessApply -x createVersionFile
