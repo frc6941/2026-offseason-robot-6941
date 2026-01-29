@@ -11,6 +11,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import frc.robot.RobotConstants;
 import lib.ironpulse.swerve.ImuIO;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
 import lib.ironpulse.utils.PhoenixUtils;
@@ -42,8 +44,7 @@ public class ImuIOPigeon implements ImuIO {
         syncThread = SwerveModuleIOMK5N.getSyncThread();
 
         // Initialize Pigeon2
-        CANBus canivoreCanBusName = new CANBus(config.canivoreCanBusName);
-        pigeon = new Pigeon2(config.pigeonId, canivoreCanBusName);
+        pigeon = new Pigeon2(config.pigeonId, RobotConstants.canivoreBus);
 
         // Get status signals
         yaw = pigeon.getYaw();

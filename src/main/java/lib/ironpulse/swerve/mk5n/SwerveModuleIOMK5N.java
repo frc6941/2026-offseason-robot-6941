@@ -20,6 +20,8 @@ import edu.wpi.first.units.measure.*;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
+
+import frc.robot.RobotConstants;
 import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveModuleIO;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
@@ -71,10 +73,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
             syncThread = new PhoenixSynchronizationThread(syncLock, config.odometryFrequency);
 
         // initialize and config motors
-        CANBus canivoreCanBusName = new CANBus(config.canivoreCanBusName);
-        driveMotor = new TalonFX(moduleConfig.driveMotorId, canivoreCanBusName);
-        steerMotor = new TalonFX(moduleConfig.steerMotorId, canivoreCanBusName);
-        encoder = new CANcoder(moduleConfig.encoderId, canivoreCanBusName);
+        driveMotor = new TalonFX(moduleConfig.driveMotorId, RobotConstants.canivoreBus);
+        steerMotor = new TalonFX(moduleConfig.steerMotorId, RobotConstants.canivoreBus);
+        encoder = new CANcoder(moduleConfig.encoderId, RobotConstants.canivoreBus);
         configureDriveMotor();
         configureSteerMotor();
 

@@ -17,8 +17,7 @@ public class CANCoderIOCANCoder implements CANCoderIO {
     private StatusSignal<Angle> positionSig;
 
     public CANCoderIOCANCoder(int canDeviceId, Angle offset, boolean inverted) {
-        CANBus canBus = new CANBus(RobotConstants.CANIVORE_CAN_BUS_NAME);
-        encoder = new CANcoder(canDeviceId, canBus);
+        encoder = new CANcoder(canDeviceId, RobotConstants.canivoreBus);
 
         var cancoderConfigs = new CANcoderConfiguration();
         cancoderConfigs.MagnetSensor.MagnetOffset = offset.in(Rotations);

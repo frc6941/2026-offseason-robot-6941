@@ -20,6 +20,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.PhoenixUtils;
 
@@ -51,8 +52,7 @@ public class MotorIOTalonFX implements MotorIO {
     private final SubsystemConfig config;
 
     public MotorIOTalonFX(SubsystemConfig cfg) {
-        CANBus mainBus = new CANBus(cfg.mainBus);
-        this.main = new TalonFX(cfg.mainId, mainBus);
+        this.main = new TalonFX(cfg.mainId, RobotConstants.canivoreBus);
         this.config = cfg;
 
         this.fx = cfg.fxConfig;
@@ -109,8 +109,7 @@ public class MotorIOTalonFX implements MotorIO {
         this.followers = new TalonFX[cfg.followers.length];
         for (int i = 0; i < followers.length; i++) {
             var f = cfg.followers[i];
-            CANBus fBus = new CANBus(f.bus);
-            followers[i] = new TalonFX(f.id, fBus);
+            followers[i] = new TalonFX(f.id, RobotConstants.canivoreBus);
             followers[i].setControl(new Follower(cfg.mainId, f.opposeMain));
         }
 
@@ -138,8 +137,7 @@ public class MotorIOTalonFX implements MotorIO {
     }
 
     private void configureCANcoder(SubsystemConfig.RemoteCANcoder rc) {
-        CANBus rcBus = new CANBus(rc.bus);
-        CANcoder coder = new CANcoder(rc.id, rcBus);
+        CANcoder coder = new CANcoder(rc.id, RobotConstants.canivoreBus);
         // Build a CANcoderConfiguration from rc fields
         CANcoderConfiguration c = new CANcoderConfiguration();
         c.MagnetSensor.MagnetOffset = rc.magnetOffset;
