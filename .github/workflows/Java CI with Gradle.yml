@@ -93,4 +93,4 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
 
       - name: Compile (and tests if enabled)
-        run: ./gradlew --no-daemon build -x spotlessApply -x createVersionFile
+        run: ./gradlew --no-daemon build -x spotlessApply
