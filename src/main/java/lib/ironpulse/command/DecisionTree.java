@@ -75,7 +75,7 @@ public class DecisionTree {
         // 1. start the root if nothing is running yet
         if (currentCommand == null) {
             if (rootCommand != null) {
-                rootCommand.schedule();
+                CommandScheduler.getInstance().schedule(rootCommand);
                 currentCommand = rootCommand;
             }
             return;
@@ -87,7 +87,7 @@ public class DecisionTree {
             for (BooleanSupplier edge : graph.outgoingEdgesOf(currentCommand)) {
                 if (edge.getAsBoolean()) {
                     Command next = graph.getEdgeTarget(edge);
-                    next.schedule();
+                    CommandScheduler.getInstance().schedule(next);
                     currentCommand = next;
                     return;
                 }

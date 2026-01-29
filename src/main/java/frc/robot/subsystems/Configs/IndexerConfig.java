@@ -2,7 +2,7 @@ package frc.robot.subsystems.Configs;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import frc.robot.RobotConstants;
+import static frc.robot.RobotConstants.CANIVORE_BUS;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -10,7 +10,6 @@ public class IndexerConfig {
     private IndexerConfig() {}
 
     public static final String NAME = "Indexer";
-    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
     private static final int INDEXER_MOTOR_MAIN_ID = 50;
     private static final double INDEXER_GEAR_RATIO = 3;
@@ -18,7 +17,7 @@ public class IndexerConfig {
     public static final SubsystemConfig INDEXER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS_NAME)
+                    .mainBus(CANIVORE_BUS)
                     .mainId(INDEXER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(false)

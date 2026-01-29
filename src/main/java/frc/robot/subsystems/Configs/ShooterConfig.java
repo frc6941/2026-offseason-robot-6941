@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import frc.robot.RobotConstants;
+import static frc.robot.RobotConstants.CANIVORE_BUS;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -20,7 +21,7 @@ public class ShooterConfig {
     public static final SubsystemConfig SHOOTER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS_NAME)
+                    .mainBus(CANIVORE_BUS)
                     .mainId(SHOOTER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .defaultBrake(false)
@@ -29,7 +30,7 @@ public class ShooterConfig {
                             new SubsystemConfig.FollowerConfig[] {
                                 SubsystemConfig.FollowerConfig.builder()
                                         .id(SHOOTER_MOTOR_FOLLOWER_ID)
-                                        .bus(CANIVORE_CAN_BUS_NAME)
+                                        .bus(CANIVORE_BUS)
                                         .opposeMain(MotorAlignmentValue.Opposed)
                                         .build()
                             })

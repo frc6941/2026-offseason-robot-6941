@@ -1,11 +1,11 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static frc.robot.RobotConstants.CANIVORE_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -13,7 +13,6 @@ public class TurretConfig {
     private TurretConfig() {}
 
     public static final String NAME = "Turret";
-    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
     public static final int TURRET_MOTOR_MAIN_ID = 96;
     public static final double TURRET_GEAR_RATIO = 40.0;
@@ -38,7 +37,7 @@ public class TurretConfig {
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS_NAME)
+                    .mainBus(CANIVORE_BUS)
                     .mainId(TURRET_MOTOR_MAIN_ID)
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)

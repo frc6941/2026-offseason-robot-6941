@@ -2,6 +2,7 @@ package lib.ironpulse.subsystem;
 
 import static edu.wpi.first.units.Units.Degree;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -30,7 +31,7 @@ public class SubsystemConfig {
 
     // Primary TalonFX
     public final int mainId;
-    public final String mainBus;
+    public final CANBus mainBus;
 
     /** Phoenix configuration to apply to the primary TalonFX. */
     @Default public final TalonFXConfiguration fxConfig = new TalonFXConfiguration();
@@ -81,7 +82,7 @@ public class SubsystemConfig {
     @AllArgsConstructor
     public static class RemoteCANcoder {
         public final int id;
-        public final String bus;
+        public final CANBus bus;
         public final double magnetOffset;
         public final double rotorToSensorRatio;
 
@@ -109,7 +110,7 @@ public class SubsystemConfig {
     @AllArgsConstructor
     public static class FollowerConfig {
         public final int id;
-        public final String bus;
+        public final CANBus bus;
 
         /** If true, follower output is inverted (oppose main). */
         @Default public final MotorAlignmentValue opposeMain = MotorAlignmentValue.Aligned;
@@ -138,7 +139,7 @@ public class SubsystemConfig {
      * @return A SubsystemConfig with default values for all other parameters
      */
     public static SubsystemConfig simpleMotorCfg(
-            String name, int mainId, String mainBus, InvertedValue motorInvertedValue) {
+            String name, int mainId, CANBus mainBus, InvertedValue motorInvertedValue) {
         return SubsystemConfig.builder()
                 .name(name)
                 .mainId(mainId)

@@ -1,6 +1,7 @@
 package lib.ironpulse.swerve.mk5n;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,6 +11,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import frc.robot.RobotConstants;
 import lib.ironpulse.swerve.ImuIO;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
 import lib.ironpulse.utils.PhoenixUtils;
@@ -41,7 +44,7 @@ public class ImuIOPigeon implements ImuIO {
         syncThread = SwerveModuleIOMK5N.getSyncThread();
 
         // Initialize Pigeon2
-        pigeon = new Pigeon2(config.pigeonId, config.canivoreCanBusName);
+        pigeon = new Pigeon2(config.pigeonId, config.canivoreCanBus);
 
         // Get status signals
         yaw = pigeon.getYaw();
