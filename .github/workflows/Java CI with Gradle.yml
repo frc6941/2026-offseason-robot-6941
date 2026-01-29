@@ -12,14 +12,15 @@ concurrency:
 
 jobs:
   spotless_autofix:
-    name: Spotless (auto-fix)
+    name: Spotless
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2026-22.04-py314
     permissions:
       contents: write
 
     steps:
-      - name: Checkout PR branch (NOT detached)
+      - name: Checkout PR branch (same-repo)
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
@@ -27,19 +28,22 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Checkout PR branch (fork)
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Avoid "dubious ownership" errors inside container
       - name: Add repository to git safe directories
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Run Spotless without triggering createVersionFile
-      - name: Run Spotless (skip createVersionFile)
+      - name: Run Spotless (same-repo)
+        if: github.event.pull_request.head.repo.full_name == github.repository
         run: ./gradlew --no-daemon spotlessApply -x createVersionFile
 
-      # Auto-push only for same-repo PRs (forks have no permission)
       - name: Commit and push formatting changes
         if: github.event.pull_request.head.repo.full_name == github.repository
         uses: stefanzweifel/git-auto-commit-action@v7
@@ -47,12 +51,16 @@ jobs:
           commit_message: "chore: apply Spotless"
           file_pattern: "src/**/*.java"
 
-      # Fail if changes remain (e.g. fork PRs)
-      - name: Fail if formatting changes remain
+      - name: Fail if formatting changes remain (same-repo)
+        if: github.event.pull_request.head.repo.full_name == github.repository
         run: git --no-pager diff --exit-code
 
+      - name: Run Spotless Check (fork)
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: ./gradlew --no-daemon spotlessCheck
+
   build:
-    name: Build (compile)
+    name: Build
     needs: spotless_autofix
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2026-22.04-py314
@@ -70,6 +78,5 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Compile without Spotless or createVersionFile to keep CI clean
       - name: Compile (and tests if enabled)
         run: ./gradlew --no-daemon build -x spotlessApply -x createVersionFile
