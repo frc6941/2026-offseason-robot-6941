@@ -52,7 +52,7 @@ public class MotorIOTalonFX implements MotorIO {
     private final SubsystemConfig config;
 
     public MotorIOTalonFX(SubsystemConfig cfg) {
-        this.main = new TalonFX(cfg.mainId, RobotConstants.canivoreBus);
+        this.main = new TalonFX(cfg.mainId, cfg.mainBus);
         this.config = cfg;
 
         this.fx = cfg.fxConfig;
@@ -109,7 +109,7 @@ public class MotorIOTalonFX implements MotorIO {
         this.followers = new TalonFX[cfg.followers.length];
         for (int i = 0; i < followers.length; i++) {
             var f = cfg.followers[i];
-            followers[i] = new TalonFX(f.id, RobotConstants.canivoreBus);
+            followers[i] = new TalonFX(f.id, f.bus);
             followers[i].setControl(new Follower(cfg.mainId, f.opposeMain));
         }
 
@@ -137,7 +137,7 @@ public class MotorIOTalonFX implements MotorIO {
     }
 
     private void configureCANcoder(SubsystemConfig.RemoteCANcoder rc) {
-        CANcoder coder = new CANcoder(rc.id, RobotConstants.canivoreBus);
+        CANcoder coder = new CANcoder(rc.id, rc.bus);
         // Build a CANcoderConfiguration from rc fields
         CANcoderConfiguration c = new CANcoderConfiguration();
         c.MagnetSensor.MagnetOffset = rc.magnetOffset;

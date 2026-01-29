@@ -1,7 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import com.ctre.phoenix6.signals.InvertedValue;
-import frc.robot.RobotConstants;
+import static frc.robot.RobotConstants.CANIVORE_BUS;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -9,7 +9,6 @@ public class HoodConfig {
     private HoodConfig() {}
 
     public static final String NAME = "Hood";
-    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
     // Local hardware constants
     private static final int HOOD_MOTOR_MAIN_ID = 99;
@@ -18,7 +17,7 @@ public class HoodConfig {
     public static final SubsystemConfig HOOD_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS_NAME)
+                    .mainBus(CANIVORE_BUS)
                     .mainId(HOOD_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .SensorToMechanismRatio(HOOD_GEAR_RATIO)

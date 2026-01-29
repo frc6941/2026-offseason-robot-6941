@@ -13,7 +13,7 @@ public final class RobotConstants {
     // CAN bus configuration
     public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";
 
-    public static final CANBus canivoreBus = new CANBus(CANIVORE_CAN_BUS_NAME);
+    public static final CANBus CANIVORE_BUS = new CANBus(CANIVORE_CAN_BUS_NAME);
 
     // Hardware device IDs
     public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID

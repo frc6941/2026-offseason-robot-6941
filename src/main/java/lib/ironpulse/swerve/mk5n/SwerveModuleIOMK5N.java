@@ -3,7 +3,6 @@ package lib.ironpulse.swerve.mk5n;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -21,7 +20,6 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
-import frc.robot.RobotConstants;
 import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveModuleIO;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
@@ -73,9 +71,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
             syncThread = new PhoenixSynchronizationThread(syncLock, config.odometryFrequency);
 
         // initialize and config motors
-        driveMotor = new TalonFX(moduleConfig.driveMotorId, RobotConstants.canivoreBus);
-        steerMotor = new TalonFX(moduleConfig.steerMotorId, RobotConstants.canivoreBus);
-        encoder = new CANcoder(moduleConfig.encoderId, RobotConstants.canivoreBus);
+        driveMotor = new TalonFX(moduleConfig.driveMotorId, config.canivoreCanBus);
+        steerMotor = new TalonFX(moduleConfig.steerMotorId, config.canivoreCanBus);
+        encoder = new CANcoder(moduleConfig.encoderId, config.canivoreCanBus);
         configureDriveMotor();
         configureSteerMotor();
 

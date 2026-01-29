@@ -44,7 +44,7 @@ public class ImuIOPigeon implements ImuIO {
         syncThread = SwerveModuleIOMK5N.getSyncThread();
 
         // Initialize Pigeon2
-        pigeon = new Pigeon2(config.pigeonId, RobotConstants.canivoreBus);
+        pigeon = new Pigeon2(config.pigeonId, config.canivoreCanBus);
 
         // Get status signals
         yaw = pigeon.getYaw();
