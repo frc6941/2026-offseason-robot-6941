@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretPosParamsNT;
-
 import java.util.function.Supplier;
 import lib.ironpulse.io.CANCoderIO;
 import lib.ironpulse.io.CANCoderIOInputsAutoLogged;
@@ -27,7 +26,6 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityParamSources;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -69,9 +67,12 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                     new TrapezoidProfile.Constraints(
                             TurretPosParamsNT.maxVelocityRPS.getValue() * 360.0,
                             TurretPosParamsNT.maxAccelerationRPS2.getValue() * 360.0));
-    
-    @Getter @Setter @AutoLogOutput(key= "Turret/currentMode") 
+
+    @Getter
+    @Setter
+    @AutoLogOutput(key = "Turret/currentMode")
     private TurretMode currentMode = TurretMode.SEEKING;
+
     private TurretMode lastControllerMode = null;
     private Supplier<Angle> targetAngleWorld = () -> Degrees.of(0.0);
     private Angle targetAngleRobotWrapped = Degrees.of(0.0);
@@ -89,7 +90,6 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         this.encoderG2 = encoderG2;
         updateUnwrappedTurretAngle();
         io.setCurrentPosition(unwrappedTurretAngle);
-
     }
 
     @Override
@@ -105,7 +105,8 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     protected void logState() {
         Logger.processInputs(getName() + "/Absolute/encoderG1", encoderG1Inputs);
         Logger.processInputs(getName() + "/Absolute/encoderG2", encoderG2Inputs);
-        Logger.recordOutput(getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
+        Logger.recordOutput(
+                getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleWorld", targetAngleWorld.get().in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleRobot", targetAngleRobot.in(Degrees));
         Logger.recordOutput(getName() + "/targetVelocity", getCurrSetpoint().in(DegreesPerSecond));
@@ -116,7 +117,6 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(DegreesPerSecond));
     }
 
-
     public Command setTurretPoseWorld(Supplier<Angle> targetAngleSupplier, TurretMode mode) {
         return Commands.runOnce(
                 () -> {
@@ -126,11 +126,9 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     }
 
     public Command runTurretTargetLoop() {
-        return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees))).andThen(
-                runVelocity(() -> 
-                    calculateTargetVelocity(targetAngleRobot)));
+        return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees)))
+                .andThen(runVelocity(() -> calculateTargetVelocity(targetAngleRobot)));
     }
-        
 
     private void updateController(TurretMode mode) {
         if (mode == lastControllerMode && !TurretPosParamsNT.isAnyChanged()) {
@@ -161,7 +159,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
         double desiredVelocity =
                 posVelCtl.calculate(getPosition().in(Degrees), targetAngle.in(Degrees));
-        //compansate for the chassis rotation
+        // compansate for the chassis rotation
         double chassisOmegaDegPerSec =
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
         desiredVelocity -=
@@ -222,8 +220,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         return Degrees.of(robotRelative.getDegrees());
     }
 
-
-    //absolute encoder angle, only used currently for starting pos
+    // absolute encoder angle, only used currently for starting pos
     private void updateUnwrappedTurretAngle() {
         encoderG1.readInputs(encoderG1Inputs);
         encoderG2.readInputs(encoderG2Inputs);

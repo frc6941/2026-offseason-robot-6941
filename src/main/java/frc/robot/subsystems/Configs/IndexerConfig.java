@@ -1,8 +1,9 @@
 package frc.robot.subsystems.Configs;
 
+import static frc.robot.RobotConstants.CANIVORE_BUS;
+
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import static frc.robot.RobotConstants.CANIVORE_BUS;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
