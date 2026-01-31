@@ -177,7 +177,7 @@ simgui.json
 *-window.json
 
 # Simulation data log directory
-logs/
+../../../../../C盘/下载/logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
@@ -189,4 +189,4 @@ compile_commands.json
 # Eclipse generated file for annotation processors
 .factorypath
 
-BuildConstants.java
+**/BuildConstants.java

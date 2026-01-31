@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.3.2"
+    id "edu.wpi.first.GradleRIO" version "2026.2.1"
     id "com.peterabeles.gversion" version "1.10"
     id "com.diffplug.spotless" version "6.25.0"
 }
@@ -10,7 +10,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-// repos
 repositories {
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/staging/' }
@@ -34,10 +33,7 @@ deploy {
                 // First part is artifact name, 2nd is artifact type
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
-//                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-//                }
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-                    // Enable VisualVM connection
                     jvmArgs.add("-Dcom.sun.management.jmxremote=true")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
@@ -51,28 +47,36 @@ deploy {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
                     deleteOldFiles = false // Change to true to delete files on roboRIO that no
-                    // longer exist in deploy directory of this project
+                                           // longer exist in deploy directory of this project
                 }
             }
         }
     }
 }
 
-
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
-// Set to true to use debug for JNI.
+// Set to true to use debug for all targets including JNI, which will drastically impact
+// performance.
 wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
 
-// source sets for external annotation processors
 sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
     external {
-        java.srcDir 'src/ext/java'
+        java {
+            srcDir 'src/ext/java'
+        }
+        resources.srcDir 'src/ext/resources'
     }
 }
+
 dependencies {
     externalAnnotationProcessor wpi.java.deps.wpilibAnnotations()
     externalImplementation wpi.java.deps.wpilib()
@@ -82,6 +86,11 @@ dependencies {
     externalAnnotationProcessor 'com.google.auto.service:auto-service:1.1.1'
 }
 
+tasks.register('replayWatch', JavaExec) {
+    mainClass = "org.littletonrobotics.junction.ReplayWatch"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
@@ -89,19 +98,6 @@ dependencies {
     annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-
-    // AdvantageKit vendordep
-    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
-    annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
-
-    implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
-    implementation 'org.jgrapht:jgrapht-core:1.5.1'
-
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.28'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -120,8 +116,21 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation sourceSets.external.output
-    annotationProcessor sourceSets.external.output
+    implementation group: 'gov.nist.math', name: 'jama', version: '1.0.3'
+    implementation 'org.jgrapht:jgrapht-core:1.5.1'
+
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.32'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
+    implementation group: 'com.neuronrobotics', name: 'mujoco-java', version: '3.1.1-pre.1'
+
+    implementation files(sourceSets.external.output.classesDirs)
+    annotationProcessor files(sourceSets.external.output.classesDirs)
 }
 
 test {
@@ -137,11 +146,10 @@ wpi.sim.addDriverstation()
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
 jar {
-    from {
-        configurations.runtimeClasspath
-                .filter { it.exists() }
-                .collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from('src') { into 'backup/src' }
+    from('vendordeps') { into 'backup/vendordeps' }
+    from('build.gradle') { into 'backup' }
     from sourceSets.main.allSource
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
@@ -154,10 +162,19 @@ wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+gversion {
+    srcDir = "src/main/java/"
+    classPackage = "frc.robot"
+    className = "BuildConstants"
+    dateFormat = "yyyy-MM-dd HH:mm:ss z"
+    timeZone = "Asia/Shanghai" // Use preferred time zone
+    indent = "  "
+}
 
-// Create version file
+// spotless
 project.compileJava.dependsOn('spotlessApply')
 tasks.named('spotlessApply') {
     dependsOn('createVersionFile')
@@ -172,14 +189,7 @@ spotless {
     }
 }
 
-gversion {
-    srcDir = "src/main/java/"
-    classPackage = "frc.robot"
-    className = "BuildConstants"
-    dateFormat = "yyyy-MM-dd HH:mm:ss z"
-    timeZone = "Asia/Shanghai" // Use preferred time zone
-    indent = "  "
-}
+
 
 // Create commit with working changes on event branches
 task(eventDeploy) {
@@ -213,8 +223,3 @@ task(eventDeploy) {
     }
 }
 createVersionFile.dependsOn(eventDeploy)
-
-task(replayWatch, type: JavaExec) {
-    mainClass = "org.littletonrobotics.junction.ReplayWatch"
-    classpath = sourceSets.main.runtimeClasspath
-}
