@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
-import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
@@ -48,16 +47,13 @@ public class RobotContainer {
   private final Swerve swerve;
   private final TurretSubsystem turret;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-  private final SpindexerSubsystem idx;
+  private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
   private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
   // private final ShootingSuperstructure shootingSuperstructure;
   private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
   private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
   public RobotContainer() {
-    VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
-    VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> vert;
-    VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> horiz;
 
     if (RobotBase.isReal()) {
       swerve =
@@ -153,17 +149,10 @@ public class RobotContainer {
               Degrees.of(360));
     }
 
-    idx =
-        new SpindexerSubsystem(
-            spindexer,
-            IdxConfig.SPINDEXER_GEAR_RATIO,
-            IdxConfig.SPIN_GEAR_RATIO,
-            IdxConfig.INDEXER_GEAR_RATIO);
     // shootingSuperstructure =
     //        new ShootingSuperstructure(turret, hood, shooter, idx, shootingParametersTable);
     configureBindings();
     // shootingSuperstructure.setDefaultCommand();
-    idx.setDefaultCommand();
     swerve.setDefaultCommand(
         SwerveCommands.driveWithJoystick(
             swerve,
@@ -173,11 +162,11 @@ public class RobotContainer {
             RobotStateRecorder::getPoseDriverRobotCurrent,
             MetersPerSecond.of(0.04),
             DegreesPerSecond.of(3.0)));
-    driver.leftTrigger().onTrue(idx.runOpenLoop(0.5));
-    driver.leftTrigger().onFalse(idx.runOpenLoop(0));
+    driver.leftTrigger().onTrue(spindexer.runDutyCycle(0.5));
+    driver.leftTrigger().onFalse(spindexer.runDutyCycle(0));
 
-    driver.rightTrigger().onTrue(idx.runOpenLoop(0.8));
-    driver.rightTrigger().onFalse(idx.runOpenLoop(0));
+    driver.rightTrigger().onTrue(spindexer.runDutyCycle(0.8));
+    driver.rightTrigger().onFalse(spindexer.runDutyCycle(0));
   }
 
   public void robotPeriodic() {
