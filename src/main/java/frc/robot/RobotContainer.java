@@ -14,23 +14,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.Configs.HoodConfig;
-import frc.robot.subsystems.Configs.HoodParamsNT;
-import frc.robot.subsystems.Configs.IntakerConfig;
-import frc.robot.subsystems.Configs.IntakerParamsNT;
-import frc.robot.subsystems.Configs.ShooterConfig;
-import frc.robot.subsystems.Configs.ShooterParamsNT;
-import frc.robot.subsystems.Configs.IdxConfig;
-import frc.robot.subsystems.Configs.IdxHorizParamsNT;
-import frc.robot.subsystems.Configs.IdxSpinParamsNT;
-import frc.robot.subsystems.Configs.IdxVertParamsNT;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
-import frc.robot.subsystems.Configs.TurretConfig;
-import frc.robot.subsystems.Configs.TurretVelParamsNT;
-import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
-import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
-import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
+import frc.robot.subsystems.Configs.*;
+import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
@@ -58,7 +43,7 @@ public class RobotContainer {
   private static final boolean HAS_IDX_IO = true;
 
   private final CommandXboxController driver = new CommandXboxController(0);
-    private final ShotCalculator shotCalculator = new ShotCalculator();
+  private final ShotCalculator shotCalculator = new ShotCalculator();
   private final Swerve swerve;
   private final TurretSubsystem turret;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -165,7 +150,7 @@ public class RobotContainer {
     }
 
     // shootingSuperstructure =
-        //        new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
+    //        new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
     configureBindings();
     // shootingSuperstructure.setDefaultCommand();
     swerve.setDefaultCommand(
@@ -189,7 +174,7 @@ public class RobotContainer {
     PhoenixUtils.refreshAll();
     // update NTparameters
     NTParameterRegistry.refresh();
-        shotCalculator.refreshTuningFromNetworkTables();
+    shotCalculator.refreshTuningFromNetworkTables();
     // update RobotStateRecorder
     var now = Seconds.of(Timer.getTimestamp());
     RobotStateRecorder.getInstance()

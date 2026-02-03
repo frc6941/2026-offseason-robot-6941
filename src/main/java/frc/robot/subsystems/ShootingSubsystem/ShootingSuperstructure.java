@@ -1,16 +1,11 @@
 package frc.robot.subsystems.ShootingSubsystem;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
@@ -25,7 +20,7 @@ public class ShootingSuperstructure {
   private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
-    private final ShotCalculator shotCalculator;
+  private final ShotCalculator shotCalculator;
 
   public ShootingSuperstructure(
       TurretSubsystem turret,
@@ -37,7 +32,7 @@ public class ShootingSuperstructure {
     this.hood = hood;
     this.shooter = shooter;
     this.idx = idx;
-        this.shotCalculator = shotCalculator;
+    this.shotCalculator = shotCalculator;
   }
 
   public void setDefaultCommand() {
@@ -47,8 +42,8 @@ public class ShootingSuperstructure {
         shooter.runVelocity(() -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
   }
 
-    public ShotFrame computeFrame(ShotCalculator.TargetMode targetMode, double shotDelaySec) {
-        return shotCalculator.computeShotFrame(targetMode, shotDelaySec);
+  public ShotFrame computeFrame(ShotCalculator.TargetMode targetMode, double shotDelaySec) {
+    return shotCalculator.computeShotFrame(targetMode, shotDelaySec);
   }
 
   public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {

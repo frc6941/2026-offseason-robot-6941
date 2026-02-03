@@ -10,9 +10,9 @@ public class IdxConfig {
   public static final String SPINDEXER = "Spindexer";
   public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
   public static final double SPINDEXER_GEAR_RATIO =
-      27.0 / 1.0 * 66.0 / 28.0; // RATIO FROM MOTOR TO SPIN
+      15.0 / 1.0 * 66.0 / 28.0; // RATIO FROM MOTOR TO SPIN
   public static final double INDEXER_GEAR_RATIO =
-      27.0 / 1.0 * 66.0 / 28.0 / 86.0 * 12.0 / 28.0 * 22.0 / 22.0
+      15.0 / 1.0 * 66.0 / 28.0 / 86.0 * 12.0 / 28.0 * 22.0 / 22.0
           * 15.0; // RATIO FROM MOTOR TO INDEXER, NOT USED IN CODE
   private static final int SPINDEXER_ID = 1;
   public static final SubsystemConfig SPINDEXER_CFG =
