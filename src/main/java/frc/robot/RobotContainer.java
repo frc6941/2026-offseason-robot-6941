@@ -55,6 +55,8 @@ import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import java.util.Map;
 
+import org.littletonrobotics.junction.Logger;
+
 
 public class RobotContainer {
     private static final boolean HAS_TURRET_IO = false;
@@ -285,21 +287,21 @@ public class RobotContainer {
                 shootingSuperstructure.runFrame(
                 () -> shotCalculator.computeShotFrame(TargetMode.GOAL),
                  TurretMode.TRACKING).alongWith(
-                      new VisualizeProjectileShot(
-                              RobotStateRecorder::getPoseWorldShotCurrent,
-                              () -> Rotation2d.fromRadians(
-                                      RobotStateRecorder.getCurrentFrame()
-                                              .turretAngleWorld()
-                                              .in(Radians)),
-                              () -> Rotation2d.fromRadians(
-                                      RobotStateRecorder.getCurrentFrame()
-                                              .hoodAngle()
-                                              .in(Radians)),
-                              () ->
-                                      RobotStateRecorder.getCurrentFrame()
-                                              .muzzleSpeed()
-                                              .in(MetersPerSecond),
-                              true)));
+                Commands.run(() -> {
+                    if (shootingSuperstructure.readyToShoot()) {
+                        var frame = RobotStateRecorder.getCurrentFrame();
+                        VisualizeProjectileShot.logPath(
+                                RobotStateRecorder.getPoseWorldShotCurrent(),
+                                Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
+                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
+                                frame.muzzleSpeed().in(MetersPerSecond),
+                                null,
+                                true);
+                    } else {
+                        // Logger.recordOutput(
+                        //         "Commands/VisualizeProjectileShot/pathWorld", new Pose3d[0]);
+                    }
+                })));
     }
 
     public Command getAutonomousCommand() {

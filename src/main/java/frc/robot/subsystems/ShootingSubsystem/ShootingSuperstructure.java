@@ -54,8 +54,7 @@ public class ShootingSuperstructure {
     public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
         return Commands.parallel(
                 Commands.runOnce(() -> cmdFrame = frame.get()),
-                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode)
-                        .andThen(turret.runTurretTargetLoop()),
+                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode),
                 hood.runPosition(
                         () -> {
                             ShotFrame target = frame.get();

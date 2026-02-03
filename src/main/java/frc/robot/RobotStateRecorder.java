@@ -83,6 +83,10 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
+                "RobotStateRecorder/translationShotToGoal", getTranslationShotToGoalCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/GoalWorld", getPoseWorldGoalCurrent());
+        Logger.recordOutput(
                 "RobotStateRecorder/poseShot", RobotStateRecorder.getPoseWorldShotCurrent());
         Logger.recordOutput("RobotStateRecorder/currentFrame", currentFrame);
     }

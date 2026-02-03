@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.Radians;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.RobotStateRecorder;
@@ -98,7 +100,7 @@ public class ShotCalculator {
             setTargetMode(mode);
         }
         TargetMode activeMode = targetMode;
-        Translation2d turretToTarget = getTurretToTargetTranslation(activeMode);
+        Translation2d turretToTarget = getShotToTargetTranslation(activeMode);
         double distanceMeters = Math.hypot(turretToTarget.getX(), turretToTarget.getY());
         Translation2d goalVelocity = getVelocityGoalRobotCurrent(activeMode);
         double vParallel = goalVelocity.getX();
@@ -107,9 +109,9 @@ public class ShotCalculator {
         ShotModel model = lookupModel(distanceMeters, vParallel);
         model = applyModelTuning(model);
 
-        double turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
+        Angle turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
         return new ShotFrame(
-            Degrees.of(turretYawRad),
+            turretYawRad,
              Degrees.of(model.launchAngleDeg),
               MetersPerSecond.of(model.exitSpeedMps));
     }
@@ -119,7 +121,7 @@ public class ShotCalculator {
      *
      * <p>For now, only GOAL is wired. Feed targets can be added once frames exist.
      */
-    public Translation2d getTurretToTargetTranslation(TargetMode mode) {
+    public Translation2d getShotToTargetTranslation(TargetMode mode) {
         if (mode == TargetMode.GOAL) {
             return RobotStateRecorder.getTranslationShotToGoalCurrent();
         }
@@ -193,8 +195,8 @@ public class ShotCalculator {
      *
      * <p>Skeleton currently aims directly at the target direction.
      */
-    public double solveTurretYaw(Translation2d turretToTarget, double vPerp, ShotModel model) {
-        return Math.atan2(turretToTarget.getY(), turretToTarget.getX());
+    public Angle solveTurretYaw(Translation2d turretToTarget, double vPerp, ShotModel model) {
+        return new Rotation2d(turretToTarget.getX(), turretToTarget.getY()).getMeasure();
     }
 
 

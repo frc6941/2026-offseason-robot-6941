@@ -134,7 +134,12 @@ public class VisualizeProjectileShot extends Command {
     }
 
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        Logger.recordOutput(kTag + "/muzzleSpeedMps", 0.0);
+        Logger.recordOutput(kTag + "/addedVelocityWorldMps", new Translation2d());
+        Logger.recordOutput(kTag + "/useGravity", false);
+        Logger.recordOutput(kTag + "/pathWorld", new Pose3d[0]);
+    }
 
     public static void logPath(
             Pose3d releasePoseWorld,
