@@ -41,10 +41,6 @@ public class ShootingSuperstructure {
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
     }
 
-    public ShotFrame computeFrame(ShotCalculator.TargetMode targetMode, double shotDelaySec) {
-        return shotCalculator.computeShotFrame(targetMode, shotDelaySec);
-    }
-
     public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
         return Commands.parallel(
                 turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode)

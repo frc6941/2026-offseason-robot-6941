@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,8 +54,9 @@ import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
+import java.util.Map;
 
-@SuppressWarnings({"unused"})
+
 public class RobotContainer {
     private static final boolean HAS_TURRET_IO = false;
     private static final boolean HAS_SHOOTER_IO = false;
@@ -200,6 +202,12 @@ public class RobotContainer {
         }
 
         idx = new SpindexerSubsystem(spin, vert, horiz);
+        shotCalculator.initialize(
+                Map.of(
+                        ShotCalculator.TargetMode.GOAL,
+                        Filesystem.getDeployDirectory()
+                                .toPath()
+                                .resolve("results_enumerate.json")));
         //shootingSuperstructure =
         //        new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
         configureBindings();
@@ -221,7 +229,6 @@ public class RobotContainer {
         PhoenixUtils.refreshAll();
         // update NTparameters
         NTParameterRegistry.refresh();
-        shotCalculator.refreshTuningFromNetworkTables();
         // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
         RobotStateRecorder.getInstance()
