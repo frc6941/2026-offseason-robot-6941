@@ -13,7 +13,7 @@ public class ShooterConfig {
     public static final String NAME = "Shooter";
     public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
 
-    private static final int SHOOTER_MOTOR_MAIN_ID = 50;
+    private static final int SHOOTER_MOTOR_MAIN_ID = 1;
     private static final int SHOOTER_MOTOR_FOLLOWER_ID = 51;
     private static final int SHOOTER_GEAR_RATIO = 1;
 
@@ -43,12 +43,12 @@ public class ShooterConfig {
     @NTParameter(tableName = "Params/" + NAME)
     public static final class ShooterParams {
         // velocity gains
-        public static final double kP = 0.1;
+        public static final double kP = 1;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kV = 0.11625;
-        public static final double kA = 0.0031037;
-        public static final double kS = 0.12346;
+        public static final double kV = 0.11517;
+        public static final double kA = 0.014747;
+        public static final double kS = 0.08;
 
         public static final double velocityAtGoalToleranceRPS = 30;
 
