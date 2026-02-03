@@ -1,14 +1,13 @@
 package frc.robot.subsystems.ShootingSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
@@ -31,11 +30,18 @@ import java.util.TreeMap;
  *   <li>Interpolate the model table by distance and v_parallel.
  *   <li>Apply tuning (scale/offset/bias).
  *   <li>Solve turret yaw to cancel lateral velocity (v_perp).
- *   <li>Map model outputs to hardware with linear regression (RPM + hood angle).
+ *   <li>Return a model-space {@link ShotFrame} (muzzle speed + launch angle).
  * </ol>
  *
- * <p>This skeleton always returns a {@link ShotFrame}; physical bounds and validity checks should
- * be applied elsewhere in the shooter subsystem.
+ * <p>{@link ShotFrame} is kept in model units:
+ * <ul>
+ *   <li>turretAngleWorld: world yaw to target
+ *   <li>hoodAngle: launch angle from the model (deg)
+ *   <li>muzzleSpeed: exit speed from the model (m/s)
+ * </ul>
+ *
+ * <p>Calibration from model units to actuator units (RPM + BBA angle) is applied in the shooter
+ * subsystem using {@code ShotCalculatorParams}.
  */
 public class ShotCalculator {
     /** Targets supported by the shot calculator. */
@@ -102,7 +108,10 @@ public class ShotCalculator {
         model = applyModelTuning(model);
 
         double turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
-        return mapToHardwareLinear(model, turretYawRad);
+        return new ShotFrame(
+            Degrees.of(turretYawRad),
+             Degrees.of(model.launchAngleDeg),
+              MetersPerSecond.of(model.exitSpeedMps));
     }
 
     /**
@@ -112,9 +121,9 @@ public class ShotCalculator {
      */
     public Translation2d getTurretToTargetTranslation(TargetMode mode) {
         if (mode == TargetMode.GOAL) {
-            return RobotStateRecorder.getTranslationTurretToGoalCurrent();
+            return RobotStateRecorder.getTranslationShotToGoalCurrent();
         }
-        return RobotStateRecorder.getTranslationTurretToGoalCurrent();
+        return RobotStateRecorder.getTranslationShotToGoalCurrent();
     }
 
     /**
@@ -188,25 +197,6 @@ public class ShotCalculator {
         return Math.atan2(turretToTarget.getY(), turretToTarget.getX());
     }
 
-    /**
-     * Maps model outputs to hardware using linear regression.
-     *
-     * <p>rpm = a*exitSpeed + c
-     * <p>hood = b*launchAngle + c
-     */
-    public ShotFrame mapToHardwareLinear(ShotModel model, double turretYawRad) {
-        double rpm =
-                ShotCalculatorParamsNT.rpmA.getValue() * model.exitSpeedMps
-                        + ShotCalculatorParamsNT.rpmC.getValue();
-        double hoodDeg =
-                ShotCalculatorParamsNT.hoodB.getValue() * model.launchAngleDeg
-                        + ShotCalculatorParamsNT.hoodC.getValue();
-
-        Angle turretAngle = Radians.of(turretYawRad);
-        Angle hoodAngle = Degrees.of(hoodDeg);
-        AngularVelocity shooterVel = RotationsPerSecond.of(rpm / 60.0);
-        return new ShotFrame(turretAngle, hoodAngle, shooterVel);
-    }
 
     private static NavigableMap<Double, NavigableMap<Double, ShotModel>> buildTable(
             List<ModelPoint> points) {

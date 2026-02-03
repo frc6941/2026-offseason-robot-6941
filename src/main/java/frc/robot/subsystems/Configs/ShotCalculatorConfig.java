@@ -21,7 +21,10 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmC
-        public static final double rpmA = 1;
+        // Theoretical conversion using a 4" wheel:
+        //   rpmA = 60 / (pi * wheelDiameterMeters), rpmC = 0
+        //   exitSpeed is in m/s
+        public static final double rpmA = 60.0 / (Math.PI * 0.1016);
         public static final double rpmC = 0.0;
 
         // hood = hoodB * launchAngle + hoodC

@@ -1,6 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static lib.ironpulse.math.MathTools.toPose2d;
 
@@ -14,16 +16,23 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import lib.ironpulse.math.rbd.TransformRecorder;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.littletonrobotics.junction.Logger;
 
 public class RobotStateRecorder extends TransformRecorder {
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
+    @Getter @Setter
+    private static ShotFrame currentFrame =
+            new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
 
-    public static final String kFrameTurret = "Turret";
+    public static final String kFrameShot = "Shot";
     public static final String kFrameGoal = "Goal";
-    public static final Translation3d kRobotToTurret =
+    public static final Translation3d kRobotToShot =
             new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
     private RobotStateRecorder() {
@@ -45,10 +54,10 @@ public class RobotStateRecorder extends TransformRecorder {
                 kFrameWorld,
                 kFrameRobot); // dynamic TWorldRobot at origin
         putTransform(
-                new Pose3d(kRobotToTurret, Rotation3d.kZero),
+                new Pose3d(kRobotToShot, Rotation3d.kZero),
                 Seconds.of(0.0),
                 kFrameRobot,
-                kFrameTurret); // dynamic TRobotTurret
+                kFrameShot); // dynamic TRobotShot
         putTransform(
                 new Pose3d(FieldConstants.Hub.innerCenterPoint, Rotation3d.kZero),
                 Seconds.of(0.0),
@@ -74,8 +83,11 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/poseTurret", RobotStateRecorder.getPoseWorldTurretCurrent());
+                "RobotStateRecorder/poseShot", RobotStateRecorder.getPoseWorldShotCurrent());
+        Logger.recordOutput("RobotStateRecorder/currentFrame", currentFrame);
     }
+
+
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
         velocityRobotBuffer.addSample(time.in(Seconds), toPose2d(speed));
@@ -110,12 +122,12 @@ public class RobotStateRecorder extends TransformRecorder {
                 .orElse(new Pose3d());
     }
 
-    public static Pose3d getPoseWorldTurretCurrent() {
+    public static Pose3d getPoseWorldShotCurrent() {
         return RobotStateRecorder.getInstance()
                 .getTransform(
                         Seconds.of(Timer.getTimestamp()),
                         TransformRecorder.kFrameWorld,
-                        RobotStateRecorder.kFrameTurret)
+                        RobotStateRecorder.kFrameShot)
                 .orElse(new Pose3d());
     }
 
@@ -155,21 +167,22 @@ public class RobotStateRecorder extends TransformRecorder {
                 goalBlue.getRotation());
     }
 
-    public static Translation2d getTranslationTurretToGoalCurrent() {
-        Pose3d turretPoseWorld = getPoseWorldTurretCurrent();
+    public static Translation2d getTranslationShotToGoalCurrent() {
+        Pose3d shotPoseWorld = getPoseWorldShotCurrent();
         Pose3d goalPoseWorld = getPoseWorldGoalCurrent();
         Translation3d delta =
-                goalPoseWorld.getTranslation().minus(turretPoseWorld.getTranslation());
+                goalPoseWorld.getTranslation().minus(shotPoseWorld.getTranslation());
         return new Translation2d(delta.getX(), delta.getY());
     }
 
     public static Translation2d getVelocityGoalRobotCurrent() {
-        Translation2d turretToGoal = getTranslationTurretToGoalCurrent();
-        double dist = Math.hypot(turretToGoal.getX(), turretToGoal.getY());
+        Translation2d shotToGoal = getTranslationShotToGoalCurrent();
+        double dist = Math.hypot(shotToGoal.getX(), shotToGoal.getY());
         if (dist < 1e-6) {
             return new Translation2d();
         }
-        Translation2d lineDir = new Translation2d(turretToGoal.getX() / dist, turretToGoal.getY() / dist);
+        Translation2d lineDir =
+                new Translation2d(shotToGoal.getX() / dist, shotToGoal.getY() / dist);
         Translation2d velWorld = getVelocityWorldRobotCurrent().getTranslation();
         double vParallel = velWorld.getX() * lineDir.getX() + velWorld.getY() * lineDir.getY();
         double vPerp = velWorld.getX() * (-lineDir.getY()) + velWorld.getY() * lineDir.getX();
