@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -15,27 +14,25 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.Configs.HoodConfig;
-import frc.robot.subsystems.Configs.HoodParamsNT;
-import frc.robot.subsystems.Configs.IntakerConfig;
-import frc.robot.subsystems.Configs.IntakerParamsNT;
 import frc.robot.subsystems.Configs.ShooterConfig;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.SwerveMK5Config;
+import frc.robot.subsystems.Configs.TurretConfig;
+import frc.robot.subsystems.Configs.TurretVelParamsNT;
+import frc.robot.commands.TestingVelocityCommand;
+import frc.robot.subsystems.Configs.HoodConfig;
+import frc.robot.subsystems.Configs.HoodParamsNT;
 import frc.robot.subsystems.Configs.IdxConfig;
 import frc.robot.subsystems.Configs.IdxHorizParamsNT;
 import frc.robot.subsystems.Configs.IdxSpinParamsNT;
 import frc.robot.subsystems.Configs.IdxVertParamsNT;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
-import frc.robot.subsystems.Configs.TurretConfig;
-import frc.robot.subsystems.Configs.TurretVelParamsNT;
-import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
+import frc.robot.subsystems.Configs.UpperRollerConfig;
+import frc.robot.subsystems.Configs.UpperRollerParamsNT;
+import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
+import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
-import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
-import lib.ironpulse.command.SysIdCommand;
-import lib.ironpulse.command.VisualizeProjectileShot;
 import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
 import lib.ironpulse.io.MotorIO;
@@ -54,7 +51,6 @@ import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 
-@SuppressWarnings({"unused"})
 public class RobotContainer {
     private static final boolean HAS_TURRET_IO = false;
     private static final boolean HAS_SHOOTER_IO = false;
@@ -64,13 +60,15 @@ public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
     private final Swerve swerve;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> upperRoller;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final SpindexerSubsystem idx;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-    //private final ShootingSuperstructure shootingSuperstructure;
+    private final ShootingSuperstructure shootingSuperstructure;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
+    private final SerialSubsystem serialSubsystem;
 
     public RobotContainer() {
         VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spin;
@@ -78,6 +76,8 @@ public class RobotContainer {
         VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> horiz;
 
         if (RobotBase.isReal()) {
+             serialSubsystem = new SerialSubsystem();
+            serialSubsystem.enable();
             swerve =
                     new Swerve(
                             SwerveMK5Config.kRealConfig,
@@ -114,6 +114,12 @@ public class RobotContainer {
                                     ? new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG)
                                     : new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
                             ShooterParamsNT.asVelocityParamSources());
+            upperRoller =
+                    new VelocityMotorSubsystem<>(
+                            UpperRollerConfig.UPPER_ROLLER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(UpperRollerConfig.UPPER_ROLLER_CONFIG),
+                            UpperRollerParamsNT.asVelocityParamSources());
             spin =
                     new VelocityMotorSubsystem<>(
                             IdxConfig.SPIN_CFG,
@@ -148,7 +154,9 @@ public class RobotContainer {
                             HoodParamsNT.asPositionParamSources(),
                             Degrees.of(0),
                             Degrees.of(360));
+       
         } else {
+                serialSubsystem = null;
             swerve =
                     new Swerve(
                             SwerveMK5Config.kSimConfig,
@@ -171,6 +179,12 @@ public class RobotContainer {
                             new MotorInputsAutoLogged(),
                             new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
                             ShooterParamsNT.asVelocityParamSources());
+
+                upperRoller = new VelocityMotorSubsystem<>(
+                            UpperRollerConfig.UPPER_ROLLER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(UpperRollerConfig.UPPER_ROLLER_CONFIG),
+                            UpperRollerParamsNT.asVelocityParamSources());
             spin =
                     new VelocityMotorSubsystem<>(
                             IdxConfig.SPIN_CFG,
@@ -200,10 +214,10 @@ public class RobotContainer {
         }
 
         idx = new SpindexerSubsystem(spin, vert, horiz);
-        //shootingSuperstructure =
-        //        new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
+        shootingSuperstructure =
+               new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
         configureBindings();
-        //shootingSuperstructure.setDefaultCommand();
+        shootingSuperstructure.setDefaultCommand();
         idx.setDefaultCommand();
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
@@ -235,18 +249,21 @@ public class RobotContainer {
                 .putTransform(
                         new Pose3d(
                                 RobotStateRecorder.kRobotToTurret,
-                                new Rotation3d(0.0, 0.0, turret.getPosition().in(Radians))),
+                                new Rotation3d(0.0, 0.0, 0.0)),
                         now,
                         TransformRecorder.kFrameRobot,
                         RobotStateRecorder.kFrameTurret);
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.periodic();
+        if (RobotBase.isReal()) {
+                serialSubsystem.log();
+        }
+        serialSubsystem.log();
     }
 
     private void configureBindings() {
-
-
+        driver.a().onTrue(new TestingVelocityCommand(indexer, upperRoller, serialSubsystem));
     }
 
     public Command getAutonomousCommand() {

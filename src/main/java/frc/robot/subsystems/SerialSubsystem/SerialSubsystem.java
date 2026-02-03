@@ -1,96 +1,66 @@
 package frc.robot.subsystems.SerialSubsystem;
 
-import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class SerialSubsystem extends SubsystemBase {
+    private final I2C i2c;
+    private static final int ARDUINO_ADDR = 0x08;
 
-	private SerialPort arduino;
-	private final StringBuilder rxBuffer = new StringBuilder();
-	private boolean enabled = false;
+    @Getter
+    private double speed = 0.0;
+    private double previousSpeed = 0.0;  // Added to track previous speed
+    private boolean enabled = false;
+    private double lastRxTime = 0.0;
 
-	@Getter
-	private double speed = 0.0;
-	@Getter
-	private String lastException = "";
-	private double lastRxTime = 0.0;
+    public SerialSubsystem() {
+        // 使用 RoboRIO 上的 Onboard I2C 接口
+        i2c = new I2C(I2C.Port.kOnboard, ARDUINO_ADDR);
+    }
 
-	private static final double TIMEOUT_SEC = 0.5;
+    public boolean isSpeedChanged() {
+        return Math.abs(speed - previousSpeed) > 1e-6;  // Using small epsilon for floating point comparison
+    }
 
-	public SerialSubsystem() {
-		try {
-			arduino = new SerialPort(1000000, SerialPort.Port.kUSB);
-			arduino.setTimeout(0.0);
-			arduino.setReadBufferSize(256);
-		} catch (Exception e) {
-			arduino = null;
-		}
-	}
+    public void enable() {
+        enabled = true;
+    }
 
-	public void enable() {
-		enabled = true;
-		rxBuffer.setLength(0);
-		lastException = "";
-		lastRxTime = 0.0;
-	}
+    public void disable() {
+        enabled = false;
+    }
 
-	public void disable() {
-		enabled = false;
-		rxBuffer.setLength(0);
-	}
+    @Override
+    public void periodic() {
+        if (!enabled) return;
 
-	@Override
-	public void periodic() {
-		if (!enabled || arduino == null) return;
+        byte[] data = new byte[4];
+        if (!i2c.readOnly(data, 4)) {
+            float receivedSpeed = ByteBuffer.wrap(data)
+                                            .order(ByteOrder.LITTLE_ENDIAN)
+                                            .getFloat();
+            
+            if (!Float.isNaN(receivedSpeed) && !Float.isInfinite(receivedSpeed)) {
+                previousSpeed = speed;  // Store current speed as previous before updating
+                speed = receivedSpeed;
+                lastRxTime = Timer.getFPGATimestamp();
+            }
+        }
+    }
 
-		int available = arduino.getBytesReceived();
-		if (available <= 0) return;
+    public boolean isTimedOut() {
+        return (Timer.getFPGATimestamp() - lastRxTime) > 0.5;
+    }
 
-		byte[] data = arduino.read(available);
-		for (byte b : data) {
-			processByte((char) b);
-		}
-	}
-
-	private void processByte(char c) {
-		if (c == '<') {
-			rxBuffer.setLength(0);
-		} else if (c == '>') {
-			parseFrame(rxBuffer.toString().trim());
-			rxBuffer.setLength(0);
-		} else {
-			rxBuffer.append(c);
-		}
-	}
-
-	private void parseFrame(String frame) {
-		lastRxTime = Timer.getFPGATimestamp();
-
-		if (frame.startsWith("Speed(m/s):")) {
-			try {
-				speed = Double.parseDouble(
-						frame.substring("Speed(m/s):".length())
-				);
-				lastException = "";
-			} catch (Exception ignored) {}
-			return;
-		}
-
-		lastException = frame;
-	}
-
-	public boolean isTimedOut() {
-		if (lastRxTime == 0) return true;
-		return Timer.getFPGATimestamp() - lastRxTime > TIMEOUT_SEC;
-	}
-
-	public void log() {
-		Logger.recordOutput("Arduino/Speed", speed);
-		Logger.recordOutput("Arduino/Exception", lastException);
-		Logger.recordOutput("Arduino/TimedOut", isTimedOut());
-		Logger.recordOutput("Arduino/Enabled", enabled);
-	}
+    public void log() {
+        Logger.recordOutput("Arduino/Speed", speed);
+        Logger.recordOutput("Arduino/TimedOut", isTimedOut());
+        Logger.recordOutput("Arduino/Enabled", enabled);
+        Logger.recordOutput("Arduino/SpeedChanged", isSpeedChanged());  // Optional: Log this as well
+    }
 }
