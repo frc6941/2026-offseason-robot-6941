@@ -14,8 +14,6 @@ import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -28,7 +26,6 @@ public class ShootingSuperstructure {
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
   private final ShootingParametersTable parametersTable;
-  Map<IdxMode, AngularVelocity> idxSpeed = new HashMap<>();
 
   public ShootingSuperstructure(
       TurretSubsystem turret,
@@ -41,17 +38,11 @@ public class ShootingSuperstructure {
     this.shooter = shooter;
     this.idx = idx;
     this.parametersTable = parametersTable;
-    this.idxSpeed.put(IdxMode.OFF, RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue()));
-    this.idxSpeed.put(
-        IdxMode.FEED, RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue()));
-    this.idxSpeed.put(
-        IdxMode.REVERSE, RotationsPerSecond.of(SpindexerModeParamsNT.revRPS.getValue()));
   }
 
   public void setDefaultCommand() {
     turret.setDefaultCommand(turret.runTurretTargetLoop());
-    idx.setDefaultCommand(
-        idx.runVelocity(() -> RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue())));
+    idx.setDefaultCommand(idx.runVelocity(() -> getIdxSpeed(IdxMode.OFF)));
     shooter.setDefaultCommand(
         shooter.runVelocity(() -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
   }
@@ -86,11 +77,19 @@ public class ShootingSuperstructure {
             .andThen(turret.runTurretTargetLoop()),
         hood.runPosition(() -> frame.get().hoodAngle()),
         shooter.runVelocity(() -> frame.get().shooterVelocity()),
-        idx.runVelocity(() -> idxSpeed.get(readyToShoot() ? idxMode : IdxMode.OFF)));
+        idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode : IdxMode.OFF)));
   }
 
   public boolean readyToShoot() {
     return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
+  }
+
+  public AngularVelocity getIdxSpeed(IdxMode idxMode) {
+    return switch (idxMode) {
+      case OFF -> RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue());
+      case FEED -> RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue());
+      case REVERSE -> RotationsPerSecond.of(SpindexerModeParamsNT.revRPS.getValue());
+    };
   }
 
   public enum IdxMode {
