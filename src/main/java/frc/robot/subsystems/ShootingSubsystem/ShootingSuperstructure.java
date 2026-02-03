@@ -25,19 +25,19 @@ public class ShootingSuperstructure {
   private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
-  private final ShootingParametersTable parametersTable;
+    private final ShotCalculator shotCalculator;
 
   public ShootingSuperstructure(
       TurretSubsystem turret,
       PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
       VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
       VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx,
-      ShootingParametersTable parametersTable) {
+      ShotCalculator shotCalculator) {
     this.turret = turret;
     this.hood = hood;
     this.shooter = shooter;
     this.idx = idx;
-    this.parametersTable = parametersTable;
+        this.shotCalculator = shotCalculator;
   }
 
   public void setDefaultCommand() {
@@ -47,18 +47,8 @@ public class ShootingSuperstructure {
         shooter.runVelocity(() -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
   }
 
-  public ShotFrame computeFrame(Supplier<Pose3d> targetPoseWorld) {
-    Pose3d turretPoseWorld = RobotStateRecorder.getPoseWorldTurretCurrent();
-    Translation3d delta =
-        targetPoseWorld.get().getTranslation().minus(turretPoseWorld.getTranslation());
-    double distanceMeters = Math.hypot(delta.getX(), delta.getY());
-
-    ShootingParameters params = parametersTable.getParameters(distanceMeters);
-    Angle turretAngleWorld = Radians.of(Math.atan2(delta.getY(), delta.getX()));
-    Angle hoodAngle = Degrees.of(params.getBackboardAngleDegree());
-    AngularVelocity shooterVelocity = RotationsPerSecond.of(params.getVelocityRpm() / 60.0);
-
-    return new ShotFrame(turretAngleWorld, hoodAngle, shooterVelocity);
+    public ShotFrame computeFrame(ShotCalculator.TargetMode targetMode, double shotDelaySec) {
+        return shotCalculator.computeShotFrame(targetMode, shotDelaySec);
   }
 
   public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
