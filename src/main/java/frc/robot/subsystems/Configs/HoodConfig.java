@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Configs;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.signals.InvertedValue;
 import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
@@ -27,6 +29,8 @@ public class HoodConfig {
                                     .zeroingFilterSize(5)
                                     .zeroingVoltage(1)
                                     .build())
+                //TODO: set this so the target angle represents the Real angle of the hood
+                    .zeroOffset(Degrees.of(0.0))
                     .simConfig(
                             SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())
                     .build();
