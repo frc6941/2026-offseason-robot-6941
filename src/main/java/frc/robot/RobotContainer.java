@@ -172,11 +172,6 @@ public class RobotContainer {
             RobotStateRecorder::getPoseDriverRobotCurrent,
             MetersPerSecond.of(0.04),
             DegreesPerSecond.of(3.0)));
-    driver.leftTrigger().onTrue(spindexer.runDutyCycle(0.5));
-    driver.leftTrigger().onFalse(spindexer.runDutyCycle(0));
-
-    driver.rightTrigger().onTrue(spindexer.runDutyCycle(0.8));
-    driver.rightTrigger().onFalse(spindexer.runDutyCycle(0));
   }
 
   public void robotPeriodic() {
@@ -256,10 +251,16 @@ public class RobotContainer {
                             //         "Commands/VisualizeProjectileShot/pathWorld", new Pose3d[0]);
                           }
                         })));
-    driver.leftTrigger().onTrue(spindexer.runDutyCycle(0.5));
+    driver.leftTrigger().onTrue(spindexer.runVelocity(RotationsPerSecond.of(2.0)));
     driver.leftTrigger().onFalse(spindexer.runDutyCycle(0));
-    driver.rightTrigger().onTrue(spindexer.runDutyCycle(0.8));
+    driver.rightTrigger().onTrue(spindexer.runDutyCycle(1.0));
     driver.rightTrigger().onFalse(spindexer.runDutyCycle(0));
+//    driver
+//        .leftBumper()
+//        .onTrue(new SysIdCommand(spindexer).dynamic(SysIdRoutine.Direction.kForward));
+//    driver
+//        .rightBumper()
+//        .onTrue(new SysIdCommand(spindexer).quasistatic(SysIdRoutine.Direction.kForward));
   }
 
   public Command getAutonomousCommand() {
