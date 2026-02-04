@@ -17,15 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Configs.*;
-import frc.robot.subsystems.Configs.HoodConfig;
-import frc.robot.subsystems.Configs.HoodParamsNT;
-import frc.robot.subsystems.Configs.IdxConfig;
-import frc.robot.subsystems.Configs.ShooterConfig;
-import frc.robot.subsystems.Configs.ShooterParamsNT;
-import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
-import frc.robot.subsystems.Configs.TurretConfig;
-import frc.robot.subsystems.Configs.TurretVelParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
@@ -213,7 +204,8 @@ public class RobotContainer {
             RobotStateRecorder.kFrameShot);
 
     RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
-    var turretWorldRotation = RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
+    Rotation2d turretWorldRotation =
+        RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
     // calculate the hood angle and muzzle speed(model space)
     double bbaDeg = hood.getCurrPos().in(Degrees);
     double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
@@ -241,7 +233,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
     driver
         .a()
         .whileTrue(
@@ -265,6 +256,10 @@ public class RobotContainer {
                             //         "Commands/VisualizeProjectileShot/pathWorld", new Pose3d[0]);
                           }
                         })));
+    driver.leftTrigger().onTrue(spindexer.runDutyCycle(0.5));
+    driver.leftTrigger().onFalse(spindexer.runDutyCycle(0));
+    driver.rightTrigger().onTrue(spindexer.runDutyCycle(0.8));
+    driver.rightTrigger().onFalse(spindexer.runDutyCycle(0));
   }
 
   public Command getAutonomousCommand() {

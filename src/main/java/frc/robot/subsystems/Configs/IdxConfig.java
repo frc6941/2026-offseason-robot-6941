@@ -9,7 +9,7 @@ import lib.ntext.NTParameter;
 public class IdxConfig {
   public static final String SPINDEXER = "Spindexer";
   public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
-  public static final double STATOR_CURRENT_LIMIT_AMPS = 40;
+  public static final double STATOR_CURRENT_LIMIT_AMPS = 30;
   public static final double SPINDEXER_GEAR_RATIO =
       15.0 / 1.0 * 66.0 / 28.0; // RATIO FROM MOTOR TO SPIN
   public static final double INDEXER_GEAR_RATIO =
