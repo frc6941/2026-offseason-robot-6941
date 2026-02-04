@@ -3,12 +3,14 @@ package frc.robot.subsystems.ShootingSubsystem;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
-import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem.IdxMode;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
+import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 
@@ -24,8 +26,8 @@ public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final SpindexerSubsystem idx;
-    public void updateCurrentFrame() {
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
+    public ShotFrame getCurrentFrame() {
         var turretWorldRotation =
                 RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
         double bbaDeg = hood.getCurrPos().in(Degrees);
@@ -41,32 +43,29 @@ public class ShootingSuperstructure {
                 Math.abs(rpmA) < 1e-9
                         ? 0.0
                         : (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
-        RobotStateRecorder.setCurrentFrame(
-                new ShotFrame(
+        return new ShotFrame(
                         Degrees.of(turretWorldRotation.getDegrees()),
                         Degrees.of(modelHoodDeg),
-                        MetersPerSecond.of(muzzleSpeedMps)));
+                        MetersPerSecond.of(muzzleSpeedMps));
     }
 
-    public ShootingSuperstructure(
-            TurretSubsystem turret,
-            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
-            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
-            SpindexerSubsystem idx
-        ) {
-        this.turret = turret;
-        this.hood = hood;
-        this.shooter = shooter;
-        this.idx = idx;
-    }
+  public ShootingSuperstructure(
+      TurretSubsystem turret,
+      PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
+      VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
+      VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx) {
+    this.turret = turret;
+    this.hood = hood;
+    this.shooter = shooter;
+    this.idx = idx;
+  }
 
-    public void setDefaultCommand() {
-        turret.setDefaultCommand(turret.runTurretTargetLoop());
-        idx.setDefaultCommand();
-        shooter.setDefaultCommand(
-                shooter.runVelocity(
-                        () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
-    }
+  public void setDefaultCommand() {
+    turret.setDefaultCommand(turret.runTurretTargetLoop());
+    idx.setDefaultCommand(idx.runVelocity(() -> getIdxSpeed(IdxMode.OFF)));
+    shooter.setDefaultCommand(
+        shooter.runVelocity(() -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
+  }
 
     public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
         return Commands.parallel(
@@ -92,15 +91,28 @@ public class ShootingSuperstructure {
                         }));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode, IdxMode idxMode) {
-        return Commands.parallel(
-                runFrame(frame, mode),
-                idx.runMode(() -> readyToShoot() ? idxMode : IdxMode.OFF));
-    }
+  public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode, IdxMode idxMode) {
+    return Commands.parallel(
+        runFrame(frame, mode),
+        idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode : IdxMode.OFF)));
+  }
 
-    @AutoLogOutput(key= "ShootingSuperstructure/readyToShoot")
-    public boolean readyToShoot() {
-        return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
-    }
+  @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
+  public boolean readyToShoot() {
+    return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
+  }
 
+  public AngularVelocity getIdxSpeed(IdxMode idxMode) {
+    return switch (idxMode) {
+      case OFF -> RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue());
+      case FEED -> RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue());
+      case REVERSE -> RotationsPerSecond.of(SpindexerModeParamsNT.revRPS.getValue());
+    };
+  }
+
+  public enum IdxMode {
+    OFF,
+    FEED,
+    REVERSE
+  }
 }
