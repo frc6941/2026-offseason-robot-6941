@@ -1,0 +1,22 @@
+---
+description: Prefer WPILib geometry/vector helpers over manual math
+alwaysApply: true
+---
+
+# WPILib Vector Math Preference
+
+- Prefer WPILib geometry/vector APIs (`Translation2d`, `Rotation2d`, `Pose2d`) for transforms,
+  dot products, and coordinate-frame changes instead of hand-written trig and component math.
+- Use helpers like `getAngle()`, `rotateBy()`, `plus()`, `minus()`, and `getNorm()` to keep
+  intent clear and reduce sign/axis mistakes.
+
+## Examples
+
+```java
+// ✅ GOOD: rotate world velocity into goal-aligned frame
+Translation2d velGoal = velWorld.rotateBy(shotToGoal.getAngle().unaryMinus());
+
+// ❌ BAD: manual dot/cross math for components
+double vParallel = vx * dirX + vy * dirY;
+double vPerp = vx * -dirY + vy * dirX;
+```

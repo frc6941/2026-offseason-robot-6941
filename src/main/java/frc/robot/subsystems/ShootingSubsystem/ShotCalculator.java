@@ -2,11 +2,11 @@ package frc.robot.subsystems.ShootingSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
@@ -193,10 +193,20 @@ public class ShotCalculator {
     /**
      * Solves turret yaw to cancel lateral velocity.
      *
-     * <p>Skeleton currently aims directly at the target direction.
+     * <p>Compensates lateral velocity by yawing into the motion so the net lateral
+     * component is near zero in the goal-aligned frame.
      */
     public Angle solveTurretYaw(Translation2d turretToTarget, double vPerp, ShotModel model) {
-        return new Rotation2d(turretToTarget.getX(), turretToTarget.getY()).getMeasure();
+        Rotation2d baseYaw = turretToTarget.getAngle();
+        double launchRad = Math.toRadians(model.launchAngleDeg);
+        double vHoriz = model.exitSpeedMps * Math.cos(launchRad);
+        if (Math.abs(vHoriz) < 1e-6) {
+            return baseYaw.getMeasure();
+        }
+        double scaledVPerp = vPerp * ShotCalculatorParamsNT.lateralVelocityCompScale.getValue();
+        double ratio = MathUtil.clamp(-scaledVPerp / vHoriz, -1.0, 1.0);
+        Rotation2d yawComp = Rotation2d.fromRadians(Math.asin(ratio));
+        return baseYaw.plus(yawComp).getMeasure();
     }
 
 

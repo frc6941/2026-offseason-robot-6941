@@ -229,11 +229,19 @@ public class RobotContainer {
                                 Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
                                 Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
                                 frame.muzzleSpeed().in(MetersPerSecond),
-                                null,
-                                true);
+                                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
+                                true,
+                             "Valid");
                           } else {
-                            // Logger.recordOutput(
-                            //         "Commands/VisualizeProjectileShot/pathWorld", new Pose3d[0]);
+                            var frame = RobotStateRecorder.getCurrentFrame();
+                            VisualizeProjectileShot.logPath(
+                                RobotStateRecorder.getPoseWorldShotCurrent(),
+                                Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
+                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
+                                frame.muzzleSpeed().in(MetersPerSecond),
+                                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
+                                true,
+                             "Invalid");
                           }
                         })));
     driver.leftTrigger().onTrue(spindexer.runVelocity(RotationsPerSecond.of(2.0)));

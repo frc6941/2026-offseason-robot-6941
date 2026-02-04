@@ -125,7 +125,8 @@ public class VisualizeProjectileShot extends Command {
                 pitchSnapshot,
                 muzzleSpeedMps,
                 vAdded,
-                useGravity);
+                useGravity,
+                "");
     }
 
     @Override
@@ -147,7 +148,9 @@ public class VisualizeProjectileShot extends Command {
             Rotation2d pitch,
             double muzzleSpeedMps,
             Translation2d addedVelocityWorldMps,
-            boolean useGravity) {
+            boolean useGravity,
+            String logTag) {
+        Logger.recordOutput(kTag + "/pathWorld" + logTag, new Pose3d[0]);
         Pose3d releasePoseWorldSnapshot =
                 Objects.requireNonNull(releasePoseWorld, "releasePoseWorld");
         Rotation2d yawWorldSnapshot = Objects.requireNonNull(yawWorld, "yawWorld");
@@ -167,7 +170,7 @@ public class VisualizeProjectileShot extends Command {
         Logger.recordOutput(kTag + "/muzzleSpeedMps", muzzleSpeedMps);
         Logger.recordOutput(kTag + "/addedVelocityWorldMps", addedVelocityWorldMpsSnapshot);
         Logger.recordOutput(kTag + "/useGravity", useGravity);
-        Logger.recordOutput(kTag + "/pathWorld", pathWorld);
+        Logger.recordOutput(kTag + "/pathWorld" + logTag, pathWorld);
     }
 
     /**

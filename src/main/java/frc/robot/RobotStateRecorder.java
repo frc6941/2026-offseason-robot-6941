@@ -197,20 +197,14 @@ public class RobotStateRecorder extends TransformRecorder {
         Pose3d goalPoseWorld = getPoseWorldGoalCurrent();
         Translation3d delta =
                 goalPoseWorld.getTranslation().minus(shotPoseWorld.getTranslation());
-        return new Translation2d(delta.getX(), delta.getY());
+        return delta.toTranslation2d();
     }
 
     public static Translation2d getVelocityGoalRobotCurrent() {
         Translation2d shotToGoal = getTranslationShotToGoalCurrent();
-        double dist = Math.hypot(shotToGoal.getX(), shotToGoal.getY());
-        if (dist < 1e-6) {
-            return new Translation2d();
-        }
-        Translation2d lineDir =
-                new Translation2d(shotToGoal.getX() / dist, shotToGoal.getY() / dist);
         Translation2d velWorld = getVelocityWorldRobotCurrent().getTranslation();
-        double vParallel = velWorld.getX() * lineDir.getX() + velWorld.getY() * lineDir.getY();
-        double vPerp = velWorld.getX() * (-lineDir.getY()) + velWorld.getY() * lineDir.getX();
-        return new Translation2d(vParallel, vPerp);
+        Translation2d velGoal =
+                velWorld.rotateBy(shotToGoal.getAngle().unaryMinus()); // +X is toward goal
+        return velGoal;
     }
 }
