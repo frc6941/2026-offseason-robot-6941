@@ -18,18 +18,35 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
-import lombok.Getter;
+import frc.robot.RobotStateRecorder;
 
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final SpindexerSubsystem idx;
-    @Getter @AutoLogOutput(key= "ShootingSuperstructure/cmdFrame")
-    private ShotFrame cmdFrame = new ShotFrame(
-            Degrees.of(0.0), 
-            Degrees.of(0.0), 
-            MetersPerSecond.of(0.0));
+    public void updateCurrentFrame() {
+        var turretWorldRotation =
+                RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
+        double bbaDeg = hood.getCurrPos().in(Degrees);
+        double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
+        double modelHoodDeg =
+                Math.abs(hoodB) < 1e-9
+                        ? bbaDeg
+                        : (bbaDeg - ShotCalculatorParamsNT.hoodC.getValue()) / hoodB;
+        double rps = shooter.getVelocity().in(RotationsPerSecond);
+        double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
+        double rpm = rps * 60.0;
+        double muzzleSpeedMps =
+                Math.abs(rpmA) < 1e-9
+                        ? 0.0
+                        : (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
+        RobotStateRecorder.setCurrentFrame(
+                new ShotFrame(
+                        Degrees.of(turretWorldRotation.getDegrees()),
+                        Degrees.of(modelHoodDeg),
+                        MetersPerSecond.of(muzzleSpeedMps)));
+    }
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
@@ -53,7 +70,7 @@ public class ShootingSuperstructure {
 
     public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
         return Commands.parallel(
-                Commands.runOnce(() -> cmdFrame = frame.get()),
+                Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
                 turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode),
                 hood.runPosition(
                         () -> {

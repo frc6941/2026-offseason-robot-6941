@@ -101,7 +101,7 @@ public class ShotCalculator {
         }
         TargetMode activeMode = targetMode;
         Translation2d turretToTarget = getShotToTargetTranslation(activeMode);
-        double distanceMeters = Math.hypot(turretToTarget.getX(), turretToTarget.getY());
+        double distanceMeters = turretToTarget.getNorm();
         Translation2d goalVelocity = getVelocityGoalRobotCurrent(activeMode);
         double vParallel = goalVelocity.getX();
         double vPerp = goalVelocity.getY();

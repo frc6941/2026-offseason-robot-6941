@@ -20,7 +20,6 @@ import frc.robot.subsystems.Configs.HoodConfig;
 import frc.robot.subsystems.Configs.HoodParamsNT;
 import frc.robot.subsystems.Configs.ShooterConfig;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
-import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.IdxConfig;
 import frc.robot.subsystems.Configs.IdxHorizParamsNT;
 import frc.robot.subsystems.Configs.IdxSpinParamsNT;
@@ -30,7 +29,6 @@ import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretVelParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
-import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
@@ -55,7 +53,6 @@ import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
 
 
 public class RobotContainer {
@@ -251,33 +248,7 @@ public class RobotContainer {
                         RobotStateRecorder.kFrameShot);
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
-        var turretWorldRotation =
-                RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
-        // calculate the hood angle and muzzle speed(model space)
-        double bbaDeg = hood.getCurrPos().in(Degrees);
-        double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
-        double modelHoodDeg =
-                Math.abs(hoodB) < 1e-9
-                        ? bbaDeg
-                        : (bbaDeg - ShotCalculatorParamsNT.hoodC.getValue()) / hoodB;
-        double muzzleSpeedMps;
-        double rps = shooter.getVelocity().in(RotationsPerSecond);
-        if (RobotBase.isSimulation()) {
-            double circumferenceMeters = Math.PI * Inches.of(4.0).in(Meters);
-            muzzleSpeedMps = rps * circumferenceMeters;
-        } else {
-            double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-            double rpm = rps * 60.0;
-            muzzleSpeedMps =
-                    Math.abs(rpmA) < 1e-9
-                            ? 0.0
-                            : (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
-        }
-        RobotStateRecorder.setCurrentFrame(
-                new ShotFrame(
-                        Degrees.of(turretWorldRotation.getDegrees()),
-                        Degrees.of(modelHoodDeg),
-                        MetersPerSecond.of(muzzleSpeedMps)));
+        shootingSuperstructure.updateCurrentFrame();
         RobotStateRecorder.periodic();
     }
 

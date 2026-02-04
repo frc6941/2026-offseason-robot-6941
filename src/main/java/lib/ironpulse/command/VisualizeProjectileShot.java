@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 public class VisualizeProjectileShot extends Command {
     private static final String kTag = "Commands/VisualizeProjectileShot";
 
-    private static final double kDtSec = 0.02;
+    private static final double kDtSec = 0.06;
     private static final double kMaxTimeSec = 2.0;
     private static final double kStopHeightM = 0.0;
     private static final double kGravityMps2 = 9.81;

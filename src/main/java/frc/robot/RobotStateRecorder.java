@@ -29,6 +29,9 @@ public class RobotStateRecorder extends TransformRecorder {
     @Getter @Setter
     private static ShotFrame currentFrame =
             new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
+    @Getter @Setter
+    private static ShotFrame cmdFrame =
+            new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
 
     public static final String kFrameShot = "Shot";
     public static final String kFrameGoal = "Goal";
@@ -73,7 +76,6 @@ public class RobotStateRecorder extends TransformRecorder {
     }
 
     public static void periodic() {
-        Logger.recordOutput("RobotStateRecorder/fixed", new Pose3d());
         // logging
         Logger.recordOutput(
                 "RobotStateRecorder/poseWorldRobot", RobotStateRecorder.getPoseWorldRobotCurrent());
@@ -83,12 +85,31 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/translationShotToGoal", getTranslationShotToGoalCurrent());
+                "RobotStateRecorder/ShotFrame/distanceToGoal", getTranslationShotToGoalCurrent().getNorm());
         Logger.recordOutput(
-                "RobotStateRecorder/GoalWorld", getPoseWorldGoalCurrent());
+                "RobotStateRecorder/ShotFrame/velocityGoalRobot", getVelocityGoalRobotCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/poseShot", RobotStateRecorder.getPoseWorldShotCurrent());
-        Logger.recordOutput("RobotStateRecorder/currentFrame", currentFrame);
+                "RobotStateRecorder/ShotFrame/GoalWorld", getPoseWorldGoalCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/poseShot", RobotStateRecorder.getPoseWorldShotCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/currentFrame/turretAngleWorldDeg",
+                currentFrame.turretAngleWorld().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/currentFrame/hoodAngleDeg",
+                currentFrame.hoodAngle().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/currentFrame/muzzleSpeedMps",
+                currentFrame.muzzleSpeed().in(MetersPerSecond));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/cmdFrame/turretAngleWorldDeg",
+                cmdFrame.turretAngleWorld().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/cmdFrame/hoodAngleDeg",
+                cmdFrame.hoodAngle().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
+                cmdFrame.muzzleSpeed().in(MetersPerSecond));
     }
 
 
