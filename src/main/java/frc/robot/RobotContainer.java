@@ -7,16 +7,33 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Configs.*;
+import frc.robot.subsystems.Configs.HoodConfig;
+import frc.robot.subsystems.Configs.HoodParamsNT;
+import frc.robot.subsystems.Configs.IdxConfig;
+import frc.robot.subsystems.Configs.ShooterConfig;
+import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
+import frc.robot.subsystems.Configs.SwerveMK5Config;
+import frc.robot.subsystems.Configs.TurretConfig;
+import frc.robot.subsystems.Configs.TurretVelParamsNT;
+import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
+import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
+import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
+import java.util.Map;
+import lib.ironpulse.command.VisualizeProjectileShot;
 import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
 import lib.ironpulse.io.MotorIO;
@@ -35,7 +52,6 @@ import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 
-@SuppressWarnings({"unused"})
 public class RobotContainer {
   private static final boolean HAS_TURRET_IO = false;
   private static final boolean HAS_SHOOTER_IO = false;
@@ -49,7 +65,7 @@ public class RobotContainer {
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
   private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-  // private final ShootingSuperstructure shootingSuperstructure;
+  private final ShootingSuperstructure shootingSuperstructure;
   private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
   private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -149,10 +165,13 @@ public class RobotContainer {
               Degrees.of(360));
     }
 
-    // shootingSuperstructure =
-    //        new ShootingSuperstructure(turret, hood, shooter, idx, shotCalculator);
+    shotCalculator.initialize(
+        Map.of(
+            ShotCalculator.TargetMode.GOAL,
+            Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
+    shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
     configureBindings();
-    // shootingSuperstructure.setDefaultCommand();
+    shootingSuperstructure.setDefaultCommand();
     swerve.setDefaultCommand(
         SwerveCommands.driveWithJoystick(
             swerve,
@@ -174,7 +193,6 @@ public class RobotContainer {
     PhoenixUtils.refreshAll();
     // update NTparameters
     NTParameterRegistry.refresh();
-    shotCalculator.refreshTuningFromNetworkTables();
     // update RobotStateRecorder
     var now = Seconds.of(Timer.getTimestamp());
     RobotStateRecorder.getInstance()
@@ -187,17 +205,67 @@ public class RobotContainer {
     RobotStateRecorder.getInstance()
         .putTransform(
             new Pose3d(
-                RobotStateRecorder.kRobotToTurret,
-                new Rotation3d(0.0, 0.0, turret.getPosition().in(Radians))),
+                RobotStateRecorder.kRobotToShot,
+                new Rotation3d(
+                    0.0, hood.getCurrPos().in(Radians), turret.getPosition().in(Radians))),
             now,
             TransformRecorder.kFrameRobot,
-            RobotStateRecorder.kFrameTurret);
+            RobotStateRecorder.kFrameShot);
 
     RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
+    var turretWorldRotation = RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
+    // calculate the hood angle and muzzle speed(model space)
+    double bbaDeg = hood.getCurrPos().in(Degrees);
+    double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
+    double modelHoodDeg =
+        Math.abs(hoodB) < 1e-9
+            ? bbaDeg
+            : (bbaDeg - ShotCalculatorParamsNT.hoodC.getValue()) / hoodB;
+    double muzzleSpeedMps;
+    double rps = shooter.getVelocity().in(RotationsPerSecond);
+    if (RobotBase.isSimulation()) {
+      double circumferenceMeters = Math.PI * Inches.of(4.0).in(Meters);
+      muzzleSpeedMps = rps * circumferenceMeters;
+    } else {
+      double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
+      double rpm = rps * 60.0;
+      muzzleSpeedMps =
+          Math.abs(rpmA) < 1e-9 ? 0.0 : (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
+    }
+    RobotStateRecorder.setCurrentFrame(
+        new ShotFrame(
+            Degrees.of(turretWorldRotation.getDegrees()),
+            Degrees.of(modelHoodDeg),
+            MetersPerSecond.of(muzzleSpeedMps)));
     RobotStateRecorder.periodic();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+
+    driver
+        .a()
+        .whileTrue(
+            shootingSuperstructure
+                .runFrame(
+                    () -> shotCalculator.computeShotFrame(TargetMode.GOAL), TurretMode.TRACKING)
+                .alongWith(
+                    Commands.run(
+                        () -> {
+                          if (shootingSuperstructure.readyToShoot()) {
+                            var frame = RobotStateRecorder.getCurrentFrame();
+                            VisualizeProjectileShot.logPath(
+                                RobotStateRecorder.getPoseWorldShotCurrent(),
+                                Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
+                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
+                                frame.muzzleSpeed().in(MetersPerSecond),
+                                null,
+                                true);
+                          } else {
+                            // Logger.recordOutput(
+                            //         "Commands/VisualizeProjectileShot/pathWorld", new Pose3d[0]);
+                          }
+                        })));
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

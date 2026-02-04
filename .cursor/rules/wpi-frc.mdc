@@ -1,11 +1,11 @@
 ---
 description: 
-globs: 
 alwaysApply: true
 ---
+
 This is a code to control a robot that competes in 2025 first robotics competition 
 
-Always Address User as "Mai", use "hi"+ user at the start of each response
+ALWAYS Address User as "Mai", use "hi"+ user at the start of each response
 
 project uses :
 
@@ -56,4 +56,3 @@ always refer to the above api for usages and implimentations when creating and d
 <reading_code>
 when reading, understanding and explaining code, Always think with the code's connection with the compitition robot in mind. 
 </reading_code>
-    
