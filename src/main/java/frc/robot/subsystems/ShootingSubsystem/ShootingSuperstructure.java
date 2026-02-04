@@ -27,25 +27,25 @@ public class ShootingSuperstructure {
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
+
     public ShotFrame getCurrentFrame() {
-        var turretWorldRotation =
-                RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation();
-        double bbaDeg = hood.getCurrPos().in(Degrees);
+        Angle turretWorldRotation =
+                RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation().getMeasure();
+        Angle bba = hood.getCurrPos();
         double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
-        double modelHoodDeg =
-                Math.abs(hoodB) < 1e-9
-                        ? bbaDeg
-                        : (bbaDeg - ShotCalculatorParamsNT.hoodC.getValue()) / hoodB;
-        double rps = shooter.getVelocity().in(RotationsPerSecond);
         double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-        double rpm = rps * 60.0;
-        double muzzleSpeedMps =
-                Math.abs(rpmA) < 1e-9
-                        ? 0.0
-                        : (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
+        if (hoodB == 0.0||rpmA == 0.0) {
+            throw new IllegalStateException("ShotCalculatorParamsNT.hoodB and rpmA must be non-zero");
+        }
+        Angle modelHood =
+                bba.minus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue())).div(hoodB);
+        AngularVelocity shooterVel = shooter.getVelocity();
+
+        double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
+        double muzzleSpeedMps = (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
         return new ShotFrame(
-                        Degrees.of(turretWorldRotation.getDegrees()),
-                        Degrees.of(modelHoodDeg),
+                        turretWorldRotation,
+                        modelHood,
                         MetersPerSecond.of(muzzleSpeedMps));
     }
 
@@ -73,19 +73,17 @@ public class ShootingSuperstructure {
                 turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode),
                 hood.runPosition(
                         () -> {
-                            ShotFrame target = frame.get();
-                            double modelDeg = target.hoodAngle().in(Degrees);
-                            double bbaDeg =
-                                    ShotCalculatorParamsNT.hoodB.getValue() * modelDeg
-                                            + ShotCalculatorParamsNT.hoodC.getValue();
-                            return Degrees.of(bbaDeg);
+                            Angle modelAngle = frame.get().hoodAngle();
+                            Angle bba =
+                                    modelAngle.times(ShotCalculatorParamsNT.hoodB.getValue())
+                                            .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
+                            return bba;
                         }),
                 shooter.runVelocity(
                         () -> {
-                            ShotFrame target = frame.get();
-                            double muzzleSpeed = target.muzzleSpeed().in(MetersPerSecond);
+                            double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
                             double rpm =
-                                    ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed
+                                    rpmA * frame.get().muzzleSpeed().in(MetersPerSecond)
                                             + ShotCalculatorParamsNT.rpmC.getValue();
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
