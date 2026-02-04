@@ -14,8 +14,6 @@ public final class RobotConstants {
   // Hardware device IDs
   public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID
 
-  public static final boolean disableHAL = false;
-
   private RobotConstants() {
     // Prevent instantiation
   }
