@@ -37,6 +37,56 @@ public class FieldConstants {
   public static final double fieldLength = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
   public static final double fieldWidth = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
 
+  @RequiredArgsConstructor
+  public enum FieldType {
+    ANDYMARK("andymark"),
+    WELDED("welded");
+
+    @Getter private final String jsonFolder;
+  }
+
+  public enum AprilTagLayoutType {
+    OFFICIAL("2026-official"),
+    NONE("2026-none");
+
+    private final String name;
+    private volatile AprilTagFieldLayout layout;
+    private volatile String layoutString;
+
+    AprilTagLayoutType(String name) {
+      this.name = name;
+    }
+
+    public AprilTagFieldLayout getLayout() {
+      if (layout == null) {
+        synchronized (this) {
+          if (layout == null) {
+            try {
+              Path p =
+                  Path.of(
+                      Filesystem.getDeployDirectory().getPath(),
+                      "apriltags",
+                      fieldType.getJsonFolder(),
+                      name + ".json");
+              layout = new AprilTagFieldLayout(p);
+              layoutString = new ObjectMapper().writeValueAsString(layout);
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
+          }
+        }
+      }
+      return layout;
+    }
+
+    public String getLayoutString() {
+      if (layoutString == null) {
+        getLayout();
+      }
+      return layoutString;
+    }
+  }
+
   /**
    * Officially defined and relevant vertical lines found on the field (defined by X-axis offset)
    */
@@ -94,12 +144,6 @@ public class FieldConstants {
             AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getX() + width / 2.0,
             fieldWidth / 2.0,
             height);
-    public static final Translation3d innerCenterPoint =
-        new Translation3d(
-            AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getX() + width / 2.0,
-            fieldWidth / 2.0,
-            innerHeight);
-
     public static final Translation2d nearLeftCorner =
         new Translation2d(topCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 + width / 2.0);
     public static final Translation2d nearRightCorner =
@@ -108,7 +152,11 @@ public class FieldConstants {
         new Translation2d(topCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 + width / 2.0);
     public static final Translation2d farRightCorner =
         new Translation2d(topCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 - width / 2.0);
-
+    public static final Translation3d innerCenterPoint =
+        new Translation3d(
+            AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get().getX() + width / 2.0,
+            fieldWidth / 2.0,
+            innerHeight);
     // Relevant reference points on the opposite side
     public static final Translation3d oppTopCenterPoint =
         new Translation3d(
@@ -305,63 +353,5 @@ public class FieldConstants {
     // Relevant reference points on alliance side
     public static final Translation2d centerPoint =
         new Translation2d(0, AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(29).get().getY());
-  }
-
-  @RequiredArgsConstructor
-  public enum FieldType {
-    ANDYMARK("andymark"),
-    WELDED("welded");
-
-    @Getter private final String jsonFolder;
-  }
-
-  public enum AprilTagLayoutType {
-    OFFICIAL("2026-official"),
-    NONE("2026-none");
-
-    private final String name;
-    private volatile AprilTagFieldLayout layout;
-    private volatile String layoutString;
-
-    AprilTagLayoutType(String name) {
-      this.name = name;
-    }
-
-    public AprilTagFieldLayout getLayout() {
-      if (layout == null) {
-        synchronized (this) {
-          if (layout == null) {
-            try {
-              Path p =
-                  RobotConstants.disableHAL
-                      ? Path.of(
-                          "src",
-                          "main",
-                          "deploy",
-                          "apriltags",
-                          fieldType.getJsonFolder(),
-                          name + ".json")
-                      : Path.of(
-                          Filesystem.getDeployDirectory().getPath(),
-                          "apriltags",
-                          fieldType.getJsonFolder(),
-                          name + ".json");
-              layout = new AprilTagFieldLayout(p);
-              layoutString = new ObjectMapper().writeValueAsString(layout);
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          }
-        }
-      }
-      return layout;
-    }
-
-    public String getLayoutString() {
-      if (layoutString == null) {
-        getLayout();
-      }
-      return layoutString;
-    }
   }
 }
