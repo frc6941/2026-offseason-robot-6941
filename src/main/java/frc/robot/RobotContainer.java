@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -15,9 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
-import frc.robot.subsystems.Configs.TurretConfig;
-import frc.robot.subsystems.Configs.TurretVelParamsNT;
+import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
@@ -28,16 +25,16 @@ import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.rbd.TransformRecorder;
+import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
-import lib.ironpulse.utils.LimelightHelpers;
+import lib.ironpulse.utils.AllianceFlipUtil;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
-import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
@@ -45,6 +42,7 @@ public class RobotContainer {
     private final ShootingParametersTable shootingParametersTable = new ShootingParametersTable();
     private final Swerve swerve;
     private final TurretSubsystem turret;
+    private final VelocityMotorSubsystem intaker;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -74,6 +72,12 @@ public class RobotContainer {
                                     TurretConfig.TURRET_ENCODER_G2_OFFSET,
                                     false),
                             TurretVelParamsNT.asVelocityParamSources());
+            intaker =
+                    new VelocityMotorSubsystem(
+                            IntakerConfig.INTAKER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(IntakerConfig.INTAKER_CONFIG),
+                            IntakerParamsNT.asVelocityParamSources());
 
         } else {
             swerve =
@@ -92,6 +96,12 @@ public class RobotContainer {
                             encoderG1Sim,
                             encoderG2Sim,
                             TurretVelParamsNT.asVelocityParamSources());
+            intaker =
+                    new VelocityMotorSubsystem(
+                            IntakerConfig.INTAKER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IntakerConfig.INTAKER_CONFIG),
+                            IntakerParamsNT.asVelocityParamSources());
         }
         configureBindings();
         swerve.setDefaultCommand(
@@ -105,7 +115,27 @@ public class RobotContainer {
                         // () -> new Pose3d(),
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
+        driver.start()
+                .onTrue(
+                        SwerveCommands.resetAngle(
+                                        swerve,
+                                        () ->
+                                                AllianceFlipUtil.shouldFlip()
+                                                        ? Rotation2d.kZero
+                                                        : Rotation2d.k180deg)
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    RobotStateRecorder.getInstance()
+                                                            .resetTransform(
+                                                                    TransformRecorder.kFrameWorld,
+                                                                    TransformRecorder.kFrameRobot);
+                                                }))
+                                .ignoringDisable(true));
         turret.setDefaultCommand(turret.runTurretTargetLoop());
+        intaker.setDefaultCommand(intaker.runDutyCycle(0));
+        driver.a().onTrue(intaker.runDutyCycle(1.0));
+        driver.a().onFalse(intaker.runDutyCycle(0));
     }
 
     public void robotPeriodic() {
@@ -134,21 +164,23 @@ public class RobotContainer {
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.periodic();
-        LimelightHelpers.SetRobotOrientation(
-                "limelight",
-                RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
-                RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
-                0,
-                0,
-                0,
-                0);
-        Logger.recordOutput(
-                "Limelight/Pose",
-                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
-        swerve.addVisionMeasurement(
-                new Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
-                now.in(Seconds),
-                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
+        //        LimelightHelpers.SetRobotOrientation(
+        //                "limelight",
+        //
+        // RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
+        //
+        // RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
+        //                0,
+        //                0,
+        //                0,
+        //                0);
+        //        Logger.recordOutput(
+        //                "Limelight/Pose",
+        //                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
+        //        swerve.addVisionMeasurement(
+        //                new
+        // Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
+        //                now.in(Seconds),
     }
 
     private void configureBindings() {

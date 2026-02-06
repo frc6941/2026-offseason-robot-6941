@@ -8,13 +8,9 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
 public class IntakerConfig {
-    private IntakerConfig() {}
-
     public static final String NAME = "Intaker";
-
-    private static final int INTAKER_MOTOR_MAIN_ID = 50;
+    private static final int INTAKER_MOTOR_MAIN_ID = 32;
     private static final double INTAKER_GEAR_RATIO = 3;
-
     public static final SubsystemConfig INTAKER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
@@ -29,6 +25,8 @@ public class IntakerConfig {
                                     .gearRatio(INTAKER_GEAR_RATIO)
                                     .build())
                     .build();
+
+    private IntakerConfig() {}
 
     @NTParameter(tableName = "Params/" + NAME)
     public static final class IntakerParams {
