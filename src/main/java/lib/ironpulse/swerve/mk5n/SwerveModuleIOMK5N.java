@@ -126,6 +126,10 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         driveControlConfig.CurrentLimits.StatorCurrentLimit =
                 config.driveStatorCurrentLimit.in(Amp);
 
+        driveControlConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        driveControlConfig.CurrentLimits.SupplyCurrentLimit =
+                config.driveSupplyCurrentLimit.in(Amp);
+
         // apply configuration
         PhoenixUtils.tryUntilOk(
                 5, () -> driveMotor.getConfigurator().apply(driveControlConfig, 0.25));
@@ -187,6 +191,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         steerControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         steerControlConfig.CurrentLimits.StatorCurrentLimit =
                 config.steerStatorCurrentLimit.in(Amp);
+        steerControlConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        steerControlConfig.CurrentLimits.SupplyCurrentLimit =
+                config.steerSupplyCurrentLimit.in(Amp);
 
         // PID configuration - use defaults, will be updated by periodic calls
         steerControlConfig.Slot0.StaticFeedforwardSign =
