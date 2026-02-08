@@ -33,6 +33,9 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+//                    jvmArgs.add("-Xmx64m")
+//                    jvmArgs.add("-XX:MaxDirectMemorySize=32m") // 防止 DirectBuffer/视觉/序列化堆外失控
+//                    jvmArgs.add("-XX:MaxMetaspaceSize=48m")    // 可选
                     jvmArgs.add("-Dcom.sun.management.jmxremote=true")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
@@ -46,7 +49,7 @@ deploy {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
                     deleteOldFiles = false // Change to true to delete files on roboRIO that no
-                                           // longer exist in deploy directory of this project
+                    // longer exist in deploy directory of this project
                 }
             }
         }

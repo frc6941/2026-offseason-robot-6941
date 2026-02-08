@@ -8,46 +8,25 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
-import frc.robot.RobotStateRecorder;
+import lib.ntext.NTParameter;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ShootingSuperstructure {
-    private final TurretSubsystem turret;
-    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
-
-    public ShotFrame getCurrentFrame() {
-        Angle turretWorldRotation =
-                RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation().getMeasure();
-        Angle bba = hood.getCurrPos();
-        double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
-        double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-        if (hoodB == 0.0||rpmA == 0.0) {
-            throw new IllegalStateException("ShotCalculatorParamsNT.hoodB and rpmA must be non-zero");
-        }
-        Angle modelHood =
-                bba.minus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue())).div(hoodB);
-        AngularVelocity shooterVel = shooter.getVelocity();
-
-        double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
-        double muzzleSpeedMps = (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
-        return new ShotFrame(
-                        turretWorldRotation,
-                        modelHood,
-                        MetersPerSecond.of(muzzleSpeedMps));
-    }
+  private static final String NAME = "ShootingSS";
+  private final TurretSubsystem turret;
+  private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
+  private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
+  private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
 
   public ShootingSuperstructure(
       TurretSubsystem turret,
@@ -60,6 +39,23 @@ public class ShootingSuperstructure {
     this.idx = idx;
   }
 
+  public ShotFrame getCurrentFrame() {
+    Angle turretWorldRotation =
+        RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation().getMeasure();
+    Angle bba = hood.getCurrPos();
+    double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
+    double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
+    if (hoodB == 0.0 || rpmA == 0.0) {
+      throw new IllegalStateException("ShotCalculatorParamsNT.hoodB and rpmA must be non-zero");
+    }
+    Angle modelHood = bba.minus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue())).div(hoodB);
+    AngularVelocity shooterVel = shooter.getVelocity();
+
+    double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
+    double muzzleSpeedMps = (rpm - ShotCalculatorParamsNT.rpmC.getValue()) / rpmA;
+    return new ShotFrame(turretWorldRotation, modelHood, MetersPerSecond.of(muzzleSpeedMps));
+  }
+
   public void setDefaultCommand() {
     turret.setDefaultCommand(turret.runTurretTargetLoop());
     idx.setDefaultCommand(idx.runVelocity(() -> getIdxSpeed(IdxMode.OFF)));
@@ -67,32 +63,47 @@ public class ShootingSuperstructure {
         shooter.runVelocity(() -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
   }
 
-    public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
-        return Commands.parallel(
-                Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
-                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode),
-                hood.runPosition(
-                        () -> {
-                            Angle modelAngle = frame.get().hoodAngle();
-                            Angle bba =
-                                    modelAngle.times(ShotCalculatorParamsNT.hoodB.getValue())
-                                            .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
-                            return bba;
-                        }),
-                shooter.runVelocity(
-                        () -> {
-                            double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-                            double rpm =
-                                    rpmA * frame.get().muzzleSpeed().in(MetersPerSecond)
-                                            + ShotCalculatorParamsNT.rpmC.getValue();
-                            return RotationsPerSecond.of(rpm / 60.0);
-                        }));
-    }
+  public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
+    return Commands.parallel(
+        Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
+        turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode),
+        hood.runPosition(
+            () -> {
+              Angle modelAngle = frame.get().hoodAngle();
+              Angle bba =
+                  modelAngle
+                      .times(ShotCalculatorParamsNT.hoodB.getValue())
+                      .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
+              return bba;
+            }),
+        shooter.runVelocity(
+            () -> {
+              double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
+              double rpm =
+                  rpmA * frame.get().muzzleSpeed().in(MetersPerSecond)
+                      + ShotCalculatorParamsNT.rpmC.getValue();
+              return RotationsPerSecond.of(rpm / 60.0);
+            }));
+  }
 
   public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode, IdxMode idxMode) {
     return Commands.parallel(
         runFrame(frame, mode),
         idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode : IdxMode.OFF)));
+  }
+
+  // TODO: remove it when test finished
+  public Command runDirectTest(double shooterDutyCycle, Angle hoodAngle) {
+    return Commands.parallel(
+        shooter.runDutyCycle(shooterDutyCycle), hood.runPosition(() -> hoodAngle)
+        // shooter.runVelocity(() -> shooterVelocity)
+        );
+  }
+
+  public Command runDirectTest(Angle hoodAngle) {
+    return Commands.parallel(
+        hood.runPosition(() -> hoodAngle),
+        shooter.runVelocity(RotationsPerSecond.of(ShooterParamsNT.testVelRPS.getValue())));
   }
 
   @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
@@ -112,5 +123,13 @@ public class ShootingSuperstructure {
     OFF,
     FEED,
     REVERSE
+  }
+
+  @NTParameter(tableName = "Params/" + NAME + "TestFrame")
+  public static final class ShootingFrameParams {
+    // shold be small
+    public static final double turretAngleWorldDeg = 0;
+    public static final double hoodAngleDeg = 0.0;
+    public static final double muzzleSpeedMPS = 0.0;
   }
 }
