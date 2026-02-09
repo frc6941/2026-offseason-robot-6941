@@ -1,39 +1,42 @@
 package frc.robot.subsystems.Configs;
 
+import static frc.robot.RobotConstants.CANIVORE_BUS;
+
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.signals.InvertedValue;
-import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
 public class HoodConfig {
-  public static final String NAME = "Hood";
-  public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
-  public static final int HOOD_MOTOR_MAIN_ID = 52;
-  public static final double HOOD_GEAR_RATIO = 48.0 / 8.0;
-  public static final SubsystemConfig HOOD_CONFIG =
-      SubsystemConfig.builder()
-          .name(NAME)
-          .mainBus(CANIVORE_CAN_BUS_NAME)
-          .mainId(HOOD_MOTOR_MAIN_ID)
-          .motorInvertedValue(InvertedValue.Clockwise_Positive)
-          .SensorToMechanismRatio(HOOD_GEAR_RATIO)
-          .zeroingConfig(
-              SubsystemConfig.ZeroingConfig.builder()
-                  .zeroingCurrentLimit(50)
-                  .zeroingFilterSize(5)
-                  .zeroingVoltage(1)
-                  .build())
-          // TODO: set this so the target angle represents the Real angle of the hood
-          .zeroOffset(Degrees.of(0.0))
-          .simConfig(SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())
-          .build();
+    private HoodConfig() {}
 
-  private HoodConfig() {}
+    public static final String NAME = "Hood";
+	public static final int HOOD_MOTOR_MAIN_ID = 52;
+	public static final double HOOD_GEAR_RATIO = 48.0 / 8.0;
+    // Local hardware constants
+    public static final SubsystemConfig HOOD_CONFIG =
+            SubsystemConfig.builder()
+                    .name(NAME)
+                    .mainBus(CANIVORE_BUS)
+                    .mainId(HOOD_MOTOR_MAIN_ID)
+                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .SensorToMechanismRatio(HOOD_GEAR_RATIO)
+                    .zeroingConfig(
+                            SubsystemConfig.ZeroingConfig.builder()
+                                    .zeroingCurrentLimit(50)
+                                    .zeroingFilterSize(5)
+                                    .zeroingVoltage(1)
+                                    .build())
+					// TODO: set this so the target angle represents the Real angle of the hood
+					.zeroOffset(Degrees.of(0.0))
+                    .simConfig(
+                            SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())
+                    .build();
 
-  @NTParameter(tableName = "Params/" + NAME)
-  public static final class HoodParams {
+
+    @NTParameter(tableName = "Params/" + NAME)
+    public static final class HoodParams {
 
     public static final double kP = 3.75;
     public static final double kI = 0.0;

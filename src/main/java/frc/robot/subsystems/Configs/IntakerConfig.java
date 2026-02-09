@@ -1,24 +1,20 @@
 package frc.robot.subsystems.Configs;
 
+import static frc.robot.RobotConstants.CANIVORE_BUS;
+
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
 public class IntakerConfig {
-    private IntakerConfig() {}
-
     public static final String NAME = "Intaker";
-    public static final String CANIVORE_CAN_BUS_NAME = RobotConstants.CANIVORE_CAN_BUS_NAME;
-
-    private static final int INTAKER_MOTOR_MAIN_ID = 50;
+    private static final int INTAKER_MOTOR_MAIN_ID = 32;
     private static final double INTAKER_GEAR_RATIO = 3;
-
     public static final SubsystemConfig INTAKER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS_NAME)
+                    .mainBus(CANIVORE_BUS)
                     .mainId(INTAKER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(false)
@@ -29,6 +25,8 @@ public class IntakerConfig {
                                     .gearRatio(INTAKER_GEAR_RATIO)
                                     .build())
                     .build();
+
+    private IntakerConfig() {}
 
     @NTParameter(tableName = "Params/" + NAME)
     public static final class IntakerParams {

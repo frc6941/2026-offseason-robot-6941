@@ -70,9 +70,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
             syncThread = new PhoenixSynchronizationThread(syncLock, config.odometryFrequency);
 
         // initialize and config motors
-        driveMotor = new TalonFX(moduleConfig.driveMotorId, config.canivoreCanBusName);
-        steerMotor = new TalonFX(moduleConfig.steerMotorId, config.canivoreCanBusName);
-        encoder = new CANcoder(moduleConfig.encoderId, config.canivoreCanBusName);
+        driveMotor = new TalonFX(moduleConfig.driveMotorId, config.canivoreCanBus);
+        steerMotor = new TalonFX(moduleConfig.steerMotorId, config.canivoreCanBus);
+        encoder = new CANcoder(moduleConfig.encoderId, config.canivoreCanBus);
         configureDriveMotor();
         configureSteerMotor();
 
@@ -125,6 +125,10 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         driveControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         driveControlConfig.CurrentLimits.StatorCurrentLimit =
                 config.driveStatorCurrentLimit.in(Amp);
+
+        driveControlConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        driveControlConfig.CurrentLimits.SupplyCurrentLimit =
+                config.driveSupplyCurrentLimit.in(Amp);
 
         // apply configuration
         PhoenixUtils.tryUntilOk(
@@ -187,6 +191,9 @@ public class SwerveModuleIOMK5N implements SwerveModuleIO {
         steerControlConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         steerControlConfig.CurrentLimits.StatorCurrentLimit =
                 config.steerStatorCurrentLimit.in(Amp);
+        steerControlConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        steerControlConfig.CurrentLimits.SupplyCurrentLimit =
+                config.steerSupplyCurrentLimit.in(Amp);
 
         // PID configuration - use defaults, will be updated by periodic calls
         steerControlConfig.Slot0.StaticFeedforwardSign =

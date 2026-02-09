@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  spotless_autofix:
+    name: Spotless
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu:2026-22.04-py314
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout PR branch (same-repo)
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.CI_BOT_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Checkout PR branch (fork)
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add repository to git safe directories
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Install Java
+        run: |
+          apt update
+          apt install -y openjdk-17-jdk
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
+      - name: Run Spotless (same-repo)
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: ./gradlew --no-daemon spotlessApply -x createVersionFile
+
+      - name: Commit and push formatting changes
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: apply Spotless"
+          file_pattern: "src/**/*.java"
+
+      - name: Fail if formatting changes remain (same-repo)
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: git --no-pager diff --exit-code
+
+      - name: Run Spotless Check (fork)
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: ./gradlew --no-daemon spotlessCheck
+
+  build:
+    name: Build
+    needs: spotless_autofix
+    runs-on: ubuntu-22.04
+    container: wpilib/roborio-cross-ubuntu:2026-22.04-py314
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CI_BOT_TOKEN }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Add repository to git safe directories
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Install Java
+        run: |
+          apt update
+          apt install -y openjdk-17-jdk
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
+      - name: Generate version file
+        run: ./gradlew createVersionFile
+
+      - name: Compile (and tests if enabled)
+        run: ./gradlew --no-daemon build -x spotlessApply -x spotlessCheck
+

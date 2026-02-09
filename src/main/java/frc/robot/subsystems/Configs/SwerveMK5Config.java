@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.RobotConstants.CANIVORE_BUS;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -16,89 +17,90 @@ import lib.ntext.NTParameter;
 public final class SwerveMK5Config {
     public static final String kSwerveTag = "Swerve";
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
-    public static final double kSwerveHalfWidth = 0.6 / 2.0;
+    public static final double kSwerveHalfLength = 0.30468; // m
+    public static final double kSwerveHalfWidth = 0.24218; // m
 
     public static SwerveModuleLimit kDefaultSwerveModuleLimit =
             SwerveModuleLimit.builder()
-                    // MK5n L2 defaults (drive ~= 6.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
-                    // v (mps) = 6000rpm / 60 / 6.03 * pi * 4.0in
-                    .maxDriveVelocity(MetersPerSecond.of(5.29329707470519))
-                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(17.0))
-                    // omega (rps) = 6000rpm / 60 / (287/11) ~= 3.8333 rps
-                    .maxSteerAngularVelocity(RotationsPerSecond.of(6000.0 / 60.0 / (287.0 / 11.0)))
-                    // accelerate in 0.1s
+                    // MK5n R1 defaults (drive ~= 7.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
+                    // v (mps) = 5800rpm (X60 with FOC) / 60 / 7.03 * pi * 4.0in
+                    .maxDriveVelocity(InchesPerSecond.of(5800.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(12.0)) // 6-12
+                    // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
+                    .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
+                    // accelerate in 0.2s
                     .maxSteerAngularAcceleration(
-                            RotationsPerSecondPerSecond.of(6000.0 / 60.0 / (287.0 / 11.0) / 0.1))
+                            RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
                     .build();
     public static SwerveLimit kDefaultSwerveLimit =
             SwerveLimit.builder()
-                    .maxLinearVelocity(MetersPerSecond.of(4.5))
+                    .maxLinearVelocity(MetersPerSecond.of(4.35)) // theoretically 4.39
                     // prevents skidding, see orbit archive ytb channel open class for theory
-                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(30))
-                    // must be smaller than 4.5 / (distModuleToCenter * sqrt(2)) to be actually
-                    // effective
+                    .maxSkidAcceleration(
+                            MetersPerSecondPerSecond.of(10)) // 8-14, <maxDriveAcceleration
+                    // omega_max ≈ vMax / r.
                     .maxAngularVelocity(DegreesPerSecond.of(600.0))
-                    // accelerate in 0.2s, also must be smaller than the defined module limit to be
+                    // accelerate in 0.32s, also must be smaller than the defined module limit to be
                     // actually effective
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0))
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1450.0)) // 1000-1472
                     .build();
 
     public static SwerveLimit kSimSwerveLimit =
             SwerveLimit.builder()
-                    .maxLinearVelocity(MetersPerSecond.of(4.5))
-                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(30))
-                    .maxAngularVelocity(DegreesPerSecond.of(400.0))
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1000.0))
+                    .maxLinearVelocity(MetersPerSecond.of(4.35))
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(10))
+                    .maxAngularVelocity(DegreesPerSecond.of(600.0))
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1450.0))
                     .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
             SwerveConfig.SwerveModuleConfig.builder()
-                    .name("FL")
-                    .location(new Translation2d(kSwerveHalfWidth, kSwerveHalfWidth))
+                    .name("LB")
+                    .location(new Translation2d(-kSwerveHalfLength, kSwerveHalfWidth))
                     .driveMotorId(4)
                     .steerMotorId(3)
                     .encoderId(10)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(-0.360107421875))
-                    .driveInverted(true)
+                    .steerMotorEncoderOffset(Rotations.of(-0.11083984375))
+                    .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompFR =
             SwerveConfig.SwerveModuleConfig.builder()
-                    .name("FR")
-                    .location(new Translation2d(kSwerveHalfWidth, -kSwerveHalfWidth))
+                    .name("LF")
+                    .location(new Translation2d(kSwerveHalfLength, kSwerveHalfWidth))
                     .driveMotorId(6)
                     .steerMotorId(5)
                     .encoderId(11)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(-0.3486328125))
+                    .steerMotorEncoderOffset(Rotations.of(0.3994140625))
                     .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompBL =
             SwerveConfig.SwerveModuleConfig.builder()
-                    .name("BL")
-                    .location(new Translation2d(-kSwerveHalfWidth, kSwerveHalfWidth))
+                    .name("RB")
+                    .location(new Translation2d(-kSwerveHalfLength, -kSwerveHalfWidth))
                     .driveMotorId(2)
                     .steerMotorId(1)
                     .encoderId(0)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(0.12158203125))
+                    .steerMotorEncoderOffset(Rotations.of(-0.12939453125))
                     .driveInverted(true)
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
     public static SwerveConfig.SwerveModuleConfig kModuleCompBR =
             SwerveConfig.SwerveModuleConfig.builder()
-                    .name("BR")
-                    .location(new Translation2d(-kSwerveHalfWidth, -kSwerveHalfWidth))
+                    .name("RF")
+                    .location(new Translation2d(kSwerveHalfLength, -kSwerveHalfWidth))
                     .driveMotorId(8)
                     .steerMotorId(7)
                     .encoderId(20)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(0.2900390625))
-                    .driveInverted(false)
+                    .steerMotorEncoderOffset(Rotations.of(-0.462158203125))
+                    .driveInverted(true)
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
@@ -106,14 +108,14 @@ public final class SwerveMK5Config {
             SwerveSimConfig.builder()
                     .name("Swerve")
                     .dtS(RobotConstants.LOOPER_DT)
-                    .wheelDiameter(Inch.of(4.1))
-                    .driveGearRatio(7.0)
-                    .steerGearRatio(20.0)
+                    .wheelDiameter(Inch.of(4.0))
+                    .driveGearRatio(7.03)
+                    .steerGearRatio(26.09)
                     .driveMotor(DCMotor.getKrakenX60Foc(1))
                     .driveMomentOfInertia(KilogramSquareMeters.of(0.04))
                     .driveStdDevPos(0.0000001)
                     .driveStdDevVel(0.000001)
-                    .steerMotor(DCMotor.getKrakenX60Foc(1))
+                    .steerMotor(DCMotor.getKrakenX44Foc(1))
                     .steerMomentOfInertia(KilogramSquareMeters.of(0.01))
                     .steerStdDevPos(0.0000001)
                     .steerStdDevVel(0.000001)
@@ -130,7 +132,7 @@ public final class SwerveMK5Config {
                     .name("Swerve")
                     .dtS(RobotConstants.LOOPER_DT)
                     .wheelDiameter(Inch.of(4.0))
-                    .driveGearRatio(6.03)
+                    .driveGearRatio(7.03) // R1
                     .steerGearRatio(287.0 / 11.0)
                     .defaultSwerveLimit(kDefaultSwerveLimit)
                     .defaultSwerveModuleLimit(kDefaultSwerveModuleLimit)
@@ -140,8 +142,10 @@ public final class SwerveMK5Config {
                             })
                     .odometryFrequency(Hertz.of(100))
                     .driveStatorCurrentLimit(Amps.of(80))
-                    .steerStatorCurrentLimit(Amps.of(80))
-                    .canivoreCanBusName(RobotConstants.CANIVORE_CAN_BUS_NAME)
+                    .driveSupplyCurrentLimit(Amps.of(80))
+                    .steerStatorCurrentLimit(Amps.of(60))
+                    .steerSupplyCurrentLimit(Amps.of(60))
+                    .canivoreCanBus(CANIVORE_BUS)
                     .pigeonId(RobotConstants.PIGEON_ID)
                     .build();
 
@@ -154,8 +158,8 @@ public final class SwerveMK5Config {
             static final double kD = 0.1;
             static final double kS = 1.3;
             // CTRE Slot0 kV for VelocityTorqueCurrentFOC with motor velocity units (rotor rps):
-            // kV ~= 12V / (6000rpm / 60) = 0.12
-            static final double kV = 0.12;
+            // kV ~= 12V / (5800rpm / 60) = 0.124
+            static final double kV = 0.124;
             static final double kA = 0.19;
             static final boolean isBrake = true;
         }
