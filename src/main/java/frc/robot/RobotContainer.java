@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Configs.*;
@@ -63,7 +64,6 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intakerSubsystem;
-    // private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
     private final Swerve swerve;
@@ -165,7 +165,7 @@ public class RobotContainer {
                             new MotorIOTalonFX(IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG),
                             IntakerExtensionParamsNT.asPositionParamSources(),
                             Meters.of(0),
-                            Millimeters.of(9.42 * 11.0));
+                            Meters.of(0.00942 * 11.0));
 
         } else {
             swerve =
@@ -371,10 +371,20 @@ public class RobotContainer {
                 .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
         driver.povLeft()
                 .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
-        driver.x().onTrue(intakerSubsystem.deployIntake());
-        driver.x().onFalse(intakerSubsystem.retractIntake());
+        driver.x()
+                .onTrue(
+                        Commands.runOnce(
+                                () -> {
+                                    if (intakerSubsystem.isDeployed()) {
+                                        CommandScheduler.getInstance()
+                                                .schedule(intakerSubsystem.retractIntake());
+                                    } else {
+                                        CommandScheduler.getInstance()
+                                                .schedule(intakerSubsystem.deployIntake());
+                                    }
+                                }));
         driver.y().onTrue(intakerSubsystem.outtake());
-        driver.y().onFalse(intakerSubsystem.deployIntake());
+        driver.y().onFalse(intakerSubsystem.intake());
     }
 
     public Command getAutonomousCommand() {

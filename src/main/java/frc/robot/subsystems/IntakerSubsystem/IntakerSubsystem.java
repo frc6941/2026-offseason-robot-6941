@@ -31,27 +31,39 @@ public class IntakerSubsystem {
 
     public Command retractIntake() {
         return Commands.parallel(
-                roller.runVelocity(RotationsPerSecond.of(idleVelRPS)),
-                extension.runPosition(Meters.of(retractPosMeters)));
+                        roller.runVelocity(RotationsPerSecond.of(idleVelRPS))
+                                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf),
+                        extension
+                                .runPosition(Meters.of(retractPosMeters))
+                                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf))
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
     }
 
     public Command outtake() {
-        if (extension.getCurrSetpoint() == Meters.of(retractPosMeters)) {
-            return Commands.none();
-        }
-        return roller.runVelocity(RotationsPerSecond.of(outtakeVelRPS));
+        return isDeployed()
+                ? roller.runVelocity(RotationsPerSecond.of(outtakeVelRPS))
+                        .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf)
+                : Commands.none();
     }
 
     public Command intake() {
-        if (extension.getCurrSetpoint() == Meters.of(retractPosMeters)) {
-            return Commands.none();
-        }
-        return roller.runVelocity(RotationsPerSecond.of(intakeVelRPS));
+        return isDeployed()
+                ? roller.runVelocity(RotationsPerSecond.of(intakeVelRPS))
+                        .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf)
+                : Commands.none();
     }
 
     public Command deployIntake() {
         return Commands.parallel(
-                roller.runVelocity(RotationsPerSecond.of(intakeVelRPS)),
-                extension.runPosition(Meters.of(deployPosMeters)));
+                        roller.runVelocity(RotationsPerSecond.of(intakeVelRPS))
+                                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf),
+                        extension
+                                .runPosition(Meters.of(deployPosMeters))
+                                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf))
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
+    }
+
+    public boolean isDeployed() {
+        return extension.getCurrSetpoint().equals(Meters.of(deployPosMeters));
     }
 }
