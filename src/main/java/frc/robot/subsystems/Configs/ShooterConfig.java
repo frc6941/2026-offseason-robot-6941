@@ -5,53 +5,53 @@ import static frc.robot.RobotConstants.CANIVORE_BUS;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
 public class ShooterConfig {
-  public static final String NAME = "Shooter";
-  private static final int SHOOTER_MOTOR_MAIN_ID = 50;
-  private static final int SHOOTER_MOTOR_FOLLOWER_ID = 51;
-  private static final double SHOOTER_GEAR_RATIO = 24.0 / 24.0;
-  public static final SubsystemConfig SHOOTER_CONFIG =
-      SubsystemConfig.builder()
-          .name(NAME)
+    public static final String NAME = "Shooter";
+    private static final int SHOOTER_MOTOR_MAIN_ID = 50;
+    private static final int SHOOTER_MOTOR_FOLLOWER_ID = 51;
+    private static final double SHOOTER_GEAR_RATIO = 24.0 / 24.0;
+    public static final SubsystemConfig SHOOTER_CONFIG =
+            SubsystemConfig.builder()
+                    .name(NAME)
                     .mainBus(CANIVORE_BUS)
-          .mainId(SHOOTER_MOTOR_MAIN_ID)
-          .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
-          .defaultBrake(false)
-          .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
-          .followers(
-              new SubsystemConfig.FollowerConfig[] {
-                SubsystemConfig.FollowerConfig.builder()
-                    .id(SHOOTER_MOTOR_FOLLOWER_ID)
+                    .mainId(SHOOTER_MOTOR_MAIN_ID)
+                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
+                    .defaultBrake(false)
+                    .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
+                    .followers(
+                            new SubsystemConfig.FollowerConfig[] {
+                                SubsystemConfig.FollowerConfig.builder()
+                                        .id(SHOOTER_MOTOR_FOLLOWER_ID)
                                         .bus(CANIVORE_BUS)
-                                        .opposeMain(MotorAlignmentValue.Opposed)
-                    .bus(CANIVORE_CAN_BUS_NAME)
-                    .opposeMain(MotorAlignmentValue.Aligned)
-                    .build()
-              })
-          .SensorToMechanismRatio(SHOOTER_GEAR_RATIO)
-          .simConfig(SubsystemConfig.SimConfig.builder().gearRatio(SHOOTER_GEAR_RATIO).build())
-          .build();
+                                        .opposeMain(MotorAlignmentValue.Aligned)
+                                        .build()
+                            })
+                    .SensorToMechanismRatio(SHOOTER_GEAR_RATIO)
+                    .simConfig(
+                            SubsystemConfig.SimConfig.builder()
+                                    .gearRatio(SHOOTER_GEAR_RATIO)
+                                    .build())
+                    .build();
 
-  private ShooterConfig() {}
+    private ShooterConfig() {}
 
-  @NTParameter(tableName = "Params/" + NAME)
-  public static final class ShooterParams {
-    // velocity gains
+    @NTParameter(tableName = "Params/" + NAME)
+    public static final class ShooterParams {
+        // velocity gains
 
-    public static final double kP = 1;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kV = 0.11517;
-    public static final double kA = 0.014747;
-    public static final double kS = 0.08;
+        public static final double kP = 1;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kV = 0.11517;
+        public static final double kA = 0.014747;
+        public static final double kS = 0.08;
 
-    public static final double velocityAtGoalToleranceRPS = 1;
+        public static final double velocityAtGoalToleranceRPS = 1;
 
-    public static final double testVelRPS = 10;
-    public static final double idleVelRPS = 0;
-  }
+        public static final double testVelRPS = 10;
+        public static final double idleVelRPS = 0;
+    }
 }

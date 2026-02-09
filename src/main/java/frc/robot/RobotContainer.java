@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.Configs.HoodConfig;
 import frc.robot.subsystems.Configs.HoodParamsNT;
 import frc.robot.subsystems.Configs.IdxConfig;
@@ -25,11 +26,8 @@ import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretVelParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
-import frc.robot.subsystems.Configs.*;
-import frc.robot.subsystems.ShootingSubsystem.ShootingParametersTable;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
-import lib.ironpulse.command.VisualizeProjectileShot;
 import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
 import lib.ironpulse.io.MotorIO;
@@ -51,77 +49,80 @@ import lib.ntext.NTParameterRegistry;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
-  private static final boolean HAS_TURRET_IO = false;
-  private static final boolean HAS_SHOOTER_IO = true;
-  private static final boolean HAS_HOOD_IO = true;
-  private static final boolean HAS_IDX_IO = false;
+    private static final boolean HAS_TURRET_IO = false;
+    private static final boolean HAS_SHOOTER_IO = true;
+    private static final boolean HAS_HOOD_IO = true;
+    private static final boolean HAS_IDX_IO = true;
 
-  private final CommandXboxController driver = new CommandXboxController(0);
-  private final ShotCalculator shotCalculator = new ShotCalculator();
-  private final Swerve swerve;
-  private final TurretSubsystem turret;
-  private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-  private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
-  private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-//  private final ShootingSuperstructure shootingSuperstructure;
+    private final CommandXboxController driver = new CommandXboxController(0);
+    private final ShotCalculator shotCalculator = new ShotCalculator();
+    private final Swerve swerve;
+    private final TurretSubsystem turret;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
+    //  private final ShootingSuperstructure shootingSuperstructure;
     private final VelocityMotorSubsystem intaker;
-  private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
-  private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
+    private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
+    private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
-public RobotContainer() {
+    public RobotContainer() {
 
-    if (RobotBase.isReal()) {
-      swerve =
-          new Swerve(
-              SwerveMK5Config.kRealConfig,
-              new ImuIOPigeon(SwerveMK5Config.kRealConfig),
-              new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
-              new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
-              new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
-              new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
-      turret =
-          new TurretSubsystem(
-              TurretConfig.TURRET_CONFIG,
-              new MotorInputsAutoLogged(),
-                                    new MotorIOTalonFX(TurretConfig.TURRET_CONFIG),
-                                    new CANCoderIOCANCoder(
-                      TurretConfig.TURRET_ENCODER_G1_ID,
-                      TurretConfig.TURRET_ENCODER_G1_OFFSET,
-                      false)
-                  : encoderG1Sim,
-              HAS_TURRET_IO
-                  ? new CANCoderIOCANCoder(
-                      TurretConfig.TURRET_ENCODER_G2_ID,
-                      TurretConfig.TURRET_ENCODER_G2_OFFSET,
-                      false)
-                  : encoderG2Sim,
-              TurretVelParamsNT.asVelocityParamSources());
-      shooter =
-          new VelocityMotorSubsystem<>(
-              ShooterConfig.SHOOTER_CONFIG,
-              new MotorInputsAutoLogged(),
-              HAS_SHOOTER_IO
-                  ? new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG)
-                  : new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
-              ShooterParamsNT.asVelocityParamSources());
-      spindexer =
-          new VelocityMotorSubsystem<>(
-              IdxConfig.SPINDEXER_CFG,
-              new MotorInputsAutoLogged(),
-              HAS_IDX_IO
-                  ? new MotorIOTalonFX(IdxConfig.SPINDEXER_CFG)
-                  : new MotorIOSim(IdxConfig.SPINDEXER_CFG),
-              SpindexerParamsNT.asVelocityParamSources());
-      hood =
-          new PositionMotorSubsystem<>(
-              HoodConfig.HOOD_CONFIG,
-              new MotorInputsAutoLogged(),
-              HAS_HOOD_IO
-                  ? new MotorIOTalonFX(HoodConfig.HOOD_CONFIG)
-                  : new MotorIOSim(HoodConfig.HOOD_CONFIG),
-              HoodParamsNT.asPositionParamSources(),
-              Degrees.of(0),
-              Degrees.of(360.0 / HoodConfig.HOOD_CONFIG.SensorToMechanismRatio));
+        if (RobotBase.isReal()) {
+            swerve =
+                    new Swerve(
+                            SwerveMK5Config.kRealConfig,
+                            new ImuIOPigeon(SwerveMK5Config.kRealConfig),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
+            turret =
+                    new TurretSubsystem(
+                            TurretConfig.TURRET_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            HAS_TURRET_IO
+                                    ? new MotorIOTalonFX(TurretConfig.TURRET_CONFIG)
+                                    : new MotorIOSim(TurretConfig.TURRET_CONFIG),
+                            HAS_TURRET_IO
+                                    ? new CANCoderIOCANCoder(
+                                            TurretConfig.TURRET_ENCODER_G1_ID,
+                                            TurretConfig.TURRET_ENCODER_G1_OFFSET,
+                                            false)
+                                    : encoderG1Sim,
+                            HAS_TURRET_IO
+                                    ? new CANCoderIOCANCoder(
+                                            TurretConfig.TURRET_ENCODER_G2_ID,
+                                            TurretConfig.TURRET_ENCODER_G2_OFFSET,
+                                            false)
+                                    : encoderG2Sim,
+                            TurretVelParamsNT.asVelocityParamSources());
+            shooter =
+                    new VelocityMotorSubsystem<>(
+                            ShooterConfig.SHOOTER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            HAS_SHOOTER_IO
+                                    ? new MotorIOTalonFX(ShooterConfig.SHOOTER_CONFIG)
+                                    : new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
+                            ShooterParamsNT.asVelocityParamSources());
+            spindexer =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.SPINDEXER_CFG,
+                            new MotorInputsAutoLogged(),
+                            HAS_IDX_IO
+                                    ? new MotorIOTalonFX(IdxConfig.SPINDEXER_CFG)
+                                    : new MotorIOSim(IdxConfig.SPINDEXER_CFG),
+                            SpindexerParamsNT.asVelocityParamSources());
+            hood =
+                    new PositionMotorSubsystem<>(
+                            HoodConfig.HOOD_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            HAS_HOOD_IO
+                                    ? new MotorIOTalonFX(HoodConfig.HOOD_CONFIG)
+                                    : new MotorIOSim(HoodConfig.HOOD_CONFIG),
+                            HoodParamsNT.asPositionParamSources(),
+                            Degrees.of(0),
+                            Degrees.of(360.0 / HoodConfig.HOOD_CONFIG.SensorToMechanismRatio));
             intaker =
                     new VelocityMotorSubsystem(
                             IntakerConfig.INTAKER_CONFIG,
@@ -129,96 +130,98 @@ public RobotContainer() {
                             new MotorIOTalonFX(IntakerConfig.INTAKER_CONFIG),
                             IntakerParamsNT.asVelocityParamSources());
 
-    } else {
-      swerve =
-          new Swerve(
-              SwerveMK5Config.kSimConfig,
-              new ImuIOSim(),
-              new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
-              new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
-              new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
-              new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
-      turret =
-          new TurretSubsystem(
-              TurretConfig.TURRET_CONFIG,
-              new MotorInputsAutoLogged(),
-              new MotorIOSim(TurretConfig.TURRET_CONFIG),
-              encoderG1Sim,
-              encoderG2Sim,
-              TurretVelParamsNT.asVelocityParamSources());
+        } else {
+            swerve =
+                    new Swerve(
+                            SwerveMK5Config.kSimConfig,
+                            new ImuIOSim(),
+                            new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
+                            new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
+                            new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
+                            new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
+            turret =
+                    new TurretSubsystem(
+                            TurretConfig.TURRET_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(TurretConfig.TURRET_CONFIG),
+                            encoderG1Sim,
+                            encoderG2Sim,
+                            TurretVelParamsNT.asVelocityParamSources());
             intaker =
                     new VelocityMotorSubsystem(
                             IntakerConfig.INTAKER_CONFIG,
                             new MotorInputsAutoLogged(),
                             new MotorIOSim(IntakerConfig.INTAKER_CONFIG),
                             IntakerParamsNT.asVelocityParamSources());
-      shooter =
-          new VelocityMotorSubsystem<>(
-              ShooterConfig.SHOOTER_CONFIG,
-              new MotorInputsAutoLogged(),
-              new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
-              ShooterParamsNT.asVelocityParamSources());
-      spindexer =
-          new VelocityMotorSubsystem<>(
-              IdxConfig.SPINDEXER_CFG,
-              new MotorInputsAutoLogged(),
-              new MotorIOSim(IdxConfig.SPINDEXER_CFG),
-              SpindexerParamsNT.asVelocityParamSources());
-      hood =
-          new PositionMotorSubsystem<>(
-              HoodConfig.HOOD_CONFIG,
-              new MotorInputsAutoLogged(),
-              new MotorIOSim(HoodConfig.HOOD_CONFIG),
-              HoodParamsNT.asPositionParamSources(),
-              Degrees.of(0),
-              Degrees.of(360));
+            shooter =
+                    new VelocityMotorSubsystem<>(
+                            ShooterConfig.SHOOTER_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(ShooterConfig.SHOOTER_CONFIG),
+                            ShooterParamsNT.asVelocityParamSources());
+            spindexer =
+                    new VelocityMotorSubsystem<>(
+                            IdxConfig.SPINDEXER_CFG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IdxConfig.SPINDEXER_CFG),
+                            SpindexerParamsNT.asVelocityParamSources());
+            hood =
+                    new PositionMotorSubsystem<>(
+                            HoodConfig.HOOD_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(HoodConfig.HOOD_CONFIG),
+                            HoodParamsNT.asPositionParamSources(),
+                            Degrees.of(0),
+                            Degrees.of(360));
+        }
+
+        //    shotCalculator.initialize(
+        //        Map.of(
+        //            ShotCalculator.TargetMode.GOAL,
+        //            Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
+        //    shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
+        configureBindings();
+        //    shootingSuperstructure.setDefaultCommand();
+        swerve.setDefaultCommand(
+                SwerveCommands.driveWithJoystick(
+                        swerve,
+                        () -> -driver.getLeftY(),
+                        () -> -driver.getLeftX(),
+                        () -> -driver.getRightX(),
+                        RobotStateRecorder::getPoseDriverRobotCurrent,
+                        MetersPerSecond.of(0.04),
+                        DegreesPerSecond.of(3.0)));
     }
 
-//    shotCalculator.initialize(
-//        Map.of(
-//            ShotCalculator.TargetMode.GOAL,
-//            Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
-//    shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
-    configureBindings();
-//    shootingSuperstructure.setDefaultCommand();
-    swerve.setDefaultCommand(
-        SwerveCommands.driveWithJoystick(
-            swerve,
-            () -> -driver.getLeftY(),
-            () -> -driver.getLeftX(),
-            () -> -driver.getRightX(),
-            RobotStateRecorder::getPoseDriverRobotCurrent,
-            MetersPerSecond.of(0.04),
-            DegreesPerSecond.of(3.0)));
-  }
+    public void robotPeriodic() {
+        // update IO inputs
+        PhoenixUtils.refreshAll();
+        // update NTparameters
+        NTParameterRegistry.refresh();
+        // update RobotStateRecorder
+        var now = Seconds.of(Timer.getTimestamp());
+        RobotStateRecorder.getInstance()
+                .putTransform(
+                        swerve.getEstimatedPose(),
+                        now,
+                        TransformRecorder.kFrameWorld,
+                        TransformRecorder.kFrameRobot);
 
-  public void robotPeriodic() {
-    // update IO inputs
-    PhoenixUtils.refreshAll();
-    // update NTparameters
-    NTParameterRegistry.refresh();
-    // update RobotStateRecorder
-    var now = Seconds.of(Timer.getTimestamp());
-    RobotStateRecorder.getInstance()
-        .putTransform(
-            swerve.getEstimatedPose(),
-            now,
-            TransformRecorder.kFrameWorld,
-            TransformRecorder.kFrameRobot);
+        RobotStateRecorder.getInstance()
+                .putTransform(
+                        new Pose3d(
+                                RobotStateRecorder.kRobotToShot,
+                                new Rotation3d(
+                                        0.0,
+                                        hood.getCurrPos().in(Radians),
+                                        turret.getPosition().in(Radians))),
+                        now,
+                        TransformRecorder.kFrameRobot,
+                        RobotStateRecorder.kFrameShot);
 
-    RobotStateRecorder.getInstance()
-        .putTransform(
-            new Pose3d(
-                RobotStateRecorder.kRobotToShot,
-                new Rotation3d(
-                    0.0, hood.getCurrPos().in(Radians), turret.getPosition().in(Radians))),
-            now,
-            TransformRecorder.kFrameRobot,
-            RobotStateRecorder.kFrameShot);
-
-    RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
-//    RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
-    RobotStateRecorder.periodic();
+        RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
+        //    RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
+        RobotStateRecorder.periodic();
         //        LimelightHelpers.SetRobotOrientation(
         //                "limelight",
         //
@@ -236,65 +239,72 @@ public RobotContainer() {
         //                new
         // Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
         //                now.in(Seconds),
-  }
+    }
 
     private void configureBindings() {
-		driver.start()
-				.onTrue(
-						SwerveCommands.resetAngle(
-										swerve,
-										() ->
-												AllianceFlipUtil.shouldFlip()
-												? Rotation2d.kZero
-												: Rotation2d.k180deg)
-								.alongWith(
-										Commands.runOnce(
-												() -> {
-													RobotStateRecorder.getInstance()
-															.resetTransform(
-																	TransformRecorder.kFrameWorld,
-																	TransformRecorder.kFrameRobot);
-												}))
-								.ignoringDisable(true));
-//    driver
-//        .a()
-//        .whileTrue(
-//            shootingSuperstructure
-//                .runFrame(
-//                    () -> shotCalculator.computeShotFrame(ShotCalculator.TargetMode.GOAL),
-//                    TurretMode.TRACKING)
-//                .alongWith(
-//                    Commands.run(
-//                        () -> {
-//                          if (shootingSuperstructure.readyToShoot()) {
-//                            var frame = RobotStateRecorder.getCurrentFrame();
-//                            VisualizeProjectileShot.logPath(
-//                                RobotStateRecorder.getPoseWorldShotCurrent(),
-//                                Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
-//                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
-//                                frame.muzzleSpeed().in(MetersPerSecond),
-//                                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
-//                                true,
-//                                "Valid");
-//                          } else {
-//                            var frame = RobotStateRecorder.getCurrentFrame();
-//                            VisualizeProjectileShot.logPath(
-//                                RobotStateRecorder.getPoseWorldShotCurrent(),
-//                                Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
-//                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
-//                                frame.muzzleSpeed().in(MetersPerSecond),
-//                                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
-//                                true,
-//                                "Invalid");
-//                          }
-//                        })));
+        driver.start()
+                .onTrue(
+                        SwerveCommands.resetAngle(
+                                        swerve,
+                                        () ->
+                                                AllianceFlipUtil.shouldFlip()
+                                                        ? Rotation2d.kZero
+                                                        : Rotation2d.k180deg)
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    RobotStateRecorder.getInstance()
+                                                            .resetTransform(
+                                                                    TransformRecorder.kFrameWorld,
+                                                                    TransformRecorder.kFrameRobot);
+                                                }))
+                                .ignoringDisable(true));
+        //    driver
+        //        .a()
+        //        .whileTrue(
+        //            shootingSuperstructure
+        //                .runFrame(
+        //                    () -> shotCalculator.computeShotFrame(ShotCalculator.TargetMode.GOAL),
+        //                    TurretMode.TRACKING)
+        //                .alongWith(
+        //                    Commands.run(
+        //                        () -> {
+        //                          if (shootingSuperstructure.readyToShoot()) {
+        //                            var frame = RobotStateRecorder.getCurrentFrame();
+        //                            VisualizeProjectileShot.logPath(
+        //                                RobotStateRecorder.getPoseWorldShotCurrent(),
+        //
+        // Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
+        //                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
+        //                                frame.muzzleSpeed().in(MetersPerSecond),
+        //
+        // RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
+        //                                true,
+        //                                "Valid");
+        //                          } else {
+        //                            var frame = RobotStateRecorder.getCurrentFrame();
+        //                            VisualizeProjectileShot.logPath(
+        //                                RobotStateRecorder.getPoseWorldShotCurrent(),
+        //
+        // Rotation2d.fromRadians(frame.turretAngleWorld().in(Radians)),
+        //                                Rotation2d.fromRadians(frame.hoodAngle().in(Radians)),
+        //                                frame.muzzleSpeed().in(MetersPerSecond),
+        //
+        // RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
+        //                                true,
+        //                                "Invalid");
+        //                          }
+        //                        })));
         driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0), TurretMode.SEEKING));
-        driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90), TurretMode.SEEKING));
-        driver.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
-        driver.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
-  }
+        driver.povRight()
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90), TurretMode.SEEKING));
+        driver.povDown()
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
+        driver.povLeft()
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
+    }
 
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+    public Command getAutonomousCommand() {
+        return Commands.print("No autonomous command configured");
+    }
 }

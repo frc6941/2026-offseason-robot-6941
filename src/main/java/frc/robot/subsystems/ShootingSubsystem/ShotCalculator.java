@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,8 +26,8 @@ import java.util.TreeMap;
  *
  * <ol>
  *   <li>Pick a {@link TargetMode} (goal, feed-left, feed-right).
- *   <li>Read turret-to-target translation and goal-aligned robot velocity from
- *       {@link RobotStateRecorder}.
+ *   <li>Read turret-to-target translation and goal-aligned robot velocity from {@link
+ *       RobotStateRecorder}.
  *   <li>Interpolate the model table by distance and v_parallel.
  *   <li>Apply tuning (scale/offset/bias).
  *   <li>Solve turret yaw to cancel lateral velocity (v_perp).
@@ -37,6 +35,7 @@ import java.util.TreeMap;
  * </ol>
  *
  * <p>{@link ShotFrame} is kept in model units:
+ *
  * <ul>
  *   <li>turretAngleWorld: world yaw to target
  *   <li>hoodAngle: launch angle from the model (deg)
@@ -61,8 +60,8 @@ public class ShotCalculator {
             double distance, double robot_vel, double final_vel, double final_angle) {}
 
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
-    private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>> tableByTarget =
-            new EnumMap<>(TargetMode.class);
+    private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
+            tableByTarget = new EnumMap<>(TargetMode.class);
     private TargetMode targetMode = TargetMode.GOAL;
 
     /** Loads model tables by target. */
@@ -90,7 +89,6 @@ public class ShotCalculator {
         this.targetMode = mode;
     }
 
-
     /**
      * Computes the shot frame for the current target mode.
      *
@@ -112,9 +110,9 @@ public class ShotCalculator {
 
         Angle turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
         return new ShotFrame(
-            turretYawRad,
-             Degrees.of(model.launchAngleDeg),
-              MetersPerSecond.of(model.exitSpeedMps));
+                turretYawRad,
+                Degrees.of(model.launchAngleDeg),
+                MetersPerSecond.of(model.exitSpeedMps));
     }
 
     /**
@@ -146,6 +144,7 @@ public class ShotCalculator {
      * planes.
      *
      * <p>Expected JSON fields (units):
+     *
      * <ul>
      *   <li>distance (m)
      *   <li>robot_vel (m/s)
@@ -159,8 +158,10 @@ public class ShotCalculator {
             return new ShotModel(0.0, 0.0, 0.0);
         }
 
-        Map.Entry<Double, NavigableMap<Double, ShotModel>> distFloor = table.floorEntry(distanceMeters);
-        Map.Entry<Double, NavigableMap<Double, ShotModel>> distCeil = table.ceilingEntry(distanceMeters);
+        Map.Entry<Double, NavigableMap<Double, ShotModel>> distFloor =
+                table.floorEntry(distanceMeters);
+        Map.Entry<Double, NavigableMap<Double, ShotModel>> distCeil =
+                table.ceilingEntry(distanceMeters);
         if (distFloor == null) {
             distFloor = table.firstEntry();
         }
@@ -194,8 +195,8 @@ public class ShotCalculator {
     /**
      * Solves turret yaw to cancel lateral velocity.
      *
-     * <p>Compensates lateral velocity by yawing into the motion so the net lateral
-     * component is near zero in the goal-aligned frame.
+     * <p>Compensates lateral velocity by yawing into the motion so the net lateral component is
+     * near zero in the goal-aligned frame.
      */
     public Angle solveTurretYaw(Translation2d turretToTarget, double vPerp, ShotModel model) {
         Rotation2d baseYaw = turretToTarget.getAngle();
@@ -209,7 +210,6 @@ public class ShotCalculator {
         Rotation2d yawComp = Rotation2d.fromRadians(Math.asin(ratio));
         return baseYaw.plus(yawComp).getMeasure();
     }
-
 
     private static NavigableMap<Double, NavigableMap<Double, ShotModel>> buildTable(
             List<ModelPoint> points) {

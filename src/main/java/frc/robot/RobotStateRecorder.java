@@ -20,15 +20,16 @@ import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.littletonrobotics.junction.Logger;
 
 public class RobotStateRecorder extends TransformRecorder {
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
+
     @Getter @Setter
     private static ShotFrame currentFrame =
             new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
+
     @Getter @Setter
     private static ShotFrame cmdFrame =
             new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
@@ -85,13 +86,14 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/ShotFrame/distanceToGoal", getTranslationShotToGoalCurrent().getNorm());
+                "RobotStateRecorder/ShotFrame/distanceToGoal",
+                getTranslationShotToGoalCurrent().getNorm());
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/velocityGoalRobot", getVelocityGoalRobotCurrent());
+        Logger.recordOutput("RobotStateRecorder/ShotFrame/GoalWorld", getPoseWorldGoalCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/ShotFrame/GoalWorld", getPoseWorldGoalCurrent());
-        Logger.recordOutput(
-                "RobotStateRecorder/ShotFrame/poseShot", RobotStateRecorder.getPoseWorldShotCurrent());
+                "RobotStateRecorder/ShotFrame/poseShot",
+                RobotStateRecorder.getPoseWorldShotCurrent());
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/currentFrame/turretAngleWorldDeg",
                 currentFrame.turretAngleWorld().in(Degrees));
@@ -111,8 +113,6 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
                 cmdFrame.muzzleSpeed().in(MetersPerSecond));
     }
-
-
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
         velocityRobotBuffer.addSample(time.in(Seconds), toPose2d(speed));
@@ -195,8 +195,7 @@ public class RobotStateRecorder extends TransformRecorder {
     public static Translation2d getTranslationShotToGoalCurrent() {
         Pose3d shotPoseWorld = getPoseWorldShotCurrent();
         Pose3d goalPoseWorld = getPoseWorldGoalCurrent();
-        Translation3d delta =
-                goalPoseWorld.getTranslation().minus(shotPoseWorld.getTranslation());
+        Translation3d delta = goalPoseWorld.getTranslation().minus(shotPoseWorld.getTranslation());
         return delta.toTranslation2d();
     }
 
