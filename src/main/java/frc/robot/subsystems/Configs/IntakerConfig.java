@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Configs;
 
-import static frc.robot.RobotConstants.CANIVORE_BUS;
+import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -14,7 +14,7 @@ public class IntakerConfig {
     public static final SubsystemConfig INTAKER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_BUS)
+                    .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(false)

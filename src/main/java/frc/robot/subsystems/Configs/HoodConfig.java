@@ -1,7 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.RobotConstants.CANIVORE_BUS;
+import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
@@ -17,7 +17,7 @@ public class HoodConfig {
     public static final SubsystemConfig HOOD_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_BUS)
+                    .mainBus(CANIVORE_CAN_BUS)
                     .mainId(HOOD_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .SensorToMechanismRatio(HOOD_GEAR_RATIO)

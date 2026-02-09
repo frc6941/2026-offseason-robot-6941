@@ -1,7 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.RobotConstants.CANIVORE_BUS;
+import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -37,7 +37,7 @@ public class TurretConfig {
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_BUS)
+                    .mainBus(CANIVORE_CAN_BUS)
                     .mainId(TURRET_MOTOR_MAIN_ID)
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)

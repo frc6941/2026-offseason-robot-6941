@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Configs;
 
-import static frc.robot.RobotConstants.CANIVORE_BUS;
+import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -16,7 +16,7 @@ public class ShooterConfig {
     public static final SubsystemConfig SHOOTER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_BUS)
+                    .mainBus(CANIVORE_CAN_BUS)
                     .mainId(SHOOTER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .defaultBrake(false)
@@ -25,7 +25,7 @@ public class ShooterConfig {
                             new SubsystemConfig.FollowerConfig[] {
                                 SubsystemConfig.FollowerConfig.builder()
                                         .id(SHOOTER_MOTOR_FOLLOWER_ID)
-                                        .bus(CANIVORE_BUS)
+                                        .bus(CANIVORE_CAN_BUS)
                                         .opposeMain(MotorAlignmentValue.Aligned)
                                         .build()
                             })

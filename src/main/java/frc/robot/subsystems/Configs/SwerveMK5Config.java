@@ -1,7 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.RobotConstants.CANIVORE_BUS;
+import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -145,7 +145,7 @@ public final class SwerveMK5Config {
                     .driveSupplyCurrentLimit(Amps.of(80))
                     .steerStatorCurrentLimit(Amps.of(60))
                     .steerSupplyCurrentLimit(Amps.of(60))
-                    .canivoreCanBus(CANIVORE_BUS)
+                    .canivoreCanBus(CANIVORE_CAN_BUS)
                     .pigeonId(RobotConstants.PIGEON_ID)
                     .build();
 
