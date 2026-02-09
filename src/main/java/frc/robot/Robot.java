@@ -20,13 +20,11 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
-  public static PowerDistribution powerDistribution;
   private Command autonomousCommand;
   private RobotContainer robotContainer;
 
   public Robot() {
     super(RobotConstants.LOOPER_DT);
-    powerDistribution = new PowerDistribution();
   }
 
   @Override
@@ -49,7 +47,6 @@ public class Robot extends LoggedRobot {
     }
     CommandScheduler.getInstance().setPeriod(0.2);
 
-    powerDistribution.clearStickyFaults();
     robotContainer = new RobotContainer();
 
     // elastic
