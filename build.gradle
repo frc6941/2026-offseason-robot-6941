@@ -36,7 +36,11 @@ deploy {
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
 //                    jvmArgs.add("-Xmx64m")
 //                    jvmArgs.add("-XX:MaxDirectMemorySize=32m") // 防止 DirectBuffer/视觉/序列化堆外失控
-//                    jvmArgs.add("-XX:MaxMetaspaceSize=48m")    // 可选
+//                    jvmArgs.add("-XX:MaxMetaspaceSize=48m")
+                    // Enable automatic heap dumps on OutOfMemoryError
+                    // Note: the heap dump path here is a path on a USB flash drive
+                    jvmArgs.add("-XX:+HeapDumpOnOutOfMemoryError")
+                    jvmArgs.add("-XX:HeapDumpPath=/u/frc-usercode.hprof")
                     jvmArgs.add("-Dcom.sun.management.jmxremote=true")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
