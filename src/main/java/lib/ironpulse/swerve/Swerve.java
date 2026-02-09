@@ -24,11 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lib.ironpulse.limelight.Localizable;
 import lib.ironpulse.utils.LoggedTracer;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class Swerve extends SubsystemBase {
+public class Swerve extends SubsystemBase implements Localizable {
     // locks
     static final Lock odometryLock = new ReentrantLock();
     // config and io
@@ -238,6 +239,10 @@ public class Swerve extends SubsystemBase {
                 visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
+    public double getIMUYaw() {
+        return imuIO.getYawDeg();
+    }
+
     // ------- Configurations -------
     public SwerveLimit getSwerveLimit() {
         return setpointGenerator.getChassisLimit();
@@ -261,6 +266,10 @@ public class Swerve extends SubsystemBase {
 
     public void setSwerveModuleLimitDefault() {
         setpointGenerator.setModuleLimit(config.defaultSwerveModuleLimit);
+    }
+
+    public void setIMUYaw(double yaw) {
+        imuIO.setYawDeg(yaw);
     }
 
     public enum MODE {

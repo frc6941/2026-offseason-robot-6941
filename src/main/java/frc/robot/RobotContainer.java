@@ -34,6 +34,8 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.limelight.LimelightIOReal;
+import lib.ironpulse.limelight.LimelightSubsystem;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
@@ -44,6 +46,7 @@ import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.AllianceFlipUtil;
+import lib.ironpulse.utils.LimelightHelpers;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 
@@ -53,7 +56,8 @@ public class RobotContainer {
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-
+    private final LimelightSubsystem limelightSubsystem;
+    // private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
     private final Swerve swerve;
@@ -77,6 +81,24 @@ public class RobotContainer {
                             new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
                             new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
                             new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
+            limelightSubsystem =
+                    new LimelightSubsystem(
+                            RobotConstants.LimelightConstants.limelightSubsystemConfig,
+                            swerve,
+                            new LimelightIOReal(
+                                    RobotConstants.LimelightConstants.limelight1Config,
+                                    () ->
+                                            RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                    .toPose2d()
+                                                    .getRotation()
+                                                    .getDegrees(),
+                                    () -> {
+                                        // angular velocity > 360 deg per second
+                                        return RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .getDegrees()
+                                                > 360;
+                                    }));
             turret =
                     new TurretSubsystem(
                             TurretConfig.TURRET_CONFIG,
@@ -173,6 +195,10 @@ public class RobotContainer {
                             HoodParamsNT.asPositionParamSources(),
                             Degrees.of(0),
                             Degrees.of(360));
+            // TODO: limelight simulation
+            limelightSubsystem =
+                    new LimelightSubsystem(
+                            RobotConstants.LimelightConstants.limelightSubsystemConfig, swerve);
         }
 
         //    shotCalculator.initialize(
@@ -181,6 +207,7 @@ public class RobotContainer {
         //            Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
         //    shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         configureBindings();
+        LimelightHelpers.SetIMUMode("limelight", 1);
         //    shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
@@ -239,6 +266,7 @@ public class RobotContainer {
         //                new
         // Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
         //                now.in(Seconds),
+        //                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
     }
 
     private void configureBindings() {
