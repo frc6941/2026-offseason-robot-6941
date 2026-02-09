@@ -22,7 +22,6 @@ import lib.ntext.NTParameter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ShootingSuperstructure {
-  private static final String NAME = "ShootingSS";
   private final TurretSubsystem turret;
   private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
   private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -92,19 +91,6 @@ public class ShootingSuperstructure {
         idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode : IdxMode.OFF)));
   }
 
-  // TODO: remove it when test finished
-  public Command runDirectTest(double shooterDutyCycle, Angle hoodAngle) {
-    return Commands.parallel(
-        shooter.runDutyCycle(shooterDutyCycle), hood.runPosition(() -> hoodAngle)
-        // shooter.runVelocity(() -> shooterVelocity)
-        );
-  }
-
-  public Command runDirectTest(Angle hoodAngle) {
-    return Commands.parallel(
-        hood.runPosition(() -> hoodAngle),
-        shooter.runVelocity(RotationsPerSecond.of(ShooterParamsNT.testVelRPS.getValue())));
-  }
 
   @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
   public boolean readyToShoot() {
@@ -125,11 +111,4 @@ public class ShootingSuperstructure {
     REVERSE
   }
 
-  @NTParameter(tableName = "Params/" + NAME + "TestFrame")
-  public static final class ShootingFrameParams {
-    // shold be small
-    public static final double turretAngleWorldDeg = 0;
-    public static final double hoodAngleDeg = 0.0;
-    public static final double muzzleSpeedMPS = 0.0;
-  }
 }

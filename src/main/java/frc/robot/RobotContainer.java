@@ -240,10 +240,6 @@ public class RobotContainer {
     driver.leftTrigger().onFalse(spindexer.runDutyCycle(0));
     driver.rightTrigger().onTrue(spindexer.runDutyCycle(1.0));
     driver.rightTrigger().onFalse(spindexer.runDutyCycle(0));
-//    driver.b().onTrue(shootingSuperstructure.runDirectTest(Degrees.of(30)));
-//    driver.b().onFalse(shootingSuperstructure.runDirectTest(Degrees.of(0)));
-//    driver.x().onTrue(shootingSuperstructure.runDirectTest(0, Degrees.of(10)));
-//    driver.x().onFalse(shootingSuperstructure.runDirectTest(0, Degrees.of(0)));
     //    driver
     //        .leftBumper()
     //        .onTrue(new SysIdCommand(spindexer).dynamic(SysIdRoutine.Direction.kForward));
