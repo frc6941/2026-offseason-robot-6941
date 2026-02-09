@@ -10,7 +10,6 @@ public class SerialSubsystem extends SubsystemBase {
 
     private SerialPort arduino;
     private final StringBuilder rxBuffer = new StringBuilder();
-    private boolean enabled = false;
 
     @Getter private double speed = 0.0;
     @Getter private String lastException = "";
@@ -28,21 +27,9 @@ public class SerialSubsystem extends SubsystemBase {
         }
     }
 
-    public void enable() {
-        enabled = true;
-        rxBuffer.setLength(0);
-        lastException = "";
-        lastRxTime = 0.0;
-    }
-
-    public void disable() {
-        enabled = false;
-        rxBuffer.setLength(0);
-    }
-
     @Override
     public void periodic() {
-        if (!enabled || arduino == null) return;
+        if (arduino == null) return;
 
         int available = arduino.getBytesReceived();
         if (available <= 0) return;
@@ -88,6 +75,5 @@ public class SerialSubsystem extends SubsystemBase {
         Logger.recordOutput("Arduino/Speed", speed);
         Logger.recordOutput("Arduino/Exception", lastException);
         Logger.recordOutput("Arduino/TimedOut", isTimedOut());
-        Logger.recordOutput("Arduino/Enabled", enabled);
     }
 }

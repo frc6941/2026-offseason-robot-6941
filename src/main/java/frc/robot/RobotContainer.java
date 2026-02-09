@@ -26,6 +26,7 @@ import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.Configs.TurretConfig;
 import frc.robot.subsystems.Configs.TurretVelParamsNT;
+import frc.robot.subsystems.IntakerSubsystem.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
@@ -61,6 +62,7 @@ public class RobotContainer {
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
     private final LimelightSubsystem limelightSubsystem;
+    private final IntakerSubsystem intakerSubsystem;
     // private final IntakePivotSubsystem intakePivot = new IntakePivotSubsystem();
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
@@ -70,7 +72,8 @@ public class RobotContainer {
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final ShootingSuperstructure shootingSuperstructure;
-    private final VelocityMotorSubsystem intaker;
+    private final VelocityMotorSubsystem intakerRoller;
+    private final PositionMotorSubsystem intakerExtension;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -149,12 +152,20 @@ public class RobotContainer {
                             HoodParamsNT.asPositionParamSources(),
                             Degrees.of(0),
                             Degrees.of(360.0 / HoodConfig.HOOD_CONFIG.SensorToMechanismRatio));
-            intaker =
+            intakerRoller =
                     new VelocityMotorSubsystem(
-                            IntakerConfig.INTAKER_CONFIG,
+                            IntakerRollerConfig.INTAKER_ROLLER_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(IntakerConfig.INTAKER_CONFIG),
-                            IntakerParamsNT.asVelocityParamSources());
+                            new MotorIOTalonFX(IntakerRollerConfig.INTAKER_ROLLER_CONFIG),
+                            IntakerRollerParamsNT.asVelocityParamSources());
+            intakerExtension =
+                    new PositionMotorSubsystem(
+                            IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOTalonFX(IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG),
+                            IntakerExtensionParamsNT.asPositionParamSources(),
+                            Meters.of(0),
+                            Millimeters.of(9.42 * 11.0));
 
         } else {
             swerve =
@@ -173,12 +184,12 @@ public class RobotContainer {
                             encoderG1Sim,
                             encoderG2Sim,
                             TurretVelParamsNT.asVelocityParamSources());
-            intaker =
+            intakerRoller =
                     new VelocityMotorSubsystem(
-                            IntakerConfig.INTAKER_CONFIG,
+                            IntakerRollerConfig.INTAKER_ROLLER_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOSim(IntakerConfig.INTAKER_CONFIG),
-                            IntakerParamsNT.asVelocityParamSources());
+                            new MotorIOSim(IntakerRollerConfig.INTAKER_ROLLER_CONFIG),
+                            IntakerRollerParamsNT.asVelocityParamSources());
             shooter =
                     new VelocityMotorSubsystem<>(
                             ShooterConfig.SHOOTER_CONFIG,
@@ -199,6 +210,14 @@ public class RobotContainer {
                             HoodParamsNT.asPositionParamSources(),
                             Degrees.of(0),
                             Degrees.of(360));
+            intakerExtension =
+                    new PositionMotorSubsystem(
+                            IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG,
+                            new MotorInputsAutoLogged(),
+                            new MotorIOSim(IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG),
+                            IntakerExtensionParamsNT.asPositionParamSources(),
+                            Meters.of(0),
+                            Millimeters.of(9.42 * 11.0));
             // TODO: limelight simulation
             limelightSubsystem =
                     new LimelightSubsystem(
@@ -210,6 +229,7 @@ public class RobotContainer {
                         ShotCalculator.TargetMode.GOAL,
                         Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
+        intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
         configureBindings();
         LimelightHelpers.SetIMUMode("limelight", 1);
         //    shootingSuperstructure.setDefaultCommand();
@@ -351,6 +371,10 @@ public class RobotContainer {
                 .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
         driver.povLeft()
                 .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
+        driver.x().onTrue(intakerSubsystem.deployIntake());
+        driver.x().onFalse(intakerSubsystem.retractIntake());
+        driver.y().onTrue(intakerSubsystem.outtake());
+        driver.y().onFalse(intakerSubsystem.deployIntake());
     }
 
     public Command getAutonomousCommand() {
