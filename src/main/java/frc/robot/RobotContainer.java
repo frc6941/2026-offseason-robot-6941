@@ -238,8 +238,8 @@ public class RobotContainer {
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
-                        () -> driver.getLeftY(),
-                        () -> driver.getLeftX(),
+                        () -> -driver.getLeftY(),
+                        () -> -driver.getLeftX(),
                         () -> -driver.getRightX(),
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
@@ -314,8 +314,8 @@ public class RobotContainer {
                                         swerve,
                                         () ->
                                                 AllianceFlipUtil.shouldFlip()
-                                                        ? Rotation2d.kZero
-                                                        : Rotation2d.k180deg)
+                                                        ? Rotation2d.k180deg
+                                                        : Rotation2d.kZero)
                                 .alongWith(
                                         Commands.runOnce(
                                                 () -> {
