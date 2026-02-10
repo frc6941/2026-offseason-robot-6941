@@ -70,22 +70,22 @@ public class RobotContainer {
     public RobotContainer() {
 
         if (RobotBase.isReal()) {
-                swerve =
-                        new Swerve(
-                                SwerveMK5Config.kRealConfig,
-                                new ImuIOPigeon(SwerveMK5Config.kRealConfig),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
-                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
-        //     swerve =
-        //             new Swerve(
-        //                     SwerveMK5Config.kSimConfig,
-        //                     new ImuIOSim(),
-        //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
-        //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
-        //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
-        //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
+            swerve =
+                    new Swerve(
+                            SwerveMK5Config.kRealConfig,
+                            new ImuIOPigeon(SwerveMK5Config.kRealConfig),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
+                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
+            //     swerve =
+            //             new Swerve(
+            //                     SwerveMK5Config.kSimConfig,
+            //                     new ImuIOSim(),
+            //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
+            //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
+            //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
+            //                     new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
             //     limelightSubsystem =
             //             new LimelightSubsystem(
             //                     RobotConstants.LimelightConstants.limelightSubsystemConfig,
@@ -238,13 +238,13 @@ public class RobotContainer {
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
-                        () -> -driver.getLeftY(),
-                        () -> -driver.getLeftX(),
+                        () -> driver.getLeftY(),
+                        () -> driver.getLeftX(),
                         () -> -driver.getRightX(),
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-        //turret.setDefaultCommand(turret.runTurretTargetLoop());
+        turret.setDefaultCommand(turret.runTurretTargetLoop());
     }
 
     public void robotPeriodic() {
@@ -300,13 +300,13 @@ public class RobotContainer {
         // SysIdCommand turretSysId = new SysIdCommand(turret);
 
         driver.a().onTrue(turret.setCurrentPosition(Degrees.zero()).ignoringDisable(true));
-        driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0), TurretMode.SEEKING));
+        driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0), TurretMode.TRACKING));
         driver.povLeft()
-                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(135), TurretMode.SEEKING));
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90), TurretMode.TRACKING));
         driver.povDown()
-                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.SEEKING));
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
         driver.povRight()
-                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(-135), TurretMode.SEEKING));
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(-90), TurretMode.TRACKING));
 
         driver.start()
                 .onTrue(
@@ -387,12 +387,11 @@ public class RobotContainer {
         //                                                         "Invalid");
         //                                             }
         //                                         })));
-        // driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0),
-        // TurretMode.SEEKING));
+        driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0), TurretMode.SEEKING));
         // driver.povRight()
         //         .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90), TurretMode.SEEKING));
-        // driver.povDown()
-        //         .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
+        driver.povDown()
+                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180), TurretMode.TRACKING));
         // driver.povLeft()
         //         .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270), TurretMode.TRACKING));
     }

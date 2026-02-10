@@ -42,6 +42,7 @@ public class TurretConfig {
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
+                    .defaultBrake(true)
                     .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT)
                     .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT.unaryMinus())
                     .statorCurrentLimitAmps(80)
@@ -65,6 +66,7 @@ public class TurretConfig {
         public static final double kS = 0.23;
         // Tolerances / behavior
         public static final double velocityAtGoalToleranceRPS = 1;
+        public static final boolean isBrake = true;
     }
 
     @NTParameter(tableName = "Params/" + NAME + "Pos")

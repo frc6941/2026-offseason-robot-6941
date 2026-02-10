@@ -2,7 +2,6 @@ package frc.robot.subsystems.ShootingSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.Configs.TurretConfig.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -96,6 +95,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     @Override
     public void periodic() {
         updateUnwrappedTurretAngle();
+        updateController(currentMode);
         super.periodic();
         targetAngleRobotWrapped = toRobotRelativeFromWorld(targetAngleWorld.get());
         targetAngleRobot = unwrapTargetAngle(targetAngleRobotWrapped, getPosition());
@@ -110,13 +110,12 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleWorld", targetAngleWorld.get().in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleRobot", targetAngleRobot.in(Degrees));
-        Logger.recordOutput(
-                getName() + "/targetVelocity", getCurrSetpoint().in(RotationsPerSecond));
+        Logger.recordOutput(getName() + "/targetVelocity", getCurrSetpoint().in(DegreesPerSecond));
         Logger.recordOutput(getName() + "/atGoal/position", positionAtGoal());
         Logger.recordOutput(getName() + "/atGoal/velocity", velocityAtGoal());
         Logger.recordOutput(getName() + "/atGoal", atGoal());
         Logger.recordOutput(getName() + "/currPosition", getPosition().in(Degrees));
-        Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(RotationsPerSecond));
+        Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(DegreesPerSecond));
     }
 
     public Command setTurretPoseWorld(Supplier<Angle> targetAngleSupplier, TurretMode mode) {
@@ -157,13 +156,13 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     }
 
     private AngularVelocity calculateTargetVelocity(Angle targetAngle) {
-        updateController(currentMode);
 
         double desiredVelocity =
                 posVelCtl.calculate(getPosition().in(Degrees), targetAngle.in(Degrees));
         // compansate for the chassis rotation
         double chassisOmegaDegPerSec =
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
+        Logger.recordOutput(getName() + "/addedV", chassisOmegaDegPerSec);
         desiredVelocity -=
                 TurretPosParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;
         return DegreesPerSecond.of(desiredVelocity);
