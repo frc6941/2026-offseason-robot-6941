@@ -14,8 +14,8 @@ public class TurretConfig {
 
     public static final String NAME = "Turret";
 
-    public static final int TURRET_MOTOR_MAIN_ID = 96;
-    public static final double TURRET_GEAR_RATIO = 40.0;
+    public static final int TURRET_MOTOR_MAIN_ID = 20;
+    public static final double TURRET_GEAR_RATIO = 34 / 8 * 88 / 11;
 
     public static final int TURRET_ENCODER_G1_ID = 95;
     public static final int TURRET_ENCODER_G2_ID = 94;
@@ -31,7 +31,7 @@ public class TurretConfig {
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(250.0);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(100.0);
 
-    public static final Angle TURRET_SOFT_LIMIT = Degrees.of(200.0);
+    public static final Angle TURRET_SOFT_LIMIT = Degrees.of(220.0);
     public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(5.0);
 
     public static final SubsystemConfig TURRET_CONFIG =
@@ -40,7 +40,7 @@ public class TurretConfig {
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(TURRET_MOTOR_MAIN_ID)
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
-                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT)
                     .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT.unaryMinus())
@@ -57,12 +57,12 @@ public class TurretConfig {
         // velocity gains
         // IMPORTANT: Makesure we tune these first before tuning the position gains
         // Velocity trackeing should be clean and accurate
-        public static final double kP = 3.75;
+        public static final double kP = 2.5;
         public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kV = 0.1308;
-        public static final double kA = 0.0068;
-        public static final double kS = 0.13;
+        public static final double kD = 0.1;
+        public static final double kV = 3.0112;
+        public static final double kA = 0.2948;
+        public static final double kS = 0.23;
         // Tolerances / behavior
         public static final double velocityAtGoalToleranceRPS = 1;
     }

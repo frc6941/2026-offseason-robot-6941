@@ -2,6 +2,7 @@ package frc.robot.subsystems.ShootingSubsystem;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.subsystems.Configs.TurretConfig.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -89,7 +90,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         this.encoderG1 = encoderG1;
         this.encoderG2 = encoderG2;
         updateUnwrappedTurretAngle();
-        io.setCurrentPosition(unwrappedTurretAngle);
+        // io.setCurrentPosition(unwrappedTurretAngle);
     }
 
     @Override
@@ -109,12 +110,13 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleWorld", targetAngleWorld.get().in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleRobot", targetAngleRobot.in(Degrees));
-        Logger.recordOutput(getName() + "/targetVelocity", getCurrSetpoint().in(DegreesPerSecond));
+        Logger.recordOutput(
+                getName() + "/targetVelocity", getCurrSetpoint().in(RotationsPerSecond));
         Logger.recordOutput(getName() + "/atGoal/position", positionAtGoal());
         Logger.recordOutput(getName() + "/atGoal/velocity", velocityAtGoal());
         Logger.recordOutput(getName() + "/atGoal", atGoal());
         Logger.recordOutput(getName() + "/currPosition", getPosition().in(Degrees));
-        Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(DegreesPerSecond));
+        Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(RotationsPerSecond));
     }
 
     public Command setTurretPoseWorld(Supplier<Angle> targetAngleSupplier, TurretMode mode) {
@@ -131,25 +133,25 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     }
 
     private void updateController(TurretMode mode) {
-        if (mode == lastControllerMode && !TurretPosParamsNT.isAnyChanged()) {
-            return;
-        }
-        switch (mode) {
-            case TRACKING:
-                posVelCtl.setP(TurretPosParamsNT.kpTrack.getValue());
-                posVelCtl.setI(TurretPosParamsNT.kiTrack.getValue());
-                posVelCtl.setD(TurretPosParamsNT.kdTrack.getValue());
-                posVelCtl.setConstraints(new TrapezoidProfile.Constraints(1.0e6, 1.0e6));
-                break;
-            case SEEKING:
-                posVelCtl.setP(TurretPosParamsNT.kpSeek.getValue());
-                posVelCtl.setI(TurretPosParamsNT.kiSeek.getValue());
-                posVelCtl.setD(TurretPosParamsNT.kdSeek.getValue());
-                posVelCtl.setConstraints(
-                        new TrapezoidProfile.Constraints(
-                                TurretPosParamsNT.maxVelocityRPS.getValue() * 360.0,
-                                TurretPosParamsNT.maxAccelerationRPS2.getValue() * 360.0));
-                break;
+        if (mode != lastControllerMode || TurretPosParamsNT.isAnyChanged()) {
+
+            switch (mode) {
+                case TRACKING:
+                    posVelCtl.setP(TurretPosParamsNT.kpTrack.getValue());
+                    posVelCtl.setI(TurretPosParamsNT.kiTrack.getValue());
+                    posVelCtl.setD(TurretPosParamsNT.kdTrack.getValue());
+                    posVelCtl.setConstraints(new TrapezoidProfile.Constraints(1.0e6, 1.0e6));
+                    break;
+                case SEEKING:
+                    posVelCtl.setP(TurretPosParamsNT.kpSeek.getValue());
+                    posVelCtl.setI(TurretPosParamsNT.kiSeek.getValue());
+                    posVelCtl.setD(TurretPosParamsNT.kdSeek.getValue());
+                    posVelCtl.setConstraints(
+                            new TrapezoidProfile.Constraints(
+                                    TurretPosParamsNT.maxVelocityRPS.getValue() * 360.0,
+                                    TurretPosParamsNT.maxAccelerationRPS2.getValue() * 360.0));
+                    break;
+            }
         }
         lastControllerMode = mode;
     }
@@ -258,6 +260,10 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         }
 
         return turretAngle;
+    }
+
+    public Command setCurrentPosition(Angle pos) {
+        return Commands.runOnce(() -> io.setCurrentPosition(pos));
     }
 
     public enum TurretMode {
