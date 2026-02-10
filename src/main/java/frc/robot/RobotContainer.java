@@ -52,7 +52,6 @@ import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.AllianceFlipUtil;
-import lib.ironpulse.utils.LimelightHelpers;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 
@@ -231,8 +230,9 @@ public class RobotContainer {
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
         configureBindings();
-        LimelightHelpers.SetIMUMode("limelight", 1);
-        //    shootingSuperstructure.setDefaultCommand();
+        // LimelightHelpers.SetIMUMode("limelight", 1);
+        // LimelightHelpers.SetIMUMode("limelight", 1);
+        shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
