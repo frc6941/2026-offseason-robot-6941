@@ -38,9 +38,9 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/IdxModes")
     public static final class SpindexerModeParams {
-        public static final double feedRPS = 3.0;
+        public static final double feedRPS = 2.5;
 
-        public static final double revRPS = -3.0;
+        public static final double revRPS = -2.5;
         public static final double idleRPS = 0.0;
     }
 

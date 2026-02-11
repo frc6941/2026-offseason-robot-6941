@@ -5,8 +5,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.RobotConstants.LED_LENGTH;
-import static frc.robot.RobotConstants.LED_PORT;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -35,7 +33,6 @@ import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import lib.ironpulse.indicator.IndicatorIO;
-import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
 import lib.ironpulse.indicator.IndicatorSubsystem;
 import lib.ironpulse.io.*;
@@ -70,7 +67,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_SWERVE_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -177,7 +174,7 @@ public class RobotContainer {
                                     : new MotorIOSim(HoodConfig.HOOD_CONFIG),
                             HoodParamsNT.asPositionParamSources(),
                             Degrees.of(0),
-                            Degrees.of(360.0 / HoodConfig.HOOD_CONFIG.SensorToMechanismRatio));
+                            Degrees.of(360.0));
             intakerRoller =
                     new VelocityMotorSubsystem(
                             IntakerRollerConfig.INTAKER_ROLLER_CONFIG,
@@ -199,7 +196,9 @@ public class RobotContainer {
                             Meters.of(0),
                             Meters.of(0.00942 * 11.0));
 
-            indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOARGB(LED_PORT, LED_LENGTH));
+            //            indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOARGB(LED_PORT,
+            // LED_LENGTH));
+            indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOSim());
         } else {
             swerve =
                     new Swerve(
@@ -340,32 +339,31 @@ public class RobotContainer {
                                 }));
         driver.leftBumper().onTrue(intakerSubsystem.outtake());
         driver.leftBumper().onFalse(intakerSubsystem.intake());
-        driver.rightBumper()
-                .onTrue(
-                        shootingSuperstructure
-                                .runFrame(
-                                        () ->
-                                                new ShotFrame(
-                                                        Degrees.of(0),
-                                                        Degrees.of(30),
-                                                        MetersPerSecond.of(0.5)),
-                                        ShootingSuperstructure.IdxMode.FEED)
-                                .withDeadline(
-                                        new WaitUntilCommand(
-                                                () -> !driver.rightBumper().getAsBoolean())));
-        driver.rightTrigger()
-                .onFalse(
-                        shootingSuperstructure
-                                .runFrame(
-                                        () ->
-                                                new ShotFrame(
-                                                        Degrees.of(0),
-                                                        Degrees.of(20),
-                                                        MetersPerSecond.of(1)),
-                                        ShootingSuperstructure.IdxMode.FEED)
-                                .withDeadline(
-                                        new WaitUntilCommand(
-                                                () -> !driver.rightBumper().getAsBoolean())));
+
+        driver.x()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () ->
+                                        new ShotFrame(
+                                                Degrees.of(0),
+                                                Degrees.of(55),
+                                                MetersPerSecond.of(10)),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
+        driver.y()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () ->
+                                        new ShotFrame(
+                                                Degrees.of(0),
+                                                Degrees.of(35),
+                                                MetersPerSecond.of(5)),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
         driver.start()
                 .onTrue(
                         SwerveCommands.resetAngle(

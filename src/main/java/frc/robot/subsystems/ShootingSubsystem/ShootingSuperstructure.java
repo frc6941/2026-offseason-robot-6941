@@ -88,10 +88,13 @@ public class ShootingSuperstructure {
                         }));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame, IdxMode idxMode) {
+    public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
         return Commands.parallel(
                 runFrame(frame),
-                idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode : IdxMode.OFF)));
+                //                idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode :
+                // IdxMode.OFF)));
+                idx.runVelocity(() -> getIdxSpeed(idxMode.get())));
+        // TODO: revert
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")

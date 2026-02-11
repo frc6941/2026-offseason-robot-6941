@@ -10,7 +10,7 @@ import lib.ntext.NTParameter;
 public class HoodConfig {
     public static final String NAME = "Hood";
     public static final int HOOD_MOTOR_MAIN_ID = 52;
-    public static final double HOOD_GEAR_RATIO = 48.0 / 8.0;
+    public static final double HOOD_GEAR_RATIO = 194.0 / 12.0 * 48.0 / 8.0;
     // Local hardware constants
     public static final SubsystemConfig HOOD_CONFIG =
             SubsystemConfig.builder()
@@ -21,9 +21,9 @@ public class HoodConfig {
                     .SensorToMechanismRatio(HOOD_GEAR_RATIO)
                     .zeroingConfig(
                             SubsystemConfig.ZeroingConfig.builder()
-                                    .zeroingCurrentLimit(50)
+                                    .zeroingCurrentLimit(25)
                                     .zeroingFilterSize(5)
-                                    .zeroingVoltage(1)
+                                    .zeroingVoltage(-1)
                                     .build())
                     // TODO: set this so the target angle represents the Real angle of the hood
                     .zeroOffset(Degrees.of(12.8))
