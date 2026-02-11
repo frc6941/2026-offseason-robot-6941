@@ -4,13 +4,13 @@ package lib.ironpulse.limelight;
 // see: https://www.chiefdelphi.com/t/questions-on-how-to-tune-vision-standard-deviations/509750
 /** Runtime tuning sources for limelight vision covariance and IMU correction threshold. */
 public interface DeviationParamSources {
-  double xStdDev();
+    double xStdDev();
 
-  double yStdDev();
+    double yStdDev();
 
-  double zStdDev();
+    double zStdDev();
 
-  double angleStdDev();
+    double angleStdDev();
 
-  double imuCorrectionReliabilityThreshold();
+    double imuCorrectionReliabilityThreshold();
 }

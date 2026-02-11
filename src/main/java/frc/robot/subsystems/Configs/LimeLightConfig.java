@@ -9,8 +9,8 @@ public class LimeLightConfig {
     public static final LimelightIOConfig limelight1Config =
             LimelightIOConfig.builder()
                     .name(NAME)
-                    .isLimelight4(true)
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
+                    .limeLight4Config(LimelightIOConfig.Limelight4Config.builder().build())
                     .build();
 
     public static DeviationParamSources asDeviationParams() {

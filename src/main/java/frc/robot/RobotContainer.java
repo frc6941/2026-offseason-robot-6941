@@ -253,6 +253,7 @@ public class RobotContainer {
         //                 Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         // intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(

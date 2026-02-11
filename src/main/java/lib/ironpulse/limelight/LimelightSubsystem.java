@@ -4,7 +4,10 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import java.util.Map;
 import lib.ironpulse.math.MathTools;
@@ -14,6 +17,7 @@ public class LimelightSubsystem extends SubsystemBase {
     private final HashMap<String, LimelightIO> ioNames = new HashMap<>();
     private final HashMap<LimelightIO, LimelightIOInputsAutoLogged> ios = new HashMap<>();
     private final Localizable localizationProvider;
+    private final boolean robotEnabledPrev = true;
 
     public LimelightSubsystem(Localizable localizationProvider, LimelightIO... ios) {
         super("Limelight");
@@ -22,6 +26,12 @@ public class LimelightSubsystem extends SubsystemBase {
             this.ios.put(io, new LimelightIOInputsAutoLogged());
             this.ioNames.put(io.getName(), io);
         }
+
+        new Trigger(DriverStation::isEnabled)
+                .onTrue(new InstantCommand(() -> setThrottleAll(true)));
+
+        new Trigger(DriverStation::isDisabled)
+                .onTrue(new InstantCommand(() -> setThrottleAll(false)));
     }
 
     /**
@@ -107,5 +117,11 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public void clearAprilTagIdFilter(String id) {
         getIoById(id).clearAprilTagIdFilter();
+    }
+
+    private void setThrottleAll(boolean enabled) {
+        for (LimelightIO io : ios.keySet()) {
+            io.setThrottle(enabled);
+        }
     }
 }

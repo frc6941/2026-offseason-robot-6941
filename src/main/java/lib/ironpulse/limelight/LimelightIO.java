@@ -9,11 +9,11 @@ public interface LimelightIO {
     // reliability score: from 0 to 1
     double getReliabilityScore(LimelightHelpers.PoseEstimate poseEstimate);
 
-    default void setPipeline(int pipeline) {}
-
     default int getPipeline() {
         return 0;
     }
+
+    default void setPipeline(int pipeline) {}
 
     default void setLEDMode(LEDMode mode) {}
 
@@ -24,6 +24,8 @@ public interface LimelightIO {
     }
 
     default void updateInputs(LimelightIOInputs inputs) {}
+
+    default void setThrottle(boolean robotEnabled) {}
 
     default double[] getVisionStdDevComponents(double reliability) {
         return new double[] {
@@ -48,15 +50,6 @@ public interface LimelightIO {
 
     default String getName() {
         return "UNNAMED";
-    }
-
-    @AutoLog
-    class LimelightIOInputs {
-        public Pose3d pose;
-        public double timestampSeconds;
-        public double latency;
-        public double reliability;
-        public int[] detectedTagIds;
     }
 
     enum InternalIMUMode {
@@ -84,5 +77,14 @@ public interface LimelightIO {
         ON,
         OFF,
         BLINK
+    }
+
+    @AutoLog
+    class LimelightIOInputs {
+        public Pose3d pose;
+        public double timestampSeconds;
+        public double latency;
+        public double reliability;
+        public int[] detectedTagIds;
     }
 }
