@@ -1,10 +1,9 @@
 package lib.ironpulse.limelight;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import lib.ironpulse.utils.LimelightHelpers;
 import lombok.Getter;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface LimelightIO {
     // reliability score: from 0 to 1

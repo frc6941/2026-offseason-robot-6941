@@ -98,7 +98,7 @@ public class RobotContainer {
                     new LimelightSubsystem(
                             swerve,
                             new LimelightIOReal(
-                                    RobotConstants.LimelightConstants.limelight1Config,
+                                    LimeLightConfig.limelight1Config,
                                     () ->
                                             RobotStateRecorder.getPoseWorldRobotCurrent()
                                                     .toPose2d()
@@ -110,7 +110,8 @@ public class RobotContainer {
                                                         .getRotation()
                                                         .getDegrees()
                                                 > 360;
-                                    }));
+                                    },
+                                    LimeLightConfig.asDeviationParams()));
             turret =
                     new TurretSubsystem(
                             TurretConfig.TURRET_CONFIG,

@@ -15,15 +15,18 @@ public class LimelightIOReal implements LimelightIO {
     public final LimelightIOConfig config;
     private final DoubleSupplier yawSupplier;
     private final BooleanSupplier rejectionSupplier;
+    private final DeviationParamSources deviationParams;
     private boolean isPrevDisabled = true;
 
     public LimelightIOReal(
             LimelightIOConfig config,
             DoubleSupplier yawSupplier,
-            BooleanSupplier rejectionSupplier) {
+            BooleanSupplier rejectionSupplier,
+            DeviationParamSources deviationParams) {
         this.config = config;
         this.yawSupplier = yawSupplier;
         this.rejectionSupplier = rejectionSupplier;
+        this.deviationParams = deviationParams;
         if (config.useInternalIMU && !config.isLimelight4) {
             throw new IllegalArgumentException("Internal IMU only exists on limelight 4");
         } else if (config.useInternalIMU) {
@@ -87,11 +90,6 @@ public class LimelightIOReal implements LimelightIO {
     }
 
     @Override
-    public void setPipeline(int pipeline) {
-        LimelightHelpers.setPipelineIndex(config.name, pipeline);
-    }
-
-    @Override
     public void setLEDMode(LEDMode mode) {
         switch (mode) {
             case ON -> LimelightHelpers.setLEDMode_ForceOn(config.name);
@@ -104,6 +102,11 @@ public class LimelightIOReal implements LimelightIO {
     @Override
     public int getPipeline() {
         return (int) LimelightHelpers.getCurrentPipelineIndex(config.name);
+    }
+
+    @Override
+    public void setPipeline(int pipeline) {
+        LimelightHelpers.setPipelineIndex(config.name, pipeline);
     }
 
     @Override
@@ -146,16 +149,16 @@ public class LimelightIOReal implements LimelightIO {
     @Override
     public double[] getVisionStdDevComponents(double reliability) {
         return new double[] {
-            config.xStdDev * (2 - reliability),
-            config.yStdDev * (2 - reliability),
-            config.zStdDev * (2 - reliability),
-            config.angleStdDev * (2 - reliability)
+            deviationParams.xStdDev() * (2 - reliability),
+            deviationParams.yStdDev() * (2 - reliability),
+            deviationParams.zStdDev() * (2 - reliability),
+            deviationParams.angleStdDev() * (2 - reliability)
         };
     }
 
     @Override
     public double getImuCorrectionReliabilityThreshold() {
-        return config.imuCorrectionReliabilityThreshold;
+        return deviationParams.imuCorrectionReliabilityThreshold();
     }
 
     @Override
