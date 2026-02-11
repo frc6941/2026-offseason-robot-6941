@@ -10,6 +10,8 @@ import lombok.experimental.SuperBuilder;
 public class SwerveMK5NConfig extends SwerveConfig {
     public Current driveStatorCurrentLimit;
     public Current steerStatorCurrentLimit;
+    public Current driveSupplyCurrentLimit;
+    public Current steerSupplyCurrentLimit;
     public Frequency odometryFrequency;
     public CANBus canivoreCanBus;
     public int pigeonId;

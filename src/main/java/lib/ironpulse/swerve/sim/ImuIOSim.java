@@ -34,4 +34,15 @@ public class ImuIOSim implements ImuIO {
                             inputs.yawPosition.getMeasure())
                 };
     }
+
+    @Override
+    public void setYawDeg(double yaw) {
+        // FIXME
+    }
+
+    @Override
+    public double getYawDeg() {
+        // FIXME
+        return 0;
+    }
 }

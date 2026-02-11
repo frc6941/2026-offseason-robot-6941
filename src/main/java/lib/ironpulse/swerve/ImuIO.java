@@ -10,6 +10,10 @@ public interface ImuIO {
 
     default void reset() {}
 
+    void setYawDeg(double yaw);
+
+    double getYawDeg();
+
     @AutoLog
     class ImuIOInputs {
         public boolean connected = false;

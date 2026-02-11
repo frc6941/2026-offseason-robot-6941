@@ -59,6 +59,10 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     private final CANCoderIOInputsAutoLogged encoderG2Inputs = new CANCoderIOInputsAutoLogged();
     private final Alert wrappingAlert =
             new Alert("Turret unwrapping difference is huge", Alert.AlertType.kError);
+    private final Alert invalidHysteresisAlert =
+            new Alert(
+                    "Turret hysteresis invalid: seekEnterErrorDegrees must be > trackEnterErrorDegrees",
+                    Alert.AlertType.kWarning);
     private final ProfiledPIDController posVelCtl =
             new ProfiledPIDController(
                     TurretPosParamsNT.kpSeek.getValue(),
@@ -77,6 +81,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     private Supplier<Angle> targetAngleWorld = () -> Degrees.of(0.0);
     private Angle targetAngleRobotWrapped = Degrees.of(0.0);
     private Angle targetAngleRobot = Degrees.of(0.0);
+    private double absAimErrorDeg = 0.0;
 
     public TurretSubsystem(
             SubsystemConfig config,
@@ -89,15 +94,17 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         this.encoderG1 = encoderG1;
         this.encoderG2 = encoderG2;
         updateUnwrappedTurretAngle();
-        io.setCurrentPosition(unwrappedTurretAngle);
+        // io.setCurrentPosition(unwrappedTurretAngle);
     }
 
     @Override
     public void periodic() {
         updateUnwrappedTurretAngle();
-        super.periodic();
         targetAngleRobotWrapped = toRobotRelativeFromWorld(targetAngleWorld.get());
         targetAngleRobot = unwrapTargetAngle(targetAngleRobotWrapped, getPosition());
+        updateModeFromErrorHysteresis();
+        updateController(currentMode);
+        super.periodic();
         wrappingAlert.set(!getPosition().isNear(unwrappedTurretAngle, Degrees.of(1.0)));
     }
 
@@ -107,21 +114,21 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         Logger.processInputs(getName() + "/Absolute/encoderG2", encoderG2Inputs);
         Logger.recordOutput(
                 getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
-        Logger.recordOutput(getName() + "/targetAngleWorld", targetAngleWorld.get().in(Degrees));
-        Logger.recordOutput(getName() + "/targetAngleRobot", targetAngleRobot.in(Degrees));
+        Logger.recordOutput(getName() + "/targetAngleWorldDeg", targetAngleWorld.get().in(Degrees));
+        Logger.recordOutput(getName() + "/targetAngleRobotDeg", targetAngleRobot.in(Degrees));
+        Logger.recordOutput(getName() + "/aimErrorAbsDeg", absAimErrorDeg);
         Logger.recordOutput(getName() + "/targetVelocity", getCurrSetpoint().in(DegreesPerSecond));
         Logger.recordOutput(getName() + "/atGoal/position", positionAtGoal());
         Logger.recordOutput(getName() + "/atGoal/velocity", velocityAtGoal());
         Logger.recordOutput(getName() + "/atGoal", atGoal());
-        Logger.recordOutput(getName() + "/currPosition", getPosition().in(Degrees));
+        Logger.recordOutput(getName() + "/currAngleRobotDeg", getPosition().in(Degrees));
         Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(DegreesPerSecond));
     }
 
-    public Command setTurretPoseWorld(Supplier<Angle> targetAngleSupplier, TurretMode mode) {
+    public Command setTurretPoseWorld(Supplier<Angle> targetAngleSupplier) {
         return Commands.runOnce(
                 () -> {
                     targetAngleWorld = targetAngleSupplier;
-                    setCurrentMode(mode);
                 });
     }
 
@@ -131,37 +138,37 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     }
 
     private void updateController(TurretMode mode) {
-        if (mode == lastControllerMode && !TurretPosParamsNT.isAnyChanged()) {
-            return;
-        }
-        switch (mode) {
-            case TRACKING:
-                posVelCtl.setP(TurretPosParamsNT.kpTrack.getValue());
-                posVelCtl.setI(TurretPosParamsNT.kiTrack.getValue());
-                posVelCtl.setD(TurretPosParamsNT.kdTrack.getValue());
-                posVelCtl.setConstraints(new TrapezoidProfile.Constraints(1.0e6, 1.0e6));
-                break;
-            case SEEKING:
-                posVelCtl.setP(TurretPosParamsNT.kpSeek.getValue());
-                posVelCtl.setI(TurretPosParamsNT.kiSeek.getValue());
-                posVelCtl.setD(TurretPosParamsNT.kdSeek.getValue());
-                posVelCtl.setConstraints(
-                        new TrapezoidProfile.Constraints(
-                                TurretPosParamsNT.maxVelocityRPS.getValue() * 360.0,
-                                TurretPosParamsNT.maxAccelerationRPS2.getValue() * 360.0));
-                break;
+        if (mode != lastControllerMode || TurretPosParamsNT.isAnyChanged()) {
+
+            switch (mode) {
+                case TRACKING:
+                    posVelCtl.setP(TurretPosParamsNT.kpTrack.getValue());
+                    posVelCtl.setI(TurretPosParamsNT.kiTrack.getValue());
+                    posVelCtl.setD(TurretPosParamsNT.kdTrack.getValue());
+                    posVelCtl.setConstraints(new TrapezoidProfile.Constraints(1.0e6, 1.0e6));
+                    break;
+                case SEEKING:
+                    posVelCtl.setP(TurretPosParamsNT.kpSeek.getValue());
+                    posVelCtl.setI(TurretPosParamsNT.kiSeek.getValue());
+                    posVelCtl.setD(TurretPosParamsNT.kdSeek.getValue());
+                    posVelCtl.setConstraints(
+                            new TrapezoidProfile.Constraints(
+                                    TurretPosParamsNT.maxVelocityRPS.getValue() * 360.0,
+                                    TurretPosParamsNT.maxAccelerationRPS2.getValue() * 360.0));
+                    break;
+            }
         }
         lastControllerMode = mode;
     }
 
     private AngularVelocity calculateTargetVelocity(Angle targetAngle) {
-        updateController(currentMode);
 
         double desiredVelocity =
                 posVelCtl.calculate(getPosition().in(Degrees), targetAngle.in(Degrees));
         // compansate for the chassis rotation
         double chassisOmegaDegPerSec =
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
+        Logger.recordOutput(getName() + "/addedV", chassisOmegaDegPerSec);
         desiredVelocity -=
                 TurretPosParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;
         return DegreesPerSecond.of(desiredVelocity);
@@ -176,6 +183,24 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     public boolean atGoal() {
         return positionAtGoal() && velocityAtGoal();
+    }
+
+    private void updateModeFromErrorHysteresis() {
+        double seekEnterDeg = TurretConfig.TurretPosParams.seekEnterErrorDegrees;
+        double trackEnterDeg = TurretConfig.TurretPosParams.trackEnterErrorDegrees;
+        boolean invalidThresholds = seekEnterDeg <= trackEnterDeg;
+        invalidHysteresisAlert.set(invalidThresholds);
+        if (invalidThresholds) {
+            seekEnterDeg = 1.2;
+            trackEnterDeg = 0.8;
+        }
+
+        absAimErrorDeg = Math.abs(targetAngleRobot.minus(getPosition()).in(Degrees));
+        if (absAimErrorDeg > seekEnterDeg) {
+            currentMode = TurretMode.SEEKING;
+        } else if (absAimErrorDeg < trackEnterDeg) {
+            currentMode = TurretMode.TRACKING;
+        }
     }
 
     private Angle unwrapTargetAngle(Angle targetAngleWrapped, Angle currentAngleUnwrapped) {
@@ -258,6 +283,10 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         }
 
         return turretAngle;
+    }
+
+    public Command setCurrentPosition(Angle pos) {
+        return Commands.runOnce(() -> io.setCurrentPosition(pos));
     }
 
     public enum TurretMode {

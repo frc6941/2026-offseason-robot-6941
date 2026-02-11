@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 public class VisualizeProjectileShot extends Command {
     private static final String kTag = "Commands/VisualizeProjectileShot";
 
-    private static final double kDtSec = 0.02;
+    private static final double kDtSec = 0.06;
     private static final double kMaxTimeSec = 2.0;
     private static final double kStopHeightM = 0.0;
     private static final double kGravityMps2 = 9.81;
@@ -37,10 +37,6 @@ public class VisualizeProjectileShot extends Command {
     private final boolean useGravity;
 
     private boolean isFinished;
-    private double muzzleSpeedMpsSnapshot;
-    private Translation2d addedVelocityWorldMpsSnapshot;
-
-    private Pose3d[] pathWorld;
 
     /**
      * All frames are field/world frame.
@@ -107,6 +103,10 @@ public class VisualizeProjectileShot extends Command {
     @Override
     public void initialize() {
         isFinished = false;
+    }
+
+    @Override
+    public void execute() {
         Pose3d releasePoseWorldSnapshot =
                 Objects.requireNonNull(
                         releasePoseWorldSupplier.get(), "releasePoseWorldSupplier.get()");
@@ -117,29 +117,17 @@ public class VisualizeProjectileShot extends Command {
         double muzzleSpeedMps =
                 Objects.requireNonNull(
                         muzzleSpeedMpsSupplier.getAsDouble(), "muzzleSpeedMpsSupplier.get()");
-
-        muzzleSpeedMpsSnapshot = muzzleSpeedMps;
         Translation2d vAdded = addedVelocityWorldMpsSupplier.get();
-        addedVelocityWorldMpsSnapshot = (vAdded != null) ? vAdded : new Translation2d();
 
-        pathWorld =
-                simulateGravityOnlyPath(
-                        releasePoseWorldSnapshot,
-                        yawWorldSnapshot,
-                        pitchSnapshot,
-                        muzzleSpeedMpsSnapshot,
-                        addedVelocityWorldMpsSnapshot,
-                        useGravity);
-
-        Logger.recordOutput(kTag + "/muzzleSpeedMps", muzzleSpeedMpsSnapshot);
-        Logger.recordOutput(kTag + "/addedVelocityWorldMps", addedVelocityWorldMpsSnapshot);
-        Logger.recordOutput(kTag + "/useGravity", useGravity);
-        Logger.recordOutput(kTag + "/pathWorld", pathWorld);
-        isFinished = true;
+        logPath(
+                releasePoseWorldSnapshot,
+                yawWorldSnapshot,
+                pitchSnapshot,
+                muzzleSpeedMps,
+                vAdded,
+                useGravity,
+                "");
     }
-
-    @Override
-    public void execute() {}
 
     @Override
     public boolean isFinished() {
@@ -147,7 +135,43 @@ public class VisualizeProjectileShot extends Command {
     }
 
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        Logger.recordOutput(kTag + "/muzzleSpeedMps", 0.0);
+        Logger.recordOutput(kTag + "/addedVelocityWorldMps", new Translation2d());
+        Logger.recordOutput(kTag + "/useGravity", false);
+        Logger.recordOutput(kTag + "/pathWorld", new Pose3d[0]);
+    }
+
+    public static void logPath(
+            Pose3d releasePoseWorld,
+            Rotation2d yawWorld,
+            Rotation2d pitch,
+            double muzzleSpeedMps,
+            Translation2d addedVelocityWorldMps,
+            boolean useGravity,
+            String logTag) {
+        Logger.recordOutput(kTag + "/pathWorld" + logTag, new Pose3d[0]);
+        Pose3d releasePoseWorldSnapshot =
+                Objects.requireNonNull(releasePoseWorld, "releasePoseWorld");
+        Rotation2d yawWorldSnapshot = Objects.requireNonNull(yawWorld, "yawWorld");
+        Rotation2d pitchSnapshot = Objects.requireNonNull(pitch, "pitch");
+        Translation2d addedVelocityWorldMpsSnapshot =
+                (addedVelocityWorldMps != null) ? addedVelocityWorldMps : new Translation2d();
+
+        Pose3d[] pathWorld =
+                simulateGravityOnlyPath(
+                        releasePoseWorldSnapshot,
+                        yawWorldSnapshot,
+                        pitchSnapshot,
+                        muzzleSpeedMps,
+                        addedVelocityWorldMpsSnapshot,
+                        useGravity);
+
+        Logger.recordOutput(kTag + "/muzzleSpeedMps", muzzleSpeedMps);
+        Logger.recordOutput(kTag + "/addedVelocityWorldMps", addedVelocityWorldMpsSnapshot);
+        Logger.recordOutput(kTag + "/useGravity", useGravity);
+        Logger.recordOutput(kTag + "/pathWorld" + logTag, pathWorld);
+    }
 
     /**
      * Gravity-only projectile simulation.

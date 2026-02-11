@@ -6,11 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.net.WebServer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.lang.reflect.Field;
@@ -22,11 +18,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
-    public static PowerDistribution powerDistribution;
+    Timer m_gcTimer = new Timer();
 
     public Robot() {
         super(RobotConstants.LOOPER_DT);
-        powerDistribution = new PowerDistribution();
+        m_gcTimer.start();
     }
 
     @Override
@@ -49,7 +45,6 @@ public class Robot extends LoggedRobot {
         }
         CommandScheduler.getInstance().setPeriod(0.2);
 
-        powerDistribution.clearStickyFaults();
         robotContainer = new RobotContainer();
 
         // elastic
@@ -63,6 +58,9 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         robotContainer.robotPeriodic();
         CommandScheduler.getInstance().run();
+        if (m_gcTimer.advanceIfElapsed(5)) {
+            System.gc();
+        }
     }
 
     @Override

@@ -4,37 +4,40 @@ import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
-public class HoodConfig {
-    private HoodConfig() {}
-
-    public static final String NAME = "Hood";
-    public static final int HOOD_MOTOR_MAIN_ID = 52;
-    public static final double HOOD_GEAR_RATIO = 48.0 / 8.0;
-    // Local hardware constants
-    public static final SubsystemConfig HOOD_CONFIG =
+public class IntakerExtensionConfig {
+    public static final String NAME = "IntakerExtension";
+    private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
+    private static final double INTAKER_EXTENSION_GEAR_RATIO = 40.0 / 26.0;
+    public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
                     .mainBus(CANIVORE_CAN_BUS)
-                    .mainId(HOOD_MOTOR_MAIN_ID)
+                    .mainId(INTAKER_EXTENSION_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
-                    .SensorToMechanismRatio(HOOD_GEAR_RATIO)
+                    .defaultBrake(false)
+                    .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
+                    .SensorToMechanismRatio(INTAKER_EXTENSION_GEAR_RATIO)
+                    .simConfig(
+                            SubsystemConfig.SimConfig.builder()
+                                    .gearRatio(INTAKER_EXTENSION_GEAR_RATIO)
+                                    .build())
                     .zeroingConfig(
                             SubsystemConfig.ZeroingConfig.builder()
                                     .zeroingCurrentLimit(50)
                                     .zeroingFilterSize(5)
                                     .zeroingVoltage(1)
                                     .build())
-                    // TODO: set this so the target angle represents the Real angle of the hood
                     .zeroOffset(Degrees.of(0.0))
-                    .simConfig(
-                            SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())
                     .build();
 
+    private IntakerExtensionConfig() {}
+
     @NTParameter(tableName = "Params/" + NAME)
-    public static final class HoodParams {
+    public static final class IntakerExtensionParams {
 
         public static final double kP = 3.75;
         public static final double kI = 0.0;
@@ -49,6 +52,8 @@ public class HoodConfig {
         public static final double motionMagicJerkRPS3 = 0.0;
 
         // Tolerances / behavior
-        public static final double atGoalToleranceDegrees = 1;
+        public static final double atGoalToleranceMeters = 0.01;
+        public static final double deployPosMeters = 0.2;
+        public static final double retractPosMeters = 0.0;
     }
 }

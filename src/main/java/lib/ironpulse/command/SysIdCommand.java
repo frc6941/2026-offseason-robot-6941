@@ -47,8 +47,8 @@ public class SysIdCommand {
 
     @NTParameter(tableName = "Params/Commands/SysId")
     public static final class SysIdCommandParams {
-        public static final double rampRateVoltsPerSecond = 1.0;
-        public static final double stepVoltageVolts = 7.0;
+        public static final double rampRateVoltsPerSecond = 1.3;
+        public static final double stepVoltageVolts = 4.0;
         public static final double timeoutSeconds = 10.0;
 
         private SysIdCommandParams() {}

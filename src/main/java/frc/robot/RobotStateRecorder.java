@@ -1,6 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static lib.ironpulse.math.MathTools.toPose2d;
 
@@ -14,15 +16,27 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import lib.ironpulse.math.rbd.TransformRecorder;
+import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotStateRecorder extends TransformRecorder {
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
 
-    public static final String kFrameTurret = "Turret";
-    public static final Translation3d kRobotToTurret =
+    @Getter @Setter
+    private static ShotFrame currentFrame =
+            new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
+
+    @Getter @Setter
+    private static ShotFrame cmdFrame =
+            new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
+
+    public static final String kFrameShot = "Shot";
+    public static final String kFrameGoal = "Goal";
+    public static final Translation3d kRobotToShot =
             new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
     private RobotStateRecorder() {
@@ -44,10 +58,15 @@ public class RobotStateRecorder extends TransformRecorder {
                 kFrameWorld,
                 kFrameRobot); // dynamic TWorldRobot at origin
         putTransform(
-                new Pose3d(kRobotToTurret, Rotation3d.kZero),
+                new Pose3d(kRobotToShot, Rotation3d.kZero),
                 Seconds.of(0.0),
                 kFrameRobot,
-                kFrameTurret); // dynamic TRobotTurret
+                kFrameShot); // dynamic TRobotShot
+        putTransform(
+                new Pose3d(FieldConstants.Hub.innerCenterPoint, Rotation3d.kZero),
+                Seconds.of(0.0),
+                kFrameWorld,
+                kFrameGoal); // static TWorldGoal (blue reference)
     }
 
     public static RobotStateRecorder getInstance() {
@@ -58,7 +77,6 @@ public class RobotStateRecorder extends TransformRecorder {
     }
 
     public static void periodic() {
-        Logger.recordOutput("RobotStateRecorder/fixed", new Pose3d());
         // logging
         Logger.recordOutput(
                 "RobotStateRecorder/poseWorldRobot", RobotStateRecorder.getPoseWorldRobotCurrent());
@@ -68,7 +86,32 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
-                "RobotStateRecorder/poseTurret", RobotStateRecorder.getPoseWorldTurretCurrent());
+                "RobotStateRecorder/ShotFrame/distanceToGoal",
+                getTranslationShotToGoalCurrent().getNorm());
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/velocityGoalRobot", getVelocityGoalRobotCurrent());
+        Logger.recordOutput("RobotStateRecorder/ShotFrame/GoalWorld", getPoseWorldGoalCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/poseShot",
+                RobotStateRecorder.getPoseWorldShotCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/currentFrame/turretAngleWorldDeg",
+                currentFrame.turretAngleWorld().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/currentFrame/hoodAngleDeg",
+                currentFrame.hoodAngle().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/currentFrame/muzzleSpeedMps",
+                currentFrame.muzzleSpeed().in(MetersPerSecond));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/cmdFrame/turretAngleWorldDeg",
+                cmdFrame.turretAngleWorld().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/cmdFrame/hoodAngleDeg",
+                cmdFrame.hoodAngle().in(Degrees));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
+                cmdFrame.muzzleSpeed().in(MetersPerSecond));
     }
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
@@ -104,12 +147,12 @@ public class RobotStateRecorder extends TransformRecorder {
                 .orElse(new Pose3d());
     }
 
-    public static Pose3d getPoseWorldTurretCurrent() {
+    public static Pose3d getPoseWorldShotCurrent() {
         return RobotStateRecorder.getInstance()
                 .getTransform(
                         Seconds.of(Timer.getTimestamp()),
                         TransformRecorder.kFrameWorld,
-                        RobotStateRecorder.kFrameTurret)
+                        RobotStateRecorder.kFrameShot)
                 .orElse(new Pose3d());
     }
 
@@ -124,5 +167,43 @@ public class RobotStateRecorder extends TransformRecorder {
                                 : RobotStateRecorder.kFrameDriverStationRed,
                         TransformRecorder.kFrameRobot)
                 .orElse(new Pose3d());
+    }
+
+    public static Pose3d getPoseWorldGoalCurrent() {
+        Pose3d goalBlue =
+                RobotStateRecorder.getInstance()
+                        .getTransform(
+                                Seconds.of(Timer.getTimestamp()),
+                                TransformRecorder.kFrameWorld,
+                                RobotStateRecorder.kFrameGoal)
+                        .orElse(new Pose3d());
+        boolean isBlue =
+                DriverStation.getAlliance()
+                        .orElse(DriverStation.Alliance.Blue)
+                        .equals(DriverStation.Alliance.Blue);
+        if (isBlue) {
+            return goalBlue;
+        }
+        return new Pose3d(
+                new Translation3d(
+                        FieldConstants.fieldLength - goalBlue.getX(),
+                        goalBlue.getY(),
+                        goalBlue.getZ()),
+                goalBlue.getRotation());
+    }
+
+    public static Translation2d getTranslationShotToGoalCurrent() {
+        Pose3d shotPoseWorld = getPoseWorldShotCurrent();
+        Pose3d goalPoseWorld = getPoseWorldGoalCurrent();
+        Translation3d delta = goalPoseWorld.getTranslation().minus(shotPoseWorld.getTranslation());
+        return delta.toTranslation2d();
+    }
+
+    public static Translation2d getVelocityGoalRobotCurrent() {
+        Translation2d shotToGoal = getTranslationShotToGoalCurrent();
+        Translation2d velWorld = getVelocityWorldRobotCurrent().getTranslation();
+        Translation2d velGoal =
+                velWorld.rotateBy(shotToGoal.getAngle().unaryMinus()); // +X is toward goal
+        return velGoal;
     }
 }
