@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -32,6 +33,8 @@ import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import lib.ironpulse.io.*;
+import lib.ironpulse.limelight.LimelightIOReal;
+import lib.ironpulse.limelight.LimelightSubsystem;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.subsystem.BeamBreak;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
@@ -43,9 +46,11 @@ import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
 import lib.ironpulse.utils.AllianceFlipUtil;
+import lib.ironpulse.utils.LimelightHelpers;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
+import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings({"rawtypes", "unused"})
 public class RobotContainer {
@@ -55,7 +60,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = false;
     private static final boolean HAS_INTAKER_IO = false;
     private static final boolean HAS_SWERVE_IO = true;
-    // private final LimelightSubsystem limelightSubsystem;
+    private final LimelightSubsystem limelightSubsystem;
     // private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
@@ -95,25 +100,24 @@ public class RobotContainer {
                                 new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
                                 new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
             }
-            //     limelightSubsystem =
-            //             new LimelightSubsystem(
-            //                     RobotConstants.LimelightConstants.limelightSubsystemConfig,
-            //                     swerve,
-            //                     new LimelightIOReal(
-            //                             RobotConstants.LimelightConstants.limelight1Config,
-            //                             () ->
-            //                                     RobotStateRecorder.getPoseWorldRobotCurrent()
-            //                                             .toPose2d()
-            //                                             .getRotation()
-            //                                             .getDegrees(),
-            //                             () -> {
-            //                                 // angular velocity > 360 deg per second
-            //                                 return
-            // RobotStateRecorder.getVelocityWorldRobotCurrent()
-            //                                                 .getRotation()
-            //                                                 .getDegrees()
-            //                                         > 360;
-            //                             }));
+            limelightSubsystem =
+                    new LimelightSubsystem(
+                            swerve,
+                            new LimelightIOReal(
+                                    LimeLightConfig.limelight1Config,
+                                    () ->
+                                            RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                    .toPose2d()
+                                                    .getRotation()
+                                                    .getDegrees(),
+                                    () -> {
+                                        // angular velocity > 360 deg per second
+                                        return RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .getDegrees()
+                                                > 360;
+                                    },
+                                    LimeLightConfig.asDeviationParams()));
             turret =
                     new TurretSubsystem(
                             TurretConfig.TURRET_CONFIG,
@@ -246,10 +250,7 @@ public class RobotContainer {
                             Meters.of(0),
                             Millimeters.of(9.42 * 11.0));
             // TODO: limelight simulation
-            //     limelightSubsystem =
-            //             new LimelightSubsystem(
-            //                     RobotConstants.LimelightConstants.limelightSubsystemConfig,
-            // swerve);
+            limelightSubsystem = new LimelightSubsystem(swerve);
         }
 
         // shotCalculator.initialize(
@@ -258,6 +259,7 @@ public class RobotContainer {
         //                 Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         // intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
@@ -300,24 +302,21 @@ public class RobotContainer {
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
-        //        LimelightHelpers.SetRobotOrientation(
-        //                "limelight",
-        //
-        // RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
-        //
-        // RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
-        //                0,
-        //                0,
-        //                0,
-        //                0);
-        //        Logger.recordOutput(
-        //                "Limelight/Pose",
-        //                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
-        //        swerve.addVisionMeasurement(
-        //                new
-        // Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
-        //                now.in(Seconds),
-        //                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
+        LimelightHelpers.SetRobotOrientation(
+                "limelight",
+                RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
+                RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
+                0,
+                0,
+                0,
+                0);
+        Logger.recordOutput(
+                "Limelight/Pose",
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
+        swerve.addVisionMeasurement(
+                new Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
+                now.in(Seconds),
+                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
     }
 
     private void configureBindings() {
