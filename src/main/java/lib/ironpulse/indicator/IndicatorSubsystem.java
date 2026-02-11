@@ -39,7 +39,8 @@ public class IndicatorSubsystem extends SubsystemBase {
                                         () -> {
                                             outsideDefault = true;
                                             setPattern(pattern);
-                                        }),
+                                        },
+                                        this),
                                 Commands.waitUntil(() -> false))
                         .finallyDo(() -> outsideDefault = false)
                         .ignoringDisable(true);

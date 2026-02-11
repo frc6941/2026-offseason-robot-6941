@@ -8,8 +8,6 @@ import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
 public class HoodConfig {
-    private HoodConfig() {}
-
     public static final String NAME = "Hood";
     public static final int HOOD_MOTOR_MAIN_ID = 52;
     public static final double HOOD_GEAR_RATIO = 48.0 / 8.0;
@@ -28,10 +26,12 @@ public class HoodConfig {
                                     .zeroingVoltage(1)
                                     .build())
                     // TODO: set this so the target angle represents the Real angle of the hood
-                    .zeroOffset(Degrees.of(0.0))
+                    .zeroOffset(Degrees.of(12.8))
                     .simConfig(
                             SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())
                     .build();
+
+    private HoodConfig() {}
 
     @NTParameter(tableName = "Params/" + NAME)
     public static final class HoodParams {
