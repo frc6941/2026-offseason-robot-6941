@@ -12,7 +12,6 @@ import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
-import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -63,10 +62,10 @@ public class ShootingSuperstructure {
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode) {
+    public Command runFrame(Supplier<ShotFrame> frame) {
         return Commands.parallel(
                 Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
-                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld(), mode),
+                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld()),
                 hood.runPosition(
                         () -> {
                             Angle modelAngle = frame.get().hoodAngle();
@@ -89,9 +88,9 @@ public class ShootingSuperstructure {
                         }));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame, TurretMode mode, IdxMode idxMode) {
+    public Command runFrame(Supplier<ShotFrame> frame, IdxMode idxMode) {
         return Commands.parallel(
-                runFrame(frame, mode),
+                runFrame(frame),
                 idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode : IdxMode.OFF)));
     }
 
