@@ -5,6 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.RobotConstants.LED_LENGTH;
+import static frc.robot.RobotConstants.LED_PORT;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,7 +34,16 @@ import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import lib.ironpulse.indicator.IndicatorIO;
+import lib.ironpulse.indicator.IndicatorIOARGB;
+import lib.ironpulse.indicator.IndicatorIOSim;
+import lib.ironpulse.indicator.IndicatorSubsystem;
 import lib.ironpulse.io.*;
+import lib.ironpulse.io.CANCoderIOSim;
+import lib.ironpulse.io.MotorIO;
+import lib.ironpulse.io.MotorIOSim;
+import lib.ironpulse.io.MotorIOTalonFX;
+import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.limelight.LimelightIOReal;
 import lib.ironpulse.limelight.LimelightSubsystem;
 import lib.ironpulse.math.rbd.TransformRecorder;
@@ -72,6 +83,7 @@ public class RobotContainer {
     private final ShootingSuperstructure shootingSuperstructure;
     private final VelocityMotorSubsystem intakerRoller;
     private final PositionMotorSubsystem intakerExtension;
+    private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -197,7 +209,7 @@ public class RobotContainer {
                                 Meters.of(0),
                                 Meters.of(0.00942 * 11.0));
             }
-
+            indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOARGB(LED_PORT, LED_LENGTH));
         } else {
             swerve =
                     new Swerve(
@@ -251,6 +263,7 @@ public class RobotContainer {
                             Millimeters.of(9.42 * 11.0));
             // TODO: limelight simulation
             limelightSubsystem = new LimelightSubsystem(swerve);
+            indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOSim());
         }
 
         // shotCalculator.initialize(
@@ -271,6 +284,8 @@ public class RobotContainer {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
+        indicatorSubsystem.setDefaultCommand(
+                indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
     }
 
     public void robotPeriodic() {

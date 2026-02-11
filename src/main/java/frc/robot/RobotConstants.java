@@ -19,6 +19,8 @@ public final class RobotConstants {
 
     // Hardware device IDs
     public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID
+    public static final int LED_PORT = 0;
+    public static final int LED_LENGTH = 30;
 
     private RobotConstants() {
         // Prevent instantiation
