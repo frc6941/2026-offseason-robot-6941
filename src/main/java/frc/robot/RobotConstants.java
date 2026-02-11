@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 import lib.ironpulse.limelight.LimelightIOConfig;
-import lib.ironpulse.limelight.LimelightSubsystemConfig;
 
 /**
  * Robot-wide constants that are used across multiple subsystems. Constants that need tuning are
@@ -27,8 +26,6 @@ public final class RobotConstants {
     }
 
     public static class LimelightConstants {
-        public static final LimelightSubsystemConfig limelightSubsystemConfig =
-                LimelightSubsystemConfig.builder().build();
         public static final LimelightIOConfig limelight1Config =
                 LimelightIOConfig.builder()
                         .name("limelight")

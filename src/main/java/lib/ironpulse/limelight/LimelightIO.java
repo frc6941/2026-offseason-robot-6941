@@ -1,9 +1,10 @@
 package lib.ironpulse.limelight;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import lib.ironpulse.utils.LimelightHelpers;
 import lombok.Getter;
-import org.littletonrobotics.junction.AutoLog;
 
 public interface LimelightIO {
     // reliability score: from 0 to 1
@@ -24,6 +25,19 @@ public interface LimelightIO {
     }
 
     default void updateInputs(LimelightIOInputs inputs) {}
+
+    default double[] getVisionStdDevComponents(double reliability) {
+        return new double[] {
+            0.7 * (2 - reliability),
+            0.7 * (2 - reliability),
+            1.0 * (2 - reliability),
+            9999999 * (2 - reliability)
+        };
+    }
+
+    default double getImuCorrectionReliabilityThreshold() {
+        return 0.9;
+    }
 
     // FIXME: leave only one function for yaw. This was to see that whether robotYaw equals to
     // internal yaw.

@@ -13,13 +13,10 @@ import org.littletonrobotics.junction.Logger;
 public class LimelightSubsystem extends SubsystemBase {
     private final HashMap<String, LimelightIO> ioNames = new HashMap<>();
     private final HashMap<LimelightIO, LimelightIOInputsAutoLogged> ios = new HashMap<>();
-    private final LimelightSubsystemConfig config;
     private final Localizable localizationProvider;
 
-    public LimelightSubsystem(
-            LimelightSubsystemConfig config, Localizable localizationProvider, LimelightIO... ios) {
+    public LimelightSubsystem(Localizable localizationProvider, LimelightIO... ios) {
         super("Limelight");
-        this.config = config;
         this.localizationProvider = localizationProvider;
         for (LimelightIO io : ios) {
             this.ios.put(io, new LimelightIOInputsAutoLogged());
@@ -38,22 +35,21 @@ public class LimelightSubsystem extends SubsystemBase {
      * @param reliability The reliability score from limelight input.
      * @return The standard deviation for localization.
      */
-    private Matrix<N4, N1> getVisionStdDev(double reliability) {
-        return VecBuilder.fill(
-                config.xStdDev * (2 - reliability),
-                config.yStdDev * (2 - reliability),
-                config.zStdDev * (2 - reliability),
-                config.angleStdDev * (2 - reliability));
+    private Matrix<N4, N1> getVisionStdDev(LimelightIO io, double reliability) {
+        double[] stdDev = io.getVisionStdDevComponents(reliability);
+        return VecBuilder.fill(stdDev[0], stdDev[1], stdDev[2], stdDev[3]);
     }
 
     private void addVisionMeasurement() {
-        for (LimelightIOInputsAutoLogged input : ios.values()) {
+        for (Map.Entry<LimelightIO, LimelightIOInputsAutoLogged> entry : ios.entrySet()) {
+            LimelightIO io = entry.getKey();
+            LimelightIOInputsAutoLogged input = entry.getValue();
             if (MathTools.epsilonEquals(input.reliability, 0)) {
                 // reliability ~= zero, do not trust this limelight
                 continue;
             }
             localizationProvider.addVisionMeasurement(
-                    input.pose, input.timestampSeconds, getVisionStdDev(input.reliability));
+                    input.pose, input.timestampSeconds, getVisionStdDev(io, input.reliability));
         }
     }
 
@@ -76,7 +72,7 @@ public class LimelightSubsystem extends SubsystemBase {
             Logger.recordOutput("Limelight/IMU/" + io.getName() + "_ROBOT", io.getIMUYawRobot());
             Logger.recordOutput("Limelight/IMU/Swerve", localizationProvider.getIMUYaw());
 
-            if (inputs.reliability >= config.imuCorrectionReliabilityThreshold) {
+            if (inputs.reliability >= io.getImuCorrectionReliabilityThreshold()) {
                 // trustworthy enough to correct the swerve's IMU perhaps?
                 localizationProvider.setIMUYaw(io.getIMUYawRobot());
             }

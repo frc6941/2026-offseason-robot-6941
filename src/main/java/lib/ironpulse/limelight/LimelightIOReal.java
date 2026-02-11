@@ -144,6 +144,21 @@ public class LimelightIOReal implements LimelightIO {
     }
 
     @Override
+    public double[] getVisionStdDevComponents(double reliability) {
+        return new double[] {
+            config.xStdDev * (2 - reliability),
+            config.yStdDev * (2 - reliability),
+            config.zStdDev * (2 - reliability),
+            config.angleStdDev * (2 - reliability)
+        };
+    }
+
+    @Override
+    public double getImuCorrectionReliabilityThreshold() {
+        return config.imuCorrectionReliabilityThreshold;
+    }
+
+    @Override
     public double getIMUYawInternal() {
         return LimelightHelpers.getIMUData(config.name).Yaw;
     }

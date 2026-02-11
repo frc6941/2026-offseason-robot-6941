@@ -34,6 +34,8 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
 import lib.ironpulse.io.MotorIOTalonFX;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.limelight.LimelightIOReal;
+import lib.ironpulse.limelight.LimelightSubsystem;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
@@ -55,7 +57,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = false;
     private static final boolean HAS_INTAKER_IO = false;
     private static final boolean HAS_SWERVE_IO = true;
-    // private final LimelightSubsystem limelightSubsystem;
+    private final LimelightSubsystem limelightSubsystem;
     // private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
@@ -92,25 +94,23 @@ public class RobotContainer {
                                 new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
                                 new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
             }
-            //     limelightSubsystem =
-            //             new LimelightSubsystem(
-            //                     RobotConstants.LimelightConstants.limelightSubsystemConfig,
-            //                     swerve,
-            //                     new LimelightIOReal(
-            //                             RobotConstants.LimelightConstants.limelight1Config,
-            //                             () ->
-            //                                     RobotStateRecorder.getPoseWorldRobotCurrent()
-            //                                             .toPose2d()
-            //                                             .getRotation()
-            //                                             .getDegrees(),
-            //                             () -> {
-            //                                 // angular velocity > 360 deg per second
-            //                                 return
-            // RobotStateRecorder.getVelocityWorldRobotCurrent()
-            //                                                 .getRotation()
-            //                                                 .getDegrees()
-            //                                         > 360;
-            //                             }));
+            limelightSubsystem =
+                    new LimelightSubsystem(
+                            swerve,
+                            new LimelightIOReal(
+                                    RobotConstants.LimelightConstants.limelight1Config,
+                                    () ->
+                                            RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                    .toPose2d()
+                                                    .getRotation()
+                                                    .getDegrees(),
+                                    () -> {
+                                        // angular velocity > 360 deg per second
+                                        return RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .getDegrees()
+                                                > 360;
+                                    }));
             turret =
                     new TurretSubsystem(
                             TurretConfig.TURRET_CONFIG,
@@ -243,10 +243,7 @@ public class RobotContainer {
                             Meters.of(0),
                             Millimeters.of(9.42 * 11.0));
             // TODO: limelight simulation
-            //     limelightSubsystem =
-            //             new LimelightSubsystem(
-            //                     RobotConstants.LimelightConstants.limelightSubsystemConfig,
-            // swerve);
+            limelightSubsystem = new LimelightSubsystem(swerve);
         }
 
         // shotCalculator.initialize(

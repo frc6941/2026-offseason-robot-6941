@@ -19,6 +19,11 @@ public class LimelightIOConfig {
     // more.
     // Higher values (e.g., 0.01): Faster tracking of the reference source (MT1 or external IMU).
     @Builder.Default public final double filterAlpha = 0.001;
+    @Builder.Default public final double xStdDev = 0.7;
+    @Builder.Default public final double yStdDev = 0.7;
+    @Builder.Default public final double zStdDev = 1.0;
+    @Builder.Default public final double angleStdDev = 9999999;
+    @Builder.Default public final double imuCorrectionReliabilityThreshold = 0.9;
 
     public final String name;
     public final boolean isLimelight4;
