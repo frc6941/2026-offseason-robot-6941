@@ -38,7 +38,7 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/IdxModes")
     public static final class SpindexerModeParams {
-        public static final double feedRPS = 2.5;
+        public static final double feedRPS = 2;
 
         public static final double revRPS = -2.5;
         public static final double idleRPS = 0.0;
@@ -47,12 +47,12 @@ public class IdxConfig {
     @NTParameter(tableName = "Params/" + SPINDEXER)
     public static final class SpindexerParams {
         // TODO: sysId
-        public static final double kP = 25.0;
+        public static final double kP = 1;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kV = 0.2;
+        public static final double kV = 4.2;
         public static final double kA = 0.0;
-        public static final double kS = 0.0;
+        public static final double kS = 0.35;
 
         public static final double velocityAtGoalToleranceRPS = 0.01;
     }
