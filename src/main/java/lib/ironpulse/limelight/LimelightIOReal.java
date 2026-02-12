@@ -15,27 +15,36 @@ public class LimelightIOReal implements LimelightIO {
     public final LimelightIOConfig config;
     private final DoubleSupplier yawSupplier;
     private final BooleanSupplier rejectionSupplier;
+    private final DeviationParamSources deviationParams;
     private boolean isPrevDisabled = true;
 
     public LimelightIOReal(
             LimelightIOConfig config,
             DoubleSupplier yawSupplier,
-            BooleanSupplier rejectionSupplier) {
+            BooleanSupplier rejectionSupplier,
+            DeviationParamSources deviationParams) {
         this.config = config;
         this.yawSupplier = yawSupplier;
         this.rejectionSupplier = rejectionSupplier;
-        if (config.useInternalIMU && !config.isLimelight4) {
-            throw new IllegalArgumentException("Internal IMU only exists on limelight 4");
-        } else if (config.useInternalIMU) {
-            LimelightHelpers.SetIMUAssistAlpha(config.name, config.filterAlpha);
+        this.deviationParams = deviationParams;
+        if (useInternalIMU()) {
+            LimelightHelpers.SetIMUAssistAlpha(config.getName(), config.getFilterAlpha());
             setIMUMode();
         }
     }
 
+    private boolean isLimelight4() {
+        return config.getLimeLight4Config() != null;
+    }
+
+    private boolean useInternalIMU() {
+        return isLimelight4() && config.getLimeLight4Config().isUseInternalIMU();
+    }
+
     @Override
     public boolean canUseInternalIMU() {
-        return config.mountPosition == LimelightIOConfig.MountPosition.ON_ROBOT
-                && config.useInternalIMU;
+        return config.getMountPosition() == LimelightIOConfig.MountPosition.ON_ROBOT
+                && useInternalIMU();
     }
 
     /**
@@ -50,16 +59,16 @@ public class LimelightIOReal implements LimelightIO {
             // no tags or decided to reject
             return 0;
         } else if (poseEstimate.tagCount == 1) {
-            return 0.5 * config.weight;
+            return 0.5 * config.getWeight();
         } else {
             // tags >= 2
-            return 1 * config.weight;
+            return 1 * config.getWeight();
         }
     }
 
     @Override
     public String getName() {
-        return config.name;
+        return config.getName();
     }
 
     /**
@@ -73,42 +82,54 @@ public class LimelightIOReal implements LimelightIO {
             // mounted on mechanisms (e.g. turrets, shooters) as the yaw reading
             // would be different from that of the robot.
             // So we do not trust the internal IMU completely...
-            LimelightHelpers.SetIMUMode(config.name, InternalIMUMode.EXTERNAL_ONLY.getValue());
+            LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.EXTERNAL_ONLY.getValue());
             return;
         }
         if (RobotState.isDisabled()) {
             // disabled; use IMU mode 1 - seed internal IMU with data
-            LimelightHelpers.SetIMUMode(config.name, InternalIMUMode.EXTERNAL_SEED.getValue());
+            LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.EXTERNAL_SEED.getValue());
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
             LimelightHelpers.SetIMUMode(
-                    config.name, InternalIMUMode.INTERNAL_EXTERNAL_ASSIST.getValue());
+                    config.getName(), InternalIMUMode.INTERNAL_EXTERNAL_ASSIST.getValue());
         }
-    }
-
-    @Override
-    public void setPipeline(int pipeline) {
-        LimelightHelpers.setPipelineIndex(config.name, pipeline);
     }
 
     @Override
     public void setLEDMode(LEDMode mode) {
         switch (mode) {
-            case ON -> LimelightHelpers.setLEDMode_ForceOn(config.name);
-            case OFF -> LimelightHelpers.setLEDMode_ForceOff(config.name);
-            case BLINK -> LimelightHelpers.setLEDMode_ForceBlink(config.name);
-            case PIPELINE_CONTROL -> LimelightHelpers.setLEDMode_PipelineControl(config.name);
+            case ON -> LimelightHelpers.setLEDMode_ForceOn(config.getName());
+            case OFF -> LimelightHelpers.setLEDMode_ForceOff(config.getName());
+            case BLINK -> LimelightHelpers.setLEDMode_ForceBlink(config.getName());
+            case PIPELINE_CONTROL -> LimelightHelpers.setLEDMode_PipelineControl(config.getName());
         }
     }
 
     @Override
     public int getPipeline() {
-        return (int) LimelightHelpers.getCurrentPipelineIndex(config.name);
+        return (int) LimelightHelpers.getCurrentPipelineIndex(config.getName());
+    }
+
+    @Override
+    public void setPipeline(int pipeline) {
+        LimelightHelpers.setPipelineIndex(config.getName(), pipeline);
+    }
+
+    @Override
+    public void setThrottle(boolean robotEnabled) {
+        if (isLimelight4()) {
+            return;
+        }
+        LimelightHelpers.SetThrottle(
+                config.getName(),
+                robotEnabled
+                        ? config.getLimeLight4Config().getThrottleWhenEnabled()
+                        : config.getLimeLight4Config().getThrottleWhenDisabled());
     }
 
     @Override
     public void setAprilTagIdFilter(int[] ids) {
-        LimelightHelpers.SetFiducialIDFiltersOverride(config.name, ids);
+        LimelightHelpers.SetFiducialIDFiltersOverride(config.getName(), ids);
     }
 
     @Override
@@ -118,7 +139,7 @@ public class LimelightIOReal implements LimelightIO {
         }
         isPrevDisabled = RobotState.isDisabled();
         LimelightHelpers.SetRobotOrientation(
-                config.name,
+                config.getName(),
                 yawSupplier.getAsDouble(),
                 0,
                 0,
@@ -128,10 +149,10 @@ public class LimelightIOReal implements LimelightIO {
 
         // generate pose Estimate
         LimelightHelpers.PoseEstimate estimate;
-        if (config.useMegaTag2) {
-            estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.name);
+        if (config.isUseMegaTag2()) {
+            estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.getName());
         } else {
-            estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(config.name);
+            estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(config.getName());
         }
         // FIXME: need testing - two versions of inputs.pose
         //        inputs.pose = new Pose3d(estimate.pose).rotateBy(
@@ -144,12 +165,27 @@ public class LimelightIOReal implements LimelightIO {
     }
 
     @Override
+    public double[] getVisionStdDevComponents(double reliability) {
+        return new double[] {
+            deviationParams.xStdDev() * (2 - reliability),
+            deviationParams.yStdDev() * (2 - reliability),
+            deviationParams.zStdDev() * (2 - reliability),
+            deviationParams.angleStdDev() * (2 - reliability)
+        };
+    }
+
+    @Override
+    public double getImuCorrectionReliabilityThreshold() {
+        return deviationParams.imuCorrectionReliabilityThreshold();
+    }
+
+    @Override
     public double getIMUYawInternal() {
-        return LimelightHelpers.getIMUData(config.name).Yaw;
+        return LimelightHelpers.getIMUData(config.getName()).Yaw;
     }
 
     @Override
     public double getIMUYawRobot() {
-        return LimelightHelpers.getIMUData(config.name).robotYaw;
+        return LimelightHelpers.getIMUData(config.getName()).robotYaw;
     }
 }

@@ -7,14 +7,15 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.Configs.HoodConfig;
 import frc.robot.subsystems.Configs.HoodParamsNT;
@@ -29,14 +30,9 @@ import frc.robot.subsystems.IntakerSubsystem.IntakerSubsystem;
 import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
+import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
-import java.util.Map;
-import lib.ironpulse.io.CANCoderIOCANCoder;
-import lib.ironpulse.io.CANCoderIOSim;
-import lib.ironpulse.io.MotorIO;
-import lib.ironpulse.io.MotorIOSim;
-import lib.ironpulse.io.MotorIOTalonFX;
-import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.io.*;
 import lib.ironpulse.limelight.LimelightIOReal;
 import lib.ironpulse.limelight.LimelightSubsystem;
 import lib.ironpulse.math.rbd.TransformRecorder;
@@ -48,8 +44,10 @@ import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
 import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
+import lib.ironpulse.utils.AllianceFlipUtil;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
+import lombok.SneakyThrows;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
@@ -57,6 +55,9 @@ public class RobotContainer {
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
+    private static final boolean HAS_INTAKER_ROLLER_IO = true;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
+    private static final boolean HAS_SWERVE_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -69,27 +70,41 @@ public class RobotContainer {
     private final ShootingSuperstructure shootingSuperstructure;
     private final VelocityMotorSubsystem intakerRoller;
     private final PositionMotorSubsystem intakerExtension;
+    // private final IndicatorSubsystem indicatorSubsystem;
     private final SerialSubsystem serialSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
+    @SneakyThrows
     public RobotContainer() {
 
         if (RobotBase.isReal()) {
-            swerve =
-                    new Swerve(
-                            SwerveMK5Config.kRealConfig,
-                            new ImuIOPigeon(SwerveMK5Config.kRealConfig),
-                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
-                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
-                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
-                            new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
+            //      BeamBreak beamBreak = new BeamBreak(new BeamBreakIOAnalog(1), Seconds.of(0.5));
+            //      if (!beamBreak.get()) throw new Exception("TURRET NOT ZEROED");
+            if (HAS_SWERVE_IO) {
+                swerve =
+                        new Swerve(
+                                SwerveMK5Config.kRealConfig,
+                                new ImuIOPigeon(SwerveMK5Config.kRealConfig),
+                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0),
+                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1),
+                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2),
+                                new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3));
+            } else {
+                swerve =
+                        new Swerve(
+                                SwerveMK5Config.kSimConfig,
+                                new ImuIOSim(),
+                                new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
+                                new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
+                                new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
+                                new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
+            }
             limelightSubsystem =
                     new LimelightSubsystem(
-                            RobotConstants.LimelightConstants.limelightSubsystemConfig,
                             swerve,
                             new LimelightIOReal(
-                                    RobotConstants.LimelightConstants.limelight1Config,
+                                    LimeLightConfig.limelight1Config,
                                     () ->
                                             RobotStateRecorder.getPoseWorldRobotCurrent()
                                                     .toPose2d()
@@ -101,7 +116,8 @@ public class RobotContainer {
                                                         .getRotation()
                                                         .getDegrees()
                                                 > 360;
-                                    }));
+                                    },
+                                    LimeLightConfig.asDeviationParams()));
             turret =
                     new TurretSubsystem(
                             TurretConfig.TURRET_CONFIG,
@@ -110,16 +126,18 @@ public class RobotContainer {
                                     ? new MotorIOTalonFX(TurretConfig.TURRET_CONFIG)
                                     : new MotorIOSim(TurretConfig.TURRET_CONFIG),
                             HAS_TURRET_IO
-                                    ? new CANCoderIOCANCoder(
-                                            TurretConfig.TURRET_ENCODER_G1_ID,
-                                            TurretConfig.TURRET_ENCODER_G1_OFFSET,
-                                            false)
+                                    ? encoderG1Sim
+                                    //     ? new CANCoderIOCANCoder(
+                                    //             TurretConfig.TURRET_ENCODER_G1_ID,
+                                    //             TurretConfig.TURRET_ENCODER_G1_OFFSET,
+                                    //             false)
                                     : encoderG1Sim,
                             HAS_TURRET_IO
-                                    ? new CANCoderIOCANCoder(
-                                            TurretConfig.TURRET_ENCODER_G2_ID,
-                                            TurretConfig.TURRET_ENCODER_G2_OFFSET,
-                                            false)
+                                    ? encoderG2Sim
+                                    //     ? new CANCoderIOCANCoder(
+                                    //             TurretConfig.TURRET_ENCODER_G2_ID,
+                                    //             TurretConfig.TURRET_ENCODER_G2_OFFSET,
+                                    //             false)
                                     : encoderG2Sim,
                             TurretVelParamsNT.asVelocityParamSources());
             shooter =
@@ -146,24 +164,33 @@ public class RobotContainer {
                                     ? new MotorIOTalonFX(HoodConfig.HOOD_CONFIG)
                                     : new MotorIOSim(HoodConfig.HOOD_CONFIG),
                             HoodParamsNT.asPositionParamSources(),
-                            Degrees.of(0),
-                            Degrees.of(360.0 / HoodConfig.HOOD_CONFIG.SensorToMechanismRatio));
+                            Degrees.of(14),
+                            Degrees.of(360.0));
             intakerRoller =
                     new VelocityMotorSubsystem(
                             IntakerRollerConfig.INTAKER_ROLLER_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(IntakerRollerConfig.INTAKER_ROLLER_CONFIG),
+                            HAS_INTAKER_ROLLER_IO
+                                    ? new MotorIOTalonFX(IntakerRollerConfig.INTAKER_ROLLER_CONFIG)
+                                    : new MotorIOSim(IntakerRollerConfig.INTAKER_ROLLER_CONFIG),
                             IntakerRollerParamsNT.asVelocityParamSources());
             intakerExtension =
                     new PositionMotorSubsystem(
                             IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG,
                             new MotorInputsAutoLogged(),
-                            new MotorIOTalonFX(IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG),
+                            HAS_INTAKER_EXTENSION_IO
+                                    ? new MotorIOTalonFX(
+                                            IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG)
+                                    : new MotorIOSim(
+                                            IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG),
                             IntakerExtensionParamsNT.asPositionParamSources(),
                             Meters.of(0),
                             Meters.of(0.00942 * 11.0));
             serialSubsystem = new SerialSubsystem();
 
+            //            indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOARGB(LED_PORT,
+            // LED_LENGTH));
+            // indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOSim());
         } else {
             swerve =
                     new Swerve(
@@ -216,21 +243,20 @@ public class RobotContainer {
                             Meters.of(0),
                             Millimeters.of(9.42 * 11.0));
             // TODO: limelight simulation
-            limelightSubsystem =
-                    new LimelightSubsystem(
-                            RobotConstants.LimelightConstants.limelightSubsystemConfig, swerve);
+            limelightSubsystem = new LimelightSubsystem(swerve);
+            // indicatorSubsystem = new IndicatorSubsystem(new IndicatorIOSim());
             serialSubsystem = new SerialSubsystem();
         }
 
-        shotCalculator.initialize(
-                Map.of(
-                        ShotCalculator.TargetMode.GOAL,
-                        Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
+        // shotCalculator.initialize(
+        //         Map.of(
+        //                 ShotCalculator.TargetMode.GOAL,
+        //                 Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+        // intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+
         configureBindings();
-        // LimelightHelpers.SetIMUMode("limelight", 1);
-        // LimelightHelpers.SetIMUMode("limelight", 1);
         shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
@@ -241,6 +267,8 @@ public class RobotContainer {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
+        // indicatorSubsystem.setDefaultCommand(
+        //        indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
     }
 
     public void robotPeriodic() {
@@ -272,150 +300,84 @@ public class RobotContainer {
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
-        //        LimelightHelpers.SetRobotOrientation(
-        //                "limelight",
-        //
-        // RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees(),
-        //
-        // RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees(),
-        //                0,
-        //                0,
-        //                0,
-        //                0);
-        //        Logger.recordOutput(
-        //                "Limelight/Pose",
-        //                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose);
-        //        swerve.addVisionMeasurement(
-        //                new
-        // Pose3d(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight").pose),
-        //                now.in(Seconds),
-        //                VecBuilder.fill(0.1, 0.1, 0.3, 100.0));
     }
 
     private void configureBindings() {
-        //        driver.start()
-        //                .onTrue(
-        //                        SwerveCommands.resetAngle(
-        //                                        swerve,
-        //                                        () ->
-        //                                                AllianceFlipUtil.shouldFlip()
-        //                                                        ? Rotation2d.kZero
-        //                                                        : Rotation2d.k180deg)
-        //                                .alongWith(
-        //                                        Commands.runOnce(
-        //                                                () -> {
-        //                                                    RobotStateRecorder.getInstance()
-        //                                                            .resetTransform(
-        //
-        // TransformRecorder.kFrameWorld,
-        //
-        // TransformRecorder.kFrameRobot);
-        //                                                }))
-        //                                .ignoringDisable(true));
-        //        driver.a()
-        //                .whileTrue(
-        //                        shootingSuperstructure
-        //                                .runFrame(
-        //                                        () ->
-        //                                                shotCalculator.computeShotFrame(
-        //                                                        ShotCalculator.TargetMode.GOAL),
-        //                                        TurretMode.TRACKING)
-        //                                .alongWith(
-        //                                        Commands.run(
-        //                                                () -> {
-        //                                                    if
-        // (shootingSuperstructure.readyToShoot())
-        // {
-        //                                                        var frame =
-        //                                                                RobotStateRecorder
-        //
-        // .getCurrentFrame();
-        //                                                        VisualizeProjectileShot.logPath(
-        //                                                                RobotStateRecorder
-        //
-        // .getPoseWorldShotCurrent(),
-        //                                                                Rotation2d.fromRadians(
-        //
-        // frame.turretAngleWorld()
-        //
-        // .in(Radians)),
-        //                                                                Rotation2d.fromRadians(
-        //                                                                        frame.hoodAngle()
-        //
-        // .in(Radians)),
-        //                                                                frame.muzzleSpeed()
-        //
-        // .in(MetersPerSecond),
-        //                                                                RobotStateRecorder
-        //
-        // .getVelocityWorldRobotCurrent()
-        //                                                                        .getTranslation(),
-        //                                                                true,
-        //                                                                "Valid");
-        //                                                    } else {
-        //                                                        var frame =
-        //                                                                RobotStateRecorder
-        //
-        // .getCurrentFrame();
-        //                                                        VisualizeProjectileShot.logPath(
-        //                                                                RobotStateRecorder
-        //
-        // .getPoseWorldShotCurrent(),
-        //                                                                Rotation2d.fromRadians(
-        //
-        // frame.turretAngleWorld()
-        //
-        // .in(Radians)),
-        //                                                                Rotation2d.fromRadians(
-        //                                                                        frame.hoodAngle()
-        //
-        // .in(Radians)),
-        //                                                                frame.muzzleSpeed()
-        //
-        // .in(MetersPerSecond),
-        //                                                                RobotStateRecorder
-        //
-        // .getVelocityWorldRobotCurrent()
-        //                                                                        .getTranslation(),
-        //                                                                true,
-        //                                                                "Invalid");
-        //                                                    }
-        //                                                })));
-        //        driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0),
-        // TurretMode.SEEKING));
-        //        driver.povRight()
-        //                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90),
-        // TurretMode.SEEKING));
-        //        driver.povDown()
-        //                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180),
-        // TurretMode.TRACKING));
-        //        driver.povLeft()
-        //                .onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270),
-        // TurretMode.TRACKING));
-        //        driver.x()
-        //                .onTrue(
-        //                        Commands.runOnce(
-        //                                () -> {
-        //                                    if (intakerSubsystem.isDeployed()) {
-        //                                        CommandScheduler.getInstance()
-        //
-        // .schedule(intakerSubsystem.retractIntake());
-        //                                    } else {
-        //                                        CommandScheduler.getInstance()
-        //
-        // .schedule(intakerSubsystem.deployIntake());
-        //                                    }
-        //                                }));
-        //        driver.y().onTrue(intakerSubsystem.outtake());
-        //        driver.y().onFalse(intakerSubsystem.intake());
-        driver.x().onTrue(shooter.runDutyCycle(1.0));
-        driver.a().onTrue(shooter.runDutyCycle(0.8));
-        driver.b().onTrue(shooter.runDutyCycle(0.6));
-        driver.y().onTrue(shooter.runDutyCycle(0));
-        driver.povUp().onTrue(hood.runPosition(Degrees.of(10)));
-        driver.povLeft().onTrue(hood.runPosition(Degrees.of(80)));
-        driver.povRight().onTrue(hood.runPosition(Degrees.of(40)));
-        driver.povDown().onTrue(hood.runPosition(Degrees.of(0)));
+        // INTAKE
+        // driver.leftTrigger()
+        //         .onTrue(
+        //                 Commands.runOnce(
+        //                         () -> {
+        //                             if (intakerSubsystem.isDeployed()) {
+        //                                 CommandScheduler.getInstance()
+        //                                         .schedule(intakerSubsystem.retractIntake());
+        //                             } else {
+        //                                 CommandScheduler.getInstance()
+        //                                         .schedule(intakerSubsystem.deployIntake());
+        //                             }
+        //                         }));
+        // driver.leftBumper().onTrue(intakerSubsystem.outtake());
+        // driver.leftBumper().onFalse(intakerSubsystem.intake());
+
+        driver.x()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () ->
+                                        new ShotFrame(
+                                                Degrees.of(0),
+                                                Degrees.of(45),
+                                                MetersPerSecond.of(20)),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
+        driver.y()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () ->
+                                        new ShotFrame(
+                                                Degrees.of(0),
+                                                Degrees.of(20),
+                                                MetersPerSecond.of(10)),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
+
+        // SYSID/test
+        // SysIdCommand shooterSysId = new SysIdCommand(shooter);
+        // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
+        // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
+        // driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
+        // driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
+
+        // SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
+        // driver.povDown().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kForward));
+        // driver.povRight().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kReverse));
+        // driver.povLeft().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kForward));
+        // driver.povUp().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kReverse));
+        // driver.povDown().whileTrue(spindexer.runVelocity(() -> RotationsPerSecond.of(2.3)));
+
+        // Swerve
+        driver.start()
+                .onTrue(
+                        SwerveCommands.resetAngle(
+                                        swerve,
+                                        () ->
+                                                AllianceFlipUtil.shouldFlip()
+                                                        ? Rotation2d.k180deg
+                                                        : Rotation2d.kZero)
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    RobotStateRecorder.getInstance()
+                                                            .resetTransform(
+                                                                    TransformRecorder.kFrameWorld,
+                                                                    TransformRecorder.kFrameRobot);
+                                                }))
+                                .ignoringDisable(true));
+
+        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
     public Command getAutonomousCommand() {

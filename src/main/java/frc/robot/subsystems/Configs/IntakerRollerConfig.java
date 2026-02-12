@@ -16,7 +16,7 @@ public class IntakerRollerConfig {
                     .name(NAME)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_ROLLER_MOTOR_MAIN_ID)
-                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .defaultBrake(false)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(INTAKER_ROLLER_GEAR_RATIO)

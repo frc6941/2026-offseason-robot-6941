@@ -1,5 +1,7 @@
 package lib.ironpulse.io;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -84,14 +86,14 @@ public class MotorIOTalonFX implements MotorIO {
         if (!Double.isNaN(cfg.forwardSoftLimitDegrees.magnitude())) {
             fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
             fx.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-                    cfg.forwardSoftLimitDegrees.magnitude();
+                    cfg.forwardSoftLimitDegrees.in(Rotations);
         } else {
             fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
         }
         if (!Double.isNaN(cfg.reverseSoftLimitDegrees.magnitude())) {
             fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
             fx.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-                    cfg.reverseSoftLimitDegrees.magnitude();
+                    cfg.reverseSoftLimitDegrees.in(Rotations);
         } else {
             fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
         }

@@ -42,12 +42,12 @@ public class ShooterConfig {
     public static final class ShooterParams {
         // velocity gains
 
-        public static final double kP = 1;
+        public static final double kP = 0.1;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kV = 0.11517;
-        public static final double kA = 0.014747;
-        public static final double kS = 0.08;
+        public static final double kV = 0.11862;
+        public static final double kA = 0.017641;
+        public static final double kS = 0.076032;
 
         public static final double velocityAtGoalToleranceRPS = 1;
 
