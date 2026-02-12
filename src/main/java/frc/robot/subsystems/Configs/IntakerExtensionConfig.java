@@ -11,7 +11,7 @@ import lib.ntext.NTParameter;
 public class IntakerExtensionConfig {
     public static final String NAME = "IntakerExtension";
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
-    private static final double INTAKER_EXTENSION_GEAR_RATIO = 40.0 / 26.0 * 20/1;
+    private static final double INTAKER_EXTENSION_GEAR_RATIO = 40.0 / 26.0 * 20 / 1;
     public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
