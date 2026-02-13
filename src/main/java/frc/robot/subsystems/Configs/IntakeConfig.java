@@ -8,13 +8,33 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
-public class IntakerExtensionConfig {
-    public static final String NAME = "IntakerExtension";
+public class IntakeConfig {
+    public static final String INTAKER_ROLLER_NAME = "IntakerRoller";
+    public static final String INTAKER_EXTENSION_NAME = "IntakerExtension";
+
+    private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
+    private static final double INTAKER_ROLLER_GEAR_RATIO = 12.0 / 26.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 40.0 / 26.0 * 20 / 1;
+
+    public static final SubsystemConfig INTAKER_ROLLER_CONFIG =
+            SubsystemConfig.builder()
+                    .name(INTAKER_ROLLER_NAME)
+                    .mainBus(CANIVORE_CAN_BUS)
+                    .mainId(INTAKER_ROLLER_MOTOR_MAIN_ID)
+                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
+                    .defaultBrake(false)
+                    .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
+                    .SensorToMechanismRatio(INTAKER_ROLLER_GEAR_RATIO)
+                    .simConfig(
+                            SubsystemConfig.SimConfig.builder()
+                                    .gearRatio(INTAKER_ROLLER_GEAR_RATIO)
+                                    .build())
+                    .build();
+
     public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
-                    .name(NAME)
+                    .name(INTAKER_EXTENSION_NAME)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_EXTENSION_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
@@ -34,9 +54,27 @@ public class IntakerExtensionConfig {
                     .zeroOffset(Degrees.of(0.0))
                     .build();
 
-    private IntakerExtensionConfig() {}
+    private IntakeConfig() {}
 
-    @NTParameter(tableName = "Params/" + NAME)
+    @NTParameter(tableName = "Params/" + INTAKER_ROLLER_NAME)
+    public static final class IntakerRollerParams {
+        // velocity gains
+        public static final double kP = 1;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kV = 0.1308;
+        public static final double kA = 0.0068;
+        public static final double kS = 0.13;
+
+        public static final double velocityAtGoalToleranceRPS = 30;
+
+        public static final double testVelRPS = 110;
+        public static final double intakeVelRPS = 50;
+        public static final double outtakeVelRPS = -50;
+        public static final double idleVelRPS = 0;
+    }
+
+    @NTParameter(tableName = "Params/" + INTAKER_EXTENSION_NAME)
     public static final class IntakerExtensionParams {
 
         public static final double kP = 3.75;

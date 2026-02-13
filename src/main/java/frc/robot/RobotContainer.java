@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Configs.*;
-import frc.robot.subsystems.IntakerSubsystem.IntakerSubsystem;
+import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
@@ -210,22 +210,22 @@ public class RobotContainer {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerRoller(
             boolean isReal) {
         return new VelocityMotorSubsystem<>(
-                IntakerRollerConfig.INTAKER_ROLLER_CONFIG,
+                IntakeConfig.INTAKER_ROLLER_CONFIG,
                 new MotorInputsAutoLogged(),
                 isReal
-                        ? new MotorIOTalonFX(IntakerRollerConfig.INTAKER_ROLLER_CONFIG)
-                        : new MotorIOSim(IntakerRollerConfig.INTAKER_ROLLER_CONFIG),
+                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_ROLLER_CONFIG)
+                        : new MotorIOSim(IntakeConfig.INTAKER_ROLLER_CONFIG),
                 IntakerRollerParamsNT.asVelocityParamSources());
     }
 
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> buildIntakerExtension(
             boolean isReal) {
         return new PositionMotorSubsystem<>(
-                IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG,
+                IntakeConfig.INTAKER_EXTENSION_CONFIG,
                 new MotorInputsAutoLogged(),
                 isReal
-                        ? new MotorIOTalonFX(IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG)
-                        : new MotorIOSim(IntakerExtensionConfig.INTAKER_EXTENSION_CONFIG),
+                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_EXTENSION_CONFIG)
+                        : new MotorIOSim(IntakeConfig.INTAKER_EXTENSION_CONFIG),
                 IntakerExtensionParamsNT.asPositionParamSources(),
                 Meters.of(0),
                 Meters.of(0.00942 * 11.0));
@@ -288,9 +288,9 @@ public class RobotContainer {
                         shootingSuperstructure.runFrame(
                                 () ->
                                         new ShotFrame(
-                                                Degrees.of(90),
                                                 Degrees.of(45),
-                                                MetersPerSecond.of(20)),
+                                                Degrees.of(45),
+                                                MetersPerSecond.of(12)),
                                 () ->
                                         driver.rightTrigger().getAsBoolean()
                                                 ? ShootingSuperstructure.IdxMode.FEED
