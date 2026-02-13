@@ -23,6 +23,10 @@ public class SerialSubsystem extends SubsystemBase {
     @Getter private LinearVelocity speed = MetersPerSecond.of(0.0);
     @Getter private String lastException = "";
     private double lastRxTime = 0.0;
+    private int count = 0;
+    private LinearVelocity speedSum = MetersPerSecond.of(0);
+    private LinearVelocity lastSpeed = null;
+    private boolean isAveraging = false;
 
     public SerialSubsystem() {
         i2c = new I2C(I2C.Port.kMXP, I2C_ADDRESS);
@@ -46,8 +50,14 @@ public class SerialSubsystem extends SubsystemBase {
                         | ((rx[3] & 0xFF) << 24);
 
         long us = Integer.toUnsignedLong(raw);
-        if (us == 0) {
-            lastException = "Time is 0us";
+        if (us < 1000) {
+            lastException = "Time filtered";
+            log();
+            return;
+        }
+
+        if (SerialSubsystemParamsNT.distanceMeters.getValue() / time.in(Seconds) < 0.2) {
+            lastException = "Speed filtered";
             log();
             return;
         }
@@ -56,6 +66,12 @@ public class SerialSubsystem extends SubsystemBase {
         speed = Meters.of(SerialSubsystemParamsNT.distanceMeters.getValue()).div(time);
         lastException = "";
         lastRxTime = Timer.getFPGATimestamp();
+
+        if (isAveraging && !lastSpeed.equals(speed)) {
+            count++;
+            speedSum = speedSum.plus(speed);
+        }
+        lastSpeed = speed;
         log();
     }
 
@@ -64,14 +80,30 @@ public class SerialSubsystem extends SubsystemBase {
     }
 
     public void log() {
-        Logger.recordOutput(NAME + "/TimeSeconds", time.in(Seconds));
-        Logger.recordOutput(NAME + "/SpeedMPS", speed.in(MetersPerSecond));
+        Logger.recordOutput(NAME + "/TimeSeconds", time);
+        Logger.recordOutput(NAME + "/SpeedMPS", speed);
         Logger.recordOutput(NAME + "/Exception", lastException);
         Logger.recordOutput(NAME + "/TimedOut", isTimedOut());
+        Logger.recordOutput(NAME + "/count", count);
+        Logger.recordOutput(NAME + "/speedSum", speedSum);
+        Logger.recordOutput(NAME + "/isAveraging", isAveraging);
+    }
+
+    public void startAveraging() {
+        count = 0;
+        speedSum = MetersPerSecond.of(0);
+        isAveraging = true;
+    }
+
+    public void stopAveraging() {
+        isAveraging = false;
+        Logger.recordOutput(NAME + "/speedAvg", speedSum.div(count));
     }
 
     @NTParameter(tableName = "Params/" + NAME)
     public static final class SerialSubsystemParams {
-        public static final double distanceMeters = 0.18;
+        public static final double distanceMeters = 0.20;
+        public static final double testFuelMPS = 0.0;
+        public static final double testFuelDeg = 0.0;
     }
 }

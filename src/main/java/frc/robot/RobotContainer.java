@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
+import frc.robot.subsystems.SerialSubsystem.SerialSubsystemParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
@@ -53,13 +54,13 @@ import lombok.SneakyThrows;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
-    private static final boolean HAS_TURRET_IO = true;
+    private static final boolean HAS_TURRET_IO = false;
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = false;
     private static final boolean HAS_INTAKER_EXTENSION_IO = false;
-    private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_SWERVE_IO = false;
     // private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -288,16 +289,23 @@ public class RobotContainer {
 
         driver.x()
                 .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () ->
-                                        new ShotFrame(
-                                                Degrees.of(45),
-                                                Degrees.of(45),
-                                                MetersPerSecond.of(12)),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
+                        shootingSuperstructure
+                                .runFrame(
+                                        () ->
+                                                new ShotFrame(
+                                                        Degrees.of(0),
+                                                        Degrees.of(
+                                                                SerialSubsystemParamsNT.testFuelDeg
+                                                                        .getValue()),
+                                                        MetersPerSecond.of(
+                                                                SerialSubsystemParamsNT.testFuelMPS
+                                                                        .getValue())),
+                                        () ->
+                                                driver.rightTrigger().getAsBoolean()
+                                                        ? ShootingSuperstructure.IdxMode.FEED
+                                                        : ShootingSuperstructure.IdxMode.OFF)
+                                .beforeStarting(Commands.runOnce(serialSubsystem::startAveraging))
+                                .finallyDo(serialSubsystem::stopAveraging));
         driver.y()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
