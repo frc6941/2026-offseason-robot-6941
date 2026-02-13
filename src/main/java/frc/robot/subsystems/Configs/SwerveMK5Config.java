@@ -2,6 +2,7 @@ package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
+import static frc.robot.RobotConstants.is10541;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -60,7 +61,7 @@ public final class SwerveMK5Config {
                     .steerMotorId(6)
                     .encoderId(11)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(-0.11083984375))
+                    .steerMotorEncoderOffset(Rotations.of(is10541 ? 0.1650390625 : -0.11083984375))
                     .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -73,7 +74,7 @@ public final class SwerveMK5Config {
                     .steerMotorId(2)
                     .encoderId(9)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(0.3994140625))
+                    .steerMotorEncoderOffset(Rotations.of(is10541 ? 0.005126953125 : 0.3994140625))
                     .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -86,7 +87,8 @@ public final class SwerveMK5Config {
                     .steerMotorId(8)
                     .encoderId(12)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(-0.12939453125))
+                    .steerMotorEncoderOffset(
+                            Rotations.of(is10541 ? 0.219970703125 : -0.12939453125))
                     .driveInverted(true)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -99,7 +101,8 @@ public final class SwerveMK5Config {
                     .steerMotorId(4)
                     .encoderId(10)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(-0.462158203125))
+                    .steerMotorEncoderOffset(
+                            Rotations.of(is10541 ? 0.263916015625 : -0.462158203125))
                     .driveInverted(true)
                     .steerInverted(false)
                     .encoderInverted(false)

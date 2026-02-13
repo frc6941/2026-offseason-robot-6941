@@ -225,9 +225,10 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
             }
         }
 
-        double forwardLimit = TURRET_SOFT_LIMIT.in(Degrees) - TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
+        double forwardLimit =
+                TURRET_SOFT_LIMIT_CCW.in(Degrees) - TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
         double reverseLimit =
-                TURRET_SOFT_LIMIT.unaryMinus().in(Degrees) + TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
+                TURRET_SOFT_LIMIT_CW.in(Degrees) + TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
         if (!Double.isNaN(forwardLimit) && finalOffset > forwardLimit) {
             finalOffset -= FULL_ROTATION.in(Degrees);
         } else if (!Double.isNaN(reverseLimit) && finalOffset < reverseLimit) {

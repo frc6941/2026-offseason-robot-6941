@@ -23,7 +23,8 @@ public class TurretConfig {
     public static final int G2_TOOTH_COUNT = 34;
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(250.0);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(100.0);
-    public static final Angle TURRET_SOFT_LIMIT = Degrees.of(220.0);
+    public static final Angle TURRET_SOFT_LIMIT_CCW = Degrees.of(85);
+    public static final Angle TURRET_SOFT_LIMIT_CW = Degrees.of(-355);
     public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(5.0);
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
@@ -34,8 +35,8 @@ public class TurretConfig {
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .defaultBrake(true)
-                    .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT)
-                    .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT.unaryMinus())
+                    .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT_CCW)
+                    .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT_CW)
                     .statorCurrentLimitAmps(80)
                     .supplyCurrentLimitAmps(80)
                     .simConfig(
@@ -51,10 +52,10 @@ public class TurretConfig {
         // velocity gains
         // IMPORTANT: Makesure we tune these first before tuning the position gains
         // Velocity trackeing should be clean and accurate
-        public static final double kP = 2.5;
+        public static final double kP = 3.5;
         public static final double kI = 0.0;
         public static final double kD = 0.1;
-        public static final double kV = 3.0112;
+        public static final double kV = 4.5;
         public static final double kA = 0.2948;
         public static final double kS = 0.23;
         // Tolerances / behavior
@@ -65,16 +66,16 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 1;
+        public static final double kpSeek = 2.5;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
-        public static final double kpTrack = 1;
+        public static final double kpTrack = 5;
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.0;
 
-        public static final double maxVelocityRPS = 5;
-        public static final double maxAccelerationRPS2 = 10;
+        public static final double maxVelocityRPS = 3;
+        public static final double maxAccelerationRPS2 = 9;
         public static final double kchassisVelCompensation = 1;
         public static final double positionAtGoalToleranceDegrees = 1;
         // Hysteresis thresholds for automatic mode switching.

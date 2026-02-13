@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.wpilibj.RobotController;
 
 /**
  * Robot-wide constants that are used across multiple subsystems. Constants that need tuning are
@@ -21,6 +22,11 @@ public final class RobotConstants {
     public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID
     public static final int LED_PORT = 0;
     public static final int LED_LENGTH = 30;
+
+    public static final String RIOSerial10541 = "03415993";
+    public static boolean is10541 =
+            RobotController.getSerialNumber().matches(RobotConstants.RIOSerial10541);
+    ;
 
     private RobotConstants() {
         // Prevent instantiation

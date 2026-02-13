@@ -117,7 +117,7 @@ public class LimelightIOReal implements LimelightIO {
 
     @Override
     public void setThrottle(boolean robotEnabled) {
-        if (isLimelight4()) {
+        if (!isLimelight4()) {
             return;
         }
         LimelightHelpers.SetThrottle(
