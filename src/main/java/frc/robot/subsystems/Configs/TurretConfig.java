@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -13,16 +14,16 @@ public class TurretConfig {
     public static final String NAME = "Turret";
     public static final int TURRET_MOTOR_MAIN_ID = 31;
     public static final double TURRET_GEAR_RATIO = 34.0 / 8.0 * 88.0 / 11.0;
-    public static final int TURRET_ENCODER_G1_ID = 95;
-    public static final int TURRET_ENCODER_G2_ID = 94;
-    public static final Angle TURRET_ENCODER_G1_OFFSET = Degrees.of(0.0);
-    public static final Angle TURRET_ENCODER_G2_OFFSET = Degrees.of(0.0);
+    public static final int TURRET_ENCODER_G1_ID = 59;
+    public static final int TURRET_ENCODER_G2_ID = 58;
+    public static final Angle TURRET_ENCODER_G1_OFFSET = Rotations.of(0.344970703125);
+    public static final Angle TURRET_ENCODER_G2_OFFSET = Rotations.of(-0.003662109375);
     // Zeroing Coder constants
-    public static final int G0_TOOTH_COUNT = 70;
-    public static final int G1_TOOTH_COUNT = 36;
-    public static final int G2_TOOTH_COUNT = 34;
-    public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(250.0);
-    public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(100.0);
+    public static final int G0_TOOTH_COUNT = 88;
+    public static final int G1_TOOTH_COUNT = 16;
+    public static final int G2_TOOTH_COUNT = 15;
+    public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(190);
+    public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(30);
     public static final Angle TURRET_SOFT_LIMIT_CCW = Degrees.of(85);
     public static final Angle TURRET_SOFT_LIMIT_CW = Degrees.of(-355);
     public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(5.0);

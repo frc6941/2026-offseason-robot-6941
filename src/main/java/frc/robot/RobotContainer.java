@@ -30,6 +30,7 @@ import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
 import lib.ironpulse.indicator.IndicatorSubsystem;
+import lib.ironpulse.io.CANCoderIOCANCoder;
 import lib.ironpulse.io.CANCoderIOSim;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorIOSim;
@@ -179,8 +180,18 @@ public class RobotContainer {
                 isReal
                         ? new MotorIOTalonFX(TurretConfig.TURRET_CONFIG)
                         : new MotorIOSim(TurretConfig.TURRET_CONFIG),
-                isReal ? encoderG1Sim : encoderG1Sim,
-                isReal ? encoderG2Sim : encoderG2Sim,
+                isReal
+                        ? new CANCoderIOCANCoder(
+                                TurretConfig.TURRET_ENCODER_G1_ID,
+                                TurretConfig.TURRET_ENCODER_G1_OFFSET,
+                                false)
+                        : encoderG1Sim,
+                isReal
+                        ? new CANCoderIOCANCoder(
+                                TurretConfig.TURRET_ENCODER_G2_ID,
+                                TurretConfig.TURRET_ENCODER_G2_OFFSET,
+                                false)
+                        : encoderG2Sim,
                 TurretVelParamsNT.asVelocityParamSources());
     }
 
@@ -321,7 +332,7 @@ public class RobotContainer {
         // driver.povLeft().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.povUp().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kReverse));
         // driver.povDown().whileTrue(spindexer.runVelocity(() -> RotationsPerSecond.of(2.3)));
-        driver.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
+        // driver.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
         // driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
         // driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
         // driver.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180)));
