@@ -94,7 +94,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         this.encoderG1 = encoderG1;
         this.encoderG2 = encoderG2;
         updateUnwrappedTurretAngle();
-        io.setCurrentPosition(unwrappedTurretAngle);
+        io.setCurrentPosition(unwrappedTurretAngle.plus(TurretConfig.TURRET_ZERO_OFFSET));
     }
 
     @Override

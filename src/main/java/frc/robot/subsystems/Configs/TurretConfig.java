@@ -2,7 +2,7 @@ package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
+import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -12,8 +12,10 @@ import lib.ntext.NTParameter;
 
 public class TurretConfig {
     public static final String NAME = "Turret";
+
     public static final int TURRET_MOTOR_MAIN_ID = 31;
     public static final double TURRET_GEAR_RATIO = 34.0 / 8.0 * 88.0 / 11.0;
+
     public static final int TURRET_ENCODER_G1_ID = 59;
     public static final int TURRET_ENCODER_G2_ID = 58;
     public static final Angle TURRET_ENCODER_G1_OFFSET = Rotations.of(0.344970703125);
@@ -24,13 +26,18 @@ public class TurretConfig {
     public static final int G2_TOOTH_COUNT = 15;
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(190);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(30);
-    public static final Angle TURRET_SOFT_LIMIT_CCW = Degrees.of(85);
-    public static final Angle TURRET_SOFT_LIMIT_CW = Degrees.of(-355);
+    // Zero offset- the position at which the two encoders are set to zero.
+    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-135);
+    public static final Angle TURRET_DOF = Degrees.of(230);
+    public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF.plus(TURRET_ZERO_OFFSET);
+    public static final Angle TURRET_SOFT_LIMIT_CW =
+            TURRET_DOF.unaryMinus().plus(TURRET_ZERO_OFFSET);
+
     public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(5.0);
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS)
+                    .mainBus(ROBORIO_CAN_BUS)
                     .mainId(TURRET_MOTOR_MAIN_ID)
                     .SensorToMechanismRatio(TURRET_GEAR_RATIO)
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
