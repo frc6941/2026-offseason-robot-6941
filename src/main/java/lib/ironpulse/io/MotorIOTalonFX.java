@@ -21,6 +21,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.PhoenixUtils;
 
@@ -132,7 +133,8 @@ public class MotorIOTalonFX implements MotorIO {
         supplyVoltSig.setUpdateFrequency(30.0);
         statorSig.setUpdateFrequency(100.0);
         supplySig.setUpdateFrequency(100.0);
-        PhoenixUtils.registerSignals(true, signals);
+        boolean isCanivoreBus = cfg.mainBus == RobotConstants.CANIVORE_CAN_BUS;
+        PhoenixUtils.registerSignals(isCanivoreBus, signals);
         main.optimizeBusUtilization();
     }
 

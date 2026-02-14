@@ -1,10 +1,11 @@
 package frc.robot.subsystems.Configs;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.units.measure.Distance;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
@@ -13,17 +14,18 @@ public class IntakeConfig {
     public static final String INTAKER_EXTENSION_NAME = "IntakerExtension";
 
     private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
-    private static final double INTAKER_ROLLER_GEAR_RATIO = 12.0 / 26.0;
+    private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
-    private static final double INTAKER_EXTENSION_GEAR_RATIO = 40.0 / 26.0 * 20 / 1;
+    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 9 / 1;
+    public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
 
     public static final SubsystemConfig INTAKER_ROLLER_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_ROLLER_NAME)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_ROLLER_MOTOR_MAIN_ID)
-                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
-                    .defaultBrake(false)
+                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(INTAKER_ROLLER_GEAR_RATIO)
                     .simConfig(
@@ -37,9 +39,9 @@ public class IntakeConfig {
                     .name(INTAKER_EXTENSION_NAME)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_EXTENSION_MOTOR_MAIN_ID)
-                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
-                    .defaultBrake(false)
-                    .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
+                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
+                    .defaultBrake(true)
+                    .kSValue(StaticFeedforwardSignValue.UseClosedLoopSign)
                     .SensorToMechanismRatio(INTAKER_EXTENSION_GEAR_RATIO)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
@@ -47,11 +49,10 @@ public class IntakeConfig {
                                     .build())
                     .zeroingConfig(
                             SubsystemConfig.ZeroingConfig.builder()
-                                    .zeroingCurrentLimit(50)
+                                    .zeroingCurrentLimit(35)
                                     .zeroingFilterSize(5)
-                                    .zeroingVoltage(1)
+                                    .zeroingVoltage(-1.75)
                                     .build())
-                    .zeroOffset(Degrees.of(0.0))
                     .build();
 
     private IntakeConfig() {}
@@ -93,5 +94,7 @@ public class IntakeConfig {
         public static final double atGoalToleranceMeters = 0.01;
         public static final double deployPosMeters = 0.2;
         public static final double retractPosMeters = 0.0;
+
+        public static final boolean isBrake = true;
     }
 }

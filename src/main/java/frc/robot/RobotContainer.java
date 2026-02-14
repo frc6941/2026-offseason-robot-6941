@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
+import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -58,8 +59,8 @@ public class RobotContainer {
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-    private static final boolean HAS_INTAKER_ROLLER_IO = false;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = false;
+    private static final boolean HAS_INTAKER_ROLLER_IO = true;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     // private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intakerSubsystem;
@@ -114,6 +115,8 @@ public class RobotContainer {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
+        intakerExtension.setDefaultCommand(intakerExtension.runStop());
+        intakerRoller.setDefaultCommand(intakerRoller.runStop());
         // indicatorSubsystem.setDefaultCommand(
         //        indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
     }
@@ -183,12 +186,14 @@ public class RobotContainer {
                 isReal
                         ? new CANCoderIOCANCoder(
                                 TurretConfig.TURRET_ENCODER_G1_ID,
+                                ROBORIO_CAN_BUS,
                                 TurretConfig.TURRET_ENCODER_G1_OFFSET,
                                 false)
                         : encoderG1Sim,
                 isReal
                         ? new CANCoderIOCANCoder(
                                 TurretConfig.TURRET_ENCODER_G2_ID,
+                                ROBORIO_CAN_BUS,
                                 TurretConfig.TURRET_ENCODER_G2_OFFSET,
                                 false)
                         : encoderG2Sim,
@@ -239,7 +244,7 @@ public class RobotContainer {
                         : new MotorIOSim(IntakeConfig.INTAKER_EXTENSION_CONFIG),
                 IntakerExtensionParamsNT.asPositionParamSources(),
                 Meters.of(0),
-                Meters.of(0.00942 * 11.0));
+                IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION);
     }
 
     private SerialSubsystem buildSerial(boolean isReal) {
@@ -301,7 +306,7 @@ public class RobotContainer {
                                         new ShotFrame(
                                                 Degrees.of(45),
                                                 Degrees.of(45),
-                                                MetersPerSecond.of(12)),
+                                                MetersPerSecond.of(13)),
                                 () ->
                                         driver.rightTrigger().getAsBoolean()
                                                 ? ShootingSuperstructure.IdxMode.FEED
@@ -312,7 +317,7 @@ public class RobotContainer {
                                 () ->
                                         new ShotFrame(
                                                 Degrees.of(180),
-                                                Degrees.of(20),
+                                                Degrees.of(30),
                                                 MetersPerSecond.of(10)),
                                 () ->
                                         driver.rightTrigger().getAsBoolean()
@@ -337,6 +342,11 @@ public class RobotContainer {
         // driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
         // driver.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180)));
         // driver.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270)));
+
+        driver.back().whileTrue(intakerExtension.zeroCommand());
+        driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
+        driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
+        driver.leftBumper().whileTrue(intakerRoller.runDutyCycle(1));
 
         // Swerve
         driver.start()
