@@ -29,7 +29,6 @@ import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
-import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -57,7 +56,7 @@ import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
 
-@SuppressWarnings({"rawtypes", "unused"})
+@SuppressWarnings({"unused"})
 public class RobotContainer {
     private static final boolean HAS_TURRET_IO = true;
     private static final boolean HAS_SHOOTER_IO = true;
@@ -175,18 +174,28 @@ public class RobotContainer {
         driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () ->
-                                        new ShotFrame(
-                                                shotCalculator
-                                                        .getShotToTargetTranslation(TargetMode.GOAL)
-                                                        .getAngle()
-                                                        .getMeasure(),
-                                                Degrees.of(45),
-                                                MetersPerSecond.of(12)),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
+                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL)));
+        // driver.back().whileTrue(intakerExtension.zeroCommand());
+        // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
+        // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
+        // driver.leftTrigger().whileTrue(intakerRoller.runDutyCycle(1));
+
+        // SYSID/test
+        // driver.leftBumper()
+        // .whileTrue(
+        //         shootingSuperstructure.runFrame(
+        //                 () ->
+        //                         new ShotFrame(
+        //                                 shotCalculator
+        //                                         .getShotToTargetTranslation(TargetMode.GOAL)
+        //                                         .getAngle()
+        //                                         .getMeasure(),
+        //                                 Degrees.of(45),
+        //                                 MetersPerSecond.of(12)),
+        //                 () ->
+        //                         driver.rightTrigger().getAsBoolean()
+        //                                 ? ShootingSuperstructure.IdxMode.FEED
+        //                                 : ShootingSuperstructure.IdxMode.OFF));
         // driver.rightBumper()
         //         .whileTrue(
         //                 shootingSuperstructure.runFrame(
@@ -199,13 +208,6 @@ public class RobotContainer {
         //                                 driver.rightTrigger().getAsBoolean()
         //                                         ? ShootingSuperstructure.IdxMode.FEED
         //                                         : ShootingSuperstructure.IdxMode.OFF));
-
-        // driver.back().whileTrue(intakerExtension.zeroCommand());
-        // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
-        // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
-        // driver.leftTrigger().whileTrue(intakerRoller.runDutyCycle(1));
-
-        // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
         // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));

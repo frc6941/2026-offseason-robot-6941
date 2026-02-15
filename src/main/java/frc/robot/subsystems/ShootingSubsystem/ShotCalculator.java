@@ -111,7 +111,7 @@ public class ShotCalculator {
         Angle turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
         return new ShotFrame(
                 turretYawRad,
-                Degrees.of(model.launchAngleDeg),
+                Degrees.of(90).minus(Degrees.of(model.launchAngleDeg)),
                 MetersPerSecond.of(model.exitSpeedMps));
     }
 
