@@ -74,16 +74,16 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 2.5;
+        public static final double kpSeek = 4.5;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
-        public static final double kpTrack = 5;
+        public static final double kpTrack = 8.5;
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.0;
 
-        public static final double maxVelocityRPS = 3;
-        public static final double maxAccelerationRPS2 = 9;
+        public static final double maxVelocityRPS = 3.5;
+        public static final double maxAccelerationRPS2 = 13;
         public static final double kchassisVelCompensation = 1;
         public static final double positionAtGoalToleranceDegrees = 1;
         // Hysteresis thresholds for automatic mode switching.
