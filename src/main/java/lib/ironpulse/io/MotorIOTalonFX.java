@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -39,6 +40,8 @@ public class MotorIOTalonFX implements MotorIO {
     private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl =
             new DynamicMotionMagicVoltage(0.0, 0.0, 0.0).withEnableFOC(true);
     private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
+    private final VelocityTorqueCurrentFOC velocityTorqueCurrentCtrl =
+            new VelocityTorqueCurrentFOC(0.0);
     private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
     private final StatusSignal<Angle> posSig;
@@ -198,8 +201,21 @@ public class MotorIOTalonFX implements MotorIO {
     }
 
     @Override
-    public void setVelocitySetpoint(AngularVelocity velocity) {
+    public void setVelVoltSetpoint(AngularVelocity velocity) {
         main.setControl(velocityCtrl.withVelocity(velocity));
+    }
+
+    @Override
+    public void setVelVoltSetpoint(AngularVelocity velocity, Voltage feedForwardVoltage) {
+        main.setControl(velocityCtrl.withVelocity(velocity).withFeedForward(feedForwardVoltage));
+    }
+
+    @Override
+    public void setVelTCSetpoint(AngularVelocity velocity, Current feedForwardTorqueCurrent) {
+        main.setControl(
+                velocityTorqueCurrentCtrl
+                        .withVelocity(velocity)
+                        .withFeedForward(feedForwardTorqueCurrent));
     }
 
     @Override

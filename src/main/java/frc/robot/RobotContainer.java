@@ -219,7 +219,7 @@ public class RobotContainer {
         // driver.povRight().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kReverse));
         // driver.povLeft().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.povUp().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kReverse));
-        // driver.povDown().whileTrue(spindexer.runVelocity(() -> RotationsPerSecond.of(2.3)));
+        // driver.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // driver.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
         // driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
         // driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));

@@ -3,6 +3,8 @@ package lib.ironpulse.io;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 
 /** Follow Team 254 style for ownership (subsystem logs) */
 public interface MotorIO {
@@ -27,7 +29,17 @@ public interface MotorIO {
     default void setNeutralMode(boolean wantsBreak) {}
     ;
 
-    default void setVelocitySetpoint(AngularVelocity velocity) {}
+    default void setVelVoltSetpoint(AngularVelocity velocity) {}
+    ;
+
+    default void setVelVoltSetpoint(AngularVelocity velocity, Voltage feedForwardVoltage) {
+        setVelVoltSetpoint(velocity);
+    }
+    ;
+
+    default void setVelTCSetpoint(AngularVelocity velocity, Current feedForwardTorqueCurrent) {
+        setVelVoltSetpoint(velocity);
+    }
     ;
 
     default void setCurrentPositionAsZero() {}

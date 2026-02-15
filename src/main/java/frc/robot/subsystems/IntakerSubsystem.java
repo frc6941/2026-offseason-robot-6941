@@ -28,7 +28,7 @@ public class IntakerSubsystem {
 
     public Command runIntake() {
         return Commands.parallel(
-                roller.runVelocity(RotationsPerSecond.of(intakeVelRPS)),
+                roller.runVelVolt(RotationsPerSecond.of(intakeVelRPS)),
                 extension.runPosition(Meters.of(deployPosMeters)));
     }
 }
