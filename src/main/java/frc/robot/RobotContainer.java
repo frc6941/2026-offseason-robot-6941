@@ -175,7 +175,7 @@ public class RobotContainer {
                 .whileTrue(
                         shootingSuperstructure.runFrame(
                                 () -> shotCalculator.computeShotFrame(TargetMode.GOAL)));
-        // driver.back().whileTrue(intakerExtension.zeroCommand());
+
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
         // driver.leftTrigger().whileTrue(intakerRoller.runDutyCycle(1));
@@ -236,6 +236,9 @@ public class RobotContainer {
         // driver.b().whileTrue(swerveSysId.quasistatic(SysIdRoutine.Direction.kReverse));
         // driver.x().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kReverse));
+        // driver.back().whileTrue(intakerExtension.zeroCommand());
+        driver.povUp().onTrue(hood.zeroCommand());
+
         // Swerve
         driver.start()
                 .onTrue(
@@ -255,9 +258,10 @@ public class RobotContainer {
                                                 }))
                                 .ignoringDisable(true));
 
-        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
         new Trigger(DriverStation::isEnabled)
-                .onTrue(new InstantCommand(() -> limelightSubsystem.setThrottleAll(true)));
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
+                                .alongWith(hood.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(
@@ -367,7 +371,7 @@ public class RobotContainer {
                         ? new MotorIOTalonFX(HoodConfig.HOOD_CONFIG)
                         : new MotorIOSim(HoodConfig.HOOD_CONFIG),
                 HoodParamsNT.asPositionParamSources(),
-                Degrees.of(14),
+                Degrees.of(HoodConfig.HOOD_ANGLE_ZEROED_DEG),
                 Degrees.of(360.0));
     }
 

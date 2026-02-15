@@ -214,8 +214,16 @@ public class MotorIOTalonFX implements MotorIO {
 
     @Override
     public void setEnableSoftLimits(boolean forward, boolean reverse) {
-        this.fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
-        this.fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+        if (!Double.isNaN(config.forwardSoftLimitDegrees.magnitude())) {
+            fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
+        } else {
+            fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        }
+        if (!Double.isNaN(config.reverseSoftLimitDegrees.magnitude())) {
+            fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+        } else {
+            fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+        }
         main.getConfigurator().apply(this.fx);
     }
 
