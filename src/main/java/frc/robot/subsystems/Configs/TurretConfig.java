@@ -28,7 +28,7 @@ public class TurretConfig {
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(30);
     // Zero offset- the position at which the two encoders are set to zero.
     public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-135);
-    public static final Angle TURRET_DOF = Degrees.of(230);
+    public static final Angle TURRET_DOF = Degrees.of(225);
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =
             TURRET_DOF.unaryMinus().plus(TURRET_ZERO_OFFSET);
@@ -60,12 +60,16 @@ public class TurretConfig {
         // velocity gains
         // IMPORTANT: Makesure we tune these first before tuning the position gains
         // Velocity trackeing should be clean and accurate
-        public static final double kP = 3.5;
+        public static final double kP = 0;
         public static final double kI = 0.0;
-        public static final double kD = 0.1;
-        public static final double kV = 4.5;
-        public static final double kA = 0.2948;
-        public static final double kS = 0.23;
+        public static final double kD = 0;
+        public static final double kV = 0;
+        public static final double kA = 0;
+        public static final double kS = 0;
+        // Magnitude of turret gravity-like bias compensation in torque current (A).
+        // Sign is computed in TurretSubsystem based on whether commanded motion moves
+        // away from or toward TURRET_ZERO_OFFSET.
+        public static final double turretBiasCompTCAmps = 0;
         // Tolerances / behavior
         public static final double velocityAtGoalToleranceRPS = 1;
         public static final boolean isBrake = true;
