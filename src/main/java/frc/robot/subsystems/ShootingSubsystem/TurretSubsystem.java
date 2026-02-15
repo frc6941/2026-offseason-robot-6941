@@ -94,7 +94,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         this.encoderG1 = encoderG1;
         this.encoderG2 = encoderG2;
         updateUnwrappedTurretAngle();
-        // io.setCurrentPosition(unwrappedTurretAngle);
+        io.setCurrentPosition(unwrappedTurretAngle.plus(TurretConfig.TURRET_ZERO_OFFSET));
     }
 
     @Override
@@ -110,8 +110,18 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     @Override
     protected void logState() {
+        double encoderDeltaRawDeg =
+                (encoderG2Inputs.positionRotations - encoderG1Inputs.positionRotations) * 360.0;
+        double encoderDeltaWrappedDeg = encoderDeltaRawDeg;
+        if (encoderDeltaWrappedDeg > ENCODER_DELTA_WRAP_THRESHOLD.in(Degrees)) {
+            encoderDeltaWrappedDeg -= 360.0;
+        } else if (encoderDeltaWrappedDeg < -ENCODER_DELTA_WRAP_THRESHOLD.in(Degrees)) {
+            encoderDeltaWrappedDeg += 360.0;
+        }
         Logger.processInputs(getName() + "/Absolute/encoderG1", encoderG1Inputs);
         Logger.processInputs(getName() + "/Absolute/encoderG2", encoderG2Inputs);
+        Logger.recordOutput(getName() + "/Absolute/encoderDeltaRawDeg", encoderDeltaRawDeg);
+        Logger.recordOutput(getName() + "/Absolute/encoderDeltaWrappedDeg", encoderDeltaWrappedDeg);
         Logger.recordOutput(
                 getName() + "/Absolute/unwrappedTurretAngle", unwrappedTurretAngle.in(Degrees));
         Logger.recordOutput(getName() + "/targetAngleWorldDeg", targetAngleWorld.get().in(Degrees));
@@ -168,7 +178,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         // compansate for the chassis rotation
         double chassisOmegaDegPerSec =
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
-        Logger.recordOutput(getName() + "/addedV", chassisOmegaDegPerSec);
+        // Logger.recordOutput(getName() + "/addedV", chassisOmegaDegPerSec);
         desiredVelocity -=
                 TurretPosParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;
         return DegreesPerSecond.of(desiredVelocity);
@@ -225,9 +235,10 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
             }
         }
 
-        double forwardLimit = TURRET_SOFT_LIMIT.in(Degrees) - TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
+        double forwardLimit =
+                TURRET_SOFT_LIMIT_CCW.in(Degrees) - TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
         double reverseLimit =
-                TURRET_SOFT_LIMIT.unaryMinus().in(Degrees) + TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
+                TURRET_SOFT_LIMIT_CW.in(Degrees) + TURRET_SOFT_LIMIT_MARGIN.in(Degrees);
         if (!Double.isNaN(forwardLimit) && finalOffset > forwardLimit) {
             finalOffset -= FULL_ROTATION.in(Degrees);
         } else if (!Double.isNaN(reverseLimit) && finalOffset < reverseLimit) {

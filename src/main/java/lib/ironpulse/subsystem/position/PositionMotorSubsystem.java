@@ -223,6 +223,7 @@ public class PositionMotorSubsystem<
         Command realZero =
                 Commands.runOnce(
                                 () -> {
+                                    io.setEnableSoftLimits(false, false);
                                     currentFilter =
                                             LinearFilter.movingAverage(
                                                     config.zeroingConfig.zeroingFilterSize);
@@ -249,6 +250,7 @@ public class PositionMotorSubsystem<
                                     mode = ControlMode.VOLTAGE;
                                     setpoint = 0.0;
                                     io.setVoltage(0.0);
+                                    io.setEnableSoftLimits(true, true);
                                 });
 
         Command simZero = Commands.runOnce(() -> io.setCurrentPositionAsZero(), this);

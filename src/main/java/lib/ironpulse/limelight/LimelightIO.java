@@ -9,11 +9,11 @@ public interface LimelightIO {
     // reliability score: from 0 to 1
     double getReliabilityScore(LimelightHelpers.PoseEstimate poseEstimate);
 
-    default void setPipeline(int pipeline) {}
-
     default int getPipeline() {
         return 0;
     }
+
+    default void setPipeline(int pipeline) {}
 
     default void setLEDMode(LEDMode mode) {}
 
@@ -25,6 +25,21 @@ public interface LimelightIO {
 
     default void updateInputs(LimelightIOInputs inputs) {}
 
+    default void setThrottle(boolean robotEnabled) {}
+
+    default double[] getVisionStdDevComponents(double reliability) {
+        return new double[] {
+            0.7 * (2 - reliability),
+            0.7 * (2 - reliability),
+            1.0 * (2 - reliability),
+            9999999 * (2 - reliability)
+        };
+    }
+
+    default double getImuCorrectionReliabilityThreshold() {
+        return 0.9;
+    }
+
     // FIXME: leave only one function for yaw. This was to see that whether robotYaw equals to
     // internal yaw.
     double getIMUYawInternal();
@@ -35,15 +50,6 @@ public interface LimelightIO {
 
     default String getName() {
         return "UNNAMED";
-    }
-
-    @AutoLog
-    class LimelightIOInputs {
-        public Pose3d pose;
-        public double timestampSeconds;
-        public double latency;
-        public double reliability;
-        public int[] detectedTagIds;
     }
 
     enum InternalIMUMode {
@@ -71,5 +77,14 @@ public interface LimelightIO {
         ON,
         OFF,
         BLINK
+    }
+
+    @AutoLog
+    class LimelightIOInputs {
+        public Pose3d pose;
+        public double timestampSeconds;
+        public double latency;
+        public double reliability;
+        public int[] detectedTagIds;
     }
 }

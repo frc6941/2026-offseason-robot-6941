@@ -18,7 +18,7 @@ public final class ShotCalculatorConfig {
         public static final double speedOffsetMps = 0.0;
         public static final double angleOffsetDeg = 0.0;
         public static final double trajectoryBiasDeg = 0.0;
-        public static final double lateralVelocityCompScale = 1.0;
+        public static final double lateralVelocityCompScale = 0.5;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmC
