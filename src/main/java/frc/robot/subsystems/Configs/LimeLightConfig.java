@@ -5,7 +5,7 @@ import lib.ironpulse.limelight.LimelightIOConfig;
 import lib.ntext.NTParameter;
 
 public class LimeLightConfig {
-    public static final String NAME = "LimeLight";
+    public static final String NAME = "limelight-a";
     public static final LimelightIOConfig limelight1Config =
             LimelightIOConfig.builder()
                     .name(NAME)

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import lib.ironpulse.utils.LimelightHelpers;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Limelight IO. Takes in a LimelightConfig and odometry from swerve for enhanced detection. Should
@@ -83,15 +84,18 @@ public class LimelightIOReal implements LimelightIO {
             // would be different from that of the robot.
             // So we do not trust the internal IMU completely...
             LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.EXTERNAL_ONLY.getValue());
+            Logger.recordOutput("Limelight/IMU/Mode", "external");
             return;
         }
         if (RobotState.isDisabled()) {
             // disabled; use IMU mode 1 - seed internal IMU with data
             LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.EXTERNAL_SEED.getValue());
+            Logger.recordOutput("Limelight/IMU/Mode", "seed");
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
             LimelightHelpers.SetIMUMode(
                     config.getName(), InternalIMUMode.INTERNAL_EXTERNAL_ASSIST.getValue());
+            Logger.recordOutput("Limelight/IMU/Mode", "assisted");
         }
     }
 
@@ -146,6 +150,7 @@ public class LimelightIOReal implements LimelightIO {
                 0,
                 0,
                 0); // the last 5 parameters are not necessary
+        Logger.recordOutput("Limelight/IMU/Swerve", yawSupplier.getAsDouble());
 
         // generate pose Estimate
         LimelightHelpers.PoseEstimate estimate;

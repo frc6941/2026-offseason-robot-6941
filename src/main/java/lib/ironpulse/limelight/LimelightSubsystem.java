@@ -4,10 +4,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import java.util.Map;
 import lib.ironpulse.math.MathTools;
@@ -26,12 +23,6 @@ public class LimelightSubsystem extends SubsystemBase {
             this.ios.put(io, new LimelightIOInputsAutoLogged());
             this.ioNames.put(io.getName(), io);
         }
-
-        new Trigger(DriverStation::isEnabled)
-                .onTrue(new InstantCommand(() -> setThrottleAll(true)));
-
-        new Trigger(DriverStation::isDisabled)
-                .onTrue(new InstantCommand(() -> setThrottleAll(false)));
     }
 
     /**
@@ -80,11 +71,10 @@ public class LimelightSubsystem extends SubsystemBase {
             // FIXME: For debugging only, remove if not needed
             Logger.recordOutput("Limelight/IMU/" + io.getName() + "_INT", io.getIMUYawInternal());
             Logger.recordOutput("Limelight/IMU/" + io.getName() + "_ROBOT", io.getIMUYawRobot());
-            Logger.recordOutput("Limelight/IMU/Swerve", localizationProvider.getIMUYaw());
 
             if (inputs.reliability >= io.getImuCorrectionReliabilityThreshold()) {
                 // trustworthy enough to correct the swerve's IMU perhaps?
-                localizationProvider.setIMUYaw(io.getIMUYawRobot());
+                // localizationProvider.setIMUYaw(io.getIMUYawRobot());
             }
         }
 
@@ -119,7 +109,7 @@ public class LimelightSubsystem extends SubsystemBase {
         getIoById(id).clearAprilTagIdFilter();
     }
 
-    private void setThrottleAll(boolean enabled) {
+    public void setThrottleAll(boolean enabled) {
         for (LimelightIO io : ios.keySet()) {
             io.setThrottle(enabled);
         }
