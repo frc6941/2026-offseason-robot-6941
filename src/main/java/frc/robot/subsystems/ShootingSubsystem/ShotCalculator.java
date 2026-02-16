@@ -84,11 +84,6 @@ public class ShotCalculator {
         }
     }
 
-    /** Selects which target table to use for interpolation. */
-    public void setTargetMode(TargetMode mode) {
-        this.targetMode = mode;
-    }
-
     /**
      * Computes the shot frame for the current target mode.
      *
@@ -96,14 +91,16 @@ public class ShotCalculator {
      */
     public ShotFrame computeShotFrame(TargetMode mode) {
         if (mode != null) {
-            setTargetMode(mode);
+            this.targetMode = mode;
         }
-        TargetMode activeMode = targetMode;
-        Translation2d turretToTarget = getShotToTargetTranslation(activeMode);
+        String targetFrame = getTargetFrameName(this.targetMode);
+        Translation2d turretToTarget =
+                RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         double distanceMeters = turretToTarget.getNorm();
-        Translation2d goalVelocity = getVelocityGoalRobotCurrent(activeMode);
-        double vParallel = goalVelocity.getX();
-        double vPerp = goalVelocity.getY();
+        Translation2d targetVelocity =
+                RobotStateRecorder.getVelocityTargetRobotCurrent(targetFrame);
+        double vParallel = targetVelocity.getX();
+        double vPerp = targetVelocity.getY();
 
         ShotModel model = lookupModel(distanceMeters, vParallel);
         model = applyModelTuning(model);
@@ -115,28 +112,15 @@ public class ShotCalculator {
                 MetersPerSecond.of(model.exitSpeedMps));
     }
 
-    /**
-     * Gets the turret-to-target translation for the given target mode.
-     *
-     * <p>For now, only GOAL is wired. Feed targets can be added once frames exist.
-     */
-    public Translation2d getShotToTargetTranslation(TargetMode mode) {
-        if (mode == TargetMode.GOAL) {
-            return RobotStateRecorder.getTranslationShotToGoalCurrent();
+    private static String getTargetFrameName(TargetMode mode) {
+        if (mode == null) {
+            return RobotStateRecorder.kFrameGoal;
         }
-        return RobotStateRecorder.getTranslationShotToGoalCurrent();
-    }
-
-    /**
-     * Gets the robot velocity in the goal-aligned frame (v_parallel, v_perp).
-     *
-     * <p>For now, only GOAL is wired. Feed targets can be added once frames exist.
-     */
-    public Translation2d getVelocityGoalRobotCurrent(TargetMode mode) {
-        if (mode == TargetMode.GOAL) {
-            return RobotStateRecorder.getVelocityGoalRobotCurrent();
-        }
-        return RobotStateRecorder.getVelocityGoalRobotCurrent();
+        return switch (mode) {
+            case GOAL -> RobotStateRecorder.kFrameGoal;
+            case FEED_LEFT -> RobotStateRecorder.kFrameFeedLeft;
+            case FEED_RIGHT -> RobotStateRecorder.kFrameFeedRight;
+        };
     }
 
     /**

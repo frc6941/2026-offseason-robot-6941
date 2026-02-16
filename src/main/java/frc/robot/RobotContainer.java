@@ -30,6 +30,7 @@ import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import java.nio.file.Path;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
@@ -69,6 +70,7 @@ public class RobotContainer {
     private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
+    private TargetMode activeTargetMode = TargetMode.GOAL;
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -99,10 +101,14 @@ public class RobotContainer {
         intakerRoller = buildIntakerRoller(isReal && HAS_INTAKER_ROLLER_IO);
         intakerExtension = buildIntakerExtension(isReal && HAS_INTAKER_EXTENSION_IO);
 
+        Path deploy = Filesystem.getDeployDirectory().toPath();
         shotCalculator.initialize(
                 Map.of(
-                        ShotCalculator.TargetMode.GOAL,
-                        Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
+                        TargetMode.GOAL,
+                        deploy.resolve("results_GOAL.json"),
+                        TargetMode.FEED_LEFT,
+                        deploy.resolve("results_GOAL.json")));
+
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
 
@@ -171,10 +177,12 @@ public class RobotContainer {
         // driver.leftBumper().onTrue(intakerSubsystem.outtake());
         // driver.leftBumper().onFalse(intakerSubsystem.intake());
 
-        driver.leftBumper()
+        driver.x()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL)));
+                                () -> shotCalculator.computeShotFrame(activeTargetMode)));
+        driver.a().onTrue(Commands.runOnce(() -> activeTargetMode = TargetMode.GOAL));
+        driver.b().onTrue(Commands.runOnce(() -> activeTargetMode = TargetMode.FEED_LEFT));
 
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
