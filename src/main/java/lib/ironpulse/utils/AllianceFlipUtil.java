@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import lib.ironpulse.math.obstacle.PolygonObstacle2d;
 
 public class AllianceFlipUtil {
     private static final Rotation2d ROT180 = Rotation2d.fromDegrees(180.0);
@@ -59,6 +60,17 @@ public class AllianceFlipUtil {
             return new Translation3d(x, y, t3.getZ());
         }
         return t3;
+    }
+
+    public static PolygonObstacle2d apply(PolygonObstacle2d pN) {
+
+        if (shouldFlip()) {
+            Translation2d[] cPt = new Translation2d[pN.cornerPoints.length];
+            for (int i = 0; i < pN.cornerPoints.length; i++) {
+                cPt[i] = apply(pN.cornerPoints[i]);
+            }
+            return new PolygonObstacle2d(cPt);
+        } else return pN;
     }
 
     public static boolean shouldFlip() {
