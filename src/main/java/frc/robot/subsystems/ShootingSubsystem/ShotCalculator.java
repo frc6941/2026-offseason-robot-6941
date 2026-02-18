@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Bridges the model table to a {@link ShotFrame}.
@@ -57,7 +59,11 @@ public class ShotCalculator {
     public record ShotModel(double exitSpeedMps, double launchAngleDeg, double flightTimeSec) {}
 
     private record ModelPoint(
-            double distance, double robot_vel, double final_vel, double final_angle) {}
+            double distance,
+            double robot_vel,
+            double final_vel,
+            double final_angle,
+            double flight_time) {}
 
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
     private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
@@ -99,20 +105,67 @@ public class ShotCalculator {
             setTargetMode(mode);
         }
         TargetMode activeMode = targetMode;
-        Translation2d turretToTarget = getShotToTargetTranslation(activeMode);
-        double distanceMeters = turretToTarget.getNorm();
-        Translation2d goalVelocity = getVelocityGoalRobotCurrent(activeMode);
-        double vParallel = goalVelocity.getX();
-        double vPerp = goalVelocity.getY();
+        Translation2d shotToTargetCurrent = getShotToTargetTranslation(activeMode);
+        Translation2d velocityWorldRobotCurrent =
+                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
+
+        double currentDistanceMeters = shotToTargetCurrent.getNorm();
+        Translation2d currentGoalVelocity =
+                velocityWorldRobotCurrent.rotateBy(shotToTargetCurrent.getAngle().unaryMinus());
+        double currentVParallel = currentGoalVelocity.getX();
+
+        ShotModel initialModel = lookupModel(currentDistanceMeters, currentVParallel);
+        double totalCyclesRaw =
+                ShotCalculatorParamsNT.lookfwdDelayCycles.getValue()
+                        + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
+                                * (initialModel.flightTimeSec / RobotConstants.LOOPER_DT);
+        double totalCycles =
+                MathUtil.clamp(
+                        totalCyclesRaw,
+                        ShotCalculatorParamsNT.lookfwdMinCycles.getValue(),
+                        ShotCalculatorParamsNT.lookfwdMaxCycles.getValue());
+
+        Translation2d shotToTargetPredicted =
+                calculateLookfwdPose(shotToTargetCurrent, velocityWorldRobotCurrent, totalCycles);
+        double distanceMeters = shotToTargetPredicted.getNorm();
+        Translation2d goalVelocityPredicted =
+                velocityWorldRobotCurrent.rotateBy(shotToTargetPredicted.getAngle().unaryMinus());
+        double vParallel = goalVelocityPredicted.getX();
+        double vPerp = goalVelocityPredicted.getY();
+
+        //logging
+        Translation2d robotDelta =
+                velocityWorldRobotCurrent.times(totalCycles * RobotConstants.LOOPER_DT);
+        Translation2d shotPoseWorldPredicted =
+                RobotStateRecorder.getPoseWorldShotCurrent()
+                        .getTranslation()
+                        .toTranslation2d()
+                        .plus(robotDelta);
+
+        Logger.recordOutput("ShotCalculator/lookfwd/totalCyclesRaw", totalCyclesRaw);
+        Logger.recordOutput("ShotCalculator/lookfwd/totalCycles", totalCycles);
+        Logger.recordOutput("ShotCalculator/lookfwd/robotDelta", robotDelta);
+        Logger.recordOutput("ShotCalculator/lookfwd/shotToTargetPredicted", shotToTargetPredicted);
+        Logger.recordOutput(
+                "ShotCalculator/lookfwd/shotPoseWorldPredicted", shotPoseWorldPredicted);
 
         ShotModel model = lookupModel(distanceMeters, vParallel);
         model = applyModelTuning(model);
 
-        Angle turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
+        Angle turretYawRad = solveTurretYaw(shotToTargetPredicted, vPerp, model);
         return new ShotFrame(
                 turretYawRad,
                 Degrees.of(90).minus(Degrees.of(model.launchAngleDeg)),
                 MetersPerSecond.of(model.exitSpeedMps));
+    }
+
+    public Translation2d calculateLookfwdPose(
+            Translation2d shotToTargetCurrent,
+            Translation2d velocityWorldRobotCurrent,
+            double totalCycles) {
+        Translation2d robotDelta =
+                velocityWorldRobotCurrent.times(totalCycles * RobotConstants.LOOPER_DT);
+        return shotToTargetCurrent.minus(robotDelta);
     }
 
     /**
@@ -216,7 +269,7 @@ public class ShotCalculator {
         NavigableMap<Double, NavigableMap<Double, ShotModel>> table = new TreeMap<>();
         for (ModelPoint p : points) {
             table.computeIfAbsent(p.distance, k -> new TreeMap<>())
-                    .put(p.robot_vel, new ShotModel(p.final_vel, p.final_angle, 0.0));
+                    .put(p.robot_vel, new ShotModel(p.final_vel, p.final_angle, p.flight_time));
         }
         return table;
     }
