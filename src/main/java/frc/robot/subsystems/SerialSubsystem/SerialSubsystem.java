@@ -26,7 +26,9 @@ public class SerialSubsystem extends SubsystemBase {
     private int count = 0;
     private LinearVelocity speedSum = MetersPerSecond.of(0);
     private LinearVelocity lastSpeed = null;
-    private boolean isAveraging = false;
+    private boolean isCalculating = false;
+    private Time firstBallTime = Seconds.of(0.0);
+    private Time lastBallTime = Seconds.of(0.0);
 
     public SerialSubsystem() {
         i2c = new I2C(I2C.Port.kMXP, I2C_ADDRESS);
@@ -34,7 +36,6 @@ public class SerialSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
         boolean aborted = i2c.readOnly(rx, 4);
         if (aborted) {
             lastException = "I2C read aborted";
@@ -42,7 +43,6 @@ public class SerialSubsystem extends SubsystemBase {
             return;
         }
 
-        // little-endian unsigned 32-bit microseconds
         int raw =
                 (rx[0] & 0xFF)
                         | ((rx[1] & 0xFF) << 8)
@@ -56,20 +56,29 @@ public class SerialSubsystem extends SubsystemBase {
             return;
         }
 
-        if (SerialSubsystemParamsNT.distanceMeters.getValue() / time.in(Seconds) < 0.2) {
+        Time newTime = Microseconds.of(us);
+        LinearVelocity newSpeed =
+                Meters.of(SerialSubsystemParamsNT.distanceMeters.getValue()).div(newTime);
+
+        if (newSpeed.in(MetersPerSecond) < 0.2) {
             lastException = "Speed filtered";
             log();
             return;
         }
 
-        time = Microseconds.of(us);
-        speed = Meters.of(SerialSubsystemParamsNT.distanceMeters.getValue()).div(time);
+        time = newTime;
+        speed = newSpeed;
         lastException = "";
         lastRxTime = Timer.getFPGATimestamp();
 
-        if (isAveraging && !lastSpeed.equals(speed)) {
+        if (isCalculating && (lastSpeed == null || !lastSpeed.equals(speed))) {
             count++;
             speedSum = speedSum.plus(speed);
+            double now = Timer.getFPGATimestamp();
+            if (count == 1) {
+                firstBallTime = Seconds.of(now);
+            }
+            lastBallTime = Seconds.of(now);
         }
         lastSpeed = speed;
         log();
@@ -86,18 +95,30 @@ public class SerialSubsystem extends SubsystemBase {
         Logger.recordOutput(NAME + "/TimedOut", isTimedOut());
         Logger.recordOutput(NAME + "/count", count);
         Logger.recordOutput(NAME + "/speedSum", speedSum);
-        Logger.recordOutput(NAME + "/isAveraging", isAveraging);
+        Logger.recordOutput(NAME + "/isCalculating", isCalculating);
+        Logger.recordOutput(NAME + "/firstBallTime", firstBallTime);
+        Logger.recordOutput(NAME + "/lastBallTime", lastBallTime);
+
+        if (count >= 2) {
+            double durationSec = lastBallTime.minus(firstBallTime).in(Seconds);
+            Logger.recordOutput(
+                    NAME + "/BPS", durationSec > 0.0 ? (count - 1.0) / durationSec : 0.0);
+        } else {
+            Logger.recordOutput(NAME + "/BPS", 0.0);
+        }
     }
 
-    public void startAveraging() {
+    public void startMeasurement() {
         count = 0;
         speedSum = MetersPerSecond.of(0);
-        isAveraging = true;
+        isCalculating = true;
     }
 
-    public void stopAveraging() {
-        isAveraging = false;
-        Logger.recordOutput(NAME + "/speedAvg", speedSum.div(count));
+    public void stopMeasurement() {
+        isCalculating = false;
+        if (count > 0) {
+            Logger.recordOutput(NAME + "/speedAvg", speedSum.div(count));
+        }
     }
 
     @NTParameter(tableName = "Params/" + NAME)

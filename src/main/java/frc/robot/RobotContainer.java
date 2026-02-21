@@ -304,8 +304,8 @@ public class RobotContainer {
                                                 driver.rightTrigger().getAsBoolean()
                                                         ? ShootingSuperstructure.IdxMode.FEED
                                                         : ShootingSuperstructure.IdxMode.OFF)
-                                .beforeStarting(Commands.runOnce(serialSubsystem::startAveraging))
-                                .finallyDo(serialSubsystem::stopAveraging));
+                                .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
+                                .finallyDo(serialSubsystem::stopMeasurement));
         driver.y()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
