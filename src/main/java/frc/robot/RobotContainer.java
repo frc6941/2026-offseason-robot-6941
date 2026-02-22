@@ -61,10 +61,11 @@ public class RobotContainer {
     private static final boolean HAS_TURRET_IO = true;
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
-    private static final boolean HAS_IDX_IO = false;
+    private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_LL_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intakerSubsystem;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -86,7 +87,7 @@ public class RobotContainer {
         final boolean isReal = RobotBase.isReal();
 
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
-        limelightSubsystem = buildLimelight(isReal, swerve);
+        limelightSubsystem = buildLimelight(isReal && HAS_LL_IO, swerve);
 
         turret = buildTurret(isReal && HAS_TURRET_IO);
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
@@ -174,7 +175,11 @@ public class RobotContainer {
         driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL)));
+                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
 
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));

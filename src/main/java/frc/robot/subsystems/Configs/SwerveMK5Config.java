@@ -52,7 +52,7 @@ public final class SwerveMK5Config {
                     .maxAngularVelocity(DegreesPerSecond.of(600.0))
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1450.0))
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompBL =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("LB")
                     .location(new Translation2d(-kSwerveHalfLength, kSwerveHalfWidth))
@@ -65,7 +65,7 @@ public final class SwerveMK5Config {
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompFR =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("LF")
                     .location(new Translation2d(kSwerveHalfLength, kSwerveHalfWidth))
@@ -78,7 +78,7 @@ public final class SwerveMK5Config {
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompBL =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompBR =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("RB")
                     .location(new Translation2d(-kSwerveHalfLength, -kSwerveHalfWidth))
@@ -92,7 +92,7 @@ public final class SwerveMK5Config {
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompBR =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompFR =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("RF")
                     .location(new Translation2d(kSwerveHalfLength, -kSwerveHalfWidth))
