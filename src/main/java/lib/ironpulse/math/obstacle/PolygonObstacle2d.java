@@ -3,7 +3,7 @@ package lib.ironpulse.math.obstacle;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class PolygonObstacle2d implements Obstacle2d {
-    private Translation2d[] cornerPoints;
+    public Translation2d[] cornerPoints;
 
     public PolygonObstacle2d(Translation2d... cornerPoints) {
         this.cornerPoints = cornerPoints;

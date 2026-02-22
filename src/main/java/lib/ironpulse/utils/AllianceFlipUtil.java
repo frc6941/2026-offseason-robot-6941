@@ -9,8 +9,8 @@ package lib.ironpulse.utils;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.FieldConstants;
-import frc.robot.RobotConstants;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import lib.ironpulse.math.obstacle.PolygonObstacle2d;
 
 public class AllianceFlipUtil {
     public static double applyX(double x) {
@@ -44,22 +44,34 @@ public class AllianceFlipUtil {
         return shouldFlip() ? rotation.rotateBy(new Rotation3d(0.0, 0.0, Math.PI)) : rotation;
     }
 
-    public static Pose3d apply(Pose3d pose) {
-        return new Pose3d(apply(pose.getTranslation()), apply(pose.getRotation()));
+    public static Pose2d apply(Pose2d p) {
+        if (shouldFlip()) {
+            Translation2d t = apply(p.getTranslation());
+            Rotation2d r = apply(p.getRotation());
+            return new Pose2d(t, r);
+        }
+        return p;
     }
 
-    // TODO: add bounds apply
-    // public static bounds apply(Bounds bounds) {
-    //   if (shouldFlip()) {
-    //     return new Bounds(
-    //         applyX(bounds.maxX()),
-    //         applyX(bounds.minX()),
-    //         applyY(bounds.maxY()),
-    //         applyY(bounds.minY()));
-    //   } else {
-    //     return bounds;
-    //   }
-    // }
+    public static Translation3d apply(Translation3d t3) {
+        if (shouldFlip()) {
+            double x = fieldLength - t3.getX();
+            double y = fieldWidth - t3.getY();
+            return new Translation3d(x, y, t3.getZ());
+        }
+        return t3;
+    }
+
+    public static PolygonObstacle2d apply(PolygonObstacle2d pN) {
+
+        if (shouldFlip()) {
+            Translation2d[] cPt = new Translation2d[pN.cornerPoints.length];
+            for (int i = 0; i < pN.cornerPoints.length; i++) {
+                cPt[i] = apply(pN.cornerPoints[i]);
+            }
+            return new PolygonObstacle2d(cPt);
+        } else return pN;
+    }
 
     public static boolean shouldFlip() {
         return !RobotConstants.disableHAL
