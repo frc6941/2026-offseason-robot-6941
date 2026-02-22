@@ -107,8 +107,11 @@ public class RobotContainer {
                 Map.of(
                         TargetMode.GOAL,
                         deploy.resolve("results_GOAL.json"),
-                        TargetMode.FEED_LEFT,
-                        deploy.resolve("results_GOAL.json")));
+                        TargetMode.FEED_DOWN,
+                        deploy.resolve("results_GOAL.json"),
+                        TargetMode.FEED_UP,
+                        deploy.resolve("results_GOAL.json")
+                ));
 
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);

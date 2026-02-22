@@ -49,8 +49,8 @@ public class ShotCalculator {
     /** Targets supported by the shot calculator. */
     public enum TargetMode {
         GOAL,
-        FEED_LEFT,
-        FEED_RIGHT
+        FEED_UP,
+        FEED_DOWN
     }
 
     /** Model-space outputs (exit speed, launch angle, flight time). */
@@ -92,8 +92,13 @@ public class ShotCalculator {
     public ShotFrame computeShotFrame(TargetMode mode) {
         if (mode != null) {
             this.targetMode = mode;
-        }
-        String targetFrame = getTargetFrameName(this.targetMode);
+        }else this.targetMode = TargetMode.GOAL;
+        String targetFrame = 
+            switch (this.targetMode) {
+                case GOAL -> RobotStateRecorder.kFrameGoal;
+                case FEED_UP -> RobotStateRecorder.kFrameFeedUp;
+                case FEED_DOWN -> RobotStateRecorder.kFrameFeedDown;
+        };
         Translation2d turretToTarget =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         double distanceMeters = turretToTarget.getNorm();
@@ -112,16 +117,6 @@ public class ShotCalculator {
                 MetersPerSecond.of(model.exitSpeedMps));
     }
 
-    private static String getTargetFrameName(TargetMode mode) {
-        if (mode == null) {
-            return RobotStateRecorder.kFrameGoal;
-        }
-        return switch (mode) {
-            case GOAL -> RobotStateRecorder.kFrameGoal;
-            case FEED_LEFT -> RobotStateRecorder.kFrameFeedLeft;
-            case FEED_RIGHT -> RobotStateRecorder.kFrameFeedRight;
-        };
-    }
 
     /**
      * Looks up the model output using bilinear interpolation between distance and v_parallel

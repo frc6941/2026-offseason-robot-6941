@@ -9,7 +9,8 @@ package lib.ironpulse.utils;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.FieldConstants;
+import frc.robot.RobotConstants;
 import lib.ironpulse.math.obstacle.PolygonObstacle2d;
 
 public class AllianceFlipUtil {
@@ -29,17 +30,6 @@ public class AllianceFlipUtil {
         return shouldFlip() ? rotation.rotateBy(Rotation2d.kPi) : rotation;
     }
 
-    public static Pose2d apply(Pose2d pose) {
-        return shouldFlip()
-                ? new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()))
-                : pose;
-    }
-
-    public static Translation3d apply(Translation3d translation) {
-        return new Translation3d(
-                applyX(translation.getX()), applyY(translation.getY()), translation.getZ());
-    }
-
     public static Rotation3d apply(Rotation3d rotation) {
         return shouldFlip() ? rotation.rotateBy(new Rotation3d(0.0, 0.0, Math.PI)) : rotation;
     }
@@ -55,8 +45,8 @@ public class AllianceFlipUtil {
 
     public static Translation3d apply(Translation3d t3) {
         if (shouldFlip()) {
-            double x = fieldLength - t3.getX();
-            double y = fieldWidth - t3.getY();
+            double x = FieldConstants.fieldLength - t3.getX();
+            double y = FieldConstants.fieldWidth - t3.getY();
             return new Translation3d(x, y, t3.getZ());
         }
         return t3;
@@ -71,6 +61,10 @@ public class AllianceFlipUtil {
             }
             return new PolygonObstacle2d(cPt);
         } else return pN;
+    }
+
+    public static Pose3d apply(Pose3d pose) {
+        return new Pose3d(apply(pose.getTranslation()), apply(pose.getRotation()));
     }
 
     public static boolean shouldFlip() {

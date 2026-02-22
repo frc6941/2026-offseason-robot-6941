@@ -37,8 +37,8 @@ public class RobotStateRecorder extends TransformRecorder {
 
     public static final String kFrameShot = "Shot";
     public static final String kFrameGoal = "Goal";
-    public static final String kFrameFeedLeft = "FeedLeft";
-    public static final String kFrameFeedRight = "FeedRight";
+    public static final String kFrameFeedUp = "FeedUp";
+    public static final String kFrameFeedDown = "FeedDown";
     public static final Translation3d kRobotToShot =
             new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
@@ -72,15 +72,15 @@ public class RobotStateRecorder extends TransformRecorder {
                 kFrameGoal); // static TWorldGoal (blue reference)
 
         putTransform(
-                new Pose3d(),
+                new Pose3d(0,8,0,new Rotation3d()),
                 Seconds.of(0.0),
                 kFrameWorld,
-                kFrameFeedLeft); // static TWorldFeedLeft
+                kFrameFeedUp); // static TWorldFeedLeft
         putTransform(
                 new Pose3d(),
                 Seconds.of(0.0),
                 kFrameWorld,
-                kFrameFeedRight); // static TWorldFeedRight
+                kFrameFeedDown); // static TWorldFeedRight
     }
 
     public static RobotStateRecorder getInstance() {

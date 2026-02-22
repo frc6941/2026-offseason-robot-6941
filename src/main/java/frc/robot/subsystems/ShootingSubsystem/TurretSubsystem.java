@@ -155,10 +155,8 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     public Command runTurretTargetLoop() {
         return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees)))
-                .andThen(
-                        runVelVolt(
-                                () -> calculateTargetVelocity(targetAngleRobot)));
-                                //this::calculateTurretTorqueCurrentFF));
+                .andThen(runVelVolt(() -> calculateTargetVelocity(targetAngleRobot)));
+        // this::calculateTurretTorqueCurrentFF));
     }
 
     private Voltage calculateTurretTorqueCurrentFF() {
