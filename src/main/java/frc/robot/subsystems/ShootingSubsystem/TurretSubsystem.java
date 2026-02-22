@@ -165,6 +165,19 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         double currentAngleDeg = getPosition().in(Degrees);
         double commandedVelDegPerSec = desiredTurretVelocity.in(DegreesPerSecond);
         double displacementFromZeroOffsetDeg = currentAngleDeg - zeroOffsetDeg;
+        double velocityDeadbandDps = TurretVelParamsNT.turretBiasCompDeadBandDps.getValue();
+        double zeroOffsetDeadbandDeg =
+                TurretVelParamsNT.turretBiasCompZeroOffsetDeadBandDeg.getValue();
+
+        // Hold previous FF direction around zero velocity to avoid sign chatter.
+        if (Math.abs(commandedVelDegPerSec) < velocityDeadbandDps) {
+            return Amps.of(feedFwdPositive ? ffMagnitudeAmps : -ffMagnitudeAmps);
+        }
+
+        // Hold previous FF direction near zero-offset where sign can rapidly flip.
+        if (Math.abs(displacementFromZeroOffsetDeg) < zeroOffsetDeadbandDeg) {
+            return Amps.of(feedFwdPositive ? ffMagnitudeAmps : -ffMagnitudeAmps);
+        }
 
         if (Math.abs(displacementFromZeroOffsetDeg) < 1.0e-9) {
             feedFwdPositive = Math.abs(commandedVelDegPerSec) > 1.0e-9;

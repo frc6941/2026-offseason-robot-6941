@@ -242,7 +242,7 @@ public class RobotContainer {
         // driver.x().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kReverse));
         // driver.back().whileTrue(intakerExtension.zeroCommand());
-        driver.povUp().onTrue(hood.zeroCommand());
+        // driver.povUp().onTrue(hood.zeroCommand());
 
         // Swerve
         driver.start()
