@@ -67,7 +67,7 @@ public class RobotContainer {
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = false;
     private final LimelightSubsystem limelightSubsystem;
-    private final IntakerSubsystem intakerSubsystem;
+    private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
     private final Swerve swerve;
@@ -105,7 +105,7 @@ public class RobotContainer {
                         ShotCalculator.TargetMode.GOAL,
                         Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
-        intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+        intake = new IntakerSubsystem(intakerRoller, intakerExtension);
 
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
@@ -118,8 +118,8 @@ public class RobotContainer {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-        intakerExtension.setDefaultCommand(intakerExtension.runStop());
-        intakerRoller.setDefaultCommand(intakerRoller.runStop());
+        intake.setDefaultCommand();
+
         // indicatorSubsystem.setDefaultCommand(
         //        indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
     }
@@ -157,20 +157,10 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        // driver.leftTrigger()
-        //         .onTrue(
-        //                 Commands.runOnce(
-        //                         () -> {
-        //                             if (intakerSubsystem.isDeployed()) {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.retractIntake());
-        //                             } else {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.deployIntake());
-        //                             }
-        //                         }));
-        // driver.leftBumper().onTrue(intakerSubsystem.outtake());
-        // driver.leftBumper().onFalse(intakerSubsystem.intake());
+        driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        driver.a().whileTrue(intake.runFeed());
+        driver.povDown().onTrue(intake.runRetract());
+        driver.back().whileTrue(intakerExtension.zeroCommand());
 
         driver.leftBumper()
                 .whileTrue(
