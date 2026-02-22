@@ -28,7 +28,7 @@ public class IntakerSubsystem {
     }
 
     public void setDefaultCommand() {
-        roller.runStop();
+        roller.setDefaultCommand(roller.runStop());
     }
 
     public Command runIntake() {
