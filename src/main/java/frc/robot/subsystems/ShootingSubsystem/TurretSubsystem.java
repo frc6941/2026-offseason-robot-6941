@@ -1,8 +1,8 @@
 package frc.robot.subsystems.ShootingSubsystem;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.Configs.TurretConfig.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -92,6 +92,8 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     private double absAimErrorDeg = 0.0;
 
     private AngularVelocity desiredTurretVelocity = DegreesPerSecond.of(0.0);
+    private Angle prevTargetAngleRobotForFF = Degrees.of(0.0);
+    private boolean hasPrevTargetAngleRobotForFF = false;
 
     public TurretSubsystem(
             SubsystemConfig config,
@@ -154,38 +156,37 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
     public Command runTurretTargetLoop() {
         return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees)))
                 .andThen(
-                        runVelTC(
-                                () -> calculateTargetVelocity(targetAngleRobot),
-                                this::calculateTurretTorqueCurrentFF));
+                        runVelVolt(
+                                () -> calculateTargetVelocity(targetAngleRobot)));
+                                //this::calculateTurretTorqueCurrentFF));
     }
 
-    private Current calculateTurretTorqueCurrentFF() {
+    private Voltage calculateTurretTorqueCurrentFF() {
         double ffMagnitudeAmps = TurretVelParamsNT.turretBiasCompTCAmps.getValue();
         double zeroOffsetDeg = TURRET_ZERO_OFFSET.in(Degrees);
-        double currentAngleDeg = getPosition().in(Degrees);
-        double commandedVelDegPerSec = desiredTurretVelocity.in(DegreesPerSecond);
-        double displacementFromZeroOffsetDeg = currentAngleDeg - zeroOffsetDeg;
-        double velocityDeadbandDps = TurretVelParamsNT.turretBiasCompDeadBandDps.getValue();
+        double targetAngleRobotDeg = targetAngleRobot.in(Degrees);
+        double setpointDisplacementFromZeroOffsetDeg = targetAngleRobotDeg - zeroOffsetDeg;
+        double setpointStepFlipDeg = TurretConfig.TurretVelParams.turretBiasCompSetpointStepFlipDeg;
         double zeroOffsetDeadbandDeg =
                 TurretVelParamsNT.turretBiasCompZeroOffsetDeadBandDeg.getValue();
+        double setpointDeltaDeg = 0.0;
+        if (hasPrevTargetAngleRobotForFF) {
+            setpointDeltaDeg = targetAngleRobotDeg - prevTargetAngleRobotForFF.in(Degrees);
+        }
+        prevTargetAngleRobotForFF = Degrees.of(targetAngleRobotDeg);
+        hasPrevTargetAngleRobotForFF = true;
 
-        // Hold previous FF direction around zero velocity to avoid sign chatter.
-        if (Math.abs(commandedVelDegPerSec) < velocityDeadbandDps) {
-            return Amps.of(feedFwdPositive ? ffMagnitudeAmps : -ffMagnitudeAmps);
+        // Turn off bias FF close to zero-offset so the controller can settle without bias.
+        if (Math.abs(setpointDisplacementFromZeroOffsetDeg) < zeroOffsetDeadbandDeg) {
+            return Volts.of(0.0);
         }
 
-        // Hold previous FF direction near zero-offset where sign can rapidly flip.
-        if (Math.abs(displacementFromZeroOffsetDeg) < zeroOffsetDeadbandDeg) {
-            return Amps.of(feedFwdPositive ? ffMagnitudeAmps : -ffMagnitudeAmps);
+        // Flip FF sign only when setpoint moves enough; otherwise hold prior sign.
+        if (Math.abs(setpointDeltaDeg) >= setpointStepFlipDeg) {
+            feedFwdPositive = setpointDeltaDeg * setpointDisplacementFromZeroOffsetDeg > 0.0;
         }
 
-        if (Math.abs(displacementFromZeroOffsetDeg) < 1.0e-9) {
-            feedFwdPositive = Math.abs(commandedVelDegPerSec) > 1.0e-9;
-        } else {
-            feedFwdPositive = commandedVelDegPerSec * displacementFromZeroOffsetDeg > 0.0;
-        }
-
-        return Amps.of(feedFwdPositive ? ffMagnitudeAmps : -ffMagnitudeAmps);
+        return Volts.of(feedFwdPositive ? ffMagnitudeAmps : -ffMagnitudeAmps);
     }
 
     private void updateController(TurretMode mode) {

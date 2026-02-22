@@ -65,7 +65,7 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
-    private static final boolean HAS_LL_IO = false;
+    private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);

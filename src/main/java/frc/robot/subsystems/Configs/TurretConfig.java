@@ -73,7 +73,7 @@ public class TurretConfig {
         // Sign is computed in TurretSubsystem based on whether commanded motion moves
         // away from or toward TURRET_ZERO_OFFSET.
         public static final double turretBiasCompTCAmps = 10;
-        public static final double turretBiasCompDeadBandDps = 5;
+        public static final double turretBiasCompSetpointStepFlipDeg = 0.5;
         public static final double turretBiasCompZeroOffsetDeadBandDeg = 1.0;
         // Tolerances / behavior
         public static final double velocityAtGoalToleranceRPS = 1;
