@@ -16,7 +16,7 @@ public class IntakeConfig {
     private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
-    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 9 / 1;
+    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
     public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
 
     public static final SubsystemConfig INTAKER_ROLLER_CONFIG =

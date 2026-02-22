@@ -63,8 +63,14 @@ public class IntakerSubsystem {
                                                     IntakerExtensionParamsNT.feedPosMeters
                                                             .getValue();
                                             double pos =
-                                                    feed + (deploy - feed)
-                                                                    * (1 + Math.sin(2 * Math.PI * rate * t)) / 2;
+                                                    feed
+                                                            + (deploy - feed)
+                                                                    * (1
+                                                                            + Math.sin(
+                                                                                    2 * Math.PI
+                                                                                            * rate
+                                                                                            * t))
+                                                                    / 2;
                                             return Meters.of(pos);
                                         })));
     }

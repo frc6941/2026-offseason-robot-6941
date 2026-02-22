@@ -58,9 +58,9 @@ import lombok.SneakyThrows;
 
 @SuppressWarnings({"unused"})
 public class RobotContainer {
-    private static final boolean HAS_TURRET_IO = true;
-    private static final boolean HAS_SHOOTER_IO = true;
-    private static final boolean HAS_HOOD_IO = true;
+    private static final boolean HAS_TURRET_IO = false;
+    private static final boolean HAS_SHOOTER_IO = false;
+    private static final boolean HAS_HOOD_IO = false;
     private static final boolean HAS_IDX_IO = false;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
@@ -159,14 +159,16 @@ public class RobotContainer {
         driver.leftTrigger().toggleOnTrue(intake.runIntake());
         driver.a().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
+        driver.back().whileTrue(intakerExtension.zeroCommand());
 
         driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
                                 () -> shotCalculator.computeShotFrame(TargetMode.GOAL),
-                                () -> driver.rightTrigger().getAsBoolean()
-                                        ? ShootingSuperstructure.IdxMode.FEED
-                                        : ShootingSuperstructure.IdxMode.OFF));
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
 
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
@@ -229,7 +231,7 @@ public class RobotContainer {
         // driver.x().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kReverse));
         // driver.back().whileTrue(intakerExtension.zeroCommand());
-        driver.povUp().onTrue(hood.zeroCommand());
+        // driver.povUp().onTrue(hood.zeroCommand());
 
         // Swerve
         driver.start()
