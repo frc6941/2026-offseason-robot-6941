@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import lib.ironpulse.utils.AllianceFlipUtil;
 
 /**
  * Bridges the model table to a {@link ShotFrame}.
@@ -84,14 +83,33 @@ public class ShotCalculator {
         }
     }
 
-    /**
-     * Computes the shot frame for the current target mode.
-     *
-     * @param mode active target mode (goal/feed)
-     */
-    public ShotFrame computeShotFrame(TargetMode mode) {
-        updateTargetFrame(mode);
-        String targetFrame = RobotStateRecorder.getKFrameTarget();
+    /** Computes the shot frame using automatic zone-based shot decision. */
+    public ShotFrame computeShotFrame() {
+        TargetMode mode = decideShotMode();
+        String targetFrame;
+        if (mode == TargetMode.GOAL) {
+            targetFrame = RobotStateRecorder.kFrameGoal;
+        } else {
+            double yAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getY();
+            targetFrame =
+                    yAlliance > FieldConstants.fieldWidth / 2.0
+                            ? RobotStateRecorder.kFrameFeedUp
+                            : RobotStateRecorder.kFrameFeedDown;
+        }
+        return computeShotFrame(mode, targetFrame);
+    }
+
+    public TargetMode decideShotMode() {
+        double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
+        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
+            return TargetMode.GOAL;
+        }
+        return TargetMode.FEED;
+    }
+
+    /** Computes the shot frame for a forced model mode and forced target frame. */
+    public ShotFrame computeShotFrame(TargetMode mode, String targetFrame) {
+        RobotStateRecorder.setKFrameTarget(targetFrame);
         Translation2d turretToTarget =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         double distanceMeters = turretToTarget.getNorm();
@@ -108,25 +126,6 @@ public class ShotCalculator {
                 turretYawRad,
                 Degrees.of(90).minus(Degrees.of(model.launchAngleDeg)),
                 MetersPerSecond.of(model.exitSpeedMps));
-    }
-
-    private void updateTargetFrame(TargetMode mode) {
-        switch (mode) {
-            case GOAL:
-                RobotStateRecorder.setKFrameTarget(RobotStateRecorder.kFrameGoal);
-                break;
-            case FEED:
-                // Use Y position of the robot to determine up/down feed
-                double y =
-                        AllianceFlipUtil.applyY(
-                                RobotStateRecorder.getPoseWorldRobotCurrent().getY());
-                if (Math.abs(y) > FieldConstants.fieldWidth / 2) {
-                    RobotStateRecorder.setKFrameTarget(RobotStateRecorder.kFrameFeedUp);
-                } else {
-                    RobotStateRecorder.setKFrameTarget(RobotStateRecorder.kFrameFeedDown);
-                }
-                break;
-        }
     }
 
     /**

@@ -163,14 +163,14 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        driver.a().whileTrue(intake.runFeed());
-        driver.povDown().onTrue(intake.runRetract());
+        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        // driver.a().whileTrue(intake.runFeed());
+        // driver.povDown().onTrue(intake.runRetract());
 
         driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL),
+                                () -> shotCalculator.computeShotFrame(),
                                 () ->
                                         driver.rightTrigger().getAsBoolean()
                                                 ? ShootingSuperstructure.IdxMode.FEED
@@ -178,7 +178,7 @@ public class RobotContainer {
         driver.rightBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(TargetMode.FEED),
+                                () -> shotCalculator.computeShotFrame(),
                                 () ->
                                         driver.rightTrigger().getAsBoolean()
                                                 ? ShootingSuperstructure.IdxMode.FEED
