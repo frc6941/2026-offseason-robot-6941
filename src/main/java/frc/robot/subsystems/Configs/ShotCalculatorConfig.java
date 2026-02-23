@@ -18,7 +18,7 @@ public final class ShotCalculatorConfig {
         public static final double speedOffsetMps = 0.0;
         public static final double angleOffsetDeg = 0.0;
         public static final double trajectoryBiasDeg = 0.0;
-        public static final double lateralVelocityCompScale = 0.5;
+        public static final double lateralVelocityCompScale = 0.7;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmC
@@ -26,7 +26,7 @@ public final class ShotCalculatorConfig {
         //   rpmA = 60 / (pi * wheelDiameterMeters), rpmC = 0
         //   exitSpeed is in m/s
         public static final double rpmA = 310;
-        public static final double rpmC = 20;
+        public static final double rpmC = 40;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;

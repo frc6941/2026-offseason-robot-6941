@@ -63,11 +63,11 @@ public class TurretConfig {
         // velocity gains
         // IMPORTANT: Makesure we tune these first before tuning the position gains
         // Velocity trackeing should be clean and accurate
-        public static final double kP = 10;
-        public static final double kI = 0.0;
+        public static final double kP = 7;
+        public static final double kI = 0.8;
         public static final double kD = 0;
-        public static final double kV = 0.17;
-        public static final double kA = 0;
+        public static final double kV = 3.0112;
+        public static final double kA = 0.294;
         public static final double kS = 0.2;
         // Magnitude of turret gravity-like bias compensation in torque current (A).
         // Sign is computed in TurretSubsystem based on whether commanded motion moves
@@ -83,18 +83,18 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 4.5;
+        public static final double kpSeek = 6;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
-        public static final double kpTrack = 8.5;
+        public static final double kpTrack = 18;
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.0;
 
         public static final double maxVelocityRPS = 3.5;
-        public static final double maxAccelerationRPS2 = 9;
-        public static final double kchassisVelCompensation = 1;
-        public static final double positionAtGoalToleranceDegrees = 1;
+        public static final double maxAccelerationRPS2 = 11;
+        public static final double kchassisVelCompensation = 0.9;
+        public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.
         // Must satisfy seekEnterErrorDegrees > trackEnterErrorDegrees.
         public static final double seekEnterErrorDegrees = 15;

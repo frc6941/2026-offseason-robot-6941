@@ -163,9 +163,10 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        // driver.a().whileTrue(intake.runFeed());
-        // driver.povDown().onTrue(intake.runRetract());
+        driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        driver.a().whileTrue(intake.runFeed());
+        driver.povDown().onTrue(intake.runRetract());
+        driver.back().onTrue(intakerExtension.zeroCommand());
 
         driver.leftBumper()
                 .whileTrue(
