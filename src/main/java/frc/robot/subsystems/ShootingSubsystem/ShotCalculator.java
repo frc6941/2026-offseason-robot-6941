@@ -6,11 +6,13 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.RobotConstants;
 import frc.robot.FieldConstants;
+import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
@@ -91,7 +93,13 @@ public class ShotCalculator {
 
     /** Computes the shot frame using automatic zone-based shot decision. */
     public ShotFrame computeShotFrame() {
-        TargetMode mode = decideShotMode();
+        TargetMode mode;
+        double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
+        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
+            mode = TargetMode.GOAL;
+        } else {
+            mode = TargetMode.FEED;
+        }
         String targetFrame;
         if (mode == TargetMode.GOAL) {
             targetFrame = RobotStateRecorder.kFrameGoal;
@@ -147,15 +155,13 @@ public class ShotCalculator {
 
         Translation2d robotDelta =
                 velocityWorldRobotCurrent.times(totalCycles * RobotConstants.LOOPER_DT);
-        Translation2d shotPoseWorldPredicted =
-                RobotStateRecorder.getPoseWorldShotCurrent()
-                        .getTranslation()
-                        .toTranslation2d()
-                        .plus(robotDelta);
+        Pose3d shotPoseWorldCurrent = RobotStateRecorder.getPoseWorldShotCurrent();
+        Pose3d shotPoseWorldPredicted =
+                new Pose3d(
+                        shotPoseWorldCurrent.getTranslation().plus(new Translation3d(robotDelta)),
+                        shotPoseWorldCurrent.getRotation());
         Logger.recordOutput("ShotCalculator/lookfwd/totalCyclesRaw", totalCyclesRaw);
         Logger.recordOutput("ShotCalculator/lookfwd/totalCycles", totalCycles);
-        Logger.recordOutput("ShotCalculator/lookfwd/robotDelta", robotDelta);
-        Logger.recordOutput("ShotCalculator/lookfwd/shotToTargetPredicted", shotToTargetPredicted);
         Logger.recordOutput(
                 "ShotCalculator/lookfwd/shotPoseWorldPredicted", shotPoseWorldPredicted);
 

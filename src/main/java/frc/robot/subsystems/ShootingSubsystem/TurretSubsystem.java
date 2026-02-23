@@ -111,13 +111,13 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     @Override
     public void periodic() {
-        updateUnwrappedTurretAngle();
+        // updateUnwrappedTurretAngle();
         targetAngleRobotWrapped = toRobotRelativeFromWorld(targetAngleWorld.get());
         targetAngleRobot = unwrapTargetAngle(targetAngleRobotWrapped, getPosition());
         updateModeFromErrorHysteresis();
         updateController(currentMode);
         super.periodic();
-        wrappingAlert.set(!getPosition().isNear(unwrappedTurretAngle, Degrees.of(1.0)));
+        // wrappingAlert.set(!getPosition().isNear(unwrappedTurretAngle, Degrees.of(1.0)));
     }
 
     @Override

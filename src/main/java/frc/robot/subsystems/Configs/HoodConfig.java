@@ -30,7 +30,7 @@ public class HoodConfig {
                                     .zeroingVoltage(-1)
                                     .build())
                     .forwardSoftLimitDegrees(Degrees.of(HOOD_ANGLE_ZEROED_DEG + HOOD_DOF_DEG))
-                    .reverseSoftLimitDegrees(Degrees.of(HOOD_ANGLE_ZEROED_DEG))
+                    .reverseSoftLimitDegrees(Degrees.of(0))
                     // TODO: set this so the target angle represents the Real angle of the hood
                     .zeroOffset(Degrees.of(HOOD_ANGLE_ZEROED_DEG))
                     .simConfig(
@@ -42,7 +42,7 @@ public class HoodConfig {
     @NTParameter(tableName = "Params/" + NAME)
     public static final class HoodParams {
 
-        public static final double kP = 200;
+        public static final double kP = 800;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0;
