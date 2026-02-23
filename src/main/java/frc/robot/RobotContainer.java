@@ -107,11 +107,8 @@ public class RobotContainer {
                 Map.of(
                         TargetMode.GOAL,
                         deploy.resolve("results_GOAL.json"),
-                        TargetMode.FEED_DOWN,
-                        deploy.resolve("results_GOAL.json"),
-                        TargetMode.FEED_UP,
-                        deploy.resolve("results_GOAL.json")
-                ));
+                        TargetMode.FEED,
+                        deploy.resolve("results_GOAL.json")));
 
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
@@ -169,12 +166,19 @@ public class RobotContainer {
         driver.leftTrigger().toggleOnTrue(intake.runIntake());
         driver.a().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
-        driver.back().whileTrue(intakerExtension.zeroCommand());
 
-        driver.x()
+        driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
                                 () -> shotCalculator.computeShotFrame(TargetMode.GOAL),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
+        driver.rightBumper()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () -> shotCalculator.computeShotFrame(TargetMode.FEED),
                                 () ->
                                         driver.rightTrigger().getAsBoolean()
                                                 ? ShootingSuperstructure.IdxMode.FEED
@@ -265,7 +269,8 @@ public class RobotContainer {
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
+                                .alongWith(hood.zeroCommand())
+                                .alongWith(intakerExtension.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(

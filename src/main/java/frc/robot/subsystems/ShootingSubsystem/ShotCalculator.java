@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.FieldConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import lib.ironpulse.utils.AllianceFlipUtil;
 
 /**
  * Bridges the model table to a {@link ShotFrame}.
@@ -49,8 +51,7 @@ public class ShotCalculator {
     /** Targets supported by the shot calculator. */
     public enum TargetMode {
         GOAL,
-        FEED_UP,
-        FEED_DOWN
+        FEED
     }
 
     /** Model-space outputs (exit speed, launch angle, flight time). */
@@ -62,7 +63,6 @@ public class ShotCalculator {
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
     private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
             tableByTarget = new EnumMap<>(TargetMode.class);
-    private TargetMode targetMode = TargetMode.GOAL;
 
     /** Loads model tables by target. */
     public void initialize(Map<TargetMode, Path> modelJsonByTarget) {
@@ -90,15 +90,8 @@ public class ShotCalculator {
      * @param mode active target mode (goal/feed)
      */
     public ShotFrame computeShotFrame(TargetMode mode) {
-        if (mode != null) {
-            this.targetMode = mode;
-        }else this.targetMode = TargetMode.GOAL;
-        String targetFrame = 
-            switch (this.targetMode) {
-                case GOAL -> RobotStateRecorder.kFrameGoal;
-                case FEED_UP -> RobotStateRecorder.kFrameFeedUp;
-                case FEED_DOWN -> RobotStateRecorder.kFrameFeedDown;
-        };
+        updateTargetFrame(mode);
+        String targetFrame = RobotStateRecorder.getKFrameTarget();
         Translation2d turretToTarget =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         double distanceMeters = turretToTarget.getNorm();
@@ -107,7 +100,7 @@ public class ShotCalculator {
         double vParallel = targetVelocity.getX();
         double vPerp = targetVelocity.getY();
 
-        ShotModel model = lookupModel(distanceMeters, vParallel);
+        ShotModel model = lookupModel(distanceMeters, vParallel, mode);
         model = applyModelTuning(model);
 
         Angle turretYawRad = solveTurretYaw(turretToTarget, vPerp, model);
@@ -117,6 +110,24 @@ public class ShotCalculator {
                 MetersPerSecond.of(model.exitSpeedMps));
     }
 
+    private void updateTargetFrame(TargetMode mode) {
+        switch (mode) {
+            case GOAL:
+                RobotStateRecorder.setKFrameTarget(RobotStateRecorder.kFrameGoal);
+                break;
+            case FEED:
+                // Use Y position of the robot to determine up/down feed
+                double y =
+                        AllianceFlipUtil.applyY(
+                                RobotStateRecorder.getPoseWorldRobotCurrent().getY());
+                if (Math.abs(y) > FieldConstants.fieldWidth / 2) {
+                    RobotStateRecorder.setKFrameTarget(RobotStateRecorder.kFrameFeedUp);
+                } else {
+                    RobotStateRecorder.setKFrameTarget(RobotStateRecorder.kFrameFeedDown);
+                }
+                break;
+        }
+    }
 
     /**
      * Looks up the model output using bilinear interpolation between distance and v_parallel
@@ -131,8 +142,8 @@ public class ShotCalculator {
      *   <li>final_angle (deg)
      * </ul>
      */
-    public ShotModel lookupModel(double distanceMeters, double velocityParallel) {
-        NavigableMap<Double, NavigableMap<Double, ShotModel>> table = tableByTarget.get(targetMode);
+    public ShotModel lookupModel(double distanceMeters, double velocityParallel, TargetMode mode) {
+        NavigableMap<Double, NavigableMap<Double, ShotModel>> table = tableByTarget.get(mode);
         if (table == null || table.isEmpty()) {
             return new ShotModel(0.0, 0.0, 0.0);
         }

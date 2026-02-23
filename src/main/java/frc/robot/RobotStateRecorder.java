@@ -21,6 +21,7 @@ import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.utils.AllianceFlipUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotStateRecorder extends TransformRecorder {
@@ -39,6 +40,12 @@ public class RobotStateRecorder extends TransformRecorder {
     public static final String kFrameGoal = "Goal";
     public static final String kFrameFeedUp = "FeedUp";
     public static final String kFrameFeedDown = "FeedDown";
+
+    @Getter
+    @Setter
+    @AutoLogOutput(key = "RobotStateRecorder/kFrameTarget")
+    private static String kFrameTarget = kFrameGoal;
+
     public static final Translation3d kRobotToShot =
             new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
@@ -72,15 +79,15 @@ public class RobotStateRecorder extends TransformRecorder {
                 kFrameGoal); // static TWorldGoal (blue reference)
 
         putTransform(
-                new Pose3d(0,8,0,new Rotation3d()),
+                new Pose3d(1.5, 7, 0, new Rotation3d()),
                 Seconds.of(0.0),
                 kFrameWorld,
-                kFrameFeedUp); // static TWorldFeedLeft
+                kFrameFeedUp);
         putTransform(
-                new Pose3d(),
+                new Pose3d(1.5, 1, 0, new Rotation3d()),
                 Seconds.of(0.0),
                 kFrameWorld,
-                kFrameFeedDown); // static TWorldFeedRight
+                kFrameFeedDown);
     }
 
     public static RobotStateRecorder getInstance() {
@@ -99,10 +106,8 @@ public class RobotStateRecorder extends TransformRecorder {
         Logger.recordOutput(
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
-
         Logger.recordOutput(
-                "RobotStateRecorder/ShotFrame/TargetPoseWorld",
-                getPoseWorldTargetCurrent(kFrameGoal));
+                "RobotStateRecorder/TargetPoseWorld", getPoseWorldTargetCurrent(kFrameTarget));
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/poseShot",
                 RobotStateRecorder.getPoseWorldShotCurrent());

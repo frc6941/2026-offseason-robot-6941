@@ -63,12 +63,12 @@ public class TurretConfig {
         // velocity gains
         // IMPORTANT: Makesure we tune these first before tuning the position gains
         // Velocity trackeing should be clean and accurate
-        public static final double kP = 150;
+        public static final double kP = 10;
         public static final double kI = 0.0;
         public static final double kD = 0;
-        public static final double kV = 0;
+        public static final double kV = 0.17;
         public static final double kA = 0;
-        public static final double kS = 0;
+        public static final double kS = 0.2;
         // Magnitude of turret gravity-like bias compensation in torque current (A).
         // Sign is computed in TurretSubsystem based on whether commanded motion moves
         // away from or toward TURRET_ZERO_OFFSET.
@@ -92,7 +92,7 @@ public class TurretConfig {
         public static final double kdTrack = 0.0;
 
         public static final double maxVelocityRPS = 3.5;
-        public static final double maxAccelerationRPS2 = 1;
+        public static final double maxAccelerationRPS2 = 9;
         public static final double kchassisVelCompensation = 1;
         public static final double positionAtGoalToleranceDegrees = 1;
         // Hysteresis thresholds for automatic mode switching.
