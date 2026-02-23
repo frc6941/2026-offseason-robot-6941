@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.RobotConstants;
+import frc.robot.FieldConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
@@ -51,8 +52,7 @@ public class ShotCalculator {
     /** Targets supported by the shot calculator. */
     public enum TargetMode {
         GOAL,
-        FEED_LEFT,
-        FEED_RIGHT
+        FEED
     }
 
     /** Model-space outputs (exit speed, launch angle, flight time). */
@@ -68,7 +68,6 @@ public class ShotCalculator {
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
     private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
             tableByTarget = new EnumMap<>(TargetMode.class);
-    private TargetMode targetMode = TargetMode.GOAL;
 
     /** Loads model tables by target. */
     public void initialize(Map<TargetMode, Path> modelJsonByTarget) {
@@ -90,31 +89,44 @@ public class ShotCalculator {
         }
     }
 
-    /** Selects which target table to use for interpolation. */
-    public void setTargetMode(TargetMode mode) {
-        this.targetMode = mode;
+    /** Computes the shot frame using automatic zone-based shot decision. */
+    public ShotFrame computeShotFrame() {
+        TargetMode mode = decideShotMode();
+        String targetFrame;
+        if (mode == TargetMode.GOAL) {
+            targetFrame = RobotStateRecorder.kFrameGoal;
+        } else {
+            double yAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getY();
+            targetFrame =
+                    yAlliance > FieldConstants.fieldWidth / 2.0
+                            ? RobotStateRecorder.kFrameFeedUp
+                            : RobotStateRecorder.kFrameFeedDown;
+        }
+        return computeShotFrame(mode, targetFrame);
     }
 
-    /**
-     * Computes the shot frame for the current target mode.
-     *
-     * @param mode active target mode (goal/feed)
-     */
-    public ShotFrame computeShotFrame(TargetMode mode) {
-        if (mode != null) {
-            setTargetMode(mode);
+    public TargetMode decideShotMode() {
+        double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
+        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
+            return TargetMode.GOAL;
         }
-        TargetMode activeMode = targetMode;
-        Translation2d shotToTargetCurrent = getShotToTargetTranslation(activeMode);
+        return TargetMode.FEED;
+    }
+
+    /** Computes the shot frame for a forced model mode and forced target frame. */
+    public ShotFrame computeShotFrame(TargetMode mode, String targetFrame) {
+        RobotStateRecorder.setKFrameTarget(targetFrame);
+        Translation2d shotToTargetCurrent =
+                RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         Translation2d velocityWorldRobotCurrent =
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
 
         double currentDistanceMeters = shotToTargetCurrent.getNorm();
-        Translation2d currentGoalVelocity =
+        Translation2d currentTargetVelocity =
                 velocityWorldRobotCurrent.rotateBy(shotToTargetCurrent.getAngle().unaryMinus());
-        double currentVParallel = currentGoalVelocity.getX();
+        double currentVParallel = currentTargetVelocity.getX();
 
-        ShotModel initialModel = lookupModel(currentDistanceMeters, currentVParallel);
+        ShotModel initialModel = lookupModel(currentDistanceMeters, currentVParallel, mode);
         double totalCyclesRaw =
                 ShotCalculatorParamsNT.lookfwdDelayCycles.getValue()
                         + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
@@ -128,12 +140,11 @@ public class ShotCalculator {
         Translation2d shotToTargetPredicted =
                 calculateLookfwdPose(shotToTargetCurrent, velocityWorldRobotCurrent, totalCycles);
         double distanceMeters = shotToTargetPredicted.getNorm();
-        Translation2d goalVelocityPredicted =
+        Translation2d targetVelocityPredicted =
                 velocityWorldRobotCurrent.rotateBy(shotToTargetPredicted.getAngle().unaryMinus());
-        double vParallel = goalVelocityPredicted.getX();
-        double vPerp = goalVelocityPredicted.getY();
+        double vParallel = targetVelocityPredicted.getX();
+        double vPerp = targetVelocityPredicted.getY();
 
-        //logging
         Translation2d robotDelta =
                 velocityWorldRobotCurrent.times(totalCycles * RobotConstants.LOOPER_DT);
         Translation2d shotPoseWorldPredicted =
@@ -141,7 +152,6 @@ public class ShotCalculator {
                         .getTranslation()
                         .toTranslation2d()
                         .plus(robotDelta);
-
         Logger.recordOutput("ShotCalculator/lookfwd/totalCyclesRaw", totalCyclesRaw);
         Logger.recordOutput("ShotCalculator/lookfwd/totalCycles", totalCycles);
         Logger.recordOutput("ShotCalculator/lookfwd/robotDelta", robotDelta);
@@ -149,7 +159,7 @@ public class ShotCalculator {
         Logger.recordOutput(
                 "ShotCalculator/lookfwd/shotPoseWorldPredicted", shotPoseWorldPredicted);
 
-        ShotModel model = lookupModel(distanceMeters, vParallel);
+        ShotModel model = lookupModel(distanceMeters, vParallel, mode);
         model = applyModelTuning(model);
 
         Angle turretYawRad = solveTurretYaw(shotToTargetPredicted, vPerp, model);
@@ -169,30 +179,6 @@ public class ShotCalculator {
     }
 
     /**
-     * Gets the turret-to-target translation for the given target mode.
-     *
-     * <p>For now, only GOAL is wired. Feed targets can be added once frames exist.
-     */
-    public Translation2d getShotToTargetTranslation(TargetMode mode) {
-        if (mode == TargetMode.GOAL) {
-            return RobotStateRecorder.getTranslationShotToGoalCurrent();
-        }
-        return RobotStateRecorder.getTranslationShotToGoalCurrent();
-    }
-
-    /**
-     * Gets the robot velocity in the goal-aligned frame (v_parallel, v_perp).
-     *
-     * <p>For now, only GOAL is wired. Feed targets can be added once frames exist.
-     */
-    public Translation2d getVelocityGoalRobotCurrent(TargetMode mode) {
-        if (mode == TargetMode.GOAL) {
-            return RobotStateRecorder.getVelocityGoalRobotCurrent();
-        }
-        return RobotStateRecorder.getVelocityGoalRobotCurrent();
-    }
-
-    /**
      * Looks up the model output using bilinear interpolation between distance and v_parallel
      * planes.
      *
@@ -205,8 +191,8 @@ public class ShotCalculator {
      *   <li>final_angle (deg)
      * </ul>
      */
-    public ShotModel lookupModel(double distanceMeters, double velocityParallel) {
-        NavigableMap<Double, NavigableMap<Double, ShotModel>> table = tableByTarget.get(targetMode);
+    public ShotModel lookupModel(double distanceMeters, double velocityParallel, TargetMode mode) {
+        NavigableMap<Double, NavigableMap<Double, ShotModel>> table = tableByTarget.get(mode);
         if (table == null || table.isEmpty()) {
             return new ShotModel(0.0, 0.0, 0.0);
         }

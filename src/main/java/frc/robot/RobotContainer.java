@@ -30,6 +30,7 @@ import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import java.nio.file.Path;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
@@ -61,14 +62,16 @@ public class RobotContainer {
     private static final boolean HAS_TURRET_IO = true;
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
-    private static final boolean HAS_IDX_IO = false;
+    private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
-    private final IntakerSubsystem intakerSubsystem;
+    private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
+    private TargetMode activeTargetMode = TargetMode.GOAL;
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -86,7 +89,7 @@ public class RobotContainer {
         final boolean isReal = RobotBase.isReal();
 
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
-        limelightSubsystem = buildLimelight(isReal, swerve);
+        limelightSubsystem = buildLimelight(isReal && HAS_LL_IO, swerve);
 
         turret = buildTurret(isReal && HAS_TURRET_IO);
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
@@ -99,12 +102,16 @@ public class RobotContainer {
         intakerRoller = buildIntakerRoller(isReal && HAS_INTAKER_ROLLER_IO);
         intakerExtension = buildIntakerExtension(isReal && HAS_INTAKER_EXTENSION_IO);
 
+        Path deploy = Filesystem.getDeployDirectory().toPath();
         shotCalculator.initialize(
                 Map.of(
-                        ShotCalculator.TargetMode.GOAL,
-                        Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
+                        TargetMode.GOAL,
+                        deploy.resolve("results_GOAL.json"),
+                        TargetMode.FEED,
+                        deploy.resolve("results_GOAL.json")));
+
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
-        intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+        intake = new IntakerSubsystem(intakerRoller, intakerExtension);
 
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
@@ -117,8 +124,8 @@ public class RobotContainer {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-        intakerExtension.setDefaultCommand(intakerExtension.runStop());
-        intakerRoller.setDefaultCommand(intakerRoller.runStop());
+        intake.setDefaultCommand();
+
         // indicatorSubsystem.setDefaultCommand(
         //        indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
     }
@@ -156,25 +163,27 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        // driver.leftTrigger()
-        //         .onTrue(
-        //                 Commands.runOnce(
-        //                         () -> {
-        //                             if (intakerSubsystem.isDeployed()) {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.retractIntake());
-        //                             } else {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.deployIntake());
-        //                             }
-        //                         }));
-        // driver.leftBumper().onTrue(intakerSubsystem.outtake());
-        // driver.leftBumper().onFalse(intakerSubsystem.intake());
+        driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        driver.a().whileTrue(intake.runFeed());
+        driver.povDown().onTrue(intake.runRetract());
+        driver.back().onTrue(intakerExtension.zeroCommand());
 
         driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL)));
+                                () -> shotCalculator.computeShotFrame(),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
+        driver.rightBumper()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () -> shotCalculator.computeShotFrame(),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
 
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
@@ -237,7 +246,7 @@ public class RobotContainer {
         // driver.x().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kReverse));
         // driver.back().whileTrue(intakerExtension.zeroCommand());
-        driver.povUp().onTrue(hood.zeroCommand());
+        // driver.povUp().onTrue(hood.zeroCommand());
 
         // Swerve
         driver.start()
@@ -261,7 +270,8 @@ public class RobotContainer {
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
+                                .alongWith(hood.zeroCommand())
+                                .alongWith(intakerExtension.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(

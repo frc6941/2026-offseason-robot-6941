@@ -16,7 +16,7 @@ public class IntakeConfig {
     private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
-    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 9 / 1;
+    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
     public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
 
     public static final SubsystemConfig INTAKER_ROLLER_CONFIG =
@@ -51,7 +51,7 @@ public class IntakeConfig {
                             SubsystemConfig.ZeroingConfig.builder()
                                     .zeroingCurrentLimit(35)
                                     .zeroingFilterSize(5)
-                                    .zeroingVoltage(-1.75)
+                                    .zeroingVoltage(-2)
                                     .build())
                     .build();
 
@@ -92,8 +92,12 @@ public class IntakeConfig {
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.2;
+        public static final double deployPosMeters = 0.3;
+        public static final double feedPosMeters = 0.07;
         public static final double retractPosMeters = 0.0;
+
+        /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
+        public static final double feedOscillationRateHz = 0.5;
 
         public static final boolean isBrake = true;
     }
