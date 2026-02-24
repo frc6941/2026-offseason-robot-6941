@@ -29,6 +29,7 @@ import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
@@ -59,14 +60,14 @@ import lombok.SneakyThrows;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
-    private static final boolean HAS_TURRET_IO = true;
+    private static final boolean HAS_TURRET_IO = false;
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-    private static final boolean HAS_INTAKER_ROLLER_IO = true;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = true;
-    private static final boolean HAS_LL_IO = true;
+    private static final boolean HAS_INTAKER_ROLLER_IO = false;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = false;
+    private static final boolean HAS_SWERVE_IO = false;
+    private static final boolean HAS_LL_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -166,19 +167,19 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        driver.a().whileTrue(intake.runFeed());
-        driver.povDown().onTrue(intake.runRetract());
-        driver.back().onTrue(intakerExtension.zeroCommand());
+        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        // driver.a().whileTrue(intake.runFeed());
+        // driver.povDown().onTrue(intake.runRetract());
+        // driver.back().onTrue(intakerExtension.zeroCommand());
 
-        driver.leftBumper()
-                .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
+        // driver.leftBumper()
+        //         .whileTrue(
+        //                 shootingSuperstructure.runFrame(
+        //                         () -> shotCalculator.computeShotFrame(),
+        //                         () ->
+        //                                 driver.rightTrigger().getAsBoolean() && turret.getCurrentMode() == TurretMode.TRACKING
+        //                                         ? ShootingSuperstructure.IdxMode.FEED
+        //                                         : ShootingSuperstructure.IdxMode.OFF));
         // driver.rightBumper()
         //         .whileTrue(
         //                 shootingSuperstructure.runFrame(
@@ -251,24 +252,27 @@ public class RobotContainer {
         // driver.back().whileTrue(intakerExtension.zeroCommand());
         // driver.povUp().onTrue(hood.zeroCommand());
 
-          // driver.x()
-        //         .whileTrue(
-        //                 shooter.runVelVolt(
-        //                                 () ->
-        //                                         RotationsPerSecond.of(
-        //                                                 ShooterParamsNT.testVelRPS.getValue()))
-        //                         .alongWith(
-        //                                 hood.runPosition(
-        //                                         () ->
-        //                                                 Degrees.of(
-        //                                                         HoodParamsNT.testAngle.getValue())))
-        //                         .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
-        //                         .finallyDo(serialSubsystem::stopMeasurement));
+        driver.x()
+                .whileTrue(
+                        shooter.runVelVolt(
+                                        () ->
+                                                RotationsPerSecond.of(
+                                                        ShooterParamsNT.testVelRPS.getValue()))
+                                .alongWith(
+                                        hood.runPosition(
+                                                () ->
+                                                        Degrees.of(
+        
+        HoodParamsNT.testAngle.getValue())))
+        
+        .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
+                                .finallyDo(serialSubsystem::stopMeasurement));
 
         // driver.rightTrigger()
         //         .whileTrue(
         //                 spindexer.runVelVolt(
-        //                         RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
+        //
+        // RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
 
         // Swerve
         driver.start()
@@ -299,8 +303,6 @@ public class RobotContainer {
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
-
-      
 
         new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }

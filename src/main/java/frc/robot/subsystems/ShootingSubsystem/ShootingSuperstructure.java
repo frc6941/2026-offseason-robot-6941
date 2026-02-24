@@ -42,10 +42,6 @@ public class ShootingSuperstructure {
         Angle bba = hood.getCurrPos();
         double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
         double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-        if (hoodB == 0.0 || rpmA == 0.0) {
-            throw new IllegalStateException(
-                    "ShotCalculatorParamsNT.hoodB and rpmA must be non-zero");
-        }
         Angle modelHood = bba.minus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue())).div(hoodB);
         AngularVelocity shooterVel = shooter.getVelocity();
 
