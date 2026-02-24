@@ -34,13 +34,17 @@ public class IntakerSubsystem {
 
     public Command runIntake() {
         return Commands.parallel(
-                roller.runVelVolt(RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
-                extension.runMotionMagic(Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())));
+                roller.runVelVolt(
+                        RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
+                extension.runMotionMagic(
+                        Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())));
     }
 
     public Command runRetract() {
         return Commands.parallel(
-                roller.runStop(), extension.runMotionMagic(Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())));
+                roller.runStop(),
+                extension.runMotionMagic(
+                        Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())));
     }
 
     public Command runFeed() {
