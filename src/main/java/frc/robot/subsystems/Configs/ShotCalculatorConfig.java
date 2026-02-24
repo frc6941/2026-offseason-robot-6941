@@ -29,8 +29,8 @@ public final class ShotCalculatorConfig {
         // Theoretical conversion using a 4" wheel:
         //   rpmA = 60 / (pi * wheelDiameterMeters), rpmC = 0
         //   exitSpeed is in m/s
-        public static final double rpmA = 200;
-        public static final double rpmC = 0;
+        public static final double rpmA = 225;
+        public static final double rpmC = 1000;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;

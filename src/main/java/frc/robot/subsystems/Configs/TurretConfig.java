@@ -83,7 +83,7 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 6;
+        public static final double kpSeek = 8;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
@@ -97,7 +97,7 @@ public class TurretConfig {
         public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.
         // Must satisfy seekEnterErrorDegrees > trackEnterErrorDegrees.
-        public static final double seekEnterErrorDegrees = 15;
-        public static final double trackEnterErrorDegrees = 5;
+        public static final double seekEnterErrorDegrees = 25;
+        public static final double trackEnterErrorDegrees = 8;
     }
 }

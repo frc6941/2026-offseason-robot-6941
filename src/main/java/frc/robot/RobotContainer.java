@@ -29,6 +29,7 @@ import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
@@ -176,7 +177,7 @@ public class RobotContainer {
                         shootingSuperstructure.runFrame(
                                 () -> shotCalculator.computeShotFrame(),
                                 () ->
-                                        driver.rightTrigger().getAsBoolean()
+                                        driver.rightTrigger().getAsBoolean() && turret.getCurrentMode() == TurretMode.TRACKING
                                                 ? ShootingSuperstructure.IdxMode.FEED
                                                 : ShootingSuperstructure.IdxMode.OFF));
         // driver.rightBumper()
@@ -251,7 +252,7 @@ public class RobotContainer {
         // driver.back().whileTrue(intakerExtension.zeroCommand());
         // driver.povUp().onTrue(hood.zeroCommand());
 
-          // driver.x()
+        // driver.x()
         //         .whileTrue(
         //                 shooter.runVelVolt(
         //                                 () ->
@@ -261,14 +262,17 @@ public class RobotContainer {
         //                                 hood.runPosition(
         //                                         () ->
         //                                                 Degrees.of(
-        //                                                         HoodParamsNT.testAngle.getValue())))
-        //                         .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
+        //
+        // HoodParamsNT.testAngle.getValue())))
+        //
+        // .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
         //                         .finallyDo(serialSubsystem::stopMeasurement));
 
         // driver.rightTrigger()
         //         .whileTrue(
         //                 spindexer.runVelVolt(
-        //                         RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
+        //
+        // RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
 
         // Swerve
         driver.start()
@@ -299,8 +303,6 @@ public class RobotContainer {
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
-
-      
 
         new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
