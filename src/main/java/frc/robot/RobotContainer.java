@@ -30,6 +30,7 @@ import frc.robot.subsystems.SerialSubsystem.SerialSubsystemParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
+import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class RobotContainer {
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
         spindexer = buildSpindexer(isReal && HAS_IDX_IO);
 
-        serialSubsystem = new SerialSubsystem();
+        serialSubsystem = buildSerial(isReal);
 
         //    indicator = builIndicator(isReal);
 
@@ -281,10 +282,28 @@ public class RobotContainer {
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
-    }
 
-    public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        driver.x()
+                .whileTrue(
+                        shootingSuperstructure
+                                .runFrame(
+                                        () ->
+                                                new ShotFrame(
+                                                        Degrees.of(0),
+                                                        Degrees.of(
+                                                                SerialSubsystemParamsNT.testFuelDeg
+                                                                        .getValue()),
+                                                        MetersPerSecond.of(
+                                                                SerialSubsystemParamsNT.testFuelMPS
+                                                                        .getValue())),
+                                        () ->
+                                                driver.rightTrigger().getAsBoolean()
+                                                        ? ShootingSuperstructure.IdxMode.FEED
+                                                        : ShootingSuperstructure.IdxMode.OFF)
+                                .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
+                                .finallyDo(serialSubsystem::stopMeasurement));
+
+        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
@@ -298,21 +317,20 @@ public class RobotContainer {
     }
 
     private Swerve buildSwerve(boolean isReal) {
-        final boolean useRealSwerve = isReal && HAS_SWERVE_IO;
 
         return new Swerve(
-                useRealSwerve ? SwerveMK5Config.kRealConfig : SwerveMK5Config.kSimConfig,
-                useRealSwerve ? new ImuIOPigeon(SwerveMK5Config.kRealConfig) : new ImuIOSim(),
-                useRealSwerve
+                isReal ? SwerveMK5Config.kRealConfig : SwerveMK5Config.kSimConfig,
+                isReal ? new ImuIOPigeon(SwerveMK5Config.kRealConfig) : new ImuIOSim(),
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
-                useRealSwerve
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
-                useRealSwerve
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
-                useRealSwerve
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
     }
@@ -415,127 +433,6 @@ public class RobotContainer {
 
     private SerialSubsystem buildSerial(boolean isReal) {
         return new SerialSubsystem();
-    }
-
-    public void robotPeriodic() {
-        // update IO inputs
-        PhoenixUtils.refreshAll();
-        // update NTparameters
-        NTParameterRegistry.refresh();
-        // update RobotStateRecorder
-        var now = Seconds.of(Timer.getTimestamp());
-        RobotStateRecorder.getInstance()
-                .putTransform(
-                        swerve.getEstimatedPose(),
-                        now,
-                        TransformRecorder.kFrameWorld,
-                        TransformRecorder.kFrameRobot);
-
-        RobotStateRecorder.getInstance()
-                .putTransform(
-                        new Pose3d(
-                                RobotStateRecorder.kRobotToShot,
-                                new Rotation3d(
-                                        0.0,
-                                        hood.getCurrPos().in(Radians),
-                                        turret.getPosition().in(Radians))),
-                        now,
-                        TransformRecorder.kFrameRobot,
-                        RobotStateRecorder.kFrameShot);
-
-        RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
-        RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
-        RobotStateRecorder.periodic();
-    }
-
-    private void configureBindings() {
-        // INTAKE
-        // driver.leftTrigger()
-        //         .onTrue(
-        //                 Commands.runOnce(
-        //                         () -> {
-        //                             if (intakerSubsystem.isDeployed()) {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.retractIntake());
-        //                             } else {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.deployIntake());
-        //                             }
-        //                         }));
-        // driver.leftBumper().onTrue(intakerSubsystem.outtake());
-        // driver.leftBumper().onFalse(intakerSubsystem.intake());
-
-        driver.x()
-                .whileTrue(
-                        shootingSuperstructure
-                                .runFrame(
-                                        () ->
-                                                new ShotFrame(
-                                                        Degrees.of(0),
-                                                        Degrees.of(
-                                                                SerialSubsystemParamsNT.testFuelDeg
-                                                                        .getValue()),
-                                                        MetersPerSecond.of(
-                                                                SerialSubsystemParamsNT.testFuelMPS
-                                                                        .getValue())),
-                                        () ->
-                                                driver.rightTrigger().getAsBoolean()
-                                                        ? ShootingSuperstructure.IdxMode.FEED
-                                                        : ShootingSuperstructure.IdxMode.OFF)
-                                .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
-                                .finallyDo(serialSubsystem::stopMeasurement));
-        driver.y()
-                .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () ->
-                                        new ShotFrame(
-                                                Degrees.of(180),
-                                                Degrees.of(20),
-                                                MetersPerSecond.of(10)),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
-
-        // SYSID/test
-        // SysIdCommand shooterSysId = new SysIdCommand(shooter);
-        // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
-        // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
-        // driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
-        // driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
-
-        // SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
-        // driver.povDown().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kForward));
-        // driver.povRight().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kReverse));
-        // driver.povLeft().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kForward));
-        // driver.povUp().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kReverse));
-        // driver.povDown().whileTrue(spindexer.runVelocity(() -> RotationsPerSecond.of(2.3)));
-        driver.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
-        // driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
-        // driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
-        // driver.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180)));
-        // driver.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270)));
-
-        // Swerve
-        driver.start()
-                .onTrue(
-                        SwerveCommands.resetAngle(
-                                        swerve,
-                                        () ->
-                                                AllianceFlipUtil.shouldFlip()
-                                                        ? Rotation2d.k180deg
-                                                        : Rotation2d.kZero)
-                                .alongWith(
-                                        Commands.runOnce(
-                                                () -> {
-                                                    RobotStateRecorder.getInstance()
-                                                            .resetTransform(
-                                                                    TransformRecorder.kFrameWorld,
-                                                                    TransformRecorder.kFrameRobot);
-                                                }))
-                                .ignoringDisable(true));
-
-        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
     public Command getAutonomousCommand() {
