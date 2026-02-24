@@ -29,8 +29,8 @@ import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
-import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.nio.file.Path;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -177,7 +177,9 @@ public class RobotContainer {
                         shootingSuperstructure.runFrame(
                                 () -> shotCalculator.computeShotFrame(),
                                 () ->
-                                        driver.rightTrigger().getAsBoolean() && turret.getCurrentMode() == TurretMode.TRACKING
+                                        driver.rightTrigger().getAsBoolean()
+                                                        && turret.getCurrentMode()
+                                                                == TurretMode.TRACKING
                                                 ? ShootingSuperstructure.IdxMode.FEED
                                                 : ShootingSuperstructure.IdxMode.OFF));
         // driver.rightBumper()
