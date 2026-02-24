@@ -30,7 +30,7 @@ public class LimelightIOConfig {
     @Builder
     public static class Limelight4Config {
         @Builder.Default private final boolean useInternalIMU = true;
-        @Builder.Default private final int throttleWhenDisabled = 0;
-        @Builder.Default private final int throttleWhenEnabled = 100;
+        @Builder.Default private final int throttleWhenDisabled = 200;
+        @Builder.Default private final int throttleWhenEnabled = 0;
     }
 }

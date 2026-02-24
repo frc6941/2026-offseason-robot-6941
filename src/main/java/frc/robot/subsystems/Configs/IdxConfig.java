@@ -54,6 +54,8 @@ public class IdxConfig {
         public static final double kA = 0.0;
         public static final double kS = 0.35;
 
+        public static final boolean isBrake = true;
+
         public static final double velocityAtGoalToleranceRPS = 0.01;
     }
 }

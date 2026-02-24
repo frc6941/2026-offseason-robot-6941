@@ -56,9 +56,9 @@ public class ShootingSuperstructure {
 
     public void setDefaultCommand() {
         turret.setDefaultCommand(turret.runTurretTargetLoop());
-        idx.setDefaultCommand(idx.runVelocity(() -> getIdxSpeed(IdxMode.OFF)));
+        idx.setDefaultCommand(idx.runVelVolt(() -> getIdxSpeed(IdxMode.OFF)));
         shooter.setDefaultCommand(
-                shooter.runVelocity(
+                shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
     }
 
@@ -78,7 +78,7 @@ public class ShootingSuperstructure {
                                                                     .getValue()));
                             return bba;
                         }),
-                shooter.runVelocity(
+                shooter.runVelVolt(
                         () -> {
                             double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
                             double rpm =
@@ -91,9 +91,9 @@ public class ShootingSuperstructure {
     public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
         return Commands.parallel(
                 runFrame(frame),
-                //                idx.runVelocity(() -> getIdxSpeed(readyToShoot() ? idxMode :
+                //                idx.runVelVolt(() -> getIdxSpeed(readyToShoot() ? idxMode :
                 // IdxMode.OFF)));
-                idx.runVelocity(() -> getIdxSpeed(idxMode.get())));
+                idx.runVelVolt(() -> getIdxSpeed(idxMode.get())));
         // TODO: revert
     }
 

@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -21,6 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.RobotConstants;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.utils.PhoenixUtils;
 
@@ -38,6 +40,8 @@ public class MotorIOTalonFX implements MotorIO {
     private final DynamicMotionMagicVoltage dynamicMotionMagicCtrl =
             new DynamicMotionMagicVoltage(0.0, 0.0, 0.0).withEnableFOC(true);
     private final VelocityVoltage velocityCtrl = new VelocityVoltage(0.0).withEnableFOC(true);
+    private final VelocityTorqueCurrentFOC velocityTorqueCurrentCtrl =
+            new VelocityTorqueCurrentFOC(0.0);
     private final DutyCycleOut dutyCtrl = new DutyCycleOut(0.0).withEnableFOC(true);
 
     private final StatusSignal<Angle> posSig;
@@ -132,7 +136,8 @@ public class MotorIOTalonFX implements MotorIO {
         supplyVoltSig.setUpdateFrequency(30.0);
         statorSig.setUpdateFrequency(100.0);
         supplySig.setUpdateFrequency(100.0);
-        PhoenixUtils.registerSignals(true, signals);
+        boolean isCanivoreBus = cfg.mainBus == RobotConstants.CANIVORE_CAN_BUS;
+        PhoenixUtils.registerSignals(isCanivoreBus, signals);
         main.optimizeBusUtilization();
     }
 
@@ -196,8 +201,21 @@ public class MotorIOTalonFX implements MotorIO {
     }
 
     @Override
-    public void setVelocitySetpoint(AngularVelocity velocity) {
+    public void setVelVoltSetpoint(AngularVelocity velocity) {
         main.setControl(velocityCtrl.withVelocity(velocity));
+    }
+
+    @Override
+    public void setVelVoltSetpoint(AngularVelocity velocity, Voltage feedForwardVoltage) {
+        main.setControl(velocityCtrl.withVelocity(velocity).withFeedForward(feedForwardVoltage));
+    }
+
+    @Override
+    public void setVelTCSetpoint(AngularVelocity velocity, Current feedForwardTorqueCurrent) {
+        main.setControl(
+                velocityTorqueCurrentCtrl
+                        .withVelocity(velocity)
+                        .withFeedForward(feedForwardTorqueCurrent));
     }
 
     @Override
@@ -212,8 +230,16 @@ public class MotorIOTalonFX implements MotorIO {
 
     @Override
     public void setEnableSoftLimits(boolean forward, boolean reverse) {
-        this.fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
-        this.fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+        if (!Double.isNaN(config.forwardSoftLimitDegrees.magnitude())) {
+            fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
+        } else {
+            fx.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        }
+        if (!Double.isNaN(config.reverseSoftLimitDegrees.magnitude())) {
+            fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+        } else {
+            fx.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+        }
         main.getConfigurator().apply(this.fx);
     }
 

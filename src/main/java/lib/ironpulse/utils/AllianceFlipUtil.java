@@ -1,46 +1,37 @@
+// Copyright (c) 2025-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package lib.ironpulse.utils;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.FieldConstants;
+import frc.robot.RobotConstants;
+import lib.ironpulse.math.obstacle.PolygonObstacle2d;
 
 public class AllianceFlipUtil {
-    private static final Rotation2d ROT180 = Rotation2d.fromDegrees(180.0);
-    public static final double fieldLength = Units.inchesToMeters(690.876);
-    public static final double fieldWidth = Units.inchesToMeters(317);
-
-    public static double apply(double x) {
-        if (shouldFlip()) {
-            return fieldLength - x;
-        }
-        return x;
+    public static double applyX(double x) {
+        return shouldFlip() ? FieldConstants.fieldLength - x : x;
     }
 
-    public static Translation2d apply(Translation2d t) {
-        if (shouldFlip()) {
-            double x = fieldLength - t.getX();
-            double y = fieldWidth - t.getY();
-            return new Translation2d(x, y);
-        }
-        return t;
+    public static double applyY(double y) {
+        return shouldFlip() ? FieldConstants.fieldWidth - y : y;
     }
 
-    public static Translation2d applySpeed(Translation2d v) {
-        if (shouldFlip()) {
-            return new Translation2d(-v.getX(), -v.getY());
-        }
-        return v;
+    public static Translation2d apply(Translation2d translation) {
+        return new Translation2d(applyX(translation.getX()), applyY(translation.getY()));
     }
 
-    public static Rotation2d apply(Rotation2d r) {
-        if (shouldFlip()) {
-            return r.plus(ROT180);
-        }
-        return r;
+    public static Rotation2d apply(Rotation2d rotation) {
+        return shouldFlip() ? rotation.rotateBy(Rotation2d.kPi) : rotation;
+    }
+
+    public static Rotation3d apply(Rotation3d rotation) {
+        return shouldFlip() ? rotation.rotateBy(new Rotation3d(0.0, 0.0, Math.PI)) : rotation;
     }
 
     public static Pose2d apply(Pose2d p) {
@@ -54,15 +45,31 @@ public class AllianceFlipUtil {
 
     public static Translation3d apply(Translation3d t3) {
         if (shouldFlip()) {
-            double x = fieldLength - t3.getX();
-            double y = fieldWidth - t3.getY();
+            double x = FieldConstants.fieldLength - t3.getX();
+            double y = FieldConstants.fieldWidth - t3.getY();
             return new Translation3d(x, y, t3.getZ());
         }
         return t3;
     }
 
+    public static PolygonObstacle2d apply(PolygonObstacle2d pN) {
+
+        if (shouldFlip()) {
+            Translation2d[] cPt = new Translation2d[pN.cornerPoints.length];
+            for (int i = 0; i < pN.cornerPoints.length; i++) {
+                cPt[i] = apply(pN.cornerPoints[i]);
+            }
+            return new PolygonObstacle2d(cPt);
+        } else return pN;
+    }
+
+    public static Pose3d apply(Pose3d pose) {
+        return new Pose3d(apply(pose.getTranslation()), apply(pose.getRotation()));
+    }
+
     public static boolean shouldFlip() {
-        return !DriverStation.getAlliance().isPresent()
-                || DriverStation.getAlliance().get() == Alliance.Red;
+        return !RobotConstants.disableHAL
+                && DriverStation.getAlliance().isPresent()
+                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
     }
 }

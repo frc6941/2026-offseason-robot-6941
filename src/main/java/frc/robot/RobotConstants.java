@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.RobotController;
 public final class RobotConstants {
     // Robot timing constants
     public static final double LOOPER_DT = 0.01; // 50Hz control loop
+    public static boolean disableHAL = false;
 
     // CAN bus configuration
     public static final String CANIVORE_CAN_BUS_NAME = "6941Canivore0";

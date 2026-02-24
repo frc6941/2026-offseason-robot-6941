@@ -18,15 +18,19 @@ public final class ShotCalculatorConfig {
         public static final double speedOffsetMps = 0.0;
         public static final double angleOffsetDeg = 0.0;
         public static final double trajectoryBiasDeg = 0.0;
-        public static final double lateralVelocityCompScale = 1.0;
+        public static final double lateralVelocityCompScale = 0.5;
+        public static final double lookfwdDelayCycles = 0.0;
+        public static final double lookfwdFlightScale = 0.36;
+        public static final double lookfwdMinCycles = 0.0;
+        public static final double lookfwdMaxCycles = 100.0;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmC
         // Theoretical conversion using a 4" wheel:
         //   rpmA = 60 / (pi * wheelDiameterMeters), rpmC = 0
         //   exitSpeed is in m/s
-        public static final double rpmA = 60.0 / (Math.PI * 0.1016);
-        public static final double rpmC = 0.0;
+        public static final double rpmA = 200;
+        public static final double rpmC = 0;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;

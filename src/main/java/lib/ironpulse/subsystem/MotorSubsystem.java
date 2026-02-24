@@ -1,6 +1,7 @@
 package lib.ironpulse.subsystem;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
@@ -34,6 +35,7 @@ public class MotorSubsystem<T extends MotorInputsAutoLogged, U extends MotorIO>
         this.config = config;
         this.io = io;
         this.inputs = inputs;
+        io.setCurrentPosition(Rotations.zero());
     }
 
     @Override

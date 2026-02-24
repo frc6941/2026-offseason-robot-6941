@@ -25,8 +25,8 @@ public final class SwerveMK5Config {
             SwerveModuleLimit.builder()
                     // MK5n R1 defaults (drive ~= 7.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
                     // v (mps) = 5800rpm (X60 with FOC) / 60 / 7.03 * pi * 4.0in
-                    .maxDriveVelocity(InchesPerSecond.of(5800.0 / 60.0 / 7.03 * Math.PI * 4.0))
-                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(12.0)) // 6-12
+                    .maxDriveVelocity(InchesPerSecond.of(5600.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
                     // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
                     // accelerate in 0.2s
@@ -37,10 +37,9 @@ public final class SwerveMK5Config {
             SwerveLimit.builder()
                     .maxLinearVelocity(MetersPerSecond.of(4.35)) // theoretically 4.39
                     // prevents skidding, see orbit archive ytb channel open class for theory
-                    .maxSkidAcceleration(
-                            MetersPerSecondPerSecond.of(10)) // 8-14, <maxDriveAcceleration
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(16)) // <maxDriveAcceleration
                     // omega_max ≈ vMax / r.
-                    .maxAngularVelocity(DegreesPerSecond.of(600.0))
+                    .maxAngularVelocity(DegreesPerSecond.of(1000))
                     // accelerate in 0.32s, also must be smaller than the defined module limit to be
                     // actually effective
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1450.0)) // 1000-1472
@@ -53,7 +52,7 @@ public final class SwerveMK5Config {
                     .maxAngularVelocity(DegreesPerSecond.of(600.0))
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1450.0))
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompBL =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("LB")
                     .location(new Translation2d(-kSwerveHalfLength, kSwerveHalfWidth))
@@ -66,7 +65,7 @@ public final class SwerveMK5Config {
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompFR =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompFL =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("LF")
                     .location(new Translation2d(kSwerveHalfLength, kSwerveHalfWidth))
@@ -79,7 +78,7 @@ public final class SwerveMK5Config {
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompBL =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompBR =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("RB")
                     .location(new Translation2d(-kSwerveHalfLength, -kSwerveHalfWidth))
@@ -93,7 +92,7 @@ public final class SwerveMK5Config {
                     .steerInverted(false)
                     .encoderInverted(false)
                     .build();
-    public static SwerveConfig.SwerveModuleConfig kModuleCompBR =
+    public static SwerveConfig.SwerveModuleConfig kModuleCompFR =
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("RF")
                     .location(new Translation2d(kSwerveHalfLength, -kSwerveHalfWidth))
@@ -156,19 +155,19 @@ public final class SwerveMK5Config {
     @SuppressWarnings("unused")
     private static final class SwerveModuleParams {
         private static final class Drive {
-            static final double kP = 4;
-            static final double kI = 0.05;
-            static final double kD = 0.1;
-            static final double kS = 1.3;
+            static final double kP = 8;
+            static final double kI = 0;
+            static final double kD = 0;
+            static final double kS = 2;
             // CTRE Slot0 kV for VelocityTorqueCurrentFOC with motor velocity units (rotor rps):
             // kV ~= 12V / (5800rpm / 60) = 0.124
-            static final double kV = 0.124;
-            static final double kA = 0.19;
+            static final double kV = 0.136;
+            static final double kA = 0.05;
             static final boolean isBrake = true;
         }
 
         private static final class Steer {
-            static final double kP = 30;
+            static final double kP = 15;
             static final double kI = 0;
             static final double kD = 0.1;
             static final double kS = 0;

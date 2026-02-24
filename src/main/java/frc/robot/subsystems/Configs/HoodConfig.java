@@ -1,7 +1,7 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
+import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
@@ -11,11 +11,13 @@ public class HoodConfig {
     public static final String NAME = "Hood";
     public static final int HOOD_MOTOR_MAIN_ID = 52;
     public static final double HOOD_GEAR_RATIO = 194.0 / 12.0 * 48.0 / 8.0;
+    public static final double HOOD_ANGLE_ZEROED_DEG = 12.8;
+    public static final double HOOD_DOF_DEG = 36;
     // Local hardware constants
     public static final SubsystemConfig HOOD_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
-                    .mainBus(CANIVORE_CAN_BUS)
+                    .mainBus(ROBORIO_CAN_BUS)
                     .mainId(HOOD_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .SensorToMechanismRatio(HOOD_GEAR_RATIO)
@@ -27,8 +29,10 @@ public class HoodConfig {
                                     .zeroingFilterSize(5)
                                     .zeroingVoltage(-1)
                                     .build())
+                    .forwardSoftLimitDegrees(Degrees.of(HOOD_ANGLE_ZEROED_DEG + HOOD_DOF_DEG))
+                    .reverseSoftLimitDegrees(Degrees.of(0))
                     // TODO: set this so the target angle represents the Real angle of the hood
-                    .zeroOffset(Degrees.of(12.8))
+                    .zeroOffset(Degrees.of(HOOD_ANGLE_ZEROED_DEG))
                     .simConfig(
                             SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())
                     .build();
@@ -38,7 +42,7 @@ public class HoodConfig {
     @NTParameter(tableName = "Params/" + NAME)
     public static final class HoodParams {
 
-        public static final double kP = 200;
+        public static final double kP = 800;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0;
