@@ -54,6 +54,8 @@ public class HoodConfig {
         public static final double motionMagicAccelRPS2 = 600.0;
         public static final double motionMagicJerkRPS3 = 0.0;
 
+        public static final double testAngle = 20;
+
         // Tolerances / behavior
         public static final double atGoalToleranceDegrees = 1;
     }

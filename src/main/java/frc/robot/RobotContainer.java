@@ -26,11 +26,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
-import frc.robot.subsystems.SerialSubsystem.SerialSubsystemParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
-import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
@@ -65,10 +63,10 @@ public class RobotContainer {
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-    private static final boolean HAS_INTAKER_ROLLER_IO = true;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = true;
-    private static final boolean HAS_LL_IO = true;
+    private static final boolean HAS_INTAKER_ROLLER_IO = false;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = false;
+    private static final boolean HAS_SWERVE_IO = false;
+    private static final boolean HAS_LL_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -168,27 +166,27 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        driver.a().whileTrue(intake.runFeed());
-        driver.povDown().onTrue(intake.runRetract());
-        driver.back().onTrue(intakerExtension.zeroCommand());
+        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        // driver.a().whileTrue(intake.runFeed());
+        // driver.povDown().onTrue(intake.runRetract());
+        // driver.back().onTrue(intakerExtension.zeroCommand());
 
-        driver.leftBumper()
-                .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
-        driver.rightBumper()
-                .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
+        // driver.leftBumper()
+        //         .whileTrue(
+        //                 shootingSuperstructure.runFrame(
+        //                         () -> shotCalculator.computeShotFrame(),
+        //                         () ->
+        //                                 driver.rightTrigger().getAsBoolean()
+        //                                         ? ShootingSuperstructure.IdxMode.FEED
+        //                                         : ShootingSuperstructure.IdxMode.OFF));
+        // driver.rightBumper()
+        //         .whileTrue(
+        //                 shootingSuperstructure.runFrame(
+        //                         () -> shotCalculator.computeShotFrame(),
+        //                         () ->
+        //                                 driver.rightTrigger().getAsBoolean()
+        //                                         ? ShootingSuperstructure.IdxMode.FEED
+        //                                         : ShootingSuperstructure.IdxMode.OFF));
 
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
@@ -285,23 +283,22 @@ public class RobotContainer {
 
         driver.x()
                 .whileTrue(
-                        shootingSuperstructure
-                                .runFrame(
+                        shooter.runVelVolt(
                                         () ->
-                                                new ShotFrame(
-                                                        Degrees.of(0),
+                                                RotationsPerSecond.of(
+                                                        ShooterParamsNT.testVelRPS.getValue()))
+                                .alongWith(
+                                        hood.runPosition(
+                                                () ->
                                                         Degrees.of(
-                                                                SerialSubsystemParamsNT.testFuelDeg
-                                                                        .getValue()),
-                                                        MetersPerSecond.of(
-                                                                SerialSubsystemParamsNT.testFuelMPS
-                                                                        .getValue())),
-                                        () ->
-                                                driver.rightTrigger().getAsBoolean()
-                                                        ? ShootingSuperstructure.IdxMode.FEED
-                                                        : ShootingSuperstructure.IdxMode.OFF)
+                                                                HoodParamsNT.testAngle.getValue())))
                                 .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
                                 .finallyDo(serialSubsystem::stopMeasurement));
+
+        driver.rightTrigger()
+                .whileTrue(
+                        spindexer.runVelVolt(
+                                RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
 
         new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
