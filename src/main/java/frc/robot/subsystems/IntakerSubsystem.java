@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
+import frc.robot.subsystems.Configs.IntakerRollerParamsNT;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
@@ -33,13 +34,13 @@ public class IntakerSubsystem {
 
     public Command runIntake() {
         return Commands.parallel(
-                roller.runVelVolt(RotationsPerSecond.of(intakeVelRPS)),
-                extension.runMotionMagic(Meters.of(deployPosMeters)));
+                roller.runVelVolt(RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
+                extension.runMotionMagic(Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())));
     }
 
     public Command runRetract() {
         return Commands.parallel(
-                roller.runStop(), extension.runMotionMagic(Meters.of(retractPosMeters)));
+                roller.runStop(), extension.runMotionMagic(Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())));
     }
 
     public Command runFeed() {
