@@ -42,10 +42,10 @@ public class HoodConfig {
     @NTParameter(tableName = "Params/" + NAME)
     public static final class HoodParams {
 
-        public static final double kP = 800;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kV = 0;
+        public static final double kP = 300;
+        public static final double kI = 5;
+        public static final double kD = 1;
+        public static final double kV = 0.35;
         public static final double kA = 0;
         public static final double kS = 0.25;
 

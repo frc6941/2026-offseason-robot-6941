@@ -129,6 +129,9 @@ public class RobotStateRecorder extends TransformRecorder {
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
                 cmdFrame.muzzleSpeed().in(MetersPerSecond));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/Distance",
+                getTranslationShotToTargetCurrent(kFrameTarget).getNorm());
     }
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {

@@ -60,12 +60,12 @@ import lombok.SneakyThrows;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
-    private static final boolean HAS_TURRET_IO = false;
+    private static final boolean HAS_TURRET_IO = true;
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-    private static final boolean HAS_INTAKER_ROLLER_IO = false;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = false;
+    private static final boolean HAS_INTAKER_ROLLER_IO = true;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
@@ -167,10 +167,10 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        // driver.a().whileTrue(intake.runFeed());
-        // driver.povDown().onTrue(intake.runRetract());
-        // driver.back().onTrue(intakerExtension.zeroCommand());
+        driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        driver.a().whileTrue(intake.runFeed());
+        driver.povDown().onTrue(intake.runRetract());
+        driver.back().onTrue(intakerExtension.zeroCommand());
 
         driver.leftBumper()
                 .whileTrue(
