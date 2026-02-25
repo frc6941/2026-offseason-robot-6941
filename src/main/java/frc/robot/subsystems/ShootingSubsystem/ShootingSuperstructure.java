@@ -10,8 +10,8 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
-import frc.robot.subsystems.Configs.ShotCalculatorConfig;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.ShotCalculatorConfig;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import java.util.function.Supplier;
@@ -68,10 +68,7 @@ public class ShootingSuperstructure {
         return Commands.parallel(
                 Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
                 turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld()),
-                hood.runPosition(
-                        () -> 
-                             computeBBA(frame.get().hoodAngle())
-                        ),
+                hood.runPosition(() -> computeBBA(frame.get().hoodAngle())),
                 shooter.runVelVolt(
                         () -> {
                             Angle targetBba = computeBBA(frame.get().hoodAngle());
