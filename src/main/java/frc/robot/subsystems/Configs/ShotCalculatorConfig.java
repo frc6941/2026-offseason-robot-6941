@@ -25,12 +25,10 @@ public final class ShotCalculatorConfig {
         public static final double lookfwdMaxCycles = 100.0;
 
         // Linear mapping (actuator-space)
-        // rpm = rpmA * exitSpeed + rpmC
-        // Theoretical conversion using a 4" wheel:
-        //   rpmA = 60 / (pi * wheelDiameterMeters), rpmC = 0
-        //   exitSpeed is in m/s
-        public static final double rpmA = 200;
-        public static final double rpmC = 800;
+        // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
+        public static final double rpmA = 326.67;
+        public static final double rpmB = 0.0;
+        public static final double rpmC = 264.03;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;

@@ -29,7 +29,6 @@ import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
-import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.nio.file.Path;
@@ -67,8 +66,8 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = false;
     private static final boolean HAS_INTAKER_EXTENSION_IO = false;
-    private static final boolean HAS_SWERVE_IO = false;
-    private static final boolean HAS_LL_IO = false;
+    private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -113,7 +112,7 @@ public class RobotContainer {
                         TargetMode.GOAL,
                         deploy.resolve("results_GOAL.json"),
                         TargetMode.FEED,
-                        deploy.resolve("results_GOAL.json")));
+                        deploy.resolve("results_FEED.json")));
 
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
@@ -173,14 +172,16 @@ public class RobotContainer {
         // driver.povDown().onTrue(intake.runRetract());
         // driver.back().onTrue(intakerExtension.zeroCommand());
 
-        // driver.leftBumper()
-        //         .whileTrue(
-        //                 shootingSuperstructure.runFrame(
-        //                         () -> shotCalculator.computeShotFrame(),
-        //                         () ->
-        //                                 driver.rightTrigger().getAsBoolean() && turret.getCurrentMode() == TurretMode.TRACKING
-        //                                         ? ShootingSuperstructure.IdxMode.FEED
-        //                                         : ShootingSuperstructure.IdxMode.OFF));
+        driver.leftBumper()
+                .whileTrue(
+                        shootingSuperstructure.runFrame(
+                                () -> shotCalculator.computeShotFrame(),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                        && turret.getCurrentMode()
+                                                                == TurretMode.TRACKING
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
         // driver.rightBumper()
         //         .whileTrue(
         //                 shootingSuperstructure.runFrame(
@@ -253,21 +254,21 @@ public class RobotContainer {
         // driver.back().whileTrue(intakerExtension.zeroCommand());
         // driver.povUp().onTrue(hood.zeroCommand());
 
-        driver.x()
-                .whileTrue(
-                        shooter.runVelVolt(
-                                        () ->
-                                                RotationsPerSecond.of(
-                                                        ShooterParamsNT.testVelRPS.getValue()))
-                                .alongWith(
-                                        hood.runPosition(
-                                                () ->
-                                                        Degrees.of(
-        
-        HoodParamsNT.testAngle.getValue())))
-        
-        .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
-                                .finallyDo(serialSubsystem::stopMeasurement));
+        // driver.x()
+        //         .whileTrue(
+        //                 shooter.runVelVolt(
+        //                                 () ->
+        //                                         RotationsPerSecond.of(
+        //                                                 ShooterParamsNT.testVelRPS.getValue()))
+        //                         .alongWith(
+        //                                 hood.runPosition(
+        //                                         () ->
+        //                                                 Degrees.of(
+        //
+        // HoodParamsNT.testAngle.getValue())))
+        //
+        // .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
+        //                         .finallyDo(serialSubsystem::stopMeasurement));
 
         // driver.rightTrigger()
         //         .whileTrue(
