@@ -78,7 +78,7 @@ public class IntakeConfig {
     @NTParameter(tableName = "Params/" + INTAKER_EXTENSION_NAME)
     public static final class IntakerExtensionParams {
 
-        public static final double kP = 3.75;
+        public static final double kP = 15;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0.1308;
@@ -86,13 +86,13 @@ public class IntakeConfig {
         public static final double kS = 0.13;
 
         // Motion Magic
-        public static final double motionMagicVelRPS = 250.0;
-        public static final double motionMagicAccelRPS2 = 600.0;
+        public static final double motionMagicVelRPS = 1000.0;
+        public static final double motionMagicAccelRPS2 = 150.0;
         public static final double motionMagicJerkRPS3 = 0.0;
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.29;
+        public static final double deployPosMeters = 0.3;
         public static final double feedPosMeters = 0.07;
         public static final double retractPosMeters = 0.0;
 

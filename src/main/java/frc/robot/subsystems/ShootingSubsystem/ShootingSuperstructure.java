@@ -71,8 +71,7 @@ public class ShootingSuperstructure {
                 hood.runPosition(() -> computeBBA(frame.get().hoodAngle())),
                 shooter.runVelVolt(
                         () -> {
-                            Angle targetBba = computeBBA(frame.get().hoodAngle());
-                            double rpm = computeRpm(frame.get().muzzleSpeed(), targetBba);
+                            double rpm = computeRpm(frame.get().muzzleSpeed());
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
     }
@@ -83,9 +82,9 @@ public class ShootingSuperstructure {
                 .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
     }
 
-    private double computeRpm(LinearVelocity muzzleSpeed, Angle actualBba) {
+    private double computeRpm(LinearVelocity muzzleSpeed) {
+
         return ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
-                + ShotCalculatorConfig.ShotCalculatorParams.rpmB * actualBba.in(Degrees)
                 + ShotCalculatorParamsNT.rpmC.getValue();
     }
 
