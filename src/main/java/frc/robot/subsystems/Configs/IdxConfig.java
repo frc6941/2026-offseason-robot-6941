@@ -14,7 +14,7 @@ public class IdxConfig {
     public static final double SPINDEXER_GEAR_RATIO =
             20.0 / 1.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     public static final double INDEXER_GEAR_RATIO =
-            15.0 / 1.0 * 66.0 / 28.0 / 86.0 * 12.0 / 28.0 * 22.0 / 22.0
+            20.0 / 1.0 * 42.0 / 20.0 / 86.0 * 12.0 / 28.0 * 22.0 / 22.0
                     * 15.0; // RATIO FROM MOTOR TO INDEXER, NOT USED IN CODE
     private static final int SPINDEXER_ID = 58;
     public static final SubsystemConfig SPINDEXER_CFG =
@@ -38,9 +38,9 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/IdxModes")
     public static final class SpindexerModeParams {
-        public static final double feedRPS = 3;
+        public static final double feedRPS = 2.3;
 
-        public static final double revRPS = -2.5;
+        public static final double revRPS = -2.3;
         public static final double idleRPS = 0.0;
     }
 
@@ -53,6 +53,8 @@ public class IdxConfig {
         public static final double kV = 4.2;
         public static final double kA = 0.0;
         public static final double kS = 0.35;
+
+        public static final boolean isBrake = true;
 
         public static final double velocityAtGoalToleranceRPS = 0.01;
     }

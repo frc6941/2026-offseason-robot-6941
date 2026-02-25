@@ -58,9 +58,6 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         robotContainer.robotPeriodic();
         CommandScheduler.getInstance().run();
-        // if (m_gcTimer.advanceIfElapsed(5)) {
-        //     System.gc();
-        // }
     }
 
     @Override

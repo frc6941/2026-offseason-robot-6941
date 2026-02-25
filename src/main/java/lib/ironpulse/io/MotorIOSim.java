@@ -10,6 +10,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ironpulse.subsystem.SubsystemConfig.SimConfig;
@@ -136,9 +138,19 @@ public class MotorIOSim implements MotorIO {
     }
 
     @Override
-    public void setVelocitySetpoint(AngularVelocity velocity) {
+    public void setVelVoltSetpoint(AngularVelocity velocity) {
         controlMode = InternalControlMode.VELOCITY;
         velocitySetpointRPS = velocity.in(RotationsPerSecond);
+    }
+
+    @Override
+    public void setVelVoltSetpoint(AngularVelocity velocity, Voltage feedForwardVoltage) {
+        setVelVoltSetpoint(velocity);
+    }
+
+    @Override
+    public void setVelTCSetpoint(AngularVelocity velocity, Current feedForwardTorqueCurrent) {
+        setVelVoltSetpoint(velocity);
     }
 
     @Override

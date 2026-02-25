@@ -6,6 +6,7 @@ public enum ControlMode {
     VOLTAGE,
     POSITION,
     MOTION_MAGIC,
-    VELOCITY,
+    VEL_VOL,
+    VEL_TC,
     SYSID
 }

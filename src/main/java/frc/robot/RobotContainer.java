@@ -30,6 +30,8 @@ import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
+import java.nio.file.Path;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
@@ -56,19 +58,21 @@ import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings("rawtypes")
 public class RobotContainer {
-    private static final boolean HAS_TURRET_IO = true;
+    private static final boolean HAS_TURRET_IO = false;
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
-    private static final boolean HAS_IDX_IO = false;
-    private static final boolean HAS_INTAKER_ROLLER_IO = true;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
+    private static final boolean HAS_IDX_IO = true;
+    private static final boolean HAS_INTAKER_ROLLER_IO = false;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = false;
     private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
-    private final IntakerSubsystem intakerSubsystem;
+    private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final ShotCalculator shotCalculator = new ShotCalculator();
+    private TargetMode activeTargetMode = TargetMode.GOAL;
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -78,6 +82,7 @@ public class RobotContainer {
     private final VelocityMotorSubsystem intakerRoller;
     private final PositionMotorSubsystem intakerExtension;
     // private final IndicatorSubsystem indicatorSubsystem;
+    private final SerialSubsystem serialSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -86,11 +91,13 @@ public class RobotContainer {
         final boolean isReal = RobotBase.isReal();
 
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
-        limelightSubsystem = buildLimelight(isReal, swerve);
+        limelightSubsystem = buildLimelight(isReal && HAS_LL_IO, swerve);
 
         turret = buildTurret(isReal && HAS_TURRET_IO);
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
         spindexer = buildSpindexer(isReal && HAS_IDX_IO);
+
+        serialSubsystem = buildSerial(isReal);
 
         //    indicator = builIndicator(isReal);
 
@@ -99,12 +106,16 @@ public class RobotContainer {
         intakerRoller = buildIntakerRoller(isReal && HAS_INTAKER_ROLLER_IO);
         intakerExtension = buildIntakerExtension(isReal && HAS_INTAKER_EXTENSION_IO);
 
+        Path deploy = Filesystem.getDeployDirectory().toPath();
         shotCalculator.initialize(
                 Map.of(
-                        ShotCalculator.TargetMode.GOAL,
-                        Filesystem.getDeployDirectory().toPath().resolve("results_GOAL.json")));
+                        TargetMode.GOAL,
+                        deploy.resolve("results_GOAL.json"),
+                        TargetMode.FEED,
+                        deploy.resolve("results_FEED.json")));
+
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
-        intakerSubsystem = new IntakerSubsystem(intakerRoller, intakerExtension);
+        intake = new IntakerSubsystem(intakerRoller, intakerExtension);
 
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
@@ -117,8 +128,8 @@ public class RobotContainer {
                         RobotStateRecorder::getPoseDriverRobotCurrent,
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
-        intakerExtension.setDefaultCommand(intakerExtension.runStop());
-        intakerRoller.setDefaultCommand(intakerRoller.runStop());
+        intake.setDefaultCommand();
+
         // indicatorSubsystem.setDefaultCommand(
         //        indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
     }
@@ -156,25 +167,29 @@ public class RobotContainer {
 
     private void configureBindings() {
         // INTAKE
-        // driver.leftTrigger()
-        //         .onTrue(
-        //                 Commands.runOnce(
-        //                         () -> {
-        //                             if (intakerSubsystem.isDeployed()) {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.retractIntake());
-        //                             } else {
-        //                                 CommandScheduler.getInstance()
-        //                                         .schedule(intakerSubsystem.deployIntake());
-        //                             }
-        //                         }));
-        // driver.leftBumper().onTrue(intakerSubsystem.outtake());
-        // driver.leftBumper().onFalse(intakerSubsystem.intake());
+        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        // driver.a().whileTrue(intake.runFeed());
+        // driver.povDown().onTrue(intake.runRetract());
+        // driver.back().onTrue(intakerExtension.zeroCommand());
 
         driver.leftBumper()
                 .whileTrue(
                         shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(TargetMode.GOAL)));
+                                () -> shotCalculator.computeShotFrame(),
+                                () ->
+                                        driver.rightTrigger().getAsBoolean()
+                                                        && turret.getCurrentMode()
+                                                                == TurretMode.TRACKING
+                                                ? ShootingSuperstructure.IdxMode.FEED
+                                                : ShootingSuperstructure.IdxMode.OFF));
+        // driver.rightBumper()
+        //         .whileTrue(
+        //                 shootingSuperstructure.runFrame(
+        //                         () -> shotCalculator.computeShotFrame(),
+        //                         () ->
+        //                                 driver.rightTrigger().getAsBoolean()
+        //                                         ? ShootingSuperstructure.IdxMode.FEED
+        //                                         : ShootingSuperstructure.IdxMode.OFF));
 
         // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
         // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
@@ -219,7 +234,7 @@ public class RobotContainer {
         // driver.povRight().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kReverse));
         // driver.povLeft().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.povUp().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kReverse));
-        // driver.povDown().whileTrue(spindexer.runVelocity(() -> RotationsPerSecond.of(2.3)));
+        // driver.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // driver.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
         // driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
         // driver.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
@@ -237,7 +252,29 @@ public class RobotContainer {
         // driver.x().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(swerveSysId.dynamic(SysIdRoutine.Direction.kReverse));
         // driver.back().whileTrue(intakerExtension.zeroCommand());
-        driver.povUp().onTrue(hood.zeroCommand());
+        // driver.povUp().onTrue(hood.zeroCommand());
+
+        // driver.x()
+        //         .whileTrue(
+        //                 shooter.runVelVolt(
+        //                                 () ->
+        //                                         RotationsPerSecond.of(
+        //                                                 ShooterParamsNT.testVelRPS.getValue()))
+        //                         .alongWith(
+        //                                 hood.runPosition(
+        //                                         () ->
+        //                                                 Degrees.of(
+        //
+        // HoodParamsNT.testAngle.getValue())))
+        //
+        // .beforeStarting(Commands.runOnce(serialSubsystem::startMeasurement))
+        //                         .finallyDo(serialSubsystem::stopMeasurement));
+
+        // driver.rightTrigger()
+        //         .whileTrue(
+        //                 spindexer.runVelVolt(
+        //
+        // RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
 
         // Swerve
         driver.start()
@@ -261,16 +298,15 @@ public class RobotContainer {
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
+                                .alongWith(hood.zeroCommand())
+                                .alongWith(intakerExtension.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
-    }
 
-    public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
@@ -284,21 +320,20 @@ public class RobotContainer {
     }
 
     private Swerve buildSwerve(boolean isReal) {
-        final boolean useRealSwerve = isReal && HAS_SWERVE_IO;
 
         return new Swerve(
-                useRealSwerve ? SwerveMK5Config.kRealConfig : SwerveMK5Config.kSimConfig,
-                useRealSwerve ? new ImuIOPigeon(SwerveMK5Config.kRealConfig) : new ImuIOSim(),
-                useRealSwerve
+                isReal ? SwerveMK5Config.kRealConfig : SwerveMK5Config.kSimConfig,
+                isReal ? new ImuIOPigeon(SwerveMK5Config.kRealConfig) : new ImuIOSim(),
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
-                useRealSwerve
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 1)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 1),
-                useRealSwerve
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 2)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 2),
-                useRealSwerve
+                isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
     }
@@ -401,5 +436,9 @@ public class RobotContainer {
 
     private SerialSubsystem buildSerial(boolean isReal) {
         return new SerialSubsystem();
+    }
+
+    public Command getAutonomousCommand() {
+        return Commands.print("No autonomous command configured");
     }
 }

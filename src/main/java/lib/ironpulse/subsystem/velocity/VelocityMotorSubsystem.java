@@ -1,11 +1,14 @@
 package lib.ironpulse.subsystem.velocity;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.Supplier;
@@ -63,7 +66,7 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
     @Override
     protected void logState() {
         Logger.recordOutput(config.name + "/mode", mode.name());
-        if (mode == ControlMode.VELOCITY) {
+        if (mode == ControlMode.VEL_VOL || mode == ControlMode.VEL_TC) {
             Logger.recordOutput(config.name + "/setPoint", currSetpoint.in(RotationsPerSecond));
         } else {
             Logger.recordOutput(config.name + "/setPoint", setpoint);
@@ -73,21 +76,65 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
         Logger.recordOutput(config.name + "/currVelocity", getVelocity().in(RotationsPerSecond));
     }
 
-    /** Set velocity setpoint command. */
-    public Command runVelocity(AngularVelocity velocity) {
-        return runVelocity(() -> velocity);
+    /** Set voltage-domain velocity setpoint command. */
+    public Command runVelVolt(AngularVelocity velocity) {
+        return runVelVolt(() -> velocity);
     }
 
-    /** Set velocity setpoint command. */
-    public Command runVelocity(Supplier<AngularVelocity> velocity) {
+    /** Set voltage-domain velocity setpoint command. */
+    public Command runVelVolt(Supplier<AngularVelocity> velocity) {
         return Commands.run(
                 () -> {
                     AngularVelocity sp = velocity.get();
-                    io.setVelocitySetpoint(sp);
+                    io.setVelVoltSetpoint(sp);
                     currSetpoint = sp;
-                    mode = ControlMode.VELOCITY;
+                    mode = ControlMode.VEL_VOL;
                 },
                 this);
+    }
+
+    /** Set voltage-domain velocity setpoint command with voltage feedforward. */
+    public Command runVelVolt(Supplier<AngularVelocity> velocity, Supplier<Voltage> feedForward) {
+        return Commands.run(
+                () -> {
+                    AngularVelocity sp = velocity.get();
+                    io.setVelVoltSetpoint(sp, feedForward.get());
+                    currSetpoint = sp;
+                    mode = ControlMode.VEL_VOL;
+                },
+                this);
+    }
+
+    /** Set voltage-domain velocity setpoint command with voltage feedforward. */
+    public Command runVelVolt(AngularVelocity velocity, Voltage feedForward) {
+        return runVelVolt(() -> velocity, () -> feedForward);
+    }
+
+    /** Set torque-current FOC velocity setpoint command with zero additional feedforward. */
+    public Command runVelTC(Supplier<AngularVelocity> velocity) {
+        return runVelTC(velocity, () -> Amps.of(0.0));
+    }
+
+    /** Set torque-current FOC velocity setpoint command with zero additional feedforward. */
+    public Command runVelTC(AngularVelocity velocity) {
+        return runVelTC(() -> velocity, () -> Amps.of(0.0));
+    }
+
+    /** Set torque-current FOC velocity setpoint command with torque-current feedforward. */
+    public Command runVelTC(Supplier<AngularVelocity> velocity, Supplier<Current> feedForward) {
+        return Commands.run(
+                () -> {
+                    AngularVelocity sp = velocity.get();
+                    io.setVelTCSetpoint(sp, feedForward.get());
+                    currSetpoint = sp;
+                    mode = ControlMode.VEL_TC;
+                },
+                this);
+    }
+
+    /** Set torque-current FOC velocity setpoint command with torque-current feedforward. */
+    public Command runVelTC(AngularVelocity velocity, Current feedForward) {
+        return runVelTC(() -> velocity, () -> feedForward);
     }
 
     /** Check if velocity is within tolerance of setpoint. */

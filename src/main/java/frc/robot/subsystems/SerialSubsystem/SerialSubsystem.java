@@ -1,79 +1,130 @@
 package frc.robot.subsystems.SerialSubsystem;
 
-import edu.wpi.first.wpilibj.SerialPort;
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import lib.ntext.NTParameter;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class SerialSubsystem extends SubsystemBase {
+    private static final int I2C_ADDRESS = 0x08;
+    private static final double TIMEOUT_SEC = 0.5;
+    private static final String NAME = "Arduino";
 
-    private SerialPort arduino;
-    private final StringBuilder rxBuffer = new StringBuilder();
+    private final I2C i2c;
+    private final byte[] rx = new byte[4];
 
-    @Getter private double speed = 0.0;
+    @Getter private Time time = Seconds.of(0.0);
+    @Getter private LinearVelocity speed = MetersPerSecond.of(0.0);
     @Getter private String lastException = "";
     private double lastRxTime = 0.0;
-
-    private static final double TIMEOUT_SEC = 0.5;
+    private int count = 0;
+    private LinearVelocity speedSum = MetersPerSecond.of(0);
+    private LinearVelocity lastSpeed = null;
+    private boolean isCalculating = false;
+    private Time firstBallTime = Seconds.of(0.0);
+    private Time lastBallTime = Seconds.of(0.0);
 
     public SerialSubsystem() {
-        try {
-            arduino = new SerialPort(1000000, SerialPort.Port.kUSB);
-            arduino.setTimeout(0.0);
-            arduino.setReadBufferSize(256);
-        } catch (Exception e) {
-            arduino = null;
-        }
+        i2c = new I2C(I2C.Port.kMXP, I2C_ADDRESS);
     }
 
     @Override
     public void periodic() {
-        if (arduino == null) return;
-
-        int available = arduino.getBytesReceived();
-        if (available <= 0) return;
-
-        byte[] data = arduino.read(available);
-        for (byte b : data) {
-            processByte((char) b);
-        }
-    }
-
-    private void processByte(char c) {
-        if (c == '<') {
-            rxBuffer.setLength(0);
-        } else if (c == '>') {
-            parseFrame(rxBuffer.toString().trim());
-            rxBuffer.setLength(0);
-        } else {
-            rxBuffer.append(c);
-        }
-    }
-
-    private void parseFrame(String frame) {
-        lastRxTime = Timer.getFPGATimestamp();
-
-        if (frame.startsWith("Speed(m/s):")) {
-            try {
-                speed = Double.parseDouble(frame.substring("Speed(m/s):".length()));
-                lastException = "";
-            } catch (Exception ignored) {
-            }
+        boolean aborted = i2c.readOnly(rx, 4);
+        if (aborted) {
+            lastException = "I2C read aborted";
+            log();
             return;
         }
 
-        lastException = frame;
+        int raw =
+                (rx[0] & 0xFF)
+                        | ((rx[1] & 0xFF) << 8)
+                        | ((rx[2] & 0xFF) << 16)
+                        | ((rx[3] & 0xFF) << 24);
+
+        long us = Integer.toUnsignedLong(raw);
+        if (us < 1000) {
+            lastException = "Time filtered";
+            log();
+            return;
+        }
+
+        Time newTime = Microseconds.of(us);
+        LinearVelocity newSpeed =
+                Meters.of(SerialSubsystemParamsNT.distanceMeters.getValue()).div(newTime);
+
+        if (newSpeed.in(MetersPerSecond) < 0.2) {
+            lastException = "Speed filtered";
+            log();
+            return;
+        }
+
+        time = newTime;
+        speed = newSpeed;
+        lastException = "";
+        lastRxTime = Timer.getFPGATimestamp();
+
+        if (isCalculating && (lastSpeed == null || !lastSpeed.equals(speed))) {
+            count++;
+            speedSum = speedSum.plus(speed);
+            double now = Timer.getFPGATimestamp();
+            if (count == 1) {
+                firstBallTime = Seconds.of(now);
+            }
+            lastBallTime = Seconds.of(now);
+        }
+        lastSpeed = speed;
+        log();
     }
 
     public boolean isTimedOut() {
-        if (lastRxTime == 0) return true;
-        return Timer.getFPGATimestamp() - lastRxTime > TIMEOUT_SEC;
+        return lastRxTime == 0.0 || (Timer.getFPGATimestamp() - lastRxTime) > TIMEOUT_SEC;
     }
 
     public void log() {
-        Logger.recordOutput("Arduino/Speed", speed);
-        Logger.recordOutput("Arduino/Exception", lastException);
-        Logger.recordOutput("Arduino/TimedOut", isTimedOut());
+        Logger.recordOutput(NAME + "/TimeSeconds", time);
+        Logger.recordOutput(NAME + "/SpeedMPS", speed);
+        Logger.recordOutput(NAME + "/Exception", lastException);
+        Logger.recordOutput(NAME + "/TimedOut", isTimedOut());
+        Logger.recordOutput(NAME + "/count", count);
+        Logger.recordOutput(NAME + "/speedSum", speedSum);
+        Logger.recordOutput(NAME + "/isCalculating", isCalculating);
+        Logger.recordOutput(NAME + "/firstBallTime", firstBallTime);
+        Logger.recordOutput(NAME + "/lastBallTime", lastBallTime);
+
+        if (count >= 2) {
+            double durationSec = lastBallTime.minus(firstBallTime).in(Seconds);
+            Logger.recordOutput(
+                    NAME + "/BPS", durationSec > 0.0 ? (count - 1.0) / durationSec : 0.0);
+        } else {
+            Logger.recordOutput(NAME + "/BPS", 0.0);
+        }
+    }
+
+    public void startMeasurement() {
+        count = 0;
+        speedSum = MetersPerSecond.of(0);
+        isCalculating = true;
+    }
+
+    public void stopMeasurement() {
+        isCalculating = false;
+        if (count > 0) {
+            Logger.recordOutput(NAME + "/speedAvg", speedSum.div(count));
+        }
+    }
+
+    @NTParameter(tableName = "Params/" + NAME)
+    public static final class SerialSubsystemParams {
+        public static final double distanceMeters = 0.20;
+        public static final double testFuelMPS = 0.0;
+        public static final double testFuelDeg = 0.0;
     }
 }
