@@ -172,36 +172,23 @@ public class RobotContainer {
         driver.back().onTrue(intakerExtension.zeroCommand());
 
         // scoring
-        driver.rightTrigger().whileTrue(shootingSuperstructure.shootWhenReady());
+        driver.rightTrigger()
+                .whileTrue(
+                        shootingSuperstructure
+                                .shootWhenReady()
+                                .alongWith(
+                                        Commands.runOnce(
+                                                        () ->
+                                                                swerve.setSwerveLimit(
+                                                                        SwerveMK5Config
+                                                                                .kShootingSwerveLimit))
+                                                .finallyDo(
+                                                        () ->
+                                                                swerve.setSwerveLimit(
+                                                                        SwerveMK5Config
+                                                                                .kDefaultSwerveLimit))));
 
         // SYSID/test
-        // driver.leftBumper()
-        // .whileTrue(
-        //         shootingSuperstructure.runFrame(
-        //                 () ->
-        //                         new ShotFrame(
-        //                                 shotCalculator
-        //                                         .getShotToTargetTranslation(TargetMode.GOAL)
-        //                                         .getAngle()
-        //                                         .getMeasure(),
-        //                                 Degrees.of(45),
-        //                                 MetersPerSecond.of(12)),
-        //                 () ->
-        //                         driver.rightTrigger().getAsBoolean()
-        //                                 ? ShootingSuperstructure.IdxMode.FEED
-        //                                 : ShootingSuperstructure.IdxMode.OFF));
-        // driver.rightBumper()
-        //         .whileTrue(
-        //                 shootingSuperstructure.runFrame(
-        //                         () ->
-        //                                 new ShotFrame(
-        //                                         Degrees.of(43),
-        //                                         Degrees.of(45),
-        //                                         MetersPerSecond.of(12)),
-        //                         () ->
-        //                                 driver.rightTrigger().getAsBoolean()
-        //                                         ? ShootingSuperstructure.IdxMode.FEED
-        //                                         : ShootingSuperstructure.IdxMode.OFF));
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
         // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
@@ -285,7 +272,6 @@ public class RobotContainer {
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
 
-        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {

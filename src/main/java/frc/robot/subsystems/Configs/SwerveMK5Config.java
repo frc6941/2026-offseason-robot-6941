@@ -45,6 +45,14 @@ public final class SwerveMK5Config {
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0)) // 1000-1472
                     .build();
 
+    public static SwerveLimit kShootingSwerveLimit =
+            SwerveLimit.builder()
+                    .maxLinearVelocity(MetersPerSecond.of(2.35))
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(16))
+                    .maxAngularVelocity(DegreesPerSecond.of(500))
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1000.0))
+                    .build();
+
     public static SwerveLimit kSimSwerveLimit =
             SwerveLimit.builder()
                     .maxLinearVelocity(MetersPerSecond.of(4.35))
