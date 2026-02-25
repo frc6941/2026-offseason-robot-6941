@@ -30,7 +30,6 @@ import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
-import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.nio.file.Path;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -114,7 +113,8 @@ public class RobotContainer {
                         TargetMode.FEED,
                         deploy.resolve("results_FEED.json")));
 
-        shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
+        shootingSuperstructure =
+                new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
 
         configureBindings();
@@ -168,32 +168,11 @@ public class RobotContainer {
     private void configureBindings() {
         // INTAKE
         driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        driver.a().whileTrue(intake.runFeed());
-        driver.povDown().onTrue(intake.runRetract());
+        driver.leftBumper().onTrue(intake.runRetract());
         driver.back().onTrue(intakerExtension.zeroCommand());
 
-        driver.leftBumper()
-                .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                        && turret.getCurrentMode()
-                                                                == TurretMode.TRACKING
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
-        // driver.rightBumper()
-        //         .whileTrue(
-        //                 shootingSuperstructure.runFrame(
-        //                         () -> shotCalculator.computeShotFrame(),
-        //                         () ->
-        //                                 driver.rightTrigger().getAsBoolean()
-        //                                         ? ShootingSuperstructure.IdxMode.FEED
-        //                                         : ShootingSuperstructure.IdxMode.OFF));
-
-        // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
-        // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
-        // driver.leftTrigger().whileTrue(intakerRoller.runDutyCycle(1));
+        // scoring
+        driver.rightTrigger().whileTrue(shootingSuperstructure.shootWhenReady());
 
         // SYSID/test
         // driver.leftBumper()

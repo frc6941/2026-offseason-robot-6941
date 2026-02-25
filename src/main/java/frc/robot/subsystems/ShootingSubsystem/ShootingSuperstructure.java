@@ -14,6 +14,7 @@ import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorConfig;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
+import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -26,16 +27,19 @@ public class ShootingSuperstructure {
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
+    private final ShotCalculator calculator;
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
-            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx) {
+            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx,
+            ShotCalculator calculator) {
         this.turret = turret;
         this.hood = hood;
         this.shooter = shooter;
         this.idx = idx;
+        this.calculator = calculator;
     }
 
     public ShotFrame getCurrentFrame() {
@@ -62,6 +66,19 @@ public class ShootingSuperstructure {
         shooter.setDefaultCommand(
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
+        hood.runPosition(() -> this.computeBBA(calculator.computeShotFrame().hoodAngle()));
+    }
+
+    public Command shootWhenReady() {
+        return Commands.parallel(
+                runFrame(() -> this.calculator.computeShotFrame()),
+                Commands.waitUntil(() -> shooter.velocityAtGoal())
+                        .andThen(
+                                idx.runVelVolt(
+                                        () ->
+                                                turret.getCurrentMode() == TurretMode.TRACKING
+                                                        ? getIdxSpeed(IdxMode.FEED)
+                                                        : getIdxSpeed(IdxMode.OFF))));
     }
 
     public Command runFrame(Supplier<ShotFrame> frame) {
@@ -76,6 +93,15 @@ public class ShootingSuperstructure {
                         }));
     }
 
+    public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
+        return Commands.parallel(
+                runFrame(frame),
+                //                idx.runVelVolt(() -> getIdxSpeed(readyToShoot() ? idxMode :
+                // IdxMode.OFF)));
+                idx.runVelVolt(() -> getIdxSpeed(idxMode.get())));
+        // TODO: revert
+    }
+
     private Angle computeBBA(Angle modelAngle) {
         return modelAngle
                 .times(ShotCalculatorParamsNT.hoodB.getValue())
@@ -86,15 +112,6 @@ public class ShootingSuperstructure {
 
         return ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
                 + ShotCalculatorParamsNT.rpmC.getValue();
-    }
-
-    public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
-        return Commands.parallel(
-                runFrame(frame),
-                //                idx.runVelVolt(() -> getIdxSpeed(readyToShoot() ? idxMode :
-                // IdxMode.OFF)));
-                idx.runVelVolt(() -> getIdxSpeed(idxMode.get())));
-        // TODO: revert
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
