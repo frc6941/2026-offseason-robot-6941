@@ -28,8 +28,8 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoActions {
-    public static final Pose2d kSweepStartPoseL = new Pose2d(0, 0, new Rotation2d(0));
-    public static final Pose2d kSweepStartPoseR = new Pose2d(0, 0, new Rotation2d(0));
+    public static final Pose2d kSweepStartPoseL = new Pose2d(7.972, 6.928, new Rotation2d(-90));
+    public static final Pose2d kSweepStartPoseR = new Pose2d(7.972, 1.126, new Rotation2d(90));
 
     private static Swerve swerve;
     private static ShootingSuperstructure shooter;

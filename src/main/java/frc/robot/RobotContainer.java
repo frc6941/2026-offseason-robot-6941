@@ -9,6 +9,7 @@ import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.auto.AutoParamsNT;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
@@ -49,6 +51,7 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
+import lib.ironpulse.swerve.commands.SwerveDriveToPose;
 import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
@@ -57,11 +60,12 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
+import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
-    private static final boolean HAS_TURRET_IO = false;
-    private static final boolean HAS_SHOOTER_IO = true;
+    private static final boolean HAS_TURRET_IO = true;
+    private static final boolean HAS_SHOOTER_IO = false;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = false;
@@ -182,6 +186,7 @@ public class RobotContainer {
                                                                 == TurretMode.TRACKING
                                                 ? ShootingSuperstructure.IdxMode.FEED
                                                 : ShootingSuperstructure.IdxMode.OFF));
+
         // driver.rightBumper()
         //         .whileTrue(
         //                 shootingSuperstructure.runFrame(
@@ -276,6 +281,45 @@ public class RobotContainer {
         //
         // RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue())));
 
+        driver.a()
+                .whileTrue(
+                        new SwerveDriveToPose(
+                                        swerve,
+                                        () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                                        () ->
+                                                AllianceFlipUtil.apply(
+                                                        new Pose3d(
+                                                                7.972,
+                                                                6.928,
+                                                                0,
+                                                                new Rotation3d(
+                                                                        new Rotation2d(90)))),
+                                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                                        new PIDController(
+                                                AutoParamsNT.kpStrave.getValue(),
+                                                AutoParamsNT.kiStrave.getValue(),
+                                                AutoParamsNT.kdStrave.getValue()),
+                                        new PIDController(
+                                                AutoParamsNT.kpSpin.getValue(),
+                                                AutoParamsNT.kiSpin.getValue(),
+                                                AutoParamsNT.kdSpin.getValue()),
+                                        Meters.of(0.2),
+                                        Degrees.of(2))
+                                .alongWith(
+                                        Commands.run(
+                                                () ->
+                                                        Logger.recordOutput(
+                                                                "AUTO/POSE",
+                                                                AllianceFlipUtil.apply(
+                                                                        new Pose3d(
+                                                                                7.972,
+                                                                                6.928,
+                                                                                0,
+                                                                                new Rotation3d(
+                                                                                        new Rotation2d(
+                                                                                                Degrees
+                                                                                                        .of(
+                                                                                                                90)))))))));
         // Swerve
         driver.start()
                 .onTrue(
