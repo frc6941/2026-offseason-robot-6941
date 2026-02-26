@@ -1,4 +1,4 @@
-package frc.robot.auto;
+package frc.robot.subsystems.Configs;
 
 import lib.ntext.NTParameter;
 

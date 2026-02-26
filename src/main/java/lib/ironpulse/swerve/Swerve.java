@@ -243,6 +243,10 @@ public class Swerve extends SubsystemBase implements Localizable {
         return poseEstimator.getEstimatedPosition().getRotation().getAngle();
     }
 
+    public double getPitchVelocityRadPerSec() {
+        return imuIOInputs.pitchVelocityRadPerSec;
+    }
+
     // ------- Configurations -------
     public SwerveLimit getSwerveLimit() {
         return setpointGenerator.getChassisLimit();
