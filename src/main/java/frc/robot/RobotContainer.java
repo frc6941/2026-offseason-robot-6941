@@ -178,15 +178,14 @@ public class RobotContainer {
                                 .shootWhenReady()
                                 .alongWith(
                                         Commands.runOnce(
-                                                        () ->
-                                                                swerve.setSwerveLimit(
-                                                                        SwerveMK5Config
-                                                                                .kShootingSwerveLimit))
-                                                .finallyDo(
-                                                        () ->
-                                                                swerve.setSwerveLimit(
-                                                                        SwerveMK5Config
-                                                                                .kDefaultSwerveLimit))));
+                                                () ->
+                                                        swerve.setSwerveLimit(
+                                                                SwerveMK5Config
+                                                                        .kShootingSwerveLimit)))
+                                .finallyDo(
+                                        () ->
+                                                swerve.setSwerveLimit(
+                                                        SwerveMK5Config.kDefaultSwerveLimit)));
 
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
@@ -264,14 +263,13 @@ public class RobotContainer {
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand())
-                                .alongWith(intakerExtension.zeroCommand()));
+                                .alongWith(hood.zeroCommand()));
+        // .alongWith(intakerExtension.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
-
     }
 
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {

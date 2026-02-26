@@ -9,8 +9,8 @@ import lib.ntext.NTParameter;
 
 public class IdxConfig {
     public static final String SPINDEXER = "Spindexer";
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 55;
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 55;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 75;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 75;
     public static final double SPINDEXER_GEAR_RATIO =
             20.0 / 1.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     public static final double INDEXER_GEAR_RATIO =

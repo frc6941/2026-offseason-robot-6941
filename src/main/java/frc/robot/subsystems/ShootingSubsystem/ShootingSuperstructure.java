@@ -66,7 +66,8 @@ public class ShootingSuperstructure {
         shooter.setDefaultCommand(
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
-        hood.runPosition(() -> this.computeBBA(calculator.computeShotFrame().hoodAngle()));
+        hood.setDefaultCommand(
+                hood.runPosition(() -> computeBBA(calculator.computeShotFrame().hoodAngle())));
     }
 
     public Command shootWhenReady() {
