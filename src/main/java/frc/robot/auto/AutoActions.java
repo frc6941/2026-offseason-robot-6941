@@ -44,11 +44,22 @@ public class AutoActions {
             new Pose2d(7.972, 6.928, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepStartPoseR =
             new Pose2d(7.972, 1.126, new Rotation2d(Degrees.of(90)));
+    public static final Pose2d kSweepEndPoseL =
+            new Pose2d(7.972, 6.928, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kSweepEndPoseR =
+            new Pose2d(7.972, 1.126, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSlopeFrontL =
             new Pose2d(5.84, 5.79, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeFrontR =
             new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-            
+
+
+            public static final Pose2d kTestA =
+            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+            public static final Pose2d kTestB =
+            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+            public static final Pose2d kTestC =
+            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));          
 
     private static Swerve swerve;
     private static ShootingSuperstructure shooter;
@@ -109,20 +120,6 @@ public class AutoActions {
                 }));
     }
 
-    private static boolean isPitchStable() {
-        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
-    }
-
-    private static double getRobotX() {
-        return RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getX();
-    }
-
-    private static boolean hasCrossedBump(boolean isToNeutral) {
-        return isToNeutral
-                ? AllianceFlipUtil.applyX(getRobotX())
-                        > FieldConstants.LinesVertical.neutralZoneNear
-                : AllianceFlipUtil.applyX(getRobotX()) < FieldConstants.LinesVertical.starting;
-    }
 
     public static Command followPath(PathPlannerPath path) {
         return new FollowPathCommand(
@@ -173,6 +170,36 @@ public class AutoActions {
     }
 
     // Helpermethod
+
+    
+    private static Command testPath() {
+    return swerve.defer(
+            () -> {
+                Pose2d current =
+                        RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
+                List<Pose2d> waypoints = List.of(current, kTestB, kTestC);
+                PathPlannerPath path =
+                        generatePath(
+                                waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
+                return followPath(path);
+            });
+    }
+
+    private static boolean isPitchStable() {
+        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
+    }
+
+    private static double getRobotX() {
+        return RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getX();
+    }
+
+    private static boolean hasCrossedBump(boolean isToNeutral) {
+        return isToNeutral
+                ? AllianceFlipUtil.applyX(getRobotX())
+                        > FieldConstants.LinesVertical.neutralZoneNear
+                : AllianceFlipUtil.applyX(getRobotX()) < FieldConstants.LinesVertical.starting;
+    }
+
     public static Command resetOnPose(Pose2d pose) {
         var resetPose = new Pose3d(AllianceFlipUtil.apply(pose));
 

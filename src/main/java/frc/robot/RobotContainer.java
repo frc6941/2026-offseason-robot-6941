@@ -332,6 +332,8 @@ public class RobotContainer {
         new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
+    //Helper methods
+
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
         return new VelocityMotorSubsystem<>(
                 IdxConfig.SPINDEXER_CFG,
