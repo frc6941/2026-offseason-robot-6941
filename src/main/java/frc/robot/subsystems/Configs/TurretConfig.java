@@ -48,8 +48,8 @@ public class TurretConfig {
                     .defaultBrake(true)
                     .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT_CCW)
                     .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT_CW)
-                    .statorCurrentLimitAmps(80)
-                    .supplyCurrentLimitAmps(80)
+                    .statorCurrentLimitAmps(45)
+                    .supplyCurrentLimitAmps(40)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(TURRET_GEAR_RATIO)
