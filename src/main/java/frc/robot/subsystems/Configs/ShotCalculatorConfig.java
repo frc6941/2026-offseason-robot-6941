@@ -17,9 +17,9 @@ public final class ShotCalculatorConfig {
         public static final double speedScale = 1.0;
         public static final double speedOffsetMps = 0.0;
         public static final double trajectoryBiasDegGOAL = -2;
-        public static final double trajectoryBiasDegFEED = 0.0;
+        public static final double trajectoryBiasDegFEED = -2;
         public static final double loookfwdDistanceScale = 1;
-        public static final double lateralVelocityCompScale = 0;
+        public static final double lateralVelocityCompScale = 1.2;
         public static final double lookfwdDelayCycles = 0;
         public static final double lookfwdFlightScale = 0;
 
@@ -30,7 +30,7 @@ public final class ShotCalculatorConfig {
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
         public static final double rpmA = 250;
         public static final double rpmB = 0;
-        public static final double rpmC = 200;
+        public static final double rpmC = 170;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;
