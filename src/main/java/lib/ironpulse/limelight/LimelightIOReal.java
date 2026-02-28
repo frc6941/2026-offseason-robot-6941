@@ -94,7 +94,7 @@ public class LimelightIOReal implements LimelightIO {
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
             LimelightHelpers.SetIMUMode(
-                    config.getName(), InternalIMUMode.INTERNAL_EXTERNAL_ASSIST.getValue());
+                    config.getName(), InternalIMUMode.INTERNAL_MT1_ASSIST.getValue());
             Logger.recordOutput("Limelight/IMU/Mode", "assisted");
         }
     }
@@ -167,6 +167,9 @@ public class LimelightIOReal implements LimelightIO {
         inputs.latency = estimate.latency;
         inputs.detectedTagIds = Arrays.stream(estimate.rawFiducials).mapToInt(r -> r.id).toArray();
         inputs.reliability = getReliabilityScore(estimate);
+        inputs.avgTagArea = estimate.avgTagArea;
+        inputs.avgTagDist = estimate.avgTagDist;
+        inputs.tagSpan = estimate.tagSpan;
     }
 
     @Override

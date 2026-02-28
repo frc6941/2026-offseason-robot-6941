@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.HashMap;
 import java.util.Map;
 import lib.ironpulse.math.MathTools;
+import lib.ironpulse.utils.LoggedTracer;
 import org.littletonrobotics.junction.Logger;
 
 public class LimelightSubsystem extends SubsystemBase {
@@ -61,7 +62,7 @@ public class LimelightSubsystem extends SubsystemBase {
             LimelightIOInputsAutoLogged inputs = entry.getValue();
 
             io.updateInputs(inputs);
-            Logger.processInputs("Subsystem/Limelight/" + io.getName(), inputs);
+            Logger.processInputs("Limelight/" + io.getName(), inputs);
 
             if (!io.canUseInternalIMU()) {
                 continue;
@@ -79,6 +80,7 @@ public class LimelightSubsystem extends SubsystemBase {
         }
 
         addVisionMeasurement();
+        LoggedTracer.record("Limelight");
     }
 
     private LimelightIO getIoById(String id) {

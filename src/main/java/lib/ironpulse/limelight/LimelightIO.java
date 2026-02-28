@@ -86,5 +86,8 @@ public interface LimelightIO {
         public double latency;
         public double reliability;
         public int[] detectedTagIds;
+        public double tagSpan;
+        public double avgTagDist;
+        public double avgTagArea;
     }
 }

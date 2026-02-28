@@ -100,7 +100,7 @@ public class IntakeConfig {
         public static final double atGoalToleranceMeters = 0.01;
         public static final double deployPosMeters = 0.3;
         public static final double feedPosMeters = 0.07;
-        public static final double retractPosMeters = 0.0;
+        public static final double retractPosMeters = 0.1;
 
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
         public static final double feedOscillationRateHz = 0.5;

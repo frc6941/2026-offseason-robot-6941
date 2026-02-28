@@ -99,7 +99,7 @@ public class ShootingSuperstructure {
                 runFrame(frame),
                 //                idx.runVelVolt(() -> getIdxSpeed(readyToShoot() ? idxMode :
                 // IdxMode.OFF)));
-                idx.runVelVolt(() -> getIdxSpeed(idxMode.get())));
+                idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
         // TODO: revert
     }
 
