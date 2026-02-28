@@ -111,7 +111,7 @@ public class RobotContainer {
                         TargetMode.GOAL,
                         deploy.resolve("results_GOAL.json"),
                         TargetMode.FEED,
-                        deploy.resolve("results_FEED.json")));
+                        deploy.resolve("results_GOAL.json")));
 
         shootingSuperstructure =
                 new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
@@ -161,6 +161,7 @@ public class RobotContainer {
                         RobotStateRecorder.kFrameShot);
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
+        RobotStateRecorder.putVelocityRobotCmd(now, swerve.getChassisSpeedsCmd());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
     }
@@ -179,13 +180,10 @@ public class RobotContainer {
                                 .alongWith(
                                         Commands.runOnce(
                                                 () ->
-                                                        swerve.setSwerveLimit(
+                                                        swerve.setSwerveModuleLimit(
                                                                 SwerveMK5Config
                                                                         .kShootingSwerveLimit)))
-                                .finallyDo(
-                                        () ->
-                                                swerve.setSwerveLimit(
-                                                        SwerveMK5Config.kDefaultSwerveLimit)));
+                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
 
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
@@ -311,7 +309,20 @@ public class RobotContainer {
                 ? new LimelightSubsystem(
                         swerve,
                         new LimelightIOReal(
-                                LimeLightConfig.limelight1Config,
+                                LimeLightConfig.limelightAConfig,
+                                () ->
+                                        RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .getDegrees()
+                                                > 360,
+                                LimeLightConfig.asDeviationParams()),
+                        new LimelightIOReal(
+                                LimeLightConfig.limelightBConfig,
                                 () ->
                                         RobotStateRecorder.getPoseWorldRobotCurrent()
                                                 .toPose2d()

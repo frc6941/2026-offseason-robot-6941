@@ -127,7 +127,7 @@ public class ShotCalculator {
         Translation2d shotToTargetCurrent =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         Translation2d velocityWorldRobotCurrent =
-                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
+                RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
 
         double currentDistanceMeters = shotToTargetCurrent.getNorm();
         Translation2d currentTargetVelocity =

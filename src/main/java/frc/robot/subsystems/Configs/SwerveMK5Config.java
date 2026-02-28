@@ -25,7 +25,7 @@ public final class SwerveMK5Config {
             SwerveModuleLimit.builder()
                     // MK5n R1 defaults (drive ~= 7.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
                     // v (mps) = 5800rpm (X60 with FOC) / 60 / 7.03 * pi * 4.0in
-                    .maxDriveVelocity(InchesPerSecond.of(5600.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveVelocity(InchesPerSecond.of(6200.0 / 60.0 / 7.03 * Math.PI * 4.0))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
                     // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
@@ -45,12 +45,15 @@ public final class SwerveMK5Config {
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000.0)) // 1000-1472
                     .build();
 
-    public static SwerveLimit kShootingSwerveLimit =
-            SwerveLimit.builder()
-                    .maxLinearVelocity(MetersPerSecond.of(2.35))
-                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(16))
-                    .maxAngularVelocity(DegreesPerSecond.of(500))
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(1000.0))
+    public static SwerveModuleLimit kShootingSwerveLimit =
+            SwerveModuleLimit.builder()
+                    .maxDriveVelocity(InchesPerSecond.of(2000.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
+                    // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
+                    .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
+                    // accelerate in 0.2s
+                    .maxSteerAngularAcceleration(
+                            RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
                     .build();
 
     public static SwerveLimit kSimSwerveLimit =
