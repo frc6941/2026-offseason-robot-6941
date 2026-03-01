@@ -14,7 +14,7 @@ public class LimelightIOConfig {
     // Lower values (e.g., 0.001): Smoother, slower drift correction. The internal IMU is trusted
     // more.
     // Higher values (e.g., 0.01): Faster tracking of the reference source (MT1 or external IMU).
-    @Builder.Default private final double filterAlpha = 0.001;
+    @Builder.Default private final double filterAlpha = 0.2;
     @Builder.Default private final String name = "UNNAMED";
 
     private final MountPosition mountPosition;

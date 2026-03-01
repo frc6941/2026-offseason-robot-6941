@@ -18,6 +18,10 @@ public class IntakeConfig {
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
     public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
+    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 35;
+    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 20;
+    private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
+    private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
 
     public static final SubsystemConfig INTAKER_ROLLER_CONFIG =
             SubsystemConfig.builder()
@@ -43,6 +47,8 @@ public class IntakeConfig {
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseClosedLoopSign)
                     .SensorToMechanismRatio(INTAKER_EXTENSION_GEAR_RATIO)
+                    .statorCurrentLimitAmps(INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS)
+                    .supplyCurrentLimitAmps(INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(INTAKER_EXTENSION_GEAR_RATIO)
@@ -78,7 +84,7 @@ public class IntakeConfig {
     @NTParameter(tableName = "Params/" + INTAKER_EXTENSION_NAME)
     public static final class IntakerExtensionParams {
 
-        public static final double kP = 3.75;
+        public static final double kP = 15;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0.1308;
@@ -86,15 +92,15 @@ public class IntakeConfig {
         public static final double kS = 0.13;
 
         // Motion Magic
-        public static final double motionMagicVelRPS = 250.0;
-        public static final double motionMagicAccelRPS2 = 600.0;
+        public static final double motionMagicVelRPS = 1000.0;
+        public static final double motionMagicAccelRPS2 = 150.0;
         public static final double motionMagicJerkRPS3 = 0.0;
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.29;
+        public static final double deployPosMeters = 0.3;
         public static final double feedPosMeters = 0.07;
-        public static final double retractPosMeters = 0.0;
+        public static final double retractPosMeters = 0.1;
 
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
         public static final double feedOscillationRateHz = 0.5;

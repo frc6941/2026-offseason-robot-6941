@@ -9,6 +9,7 @@ import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,7 +32,6 @@ import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
-import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.nio.file.Path;
 import java.util.Map;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -62,16 +62,17 @@ import lombok.SneakyThrows;
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
     private static final boolean HAS_TURRET_IO = true;
-    private static final boolean HAS_SHOOTER_IO = false;
+    private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-    private static final boolean HAS_INTAKER_ROLLER_IO = false;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = false;
+    private static final boolean HAS_INTAKER_ROLLER_IO = true;
+    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController oprator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
     private TargetMode activeTargetMode = TargetMode.GOAL;
     private final Swerve swerve;
@@ -89,6 +90,7 @@ public class RobotContainer {
 
     @SneakyThrows
     public RobotContainer() {
+        SignalLogger.enableAutoLogging(false);
         final boolean isReal = RobotBase.isReal();
 
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
@@ -113,9 +115,10 @@ public class RobotContainer {
                         TargetMode.GOAL,
                         deploy.resolve("results_GOAL.json"),
                         TargetMode.FEED,
-                        deploy.resolve("results_FEED.json")));
+                        deploy.resolve("results_PASS.json")));
 
-        shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
+        shootingSuperstructure =
+                new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
 
@@ -137,6 +140,7 @@ public class RobotContainer {
     }
 
     public void robotPeriodic() {
+
         // update IO inputs
         PhoenixUtils.refreshAll();
         // update NTparameters
@@ -163,69 +167,41 @@ public class RobotContainer {
                         RobotStateRecorder.kFrameShot);
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
+        RobotStateRecorder.putVelocityRobotCmd(now, swerve.getChassisSpeedsCmd());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
     }
 
     private void configureBindings() {
         // INTAKE
-        // driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        // driver.a().whileTrue(intake.runFeed());
-        // driver.povDown().onTrue(intake.runRetract());
-        // driver.back().onTrue(intakerExtension.zeroCommand());
+        driver.leftTrigger().toggleOnTrue(intake.runIntake());
+        driver.leftBumper().onTrue(intake.runRetract());
+        driver.back().onTrue(intakerExtension.zeroCommand());
 
-        driver.leftBumper()
+        // scoring
+        // oprator.rightTrigger()
+        //         .whileTrue(
+        //                 shootingSuperstructure
+        //                         .shootWhenReady()
+        //                         .alongWith(
+        //                                 Commands.runOnce(
+        //                                         () ->
+        //                                                 swerve.setSwerveModuleLimit(
+        //                                                         SwerveMK5Config
+        //                                                                 .kShootingSwerveLimit)))
+        //                         .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+        oprator.rightTrigger()
                 .whileTrue(
-                        shootingSuperstructure.runFrame(
-                                () -> shotCalculator.computeShotFrame(),
-                                () ->
-                                        driver.rightTrigger().getAsBoolean()
-                                                        && turret.getCurrentMode()
-                                                                == TurretMode.TRACKING
-                                                ? ShootingSuperstructure.IdxMode.FEED
-                                                : ShootingSuperstructure.IdxMode.OFF));
-
-        // driver.rightBumper()
-        //         .whileTrue(
-        //                 shootingSuperstructure.runFrame(
-        //                         () -> shotCalculator.computeShotFrame(),
-        //                         () ->
-        //                                 driver.rightTrigger().getAsBoolean()
-        //                                         ? ShootingSuperstructure.IdxMode.FEED
-        //                                         : ShootingSuperstructure.IdxMode.OFF));
-
-        // driver.povLeft().whileTrue(intakerExtension.runPosition(Centimeters.of(32)));
-        // driver.povRight().whileTrue(intakerExtension.runPosition(Centimeters.of(4)));
-        // driver.leftTrigger().whileTrue(intakerRoller.runDutyCycle(1));
-
+                        shootingSuperstructure
+                                .shootWhenReady()
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () ->
+                                                        swerve.setSwerveModuleLimit(
+                                                                SwerveMK5Config
+                                                                        .kShootingSwerveLimit)))
+                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
         // SYSID/test
-        // driver.leftBumper()
-        // .whileTrue(
-        //         shootingSuperstructure.runFrame(
-        //                 () ->
-        //                         new ShotFrame(
-        //                                 shotCalculator
-        //                                         .getShotToTargetTranslation(TargetMode.GOAL)
-        //                                         .getAngle()
-        //                                         .getMeasure(),
-        //                                 Degrees.of(45),
-        //                                 MetersPerSecond.of(12)),
-        //                 () ->
-        //                         driver.rightTrigger().getAsBoolean()
-        //                                 ? ShootingSuperstructure.IdxMode.FEED
-        //                                 : ShootingSuperstructure.IdxMode.OFF));
-        // driver.rightBumper()
-        //         .whileTrue(
-        //                 shootingSuperstructure.runFrame(
-        //                         () ->
-        //                                 new ShotFrame(
-        //                                         Degrees.of(43),
-        //                                         Degrees.of(45),
-        //                                         MetersPerSecond.of(12)),
-        //                         () ->
-        //                                 driver.rightTrigger().getAsBoolean()
-        //                                         ? ShootingSuperstructure.IdxMode.FEED
-        //                                         : ShootingSuperstructure.IdxMode.OFF));
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
         // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
@@ -321,15 +297,13 @@ public class RobotContainer {
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand())
-                                .alongWith(intakerExtension.zeroCommand()));
+                                .alongWith(hood.zeroCommand()));
+        // .alongWith(intakerExtension.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
-
-        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
     }
 
     //Helper methods
@@ -373,7 +347,20 @@ public class RobotContainer {
                 ? new LimelightSubsystem(
                         swerve,
                         new LimelightIOReal(
-                                LimeLightConfig.limelight1Config,
+                                LimeLightConfig.limelightAConfig,
+                                () ->
+                                        RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                        .getRotation()
+                                                        .getDegrees()
+                                                > 360,
+                                LimeLightConfig.asDeviationParams()),
+                        new LimelightIOReal(
+                                LimeLightConfig.limelightBConfig,
                                 () ->
                                         RobotStateRecorder.getPoseWorldRobotCurrent()
                                                 .toPose2d()

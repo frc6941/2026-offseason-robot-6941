@@ -114,6 +114,9 @@ public class SubsystemConfig {
 
         /** If true, follower output is inverted (oppose main). */
         @Default public final MotorAlignmentValue opposeMain = MotorAlignmentValue.Aligned;
+
+        @Default public final double statorCurrentLimitAmps = Double.NaN;
+        @Default public final double supplyCurrentLimitAmps = Double.NaN;
     }
 
     @Builder

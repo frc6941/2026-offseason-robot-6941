@@ -217,6 +217,11 @@ public class Swerve extends SubsystemBase implements Localizable {
         return kinematics.toChassisSpeeds(getModuleStates());
     }
 
+    public ChassisSpeeds getChassisSpeedsCmd() {
+        if (mode != MODE.VELOCITY) return new ChassisSpeeds();
+        return setpointCurr.chassisSpeeds();
+    }
+
     public Pose3d getEstimatedPose() {
         return poseEstimator.getEstimatedPosition();
     }

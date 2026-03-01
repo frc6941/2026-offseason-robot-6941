@@ -27,6 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class RobotStateRecorder extends TransformRecorder {
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
+    private static TimeInterpolatableBuffer<Pose2d> velocityRobotCmdBuffer;
 
     @Getter @Setter
     private static ShotFrame currentFrame =
@@ -52,6 +53,7 @@ public class RobotStateRecorder extends TransformRecorder {
     private RobotStateRecorder() {
         setBufferDuration(2.0);
         velocityRobotBuffer = TimeInterpolatableBuffer.createBuffer(2.0);
+        velocityRobotCmdBuffer = TimeInterpolatableBuffer.createBuffer(2.0);
 
         // add default transforms
         putTransform(
@@ -107,6 +109,12 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());
         Logger.recordOutput(
+                "RobotStateRecorder/velocityRobotCmd",
+                RobotStateRecorder.getVelocityRobotCmdCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/velocityWorldRobotCmd",
+                RobotStateRecorder.getVelocityWorldRobotCmdCurrent());
+        Logger.recordOutput(
                 "RobotStateRecorder/TargetPoseWorld", getPoseWorldTargetCurrent(kFrameTarget));
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/poseShot",
@@ -129,14 +137,25 @@ public class RobotStateRecorder extends TransformRecorder {
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
                 cmdFrame.muzzleSpeed().in(MetersPerSecond));
+        Logger.recordOutput(
+                "RobotStateRecorder/ShotFrame/Distance",
+                getTranslationShotToTargetCurrent(kFrameTarget).getNorm());
     }
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
         velocityRobotBuffer.addSample(time.in(Seconds), toPose2d(speed));
     }
 
+    public static void putVelocityRobotCmd(Time time, ChassisSpeeds speedCmd) {
+        velocityRobotCmdBuffer.addSample(time.in(Seconds), toPose2d(speedCmd));
+    }
+
     public static Pose2d getVelocityRobotCurrent() {
         return velocityRobotBuffer.getSample(Timer.getTimestamp()).orElse(new Pose2d());
+    }
+
+    public static Pose2d getVelocityRobotCmdCurrent() {
+        return velocityRobotCmdBuffer.getSample(Timer.getTimestamp()).orElse(new Pose2d());
     }
 
     public static Pose2d getVelocityWorldRobotCurrent() {
@@ -153,6 +172,22 @@ public class RobotStateRecorder extends TransformRecorder {
 
         // preserve the same angular component
         return new Pose2d(velWorldTrans, velocityRobot.getRotation());
+    }
+
+    public static Pose2d getVelocityWorldRobotCmdCurrent() {
+        // robot-relative command velocity (dx, dy, dθ) and current robot pose in world
+        Pose2d velocityRobotCmd = getVelocityRobotCmdCurrent();
+        Pose3d poseWorldRobot = getPoseWorldRobotCurrent();
+
+        // drop to 2D to get the robot's heading in the XY plane
+        Pose2d pose2dWR = poseWorldRobot.toPose2d();
+        Translation2d velRobotCmdTrans = velocityRobotCmd.getTranslation();
+
+        // rotate the translational velocity by the robot’s heading
+        Translation2d velWorldCmdTrans = velRobotCmdTrans.rotateBy(pose2dWR.getRotation());
+
+        // preserve the same angular component
+        return new Pose2d(velWorldCmdTrans, velocityRobotCmd.getRotation());
     }
 
     public static Pose3d getPoseWorldRobotCurrent() {
@@ -203,13 +238,5 @@ public class RobotStateRecorder extends TransformRecorder {
         Translation3d delta =
                 targetPoseWorld.getTranslation().minus(shotPoseWorld.getTranslation());
         return delta.toTranslation2d();
-    }
-
-    public static Translation2d getVelocityTargetRobotCurrent(String targetFrame) {
-        Translation2d shotToTarget = getTranslationShotToTargetCurrent(targetFrame);
-        Translation2d velWorld = getVelocityWorldRobotCurrent().getTranslation();
-        Translation2d velTarget =
-                velWorld.rotateBy(shotToTarget.getAngle().unaryMinus()); // +X is toward target
-        return velTarget;
     }
 }
