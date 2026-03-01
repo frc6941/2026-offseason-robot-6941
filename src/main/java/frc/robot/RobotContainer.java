@@ -275,6 +275,7 @@ public class RobotContainer {
         //                         Degrees.of(2)));
 
         driver.a().whileTrue(AutoActions.driveToSweepStart(true));
+        driver.b().whileTrue(AutoActions.testPath());
         // Swerve
         driver.start()
                 .onTrue(
@@ -306,7 +307,7 @@ public class RobotContainer {
                                 .ignoringDisable(true));
     }
 
-    //Helper methods
+    // Helper methods
 
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
         return new VelocityMotorSubsystem<>(

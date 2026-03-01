@@ -36,7 +36,6 @@ import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
 import lib.ironpulse.swerve.commands.SwerveDriveToPose;
 import lib.ironpulse.utils.AllianceFlipUtil;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoActions {
@@ -53,13 +52,9 @@ public class AutoActions {
     public static final Pose2d kSlopeFrontR =
             new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
 
-
-            public static final Pose2d kTestA =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-            public static final Pose2d kTestB =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-            public static final Pose2d kTestC =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));          
+    public static final Pose2d kTestA = new Pose2d(3.490, 7.37, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kTestB = new Pose2d(1.639, 3.588, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kTestC = new Pose2d(3.49, 0.59, new Rotation2d(Degrees.of(0)));
 
     private static Swerve swerve;
     private static ShootingSuperstructure shooter;
@@ -88,13 +83,13 @@ public class AutoActions {
                         () -> new Pose3d(slopeFront),
                         () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
                         new PIDController(
-                                AutoParamsNT.kpStrave.getValue(),
-                                AutoParamsNT.kiStrave.getValue(),
-                                AutoParamsNT.kdStrave.getValue()),
+                                AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
+                                AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
+                                AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
                         new PIDController(
-                                AutoParamsNT.kpSpin.getValue(),
-                                AutoParamsNT.kiSpin.getValue(),
-                                AutoParamsNT.kdSpin.getValue()),
+                                AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
+                                AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
+                                AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
                         edu.wpi.first.units.Units.Meters.of(0.2),
                         Degrees.of(2));
 
@@ -114,12 +109,15 @@ public class AutoActions {
                         });
 
         return Commands.sequence(
-                Commands.deadline(waitPitchSettled, driveToSlopeFront), driveToSweepStart).alongWith(Commands.runOnce(() -> {
-                    Logger.recordOutput("Temp/hasCrossedBump", hasCrossedBump(true));
-                    Logger.recordOutput("Temp/pitchStable", isPitchStable());
-                }));
+                        Commands.deadline(waitPitchSettled, driveToSlopeFront), driveToSweepStart)
+                .alongWith(
+                        Commands.runOnce(
+                                () -> {
+                                    Logger.recordOutput(
+                                            "Temp/hasCrossedBump", hasCrossedBump(true));
+                                    Logger.recordOutput("Temp/pitchStable", isPitchStable());
+                                }));
     }
-
 
     public static Command followPath(PathPlannerPath path) {
         return new FollowPathCommand(
@@ -130,8 +128,14 @@ public class AutoActions {
                             swerve.runTwist(vel);
                         },
                         new PPHolonomicDriveController(
-                                new PIDConstants(5.5, 0.0, 0.0),
-                                new PIDConstants(3.0, 0.0, 0.1),
+                                new PIDConstants(
+                                        AutoParamsNT.AutoPathParams.kpStrave.getValue(),
+                                        AutoParamsNT.AutoPathParams.kiStrave.getValue(),
+                                        AutoParamsNT.AutoPathParams.kdStrave.getValue()),
+                                new PIDConstants(
+                                        AutoParamsNT.AutoPathParams.kpSpin.getValue(),
+                                        AutoParamsNT.AutoPathParams.kiSpin.getValue(),
+                                        AutoParamsNT.AutoPathParams.kdSpin.getValue()),
                                 RobotConstants.LOOPER_DT),
                         RobotConstants.AUTO_ROBOT_CONFIG,
                         () -> false, // do not flip in command, flip done by user before passing
@@ -171,18 +175,20 @@ public class AutoActions {
 
     // Helpermethod
 
-    
-    private static Command testPath() {
-    return swerve.defer(
-            () -> {
-                Pose2d current =
-                        RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
-                List<Pose2d> waypoints = List.of(current, kTestB, kTestC);
-                PathPlannerPath path =
-                        generatePath(
-                                waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
-                return followPath(path);
-            });
+    public static Command testPath() {
+        return swerve.defer(
+                () -> {
+                    Pose2d current = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
+                    List<Pose2d> waypoints =
+                            List.of(
+                                    current,
+                                    AllianceFlipUtil.apply(kTestA),
+                                    AllianceFlipUtil.apply(kTestB),
+                                    AllianceFlipUtil.apply(kTestC));
+                    PathPlannerPath path =
+                            generatePath(waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
+                    return followPath(path);
+                });
     }
 
     private static boolean isPitchStable() {
