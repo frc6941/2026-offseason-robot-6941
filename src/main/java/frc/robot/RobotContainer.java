@@ -188,7 +188,7 @@ public class RobotContainer {
         //                                                         SwerveMK5Config
         //                                                                 .kShootingSwerveLimit)))
         //                         .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
-        driver.rightTrigger()
+        oprator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady()

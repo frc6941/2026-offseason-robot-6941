@@ -70,6 +70,8 @@ public class ShotCalculator {
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
     private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
             tableByTarget = new EnumMap<>(TargetMode.class);
+    private int laneSwitchCounter = 0;
+    private int laneSign = 1;
 
     /** Loads model tables by target. */
     public void initialize(Map<TargetMode, Path> modelJsonByTarget) {
@@ -150,9 +152,27 @@ public class ShotCalculator {
 
         Translation2d shotToTargetPredicted =
                 calculateLookfwdPose(shotToTargetCurrent, velocityWorldRobotCurrent, totalCycles);
-        double distanceMeters = shotToTargetPredicted.getNorm();
+        boolean laneSwitchRequested =
+                mode == TargetMode.GOAL
+                        && ShotCalculatorParamsNT.laneSwitchEnabled.getValue() > 0.5;
+        boolean laneSwitchNear =
+                shotToTargetPredicted.getNorm()
+                        <= ShotCalculatorParamsNT.laneSwitchNearDistanceMeters.getValue();
+        boolean laneSwitchActive = laneSwitchRequested && laneSwitchNear;
+        int laneSignApplied = updateLaneSign(laneSwitchActive);
+        double laneHalfSeparationMeters =
+                ShotCalculatorParamsNT.laneHalfSeparationMeters.getValue();
+
+        Translation2d shotToTargetLaneAdjusted =
+                applyLaneOffset(
+                        shotToTargetPredicted,
+                        laneSwitchActive,
+                        laneSignApplied,
+                        laneHalfSeparationMeters);
+        double distanceMeters = shotToTargetLaneAdjusted.getNorm();
         Translation2d targetVelocityPredicted =
-                velocityWorldRobotCurrent.rotateBy(shotToTargetPredicted.getAngle().unaryMinus());
+                velocityWorldRobotCurrent.rotateBy(
+                        shotToTargetLaneAdjusted.getAngle().unaryMinus());
         double vParallel = targetVelocityPredicted.getX();
         double vPerp = targetVelocityPredicted.getY();
 
@@ -167,15 +187,53 @@ public class ShotCalculator {
         Logger.recordOutput("ShotCalculator/lookfwd/totalCycles", totalCycles);
         Logger.recordOutput(
                 "ShotCalculator/lookfwd/shotPoseWorldPredicted", shotPoseWorldPredicted);
+        Logger.recordOutput("ShotCalculator/laneSwitch/active", laneSwitchActive);
+        Logger.recordOutput("ShotCalculator/laneSwitch/sign", laneSignApplied);
+        Logger.recordOutput(
+                "ShotCalculator/laneSwitch/appliedOffsetMeters",
+                laneSwitchActive ? laneSignApplied * laneHalfSeparationMeters : 0.0);
+        Logger.recordOutput(
+                "ShotCalculator/laneSwitch/targetDistanceMeters",
+                shotToTargetLaneAdjusted.getNorm());
 
         ShotModel model = lookupModel(distanceMeters, vParallel, mode);
         model = applyModelTuning(model, mode);
 
-        Angle turretYawRad = solveTurretYaw(shotToTargetPredicted, vPerp, model);
+        Angle turretYawRad = solveTurretYaw(shotToTargetLaneAdjusted, vPerp, model);
         return new ShotFrame(
                 turretYawRad,
                 Degrees.of(90).minus(Degrees.of(model.launchAngleDeg)),
                 MetersPerSecond.of(model.exitSpeedMps));
+    }
+
+    private int updateLaneSign(boolean laneSwitchActive) {
+        if (!laneSwitchActive) {
+            laneSwitchCounter = 0;
+            laneSign = 1;
+            return laneSign;
+        }
+        int switchCycles =
+                Math.max(1, (int) Math.round(ShotCalculatorParamsNT.laneSwitchCycles.getValue()));
+        laneSwitchCounter++;
+        if (laneSwitchCounter >= switchCycles) {
+            laneSwitchCounter = 0;
+            laneSign *= -1;
+        }
+        return laneSign;
+    }
+
+    private Translation2d applyLaneOffset(
+            Translation2d shotToTarget,
+            boolean laneSwitchActive,
+            int laneSignApplied,
+            double laneHalfSeparationMeters) {
+        if (!laneSwitchActive || shotToTarget.getNorm() < 1e-6 || laneHalfSeparationMeters <= 0.0) {
+            return shotToTarget;
+        }
+
+        Translation2d lateralUnit =
+                new Translation2d(1.0, shotToTarget.getAngle().plus(Rotation2d.fromDegrees(90.0)));
+        return shotToTarget.plus(lateralUnit.times(laneSignApplied * laneHalfSeparationMeters));
     }
 
     public Translation2d calculateLookfwdPose(
