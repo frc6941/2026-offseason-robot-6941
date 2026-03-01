@@ -36,30 +36,29 @@ import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
 import lib.ironpulse.swerve.commands.SwerveDriveToPose;
 import lib.ironpulse.utils.AllianceFlipUtil;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoActions {
     public static final Pose2d kSweepStartPoseL =
-            new Pose2d(7.972, 6.928, new Rotation2d(Degrees.of(0)));
+            new Pose2d(7.54, 5.79, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepStartPoseR =
-            new Pose2d(7.972, 1.126, new Rotation2d(Degrees.of(90)));
+            new Pose2d(7.54, 2.21, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepEndPoseL =
-            new Pose2d(7.972, 6.928, new Rotation2d(Degrees.of(0)));
+            new Pose2d(7.54, 5.79, new Rotation2d(Degrees.of(90)));
     public static final Pose2d kSweepEndPoseR =
-            new Pose2d(7.972, 1.126, new Rotation2d(Degrees.of(0)));
+            new Pose2d(7.54, 2.21, new Rotation2d(Degrees.of(-90)));
     public static final Pose2d kSlopeFrontL =
-            new Pose2d(5.84, 5.79, new Rotation2d(Degrees.of(45)));
+            new Pose2d(5.84, 5.79, new Rotation2d(Degrees.of(-45)));
     public static final Pose2d kSlopeFrontR =
             new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kSlopeEndL =
+            new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kSlopeEndR =
+            new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
 
-
-            public static final Pose2d kTestA =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-            public static final Pose2d kTestB =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-            public static final Pose2d kTestC =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));          
+    public static final Pose2d kTestA = new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kTestB = new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kTestC = new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
 
     private static Swerve swerve;
     private static ShootingSuperstructure shooter;
@@ -77,49 +76,56 @@ public class AutoActions {
         AutoActions.intake = intake;
     }
 
-    public static Command driveToSweepStart(boolean isLeft) {
+    static Command drivePastSlopeCommand(boolean isLeft, boolean isToNeutral) {
         Pose2d slopeFront = AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
-        Pose2d sweepStart = AllianceFlipUtil.apply(isLeft ? kSweepStartPoseL : kSweepStartPoseR);
-
-        Command driveToSlopeFront =
-                new SwerveDriveToPose(
-                        swerve,
-                        () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                        () -> new Pose3d(slopeFront),
-                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
-                        new PIDController(
-                                AutoParamsNT.kpStrave.getValue(),
-                                AutoParamsNT.kiStrave.getValue(),
-                                AutoParamsNT.kdStrave.getValue()),
-                        new PIDController(
-                                AutoParamsNT.kpSpin.getValue(),
-                                AutoParamsNT.kiSpin.getValue(),
-                                AutoParamsNT.kdSpin.getValue()),
-                        edu.wpi.first.units.Units.Meters.of(0.2),
-                        Degrees.of(2));
-
-        Command waitPitchSettled =
-                Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(true));
-
-        Command driveToSweepStart =
-                swerve.defer(
-                        () -> {
-                            Pose2d current =
-                                    RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
-                            List<Pose2d> waypoints = List.of(current, sweepStart);
-                            PathPlannerPath path =
-                                    generatePath(
-                                            waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
-                            return followPath(path);
-                        });
-
-        return Commands.sequence(
-                Commands.deadline(waitPitchSettled, driveToSlopeFront), driveToSweepStart).alongWith(Commands.runOnce(() -> {
-                    Logger.recordOutput("Temp/hasCrossedBump", hasCrossedBump(true));
-                    Logger.recordOutput("Temp/pitchStable", isPitchStable());
-                }));
+        Pose2d slopeEnd = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
+        Pose2d targetPose = isToNeutral ? slopeEnd : slopeFront;
+        Command drivePastSlope = new SwerveDriveToPose(
+                swerve,
+                () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                () -> new Pose3d(targetPose),
+                () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                new PIDController(
+                        AutoParamsNT.kpStrave.getValue(),
+                        AutoParamsNT.kiStrave.getValue(),
+                        AutoParamsNT.kdStrave.getValue()),
+                new PIDController(
+                        AutoParamsNT.kpSpin.getValue(),
+                        AutoParamsNT.kiSpin.getValue(),
+                        AutoParamsNT.kdSpin.getValue()),
+                edu.wpi.first.units.Units.Meters.of(0.2),
+                Degrees.of(2));
+        return Commands.deadline(waitCrossedBump(isToNeutral), drivePastSlope);
     }
 
+    static Command waitCrossedBump(boolean isToNeutral) {
+        return Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(isToNeutral));
+    }
+
+    static Command driveToSweepPathCommand(boolean isLeft) {
+        Pose2d sweepStart = AllianceFlipUtil.apply(isLeft ? kSweepStartPoseL : kSweepStartPoseR);
+        Pose2d sweepEnd = AllianceFlipUtil.apply(isLeft ? kSweepEndPoseR : kSweepEndPoseL);
+        return swerve.defer(
+                () -> {
+                    Pose2d current = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
+                    List<Pose2d> waypoints = List.of(current, sweepStart, sweepEnd);
+                    PathPlannerPath path =
+                            generatePath(waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
+                    return followPath(path);
+                });
+    }
+
+
+    public static boolean hasCrossedBump(boolean isToNeutral) {
+        return isToNeutral
+                ? AllianceFlipUtil.applyX(getRobotX())
+                        > FieldConstants.LinesVertical.neutralZoneNear
+                : AllianceFlipUtil.applyX(getRobotX()) < FieldConstants.LinesVertical.starting;
+    }
+
+    public static boolean isPitchStable() {
+        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
+    }
 
     public static Command followPath(PathPlannerPath path) {
         return new FollowPathCommand(
@@ -171,34 +177,22 @@ public class AutoActions {
 
     // Helpermethod
 
-    
     private static Command testPath() {
-    return swerve.defer(
-            () -> {
-                Pose2d current =
-                        RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
-                List<Pose2d> waypoints = List.of(current, kTestB, kTestC);
-                PathPlannerPath path =
-                        generatePath(
-                                waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
-                return followPath(path);
-            });
+        return swerve.defer(
+                () -> {
+                    Pose2d current = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
+                    List<Pose2d> waypoints = List.of(current, kTestB, kTestC);
+                    PathPlannerPath path =
+                            generatePath(waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
+                    return followPath(path);
+                });
     }
 
-    private static boolean isPitchStable() {
-        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
-    }
 
     private static double getRobotX() {
         return RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getX();
     }
 
-    private static boolean hasCrossedBump(boolean isToNeutral) {
-        return isToNeutral
-                ? AllianceFlipUtil.applyX(getRobotX())
-                        > FieldConstants.LinesVertical.neutralZoneNear
-                : AllianceFlipUtil.applyX(getRobotX()) < FieldConstants.LinesVertical.starting;
-    }
 
     public static Command resetOnPose(Pose2d pose) {
         var resetPose = new Pose3d(AllianceFlipUtil.apply(pose));

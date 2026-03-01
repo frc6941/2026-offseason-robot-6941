@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoActions;
+import frc.robot.auto.AutoRoutines;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.SerialSubsystem.SerialSubsystem;
@@ -274,7 +275,7 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.driveToSweepStart(true));
+        driver.a().whileTrue(AutoRoutines.driveToSweepStart(true));
         // Swerve
         driver.start()
                 .onTrue(
@@ -306,7 +307,7 @@ public class RobotContainer {
                                 .ignoringDisable(true));
     }
 
-    //Helper methods
+    // Helper methods
 
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
         return new VelocityMotorSubsystem<>(
