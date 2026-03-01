@@ -56,9 +56,9 @@ public class AutoActions {
     public static final Pose2d kSlopeEndR =
             new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
 
-    public static final Pose2d kTestA = new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-    public static final Pose2d kTestB = new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
-    public static final Pose2d kTestC = new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kTestA = new Pose2d(3.490, 7.37, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kTestB = new Pose2d(1.639, 3.588, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kTestC = new Pose2d(3.49, 0.59, new Rotation2d(Degrees.of(0)));
 
     private static Swerve swerve;
     private static ShootingSuperstructure shooter;
@@ -136,8 +136,14 @@ public class AutoActions {
                             swerve.runTwist(vel);
                         },
                         new PPHolonomicDriveController(
-                                new PIDConstants(5.5, 0.0, 0.0),
-                                new PIDConstants(3.0, 0.0, 0.1),
+                                new PIDConstants(
+                                        AutoParamsNT.AutoPathParams.kpStrave.getValue(),
+                                        AutoParamsNT.AutoPathParams.kiStrave.getValue(),
+                                        AutoParamsNT.AutoPathParams.kdStrave.getValue()),
+                                new PIDConstants(
+                                        AutoParamsNT.AutoPathParams.kpSpin.getValue(),
+                                        AutoParamsNT.AutoPathParams.kiSpin.getValue(),
+                                        AutoParamsNT.AutoPathParams.kdSpin.getValue()),
                                 RobotConstants.LOOPER_DT),
                         RobotConstants.AUTO_ROBOT_CONFIG,
                         () -> false, // do not flip in command, flip done by user before passing
@@ -177,11 +183,16 @@ public class AutoActions {
 
     // Helpermethod
 
-    private static Command testPath() {
+    public static Command testPath() {
         return swerve.defer(
                 () -> {
                     Pose2d current = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
-                    List<Pose2d> waypoints = List.of(current, kTestB, kTestC);
+                    List<Pose2d> waypoints =
+                            List.of(
+                                    current,
+                                    AllianceFlipUtil.apply(kTestA),
+                                    AllianceFlipUtil.apply(kTestB),
+                                    AllianceFlipUtil.apply(kTestC));
                     PathPlannerPath path =
                             generatePath(waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
                     return followPath(path);
