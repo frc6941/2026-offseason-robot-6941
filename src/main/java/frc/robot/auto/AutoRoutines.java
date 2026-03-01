@@ -9,8 +9,7 @@ public class AutoRoutines {
         Command drivePastSlope = AutoActions.drivePastSlopeCommand(isLeft, true);
         Command driveToSweepPath = AutoActions.driveToSweepPathCommand(isLeft);
 
-        return Commands.sequence(
-                        drivePastSlope, driveToSweepPath)
+        return Commands.sequence(drivePastSlope, driveToSweepPath)
                 .alongWith(
                         Commands.runOnce(
                                 () -> {
@@ -21,4 +20,4 @@ public class AutoRoutines {
                                             "Temp/pitchStable", AutoActions.isPitchStable());
                                 }));
     }
-}  
+}
