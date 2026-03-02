@@ -3,6 +3,7 @@ package frc.robot.auto;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
@@ -55,6 +56,8 @@ public class AutoActions {
             new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeEndR =
             new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kStationIntake =
+            new Pose2d(0.641, 0.691, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));
@@ -81,26 +84,11 @@ public class AutoActions {
         AutoActions.intake = intake;
     }
 
-    static Command drivePastSlopeCommand(boolean isLeft, boolean isToNeutral) {
+    static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
         Pose2d slopeFront = AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
         Pose2d slopeEnd = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
         Pose2d targetPose = isToNeutral ? slopeEnd : slopeFront;
-        Command drivePastSlope =
-                new SwerveDriveToPose(
-                        swerve,
-                        () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                        () -> new Pose3d(targetPose),
-                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
-                        new PIDController(
-                                AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
-                                AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
-                                AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
-                        new PIDController(
-                                AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
-                                AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
-                                AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
-                        edu.wpi.first.units.Units.Meters.of(0.2),
-                        Degrees.of(2));
+        Command drivePastSlope = driveToPose(targetPose);
         return Commands.deadline(waitCrossedBump(isToNeutral), drivePastSlope);
     }
 
@@ -108,7 +96,7 @@ public class AutoActions {
         return Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(isToNeutral));
     }
 
-    static Command driveToSweepPathCommand(boolean isLeft) {
+    static Command driveSweep(boolean isLeft) {
         Pose2d sweepStart = AllianceFlipUtil.apply(isLeft ? kSweepStartPoseL : kSweepStartPoseR);
         Pose2d sweepEnd = AllianceFlipUtil.apply(isLeft ? kSweepEndPoseR : kSweepEndPoseL);
         return swerve.defer(
@@ -130,6 +118,25 @@ public class AutoActions {
 
     public static boolean isPitchStable() {
         return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
+    }
+
+    static Command driveToPose(Pose2d targetPose) {
+        return new SwerveDriveToPose(
+                swerve,
+                () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                () -> new Pose3d(targetPose),
+                () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                new PIDController(
+                        AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
+                        AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
+                        AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
+                new PIDController(
+                        AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
+                        AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
+                        AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
+                Meters.of(
+                        AutoParamsNT.AutoPoseParams.tolerancePositionM.getValue()),
+                Degrees.of(AutoParamsNT.AutoPoseParams.toleranceHeadingDeg.getValue()));
     }
 
     public static Command followPath(PathPlannerPath path) {
@@ -188,6 +195,18 @@ public class AutoActions {
     public static PathPlannerPath generatePath(
             List<Pose2d> waypoints, List<RotationTarget> rotationTargets, double endVelMps) {
         return generatePath(waypoints, rotationTargets, 4.5, 7.0, endVelMps);
+    }
+
+    public static Command Intake() {
+        return intake.runIntake();
+    }
+
+    public static Command retractIntake() {
+        return intake.runRetract();
+    }
+
+    public static Command shoot() {
+        return shooter.shootWhenReady();
     }
 
     // Helpermethod

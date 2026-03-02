@@ -12,6 +12,8 @@ public class AutoConfig {
             public static final double kpSpin = 4;
             public static final double kiSpin = 0.0;
             public static final double kdSpin = 0.0;
+            public static final double tolerancePositionM = 0.2;
+            public static final double toleranceHeadingDeg = 2.0;
         }
 
         public static final class AutoPathParams {
