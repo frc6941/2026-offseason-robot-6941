@@ -84,7 +84,6 @@ public class RobotContainer {
     private final VelocityMotorSubsystem intakerRoller;
     private final PositionMotorSubsystem intakerExtension;
     private final IndicatorSubsystem indicatorSubsystem;
-    private final SerialSubsystem serialSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -99,8 +98,6 @@ public class RobotContainer {
         turret = buildTurret(isReal && HAS_TURRET_IO);
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
         spindexer = buildSpindexer(isReal && HAS_IDX_IO);
-
-        serialSubsystem = buildSerial(isReal);
 
         indicatorSubsystem = buildIndicator(isReal);
 
@@ -450,10 +447,6 @@ public class RobotContainer {
                 IntakerExtensionParamsNT.asPositionParamSources(),
                 Meters.of(0),
                 IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION);
-    }
-
-    private SerialSubsystem buildSerial(boolean isReal) {
-        return new SerialSubsystem();
     }
 
     public Command getAutonomousCommand() {
