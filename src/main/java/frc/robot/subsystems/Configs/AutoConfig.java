@@ -15,12 +15,12 @@ public class AutoConfig {
         }
 
         public static final class AutoPathParams {
-            public static final double kpStrave = 4;
+            public static final double kpStrave = 5;
             public static final double kiStrave = 0.0;
             public static final double kdStrave = 0.0;
-            public static final double kpSpin = 4;
+            public static final double kpSpin = 3;
             public static final double kiSpin = 0.0;
-            public static final double kdSpin = 0.0;
+            public static final double kdSpin = 0.1;
         }
     }
 }
