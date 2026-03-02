@@ -1,28 +1,32 @@
 package frc.robot.subsystems.Configs;
 
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
+import static frc.robot.RobotConstants.is10541;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import lib.ironpulse.subsystem.SubsystemConfig;
 import lib.ntext.NTParameter;
 
 public class IdxConfig {
     public static final String SPINDEXER = "Spindexer";
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 75;
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 75;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 55;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 55;
     public static final double SPINDEXER_GEAR_RATIO =
-            20.0 / 1.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
-    public static final double INDEXER_GEAR_RATIO =
-            20.0 / 1.0 * 42.0 / 20.0 / 86.0 * 12.0 / 28.0 * 22.0 / 22.0
-                    * 15.0; // RATIO FROM MOTOR TO INDEXER, NOT USED IN CODE
+            9.0 / 1.0 * 32 / 20 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     private static final int SPINDEXER_ID = 58;
+
+    private static final int SPINDEXER_FOLLOWER_ID = 59;
     public static final SubsystemConfig SPINDEXER_CFG =
             SubsystemConfig.builder()
                     .name(SPINDEXER)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(SPINDEXER_ID)
-                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
+                    .motorInvertedValue(
+                            is10541
+                                    ? InvertedValue.CounterClockwise_Positive
+                                    : InvertedValue.Clockwise_Positive)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(SPINDEXER_GEAR_RATIO)
@@ -30,6 +34,16 @@ public class IdxConfig {
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(SPINDEXER_GEAR_RATIO)
                                     .build())
+                    .followers(
+                            new SubsystemConfig.FollowerConfig[] {
+                                SubsystemConfig.FollowerConfig.builder()
+                                        .id(SPINDEXER_FOLLOWER_ID)
+                                        .bus(CANIVORE_CAN_BUS)
+                                        .opposeMain(MotorAlignmentValue.Aligned)
+                                        .statorCurrentLimitAmps(STATOR_CURRENT_LIMIT_AMPS)
+                                        .supplyCurrentLimitAmps(SUPPLY_CURRENT_LIMIT_AMPS)
+                                        .build()
+                            })
                     .statorCurrentLimitAmps(STATOR_CURRENT_LIMIT_AMPS)
                     .supplyCurrentLimitAmps(SUPPLY_CURRENT_LIMIT_AMPS)
                     .build();
@@ -47,12 +61,12 @@ public class IdxConfig {
     @NTParameter(tableName = "Params/" + SPINDEXER)
     public static final class SpindexerParams {
         // TODO: sysId
-        public static final double kP = 15;
+        public static final double kP = 10;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kV = 5;
+        public static final double kV = 3.2;
         public static final double kA = 0.0;
-        public static final double kS = 0.4;
+        public static final double kS = 0.25;
 
         public static final boolean isBrake = true;
 

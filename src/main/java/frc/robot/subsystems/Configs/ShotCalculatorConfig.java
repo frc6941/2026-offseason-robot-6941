@@ -23,7 +23,7 @@ public final class ShotCalculatorConfig {
         public static final double lookfwdDelayCycles = 0;
         public static final double lookfwdFlightScale = 0;
         // Two-lane switching for close-range deconfliction.
-        public static final double laneSwitchEnabled = 1.0;
+        public static final double laneSwitchEnabled = 0;
         public static final double laneHalfSeparationMeters = 0.1;
         public static final double laneSwitchCycles = 15.0;
         public static final double laneSwitchNearDistanceMeters = 2.5;
