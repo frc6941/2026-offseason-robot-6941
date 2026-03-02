@@ -156,8 +156,8 @@ public final class SwerveMK5Config {
                     .odometryFrequency(Hertz.of(100))
                     .driveStatorCurrentLimit(Amps.of(80))
                     .driveSupplyCurrentLimit(Amps.of(80))
-                    .steerStatorCurrentLimit(Amps.of(60))
-                    .steerSupplyCurrentLimit(Amps.of(60))
+                    .steerStatorCurrentLimit(Amps.of(90))
+                    .steerSupplyCurrentLimit(Amps.of(90))
                     .canivoreCanBus(CANIVORE_CAN_BUS)
                     .pigeonId(RobotConstants.PIGEON_ID)
                     .build();
@@ -178,7 +178,7 @@ public final class SwerveMK5Config {
         }
 
         private static final class Steer {
-            static final double kP = 15;
+            static final double kP = 40;
             static final double kI = 0;
             static final double kD = 0.1;
             static final double kS = 0;

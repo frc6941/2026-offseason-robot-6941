@@ -274,7 +274,7 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.driveToSweepStart(true));
+        // driver.a().whileTrue(AutoActions.driveToSweepStart(true));
         driver.b().whileTrue(AutoActions.testPath());
         // Swerve
         driver.start()
