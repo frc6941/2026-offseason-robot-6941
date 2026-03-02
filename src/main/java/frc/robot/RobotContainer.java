@@ -65,9 +65,9 @@ public class RobotContainer {
     private static final boolean HAS_SHOOTER_IO = true;
     private static final boolean HAS_HOOD_IO = true;
     private static final boolean HAS_IDX_IO = true;
-    private static final boolean HAS_INTAKER_ROLLER_IO = false;
+    private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = false;
+    private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
@@ -134,7 +134,25 @@ public class RobotContainer {
                         DegreesPerSecond.of(3.0)));
         intake.setDefaultCommand();
 
-        indicatorSubsystem.setDefaultCommand(indicatorSubsystem.indicate(Patterns.NORMAL));
+        indicatorSubsystem.setDefaultCommand(
+                Commands.runOnce(
+                                () -> {
+                                    if (!DriverStation.isEnabled()) {
+                                        if (DriverStation.isDSAttached()) {
+                                            indicatorSubsystem.setPattern(
+                                                    AllianceFlipUtil.shouldFlip()
+                                                            ? Patterns.RED_ALLIANCE
+                                                            : Patterns.BLUE_ALLIANCE);
+                                        } else {
+                                            indicatorSubsystem.setPattern(Patterns.LOSS);
+                                        }
+                                    } else {
+                                        indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                    }
+                                },
+                                indicatorSubsystem)
+                        .onlyIf(() -> !indicatorSubsystem.isOutsideDefault())
+                        .ignoringDisable(true));
     }
 
     public void robotPeriodic() {

@@ -33,9 +33,9 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = 250;
+        public static final double rpmA = 253;
         public static final double rpmB = 0;
-        public static final double rpmC = 170;
+        public static final double rpmC = 200;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;

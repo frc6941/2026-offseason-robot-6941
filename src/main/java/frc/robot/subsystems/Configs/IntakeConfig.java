@@ -98,7 +98,7 @@ public class IntakeConfig {
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.3;
+        public static final double deployPosMeters = 0.31;
         public static final double feedPosMeters = 0.07;
         public static final double retractPosMeters = 0.1;
 
