@@ -56,15 +56,65 @@ public class LimelightIOReal implements LimelightIO {
      */
     @Override
     public double getReliabilityScore(LimelightHelpers.PoseEstimate poseEstimate) {
-        if (poseEstimate.tagCount == 0 || rejectionSupplier.getAsBoolean()) {
-            // no tags or decided to reject
+        double distance = poseEstimate.avgTagDist;
+        double area = poseEstimate.avgTagArea;
+        double span = poseEstimate.tagSpan;
+
+        // hard reject
+        if (distance > 5.5 || area < 0.05 || rejectionSupplier.getAsBoolean()) return 0.0;
+
+        // --- span reliability ---
+        // ideal span: [0.3, 0.5] = 1.0
+        double reliability = getSpanReliability(span, distance, area);
+
+        if (poseEstimate.tagCount == 0) {
+            // no tags
             return 0;
         } else if (poseEstimate.tagCount == 1) {
-            return 0.5 * config.getWeight();
+            return 0.75 * config.getWeight() * reliability;
         } else {
             // tags >= 2
-            return 1 * config.getWeight();
+            return 1 * config.getWeight() * reliability;
         }
+    }
+
+    private static double getSpanReliability(double span, double distance, double area) {
+        // --- span reliability ---
+        double rSpan;
+        if (span <= 0.0) {
+            rSpan = 0.0;
+        } else if (span <= 0.3) {
+            // ramp from 0.6 at span=0 to 1.0 at span=0.3
+            rSpan = 0.6 + 0.4 * (span / 0.3);
+        } else if (span <= 0.5) {
+            // ideal plateau
+            rSpan = 1.0;
+        } else if (span <= 1.0) {
+            // gentle decay from 1.0 at 0.5 to 0.3 at 1.0
+            rSpan = 1.0 - 0.7 * ((span - 0.5) / 0.5);
+        } else if (span <= 2.0) {
+            // further decay from 0.3 at 1.0 down towards 0.05 at 2.0 (capped)
+            rSpan = 0.3 - 0.25 * (span - 1.0);
+            if (rSpan < 0.05) rSpan = 0.05;
+        } else {
+            rSpan = 0.05;
+        }
+
+        // --- distance reliability ---
+        double rDist = 1.0 / (1.0 + (distance / 3.0));
+
+        // --- area reliability ---
+        double normArea = (area - 0.1) / 0.9; // map [0.1, 1.0] -> [0, 1]
+        if (normArea < 0.0) normArea = 0.0;
+        if (normArea > 1.0) normArea = 1.0;
+
+        // sqrt: boosts medium values a bit, softer penalty for not-huge areas
+        double rArea = Math.sqrt(normArea);
+
+        double raw = (rSpan + rDist + rArea) / 3.0;
+        // --- combine using geometric mean ---
+        double reliability = Math.pow(raw, 0.8);
+        return Math.max(0.0, Math.min(1.0, reliability));
     }
 
     @Override
@@ -94,7 +144,7 @@ public class LimelightIOReal implements LimelightIO {
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
             LimelightHelpers.SetIMUMode(
-                    config.getName(), InternalIMUMode.INTERNAL_MT1_ASSIST.getValue());
+                    config.getName(), InternalIMUMode.INTERNAL_EXTERNAL_ASSIST.getValue());
             Logger.recordOutput("Limelight/IMU/Mode", "assisted");
         }
     }
@@ -167,9 +217,9 @@ public class LimelightIOReal implements LimelightIO {
         inputs.latency = estimate.latency;
         inputs.detectedTagIds = Arrays.stream(estimate.rawFiducials).mapToInt(r -> r.id).toArray();
         inputs.reliability = getReliabilityScore(estimate);
+        inputs.tagSpan = estimate.tagSpan;
         inputs.avgTagArea = estimate.avgTagArea;
         inputs.avgTagDist = estimate.avgTagDist;
-        inputs.tagSpan = estimate.tagSpan;
     }
 
     @Override
