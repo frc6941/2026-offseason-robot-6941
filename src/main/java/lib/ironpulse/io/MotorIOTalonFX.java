@@ -212,6 +212,9 @@ public class MotorIOTalonFX implements MotorIO {
         this.fx.MotorOutput.NeutralMode =
                 wantsBreak ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         main.getConfigurator().apply(this.fx);
+        for (int i = 0; i < followers.length; i++) {
+            followers[i].getConfigurator().apply(this.fx);
+        }
     }
 
     @Override

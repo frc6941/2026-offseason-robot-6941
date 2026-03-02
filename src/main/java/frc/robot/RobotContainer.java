@@ -34,6 +34,7 @@ import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
+import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
 import lib.ironpulse.indicator.IndicatorSubsystem;
@@ -83,8 +84,7 @@ public class RobotContainer {
     private final ShootingSuperstructure shootingSuperstructure;
     private final VelocityMotorSubsystem intakerRoller;
     private final PositionMotorSubsystem intakerExtension;
-    // private final IndicatorSubsystem indicatorSubsystem;
-    private final SerialSubsystem serialSubsystem;
+    private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
 
@@ -100,9 +100,7 @@ public class RobotContainer {
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
         spindexer = buildSpindexer(isReal && HAS_IDX_IO);
 
-        serialSubsystem = buildSerial(isReal);
-
-        //    indicator = builIndicator(isReal);
+        indicatorSubsystem = buildIndicator(isReal);
 
         hood = buildHood(isReal && HAS_HOOD_IO);
 
@@ -135,8 +133,25 @@ public class RobotContainer {
                         DegreesPerSecond.of(3.0)));
         intake.setDefaultCommand();
 
-        // indicatorSubsystem.setDefaultCommand(
-        //        indicatorSubsystem.indicate(IndicatorIO.Patterns.NORMAL));
+        indicatorSubsystem.setDefaultCommand(
+                Commands.runOnce(
+                                () -> {
+                                    if (!DriverStation.isEnabled()) {
+                                        if (DriverStation.isDSAttached()) {
+                                            indicatorSubsystem.setPattern(
+                                                    AllianceFlipUtil.shouldFlip()
+                                                            ? Patterns.RED_ALLIANCE
+                                                            : Patterns.BLUE_ALLIANCE);
+                                        } else {
+                                            indicatorSubsystem.setPattern(Patterns.LOSS);
+                                        }
+                                    } else {
+                                        indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                    }
+                                },
+                                indicatorSubsystem)
+                        .onlyIf(() -> !indicatorSubsystem.isOutsideDefault())
+                        .ignoringDisable(true));
     }
 
     public void robotPeriodic() {
@@ -177,7 +192,6 @@ public class RobotContainer {
         driver.leftTrigger().toggleOnTrue(intake.runIntake());
         driver.leftBumper().onTrue(intake.runRetract());
         driver.back().onTrue(intakerExtension.zeroCommand());
-
         // scoring
         // oprator.rightTrigger()
         //         .whileTrue(
@@ -191,6 +205,19 @@ public class RobotContainer {
         //                                                                 .kShootingSwerveLimit)))
         //                         .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
         oprator.rightTrigger()
+                .whileTrue(
+                        shootingSuperstructure
+                                .shootWhenReady()
+                                .alongWith(
+                                        Commands.parallel(
+                                                indicatorSubsystem.indicate(Patterns.AIMING),
+                                                Commands.runOnce(
+                                                        () ->
+                                                                swerve.setSwerveModuleLimit(
+                                                                        SwerveMK5Config
+                                                                                .kShootingSwerveLimit))))
+                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+        driver.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady()
@@ -445,10 +472,6 @@ public class RobotContainer {
                 IntakerExtensionParamsNT.asPositionParamSources(),
                 Meters.of(0),
                 IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION);
-    }
-
-    private SerialSubsystem buildSerial(boolean isReal) {
-        return new SerialSubsystem();
     }
 
     public Command getAutonomousCommand() {

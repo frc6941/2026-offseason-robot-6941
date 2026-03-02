@@ -23,7 +23,7 @@ public final class ShotCalculatorConfig {
         public static final double lookfwdDelayCycles = 0;
         public static final double lookfwdFlightScale = 0;
         // Two-lane switching for close-range deconfliction.
-        public static final double laneSwitchEnabled = 1.0;
+        public static final double laneSwitchEnabled = 0;
         public static final double laneHalfSeparationMeters = 0.1;
         public static final double laneSwitchCycles = 15.0;
         public static final double laneSwitchNearDistanceMeters = 2.5;
@@ -33,9 +33,9 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = 250;
+        public static final double rpmA = 253;
         public static final double rpmB = 0;
-        public static final double rpmC = 170;
+        public static final double rpmC = 200;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;
