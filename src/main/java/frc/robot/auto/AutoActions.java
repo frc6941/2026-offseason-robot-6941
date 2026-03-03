@@ -40,25 +40,32 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoActions {
+    public static final double kVerticalSlopelineL = 5.79;
+    public static final double kVerticalSlopelineR = 2.21;
     public static final Pose2d kSweepStartPoseL =
-            new Pose2d(7.54, 5.79, new Rotation2d(Degrees.of(0)));
+            new Pose2d(7.54, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepStartPoseR =
-            new Pose2d(7.54, 2.21, new Rotation2d(Degrees.of(0)));
+            new Pose2d(7.54, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepEndPoseL =
             new Pose2d(7.54, 5.79, new Rotation2d(Degrees.of(90)));
     public static final Pose2d kSweepEndPoseR =
             new Pose2d(7.54, 2.21, new Rotation2d(Degrees.of(-90)));
+
     public static final Pose2d kSlopeFrontL =
-            new Pose2d(5.84, 5.79, new Rotation2d(Degrees.of(-45)));
+            new Pose2d(5.84, kVerticalSlopelineL, new Rotation2d(Degrees.of(-45)));
     public static final Pose2d kSlopeFrontR =
-            new Pose2d(5.84, 2.227, new Rotation2d(Degrees.of(45)));
+            new Pose2d(5.84, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeEndL =
-            new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
+            new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeEndR =
-            new Pose2d(3.385, 2.227, new Rotation2d(Degrees.of(45)));
+            new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kStationIntake =
             new Pose2d(0.641, 0.691, new Rotation2d(Degrees.of(180)));
 
+    public static final Pose2d kQuickSweependPoseL =
+            new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kQuickSweepEndPoseR =
+            new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));
     public static final Pose2d kTestC = new Pose2d(2.69, 3.07, new Rotation2d(Degrees.of(-110)));
@@ -87,7 +94,7 @@ public class AutoActions {
     static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
         Pose2d slopeFront = AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
         Pose2d slopeEnd = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
-        Pose2d targetPose = isToNeutral ? slopeEnd : slopeFront;
+        Pose2d targetPose = isToNeutral ? slopeFront : slopeEnd;
         Command drivePastSlope = driveToPose(targetPose);
         return Commands.deadline(waitCrossedBump(isToNeutral), drivePastSlope);
     }
@@ -122,21 +129,22 @@ public class AutoActions {
 
     static Command driveToPose(Pose2d targetPose) {
         return new SwerveDriveToPose(
-                swerve,
-                () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                () -> new Pose3d(targetPose),
-                () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
-                new PIDController(
-                        AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
-                        AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
-                        AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
-                new PIDController(
-                        AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
-                        AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
-                        AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
-                Meters.of(
-                        AutoParamsNT.AutoPoseParams.tolerancePositionM.getValue()),
-                Degrees.of(AutoParamsNT.AutoPoseParams.toleranceHeadingDeg.getValue()));
+                        swerve,
+                        () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                        () -> new Pose3d(targetPose),
+                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                        new PIDController(
+                                AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
+                                AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
+                                AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
+                        new PIDController(
+                                AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
+                                AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
+                                AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
+                        Meters.of(AutoParamsNT.AutoPoseParams.tolerancePositionM.getValue()),
+                        Degrees.of(AutoParamsNT.AutoPoseParams.toleranceHeadingDeg.getValue()))
+                .beforeStarting(
+                        Commands.runOnce(() -> Logger.recordOutput("Temp/targetPose", targetPose)));
     }
 
     public static Command followPath(PathPlannerPath path) {
@@ -228,7 +236,23 @@ public class AutoActions {
                     List<RotationTarget> rotationTargets =
                             List.of(rotationTargetA, rotationTargetB);
                     PathPlannerPath path =
-                            generatePath(waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
+                            generatePath(waypoints, Collections.emptyList(), 4.2, 6.0, 0.0);
+                    return followPath(path);
+                });
+    }
+
+    public static Command followPathFile(String pathName) {
+        return swerve.defer(
+                () -> {
+                    PathPlannerPath path;
+                    try {
+                        path = PathPlannerPath.fromPathFile(pathName);
+                    } catch (java.io.IOException | org.json.simple.parser.ParseException e) {
+                        throw new RuntimeException("Failed to load path file: " + pathName, e);
+                    }
+                    if (AllianceFlipUtil.shouldFlip()) {
+                        path = path.flipPath();
+                    }
                     return followPath(path);
                 });
     }

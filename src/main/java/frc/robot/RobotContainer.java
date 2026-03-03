@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoActions;
+import frc.robot.auto.AutoRoutines;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
@@ -300,8 +301,8 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        // driver.a().whileTrue(AutoActions.driveToSweepStart(true));
-        driver.b().whileTrue(AutoActions.testPath());
+        driver.a().whileTrue(AutoActions.followPathFile("testPath"));
+        driver.b().whileTrue(AutoRoutines.quickSweepLeft());
         // Swerve
         driver.start()
                 .onTrue(
