@@ -1,7 +1,5 @@
 package lib.ironpulse.swerve.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
 import static lib.ironpulse.math.MathTools.epsilonEquals;
 import static lib.ironpulse.math.MathTools.toAngle;
 
@@ -13,8 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 import lib.ironpulse.swerve.Swerve;
@@ -33,8 +29,6 @@ public class SwerveDriveToAllign extends Command {
     private final Supplier<Pose2d> finalDestinationSupplier;
     private final PIDController translationController;
     private final PIDController rotationController;
-    private final Distance translationTolerance;
-    private final Angle rotationTolerance;
     private final SwerveLimit precisePointLimit;
     private final double parallelShiftMaxMeters;
     private final double lateralShiftMaxMeters;
@@ -48,10 +42,6 @@ public class SwerveDriveToAllign extends Command {
             Supplier<Pose3d> poseWorldRobotSupplier,
             Supplier<Pose2d> velocityWorldRobotSupplier,
             Supplier<Pose2d> finalDestinationSupplier,
-            PIDController translationController,
-            PIDController rotationController,
-            Distance translationTolerance,
-            Angle rotationTolerance,
             SwerveLimit precisePointLimit,
             double parallelShiftMaxMeters,
             double lateralShiftMaxMeters) {
@@ -59,16 +49,14 @@ public class SwerveDriveToAllign extends Command {
         this.poseWorldRobotSupplier = poseWorldRobotSupplier;
         this.velocityWorldRobotSupplier = velocityWorldRobotSupplier;
         this.finalDestinationSupplier = finalDestinationSupplier;
-        this.translationController = translationController;
-        this.rotationController = rotationController;
-        this.translationTolerance = translationTolerance;
-        this.rotationTolerance = rotationTolerance;
+        this.translationController = new PIDController(0.0, 0.0, 0.0);
+        this.rotationController = new PIDController(0.0, 0.0, 0.0);
         this.precisePointLimit = precisePointLimit;
         this.parallelShiftMaxMeters = Math.max(0.0, parallelShiftMaxMeters);
         this.lateralShiftMaxMeters = Math.max(0.0, lateralShiftMaxMeters);
         addRequirements(swerve);
 
-        rotationController.enableContinuousInput(0, Math.PI * 2);
+        this.rotationController.enableContinuousInput(0, Math.PI * 2);
     }
 
     @Override
@@ -143,7 +131,7 @@ public class SwerveDriveToAllign extends Command {
             lateralScale = 0.0;
         }
 
-        double parallelShift = parallelScale * parallelShiftMaxMeters;
+        double parallelShift = Math.copySign(parallelScale * parallelShiftMaxMeters, offset.getX());
         double lateralShift = Math.copySign(lateralScale * lateralShiftMaxMeters, offset.getY());
 
         return goal.transformBy(new Transform2d(parallelShift, lateralShift, Rotation2d.kZero));
@@ -165,12 +153,12 @@ public class SwerveDriveToAllign extends Command {
                 epsilonEquals(
                         poseRobotFinal.getTranslation().getNorm(),
                         0.0,
-                        translationTolerance.in(Meters));
+                        SwerveDriveToAllignParamsNT.translationToleranceM.getValue());
         boolean rotationOnTarget =
                 epsilonEquals(
                         poseRobotFinal.getRotation().getDegrees(),
                         0.0,
-                        rotationTolerance.in(Degrees));
+                        SwerveDriveToAllignParamsNT.rotationToleranceDeg.getValue());
 
         boolean translationStationary =
                 epsilonEquals(
@@ -204,11 +192,13 @@ public class SwerveDriveToAllign extends Command {
         static final double translationKi = 0.0;
         static final double translationKiZone = 0.0;
         static final double translationKd = 0.1;
+        static final double translationToleranceM = 0.05;
 
         static final double rotationKp = 5.0;
         static final double rotationKi = 0.0;
         static final double rotationKiZone = 0.0;
         static final double rotationKd = 0.1;
+        static final double rotationToleranceDeg = 2.0;
 
         static final double translationStationaryMps = 0.20;
         static final double rotationStationaryDegps = 10.0;

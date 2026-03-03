@@ -302,7 +302,7 @@ public class RobotContainer {
         //                         Degrees.of(2)));
 
         driver.a().whileTrue(AutoActions.followPathFile("testPath"));
-        driver.b().whileTrue(AutoRoutines.quickSweepLeft());
+        driver.b().whileTrue(AutoRoutines.quickSweepRight());
         // Swerve
         driver.start()
                 .onTrue(

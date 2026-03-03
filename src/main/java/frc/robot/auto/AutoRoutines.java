@@ -13,7 +13,7 @@ public class AutoRoutines {
                 drivePastSlope(true, true),
                 Commands.deadline(driveSweep(true), Intake()),
                 drivePastSlope(true, false),
-                shoot().alongWith(driveToPose(kStationIntake)));
+                shoot().alongWith(driveToPose(() -> AllianceFlipUtil.apply(kStationIntake))));
     }
 
     public static Command sweepRightClimb() {
@@ -24,7 +24,16 @@ public class AutoRoutines {
         return Commands.sequence(
                 drivePastSlope(true, true),
                 Commands.deadline(
-                        driveToPose(AllianceFlipUtil.apply(kQuickSweependPoseL)), Intake()),
+                        driveToPose(() -> AllianceFlipUtil.apply(kQuickSweependPoseL)), Intake()),
                 drivePastSlope(true, false));
+    }
+
+    public static Command quickSweepRight() {
+        return Commands.sequence(
+                // drivePastSlope(false, true),
+                // Commands.deadline(
+                //         driveToPose(AllianceFlipUtil.apply(kQuickSweepEndPoseR)), Intake()),
+                // drivePastSlope(false, false),
+                shoot().alongWith((allignToStation())));
     }
 }

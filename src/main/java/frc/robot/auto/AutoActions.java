@@ -26,15 +26,18 @@ import frc.robot.Robot;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.AutoParamsNT;
+import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
+import lib.ironpulse.swerve.commands.SwerveDriveToAllign;
 import lib.ironpulse.swerve.commands.SwerveDriveToPose;
 import lib.ironpulse.utils.AllianceFlipUtil;
 import org.littletonrobotics.junction.Logger;
@@ -59,13 +62,15 @@ public class AutoActions {
             new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeEndR =
             new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
+
     public static final Pose2d kStationIntake =
-            new Pose2d(0.641, 0.691, new Rotation2d(Degrees.of(180)));
+            new Pose2d(0.439, 0.595, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kQuickSweependPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kQuickSweepEndPoseR =
             new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
+
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));
     public static final Pose2d kTestC = new Pose2d(2.69, 3.07, new Rotation2d(Degrees.of(-110)));
@@ -116,6 +121,18 @@ public class AutoActions {
                 });
     }
 
+    static Command allignToClimb(boolean isLeft) {
+        return swerve.defer(
+                () -> {
+                    Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
+                    return driveToAllign(climbPose);
+                });
+    }
+
+    static Command allignToStation() {
+        return swerve.defer(() -> driveToAllign(AllianceFlipUtil.apply(kStationIntake)));
+    }
+
     public static boolean hasCrossedBump(boolean isToNeutral) {
         return isToNeutral
                 ? AllianceFlipUtil.applyX(getRobotX())
@@ -127,24 +144,58 @@ public class AutoActions {
         return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
     }
 
+    static Command driveToPose(Supplier<Pose2d> targetPoseSupplier) {
+        return swerve.defer(
+                () -> {
+                    Pose2d targetPose = targetPoseSupplier.get();
+                    return new SwerveDriveToPose(
+                                    swerve,
+                                    () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                                    () -> new Pose3d(targetPose),
+                                    () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                                    new PIDController(
+                                            AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
+                                            AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
+                                            AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
+                                    new PIDController(
+                                            AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
+                                            AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
+                                            AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
+                                    Meters.of(
+                                            AutoParamsNT.AutoPoseParams.tolerancePositionM
+                                                    .getValue()),
+                                    Degrees.of(
+                                            AutoParamsNT.AutoPoseParams.toleranceHeadingDeg
+                                                    .getValue()))
+                            .beforeStarting(
+                                    Commands.runOnce(
+                                            () ->
+                                                    Logger.recordOutput(
+                                                            "Temp/targetPose", targetPose)));
+                });
+    }
+
     static Command driveToPose(Pose2d targetPose) {
-        return new SwerveDriveToPose(
+        return driveToPose(() -> targetPose);
+    }
+
+    static Command driveToAllign(Pose2d targetPose) {
+        return new SwerveDriveToAllign(
                         swerve,
                         () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                        () -> new Pose3d(targetPose),
                         () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
-                        new PIDController(
-                                AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
-                                AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
-                                AutoParamsNT.AutoPoseParams.kdStrave.getValue()),
-                        new PIDController(
-                                AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
-                                AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
-                                AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
-                        Meters.of(AutoParamsNT.AutoPoseParams.tolerancePositionM.getValue()),
-                        Degrees.of(AutoParamsNT.AutoPoseParams.toleranceHeadingDeg.getValue()))
+                        () -> targetPose,
+                        swerve.getSwerveLimit(),
+                        1.0,
+                        0.5)
                 .beforeStarting(
-                        Commands.runOnce(() -> Logger.recordOutput("Temp/targetPose", targetPose)));
+                        Commands.runOnce(
+                                () -> {
+                                    Logger.recordOutput("Temp/targetAllignPose", targetPose);
+                                    swerve.setSwerveModuleLimit(
+                                            SwerveMK5Config.kShootingSwerveLimit);
+                                }))
+                .finallyDo(() -> swerve.setSwerveModuleLimitDefault());
     }
 
     public static Command followPath(PathPlannerPath path) {
