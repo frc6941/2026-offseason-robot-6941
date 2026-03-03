@@ -4,6 +4,7 @@ import static frc.robot.auto.AutoActions.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import lib.ironpulse.utils.AllianceFlipUtil;
 
 public class AutoRoutines {
 
@@ -22,6 +23,8 @@ public class AutoRoutines {
     public static Command quickSweepLeft() {
         return Commands.sequence(
                 drivePastSlope(true, true),
-                Commands.deadline(driveToPose(kQuickSweependPoseL), Intake()));
+                Commands.deadline(
+                        driveToPose(AllianceFlipUtil.apply(kQuickSweependPoseL)), Intake()),
+                drivePastSlope(true, false));
     }
 }
