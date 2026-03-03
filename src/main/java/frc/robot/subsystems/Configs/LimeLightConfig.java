@@ -11,10 +11,6 @@ public class LimeLightConfig {
             LimelightIOConfig.builder()
                     .name(NAME_A)
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
-                    .limeLight4Config(
-                            LimelightIOConfig.Limelight4Config.builder()
-                                    .useInternalIMU(false)
-                                    .build())
                     .build();
     public static final LimelightIOConfig limelightBConfig =
             LimelightIOConfig.builder()

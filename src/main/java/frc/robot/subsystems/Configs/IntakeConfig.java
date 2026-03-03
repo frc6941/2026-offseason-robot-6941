@@ -29,6 +29,8 @@ public class IntakeConfig {
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_ROLLER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .statorCurrentLimitAmps(INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS)
+                    .supplyCurrentLimitAmps(INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(INTAKER_ROLLER_GEAR_RATIO)
