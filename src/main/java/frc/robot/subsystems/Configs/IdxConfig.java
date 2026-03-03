@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Configs;
 
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
-import static frc.robot.RobotConstants.is10541;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -23,10 +22,7 @@ public class IdxConfig {
                     .name(SPINDEXER)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(SPINDEXER_ID)
-                    .motorInvertedValue(
-                            is10541
-                                    ? InvertedValue.CounterClockwise_Positive
-                                    : InvertedValue.Clockwise_Positive)
+                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(SPINDEXER_GEAR_RATIO)

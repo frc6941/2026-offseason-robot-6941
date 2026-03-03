@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Configs;
 
-import static frc.robot.RobotConstants.is10541;
-
 import lib.ironpulse.limelight.DeviationParamSources;
 import lib.ironpulse.limelight.LimelightIOConfig;
 import lib.ntext.NTParameter;
@@ -15,7 +13,7 @@ public class LimeLightConfig {
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
                     .limeLight4Config(
                             LimelightIOConfig.Limelight4Config.builder()
-                                    .useInternalIMU(is10541 ? true : false)
+                                    .useInternalIMU(false)
                                     .build())
                     .build();
     public static final LimelightIOConfig limelightBConfig =
