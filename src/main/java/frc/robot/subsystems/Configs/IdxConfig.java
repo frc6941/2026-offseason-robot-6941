@@ -24,9 +24,7 @@ public class IdxConfig {
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(SPINDEXER_ID)
                     .motorInvertedValue(
-                            is10541
-                                    ? InvertedValue.CounterClockwise_Positive
-                                    : InvertedValue.Clockwise_Positive)
+                                    InvertedValue.CounterClockwise_Positive)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(SPINDEXER_GEAR_RATIO)
