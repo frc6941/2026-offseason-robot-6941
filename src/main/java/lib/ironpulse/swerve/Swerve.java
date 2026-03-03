@@ -217,6 +217,11 @@ public class Swerve extends SubsystemBase implements Localizable {
         return kinematics.toChassisSpeeds(getModuleStates());
     }
 
+    public ChassisSpeeds getChassisSpeedsCmd() {
+        if (mode != MODE.VELOCITY) return new ChassisSpeeds();
+        return setpointCurr.chassisSpeeds();
+    }
+
     public Pose3d getEstimatedPose() {
         return poseEstimator.getEstimatedPosition();
     }
@@ -241,6 +246,10 @@ public class Swerve extends SubsystemBase implements Localizable {
 
     public double getIMUYaw() {
         return poseEstimator.getEstimatedPosition().getRotation().getAngle();
+    }
+
+    public double getPitchVelocityRadPerSec() {
+        return imuIOInputs.pitchVelocityRadPerSec;
     }
 
     // ------- Configurations -------

@@ -21,11 +21,11 @@ public class HoodConfig {
                     .mainId(HOOD_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .SensorToMechanismRatio(HOOD_GEAR_RATIO)
-                    .statorCurrentLimitAmps(40)
-                    .supplyCurrentLimitAmps(60)
+                    .statorCurrentLimitAmps(30)
+                    .supplyCurrentLimitAmps(25)
                     .zeroingConfig(
                             SubsystemConfig.ZeroingConfig.builder()
-                                    .zeroingCurrentLimit(25)
+                                    .zeroingCurrentLimit(20)
                                     .zeroingFilterSize(5)
                                     .zeroingVoltage(-1)
                                     .build())
@@ -42,10 +42,10 @@ public class HoodConfig {
     @NTParameter(tableName = "Params/" + NAME)
     public static final class HoodParams {
 
-        public static final double kP = 800;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kV = 0;
+        public static final double kP = 300;
+        public static final double kI = 5;
+        public static final double kD = 1;
+        public static final double kV = 0.35;
         public static final double kA = 0;
         public static final double kS = 0.25;
 

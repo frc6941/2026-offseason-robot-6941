@@ -180,7 +180,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 posVelCtl.calculate(getPosition().in(Degrees), targetAngle.in(Degrees));
         // compansate for the chassis rotation
         double chassisOmegaDegPerSec =
-                RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
+                RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getRotation().getDegrees();
         // Logger.recordOutput(getName() + "/addedV", chassisOmegaDegPerSec);
         desiredVelocity -=
                 TurretPosParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;

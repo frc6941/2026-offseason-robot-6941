@@ -13,6 +13,8 @@ public class ShooterConfig {
     private static final int SHOOTER_MOTOR_MAIN_ID = 50;
     private static final int SHOOTER_MOTOR_FOLLOWER_ID = 51;
     private static final double SHOOTER_GEAR_RATIO = 24.0 / 24.0;
+    private static final double SHOOTER_STATOR_CURRENT_LIMIT_AMPS = 75;
+    private static final double SHOOTER_SUPPLY_CURRENT_LIMIT_AMPS = 65;
     public static final SubsystemConfig SHOOTER_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
@@ -21,12 +23,16 @@ public class ShooterConfig {
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .defaultBrake(false)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
+                    .statorCurrentLimitAmps(SHOOTER_STATOR_CURRENT_LIMIT_AMPS)
+                    .supplyCurrentLimitAmps(SHOOTER_SUPPLY_CURRENT_LIMIT_AMPS)
                     .followers(
                             new SubsystemConfig.FollowerConfig[] {
                                 SubsystemConfig.FollowerConfig.builder()
                                         .id(SHOOTER_MOTOR_FOLLOWER_ID)
                                         .bus(ROBORIO_CAN_BUS)
                                         .opposeMain(MotorAlignmentValue.Aligned)
+                                        .statorCurrentLimitAmps(SHOOTER_STATOR_CURRENT_LIMIT_AMPS)
+                                        .supplyCurrentLimitAmps(SHOOTER_SUPPLY_CURRENT_LIMIT_AMPS)
                                         .build()
                             })
                     .SensorToMechanismRatio(SHOOTER_GEAR_RATIO)

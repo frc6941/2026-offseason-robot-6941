@@ -1,7 +1,9 @@
 package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.wpilibj.RobotController;
+import lib.ironpulse.utils.Logging;
 
 /**
  * Robot-wide constants that are used across multiple subsystems. Constants that need tuning are
@@ -28,6 +30,17 @@ public final class RobotConstants {
     public static boolean is10541 =
             RobotController.getSerialNumber().matches(RobotConstants.RIOSerial10541);
     ;
+
+    // auto robot config
+    public static RobotConfig AUTO_ROBOT_CONFIG;
+
+    static {
+        try {
+            AUTO_ROBOT_CONFIG = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            Logging.error("Constants", "Failed to load AUTO_ROBOT_CONFIG. %s", e.getMessage());
+        }
+    }
 
     private RobotConstants() {
         // Prevent instantiation

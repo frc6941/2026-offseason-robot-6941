@@ -16,19 +16,21 @@ public final class ShotCalculatorConfig {
         // Model tuning (model-space adjustments)
         public static final double speedScale = 1.0;
         public static final double speedOffsetMps = 0.0;
-        public static final double angleOffsetDeg = 0.0;
-        public static final double trajectoryBiasDeg = 0.0;
-        public static final double lateralVelocityCompScale = 0;
-        public static final double lookfwdDelayCycles = 0.0;
+        public static final double trajectoryBiasDegGOAL = -2;
+        public static final double trajectoryBiasDegFEED = -2;
+        public static final double loookfwdDistanceScale = 1;
+        public static final double lateralVelocityCompScale = 1.2;
+        public static final double lookfwdDelayCycles = 0;
         public static final double lookfwdFlightScale = 0;
+
         public static final double lookfwdMinCycles = 0.0;
         public static final double lookfwdMaxCycles = 100.0;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = 326.67;
-        public static final double rpmB = 0.0;
-        public static final double rpmC = 264.03;
+        public static final double rpmA = 253;
+        public static final double rpmB = 0;
+        public static final double rpmC = 200;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;

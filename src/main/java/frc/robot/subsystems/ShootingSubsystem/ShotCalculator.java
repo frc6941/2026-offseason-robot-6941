@@ -127,7 +127,7 @@ public class ShotCalculator {
         Translation2d shotToTargetCurrent =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
         Translation2d velocityWorldRobotCurrent =
-                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
+                RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
 
         double currentDistanceMeters = shotToTargetCurrent.getNorm();
         Translation2d currentTargetVelocity =
@@ -137,8 +137,11 @@ public class ShotCalculator {
         ShotModel initialModel = lookupModel(currentDistanceMeters, currentVParallel, mode);
         double totalCyclesRaw =
                 ShotCalculatorParamsNT.lookfwdDelayCycles.getValue()
-                        + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
-                                * (initialModel.flightTimeSec / RobotConstants.LOOPER_DT);
+                        + ShotCalculatorParamsNT.loookfwdDistanceScale.getValue()
+                                * currentDistanceMeters;
+        // + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
+        //         * (initialModel.flightTimeSec / RobotConstants.LOOPER_DT);
+
         double totalCycles =
                 MathUtil.clamp(
                         totalCyclesRaw,
@@ -166,7 +169,7 @@ public class ShotCalculator {
                 "ShotCalculator/lookfwd/shotPoseWorldPredicted", shotPoseWorldPredicted);
 
         ShotModel model = lookupModel(distanceMeters, vParallel, mode);
-        model = applyModelTuning(model);
+        model = applyModelTuning(model, mode);
 
         Angle turretYawRad = solveTurretYaw(shotToTargetPredicted, vPerp, model);
         return new ShotFrame(
@@ -226,14 +229,16 @@ public class ShotCalculator {
     }
 
     /** Applies tuning offsets in model space. */
-    public ShotModel applyModelTuning(ShotModel model) {
+    public ShotModel applyModelTuning(ShotModel model, TargetMode mode) {
         double speed =
                 model.exitSpeedMps * ShotCalculatorParamsNT.speedScale.getValue()
                         + ShotCalculatorParamsNT.speedOffsetMps.getValue();
         double angle =
-                model.launchAngleDeg
-                        + ShotCalculatorParamsNT.angleOffsetDeg.getValue()
-                        + ShotCalculatorParamsNT.trajectoryBiasDeg.getValue();
+                mode == TargetMode.GOAL
+                        ? model.launchAngleDeg
+                                + ShotCalculatorParamsNT.trajectoryBiasDegGOAL.getValue()
+                        : model.launchAngleDeg
+                                + ShotCalculatorParamsNT.trajectoryBiasDegFEED.getValue();
         return new ShotModel(speed, angle, model.flightTimeSec);
     }
 

@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -115,6 +116,19 @@ public class MotorIOTalonFX implements MotorIO {
             var f = cfg.followers[i];
             followers[i] = new TalonFX(f.id, f.bus);
             followers[i].setControl(new Follower(cfg.mainId, f.opposeMain));
+            if (!Double.isNaN(f.statorCurrentLimitAmps)
+                    || !Double.isNaN(f.supplyCurrentLimitAmps)) {
+                var followerCurrentLimits = new CurrentLimitsConfigs();
+                if (!Double.isNaN(f.statorCurrentLimitAmps)) {
+                    followerCurrentLimits.StatorCurrentLimitEnable = true;
+                    followerCurrentLimits.StatorCurrentLimit = f.statorCurrentLimitAmps;
+                }
+                if (!Double.isNaN(f.supplyCurrentLimitAmps)) {
+                    followerCurrentLimits.SupplyCurrentLimitEnable = true;
+                    followerCurrentLimits.SupplyCurrentLimit = f.supplyCurrentLimitAmps;
+                }
+                followers[i].getConfigurator().apply(followerCurrentLimits);
+            }
         }
 
         // Signals
@@ -198,6 +212,9 @@ public class MotorIOTalonFX implements MotorIO {
         this.fx.MotorOutput.NeutralMode =
                 wantsBreak ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         main.getConfigurator().apply(this.fx);
+        for (int i = 0; i < followers.length; i++) {
+            followers[i].getConfigurator().apply(this.fx);
+        }
     }
 
     @Override
