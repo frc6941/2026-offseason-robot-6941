@@ -6,7 +6,6 @@ import static frc.robot.subsystems.Configs.IntakeConfig.IntakerExtensionParams.*
 import static frc.robot.subsystems.Configs.IntakeConfig.IntakerRollerParams.*;
 
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
@@ -47,36 +46,47 @@ public class IntakerSubsystem {
                         () -> Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())));
     }
 
+    //     public Command runFeed() {
+    //         return Commands.runOnce(
+    //                         () -> feedOscillationStartTime = Timer.getFPGATimestamp(), extension)
+    //                 .andThen(
+    //                         Commands.parallel(
+    //                                 roller.runVelVolt(RotationsPerSecond.of(intakeVelRPS)),
+    //                                 extension.runPosition(
+    //                                         () -> {
+    //                                             double t =
+    //                                                     Timer.getFPGATimestamp()
+    //                                                             - feedOscillationStartTime;
+    //                                             double rate =
+    //
+    // IntakerExtensionParamsNT.feedOscillationRateHz
+    //                                                             .getValue();
+    //                                             double deploy =
+    //                                                     IntakerExtensionParamsNT.deployPosMeters
+    //                                                             .getValue();
+    //                                             double feed =
+    //                                                     IntakerExtensionParamsNT.feedPosMeters
+    //                                                             .getValue();
+    //                                             double pos =
+    //                                                     feed
+    //                                                             + (deploy - feed)
+    //                                                                     * (1
+    //                                                                             + Math.sin(
+    //                                                                                     2 *
+    // Math.PI
+    //                                                                                             *
+    // rate
+    //                                                                                             *
+    // t))
+    //                                                                     / 2;
+    //                                             return Meters.of(pos);
+    //                                         })));
+    //     }
     public Command runFeed() {
-        return Commands.runOnce(
-                        () -> feedOscillationStartTime = Timer.getFPGATimestamp(), extension)
-                .andThen(
-                        Commands.parallel(
-                                roller.runVelVolt(RotationsPerSecond.of(intakeVelRPS)),
-                                extension.runPosition(
-                                        () -> {
-                                            double t =
-                                                    Timer.getFPGATimestamp()
-                                                            - feedOscillationStartTime;
-                                            double rate =
-                                                    IntakerExtensionParamsNT.feedOscillationRateHz
-                                                            .getValue();
-                                            double deploy =
-                                                    IntakerExtensionParamsNT.deployPosMeters
-                                                            .getValue();
-                                            double feed =
-                                                    IntakerExtensionParamsNT.feedPosMeters
-                                                            .getValue();
-                                            double pos =
-                                                    feed
-                                                            + (deploy - feed)
-                                                                    * (1
-                                                                            + Math.sin(
-                                                                                    2 * Math.PI
-                                                                                            * rate
-                                                                                            * t))
-                                                                    / 2;
-                                            return Meters.of(pos);
-                                        })));
+        return Commands.parallel(
+                roller.runVelVolt(
+                        () -> RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
+                extension.runPosition(
+                        () -> Meters.of(IntakerExtensionParamsNT.feedPosMeters.getValue())));
     }
 }
