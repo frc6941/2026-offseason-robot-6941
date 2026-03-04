@@ -30,10 +30,13 @@ public class AutoRoutines {
 
     public static Command quickSweepRight() {
         return Commands.sequence(
-                // drivePastSlope(false, true),
-                // Commands.deadline(
-                //         driveToPose(AllianceFlipUtil.apply(kQuickSweepEndPoseR)), Intake()),
-                // drivePastSlope(false, false),
-                shoot().alongWith((allignToStation())));
+                drivePastSlope(false, true),
+                Commands.deadline(
+                        driveToPose(AllianceFlipUtil.apply(kQuickSweepEndPoseR)), Intake()),
+                drivePastSlope(false, false),
+                shoot().alongWith(
+                                Commands.sequence(
+                                        Commands.deadline(allignToStation(), Intake()),
+                                        allignToClimb(false))));
     }
 }

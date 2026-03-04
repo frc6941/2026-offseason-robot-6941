@@ -71,6 +71,9 @@ public class AutoActions {
     public static final Pose2d kQuickSweepEndPoseR =
             new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
 
+    public static final Pose2d kclimbL = new Pose2d(1.478, 4.136, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kclimbR = new Pose2d(1.478, 3.331, new Rotation2d(Degrees.of(0)));
+
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));
     public static final Pose2d kTestC = new Pose2d(2.69, 3.07, new Rotation2d(Degrees.of(-110)));
@@ -97,11 +100,14 @@ public class AutoActions {
     }
 
     static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
-        Pose2d slopeFront = AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
-        Pose2d slopeEnd = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
-        Pose2d targetPose = isToNeutral ? slopeFront : slopeEnd;
-        Command drivePastSlope = driveToPose(targetPose);
-        return Commands.deadline(waitCrossedBump(isToNeutral), drivePastSlope);
+        return swerve.defer(
+                () -> {
+                    Pose2d slopeFront =
+                            AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
+                    Pose2d slopeEnd = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
+                    Pose2d targetPose = isToNeutral ? slopeFront : slopeEnd;
+                    return Commands.deadline(waitCrossedBump(isToNeutral), driveToPose(targetPose));
+                });
     }
 
     static Command waitCrossedBump(boolean isToNeutral) {
@@ -109,10 +115,12 @@ public class AutoActions {
     }
 
     static Command driveSweep(boolean isLeft) {
-        Pose2d sweepStart = AllianceFlipUtil.apply(isLeft ? kSweepStartPoseL : kSweepStartPoseR);
-        Pose2d sweepEnd = AllianceFlipUtil.apply(isLeft ? kSweepEndPoseR : kSweepEndPoseL);
         return swerve.defer(
                 () -> {
+                    Pose2d sweepStart =
+                            AllianceFlipUtil.apply(isLeft ? kSweepStartPoseL : kSweepStartPoseR);
+                    Pose2d sweepEnd =
+                            AllianceFlipUtil.apply(isLeft ? kSweepEndPoseR : kSweepEndPoseL);
                     Pose2d current = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
                     List<Pose2d> waypoints = List.of(current, sweepStart, sweepEnd);
                     PathPlannerPath path =
@@ -124,13 +132,17 @@ public class AutoActions {
     static Command allignToClimb(boolean isLeft) {
         return swerve.defer(
                 () -> {
-                    Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
-                    return driveToAllign(climbPose);
+                    Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kclimbL : kclimbR);
+                    return driveToAllign(climbPose, AutoActions::getShiftDirectionTowardBump);
                 });
     }
 
     static Command allignToStation() {
-        return swerve.defer(() -> driveToAllign(AllianceFlipUtil.apply(kStationIntake)));
+        return swerve.defer(
+                () ->
+                        driveToAllign(
+                                AllianceFlipUtil.apply(kStationIntake),
+                                AutoActions::getShiftDirectionTowardBump));
     }
 
     public static boolean hasCrossedBump(boolean isToNeutral) {
@@ -179,15 +191,21 @@ public class AutoActions {
         return driveToPose(() -> targetPose);
     }
 
-    static Command driveToAllign(Pose2d targetPose) {
+    private static Rotation2d getShiftDirectionTowardBump() {
+        return AllianceFlipUtil.shouldFlip() ? Rotation2d.kPi : Rotation2d.kZero;
+    }
+
+    static Command driveToAllign(
+            Pose2d targetPose, Supplier<Rotation2d> shiftingDirectionSupplier) {
         return new SwerveDriveToAllign(
                         swerve,
                         () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
                         () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
                         () -> targetPose,
+                        shiftingDirectionSupplier,
                         swerve.getSwerveLimit(),
-                        1.0,
-                        0.5)
+                        1.2,
+                        1.0)
                 .beforeStarting(
                         Commands.runOnce(
                                 () -> {

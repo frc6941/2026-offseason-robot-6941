@@ -27,6 +27,7 @@ public class SwerveDriveToAllign extends Command {
     private final Supplier<Pose3d> poseWorldRobotSupplier;
     private final Supplier<Pose2d> velocityWorldRobotSupplier;
     private final Supplier<Pose2d> finalDestinationSupplier;
+    private final Supplier<Rotation2d> shiftingDirectionSupplier;
     private final PIDController translationController;
     private final PIDController rotationController;
     private final SwerveLimit precisePointLimit;
@@ -42,6 +43,7 @@ public class SwerveDriveToAllign extends Command {
             Supplier<Pose3d> poseWorldRobotSupplier,
             Supplier<Pose2d> velocityWorldRobotSupplier,
             Supplier<Pose2d> finalDestinationSupplier,
+            Supplier<Rotation2d> shiftingDirectionSupplier,
             SwerveLimit precisePointLimit,
             double parallelShiftMaxMeters,
             double lateralShiftMaxMeters) {
@@ -49,6 +51,7 @@ public class SwerveDriveToAllign extends Command {
         this.poseWorldRobotSupplier = poseWorldRobotSupplier;
         this.velocityWorldRobotSupplier = velocityWorldRobotSupplier;
         this.finalDestinationSupplier = finalDestinationSupplier;
+        this.shiftingDirectionSupplier = shiftingDirectionSupplier;
         this.translationController = new PIDController(0.0, 0.0, 0.0);
         this.rotationController = new PIDController(0.0, 0.0, 0.0);
         this.precisePointLimit = precisePointLimit;
@@ -80,7 +83,8 @@ public class SwerveDriveToAllign extends Command {
     public void execute() {
         Pose2d poseWorldRobot = poseWorldRobotSupplier.get().toPose2d();
         finalDestination = finalDestinationSupplier.get();
-        driveTarget = getDriveTarget(poseWorldRobot, finalDestination);
+        Rotation2d shiftingDirection = shiftingDirectionSupplier.get();
+        driveTarget = getDriveTarget(poseWorldRobot, finalDestination, shiftingDirection);
         velocityWorldRobot = velocityWorldRobotSupplier.get();
 
         Pose2d poseRobotTarget = driveTarget.relativeTo(poseWorldRobot);
@@ -103,9 +107,11 @@ public class SwerveDriveToAllign extends Command {
         Logger.recordOutput(kTag + "/finalDestination", finalDestination);
     }
 
-    private Pose2d getDriveTarget(Pose2d robot, Pose2d goal) {
+    private Pose2d getDriveTarget(Pose2d robot, Pose2d goal, Rotation2d shiftingDirection) {
         Transform2d offset =
-                new Transform2d(goal, new Pose2d(robot.getTranslation(), goal.getRotation()));
+                new Transform2d(
+                        new Pose2d(goal.getTranslation(), shiftingDirection),
+                        new Pose2d(robot.getTranslation(), shiftingDirection));
         double yDistance = Math.abs(offset.getY());
         double xDistance = Math.abs(offset.getX());
 
@@ -131,10 +137,11 @@ public class SwerveDriveToAllign extends Command {
             lateralScale = 0.0;
         }
 
-        double parallelShift = Math.copySign(parallelScale * parallelShiftMaxMeters, offset.getX());
+        double parallelShift = parallelScale * parallelShiftMaxMeters;
         double lateralShift = Math.copySign(lateralScale * lateralShiftMaxMeters, offset.getY());
-
-        return goal.transformBy(new Transform2d(parallelShift, lateralShift, Rotation2d.kZero));
+        Translation2d shiftWorld =
+                new Translation2d(parallelShift, lateralShift).rotateBy(shiftingDirection);
+        return new Pose2d(goal.getTranslation().plus(shiftWorld), goal.getRotation());
     }
 
     @Override
@@ -188,7 +195,7 @@ public class SwerveDriveToAllign extends Command {
 
     @NTParameter(tableName = "Params/" + kTag)
     public static class SwerveDriveToAllignParams {
-        static final double translationKp = 4.5;
+        static final double translationKp = 6;
         static final double translationKi = 0.0;
         static final double translationKiZone = 0.0;
         static final double translationKd = 0.1;
@@ -202,6 +209,6 @@ public class SwerveDriveToAllign extends Command {
 
         static final double translationStationaryMps = 0.20;
         static final double rotationStationaryDegps = 10.0;
-        static final double shiftingTerminate = 0.2;
+        static final double shiftingTerminate = 0;
     }
 }
