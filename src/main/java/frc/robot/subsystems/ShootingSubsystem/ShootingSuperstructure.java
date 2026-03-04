@@ -3,6 +3,7 @@ package frc.robot.subsystems.ShootingSubsystem;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -10,10 +11,12 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
+import frc.robot.subsystems.Configs.IdxConfig.SpindexerParams;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorConfig;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
+import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
@@ -114,6 +117,12 @@ public class ShootingSuperstructure {
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
     public boolean readyToShoot() {
         return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
+    }
+
+    public Command runUnjamming() {
+        return Commands.parallel(
+                idx.runVelVolt(() -> getIdxSpeed(IdxMode.REVERSE))
+                        .withTimeout(Seconds.of(SpindexerParamsNT.unjammTimeoutSec.getValue())));
     }
 
     public AngularVelocity getIdxSpeed(IdxMode idxMode) {

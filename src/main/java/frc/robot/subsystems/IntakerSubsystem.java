@@ -17,6 +17,7 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 public class IntakerSubsystem {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension;
+
     private enum IntakeMode {
         INTAKING,
         EXTENDED_IDLE,
