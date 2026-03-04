@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoActions;
+import frc.robot.auto.AutoFile;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
@@ -59,6 +60,7 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
@@ -75,7 +77,6 @@ public class RobotContainer {
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController oprator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
-    private TargetMode activeTargetMode = TargetMode.GOAL;
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
@@ -87,6 +88,9 @@ public class RobotContainer {
     private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
+    private final AutoFile autoFile;
+    private final LoggedDashboardChooser<Command> autoChooser;
+    private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
     public RobotContainer() {
@@ -119,7 +123,9 @@ public class RobotContainer {
                 new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
-
+        autoFile = new AutoFile();
+        autoChooser =
+                new LoggedDashboardChooser<Command>("Auto Chooser", autoFile.getAutoChooser());
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
@@ -476,6 +482,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser.get();
     }
 }
