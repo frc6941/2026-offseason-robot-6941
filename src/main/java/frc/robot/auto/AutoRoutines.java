@@ -37,6 +37,7 @@ public class AutoRoutines {
                 shoot().alongWith(
                                 Commands.sequence(
                                         Commands.deadline(allignToStation(), Intake()),
+                                        Commands.waitSeconds(2.5),
                                         allignToClimb(false))));
     }
 }
