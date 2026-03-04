@@ -2,11 +2,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.subsystems.Configs.IntakeConfig.IntakerExtensionParams.*;
-import static frc.robot.subsystems.Configs.IntakeConfig.IntakerRollerParams.*;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.IntakerRollerParamsNT;
@@ -18,7 +17,13 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 public class IntakerSubsystem {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension;
-    private double feedOscillationStartTime;
+    private enum IntakeMode {
+        INTAKING,
+        EXTENDED_IDLE,
+        RETRACTED
+    }
+
+    private IntakeMode desiredMode = IntakeMode.EXTENDED_IDLE;
 
     public IntakerSubsystem(
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller,
@@ -36,14 +41,29 @@ public class IntakerSubsystem {
                 roller.runVelVolt(
                         () -> RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
                 extension.runMotionMagic(
-                        () -> Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())));
+                        () -> Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())),
+                Commands.runOnce(() -> desiredMode = IntakeMode.INTAKING));
+    }
+
+    public Command runExtendedIdle() {
+        return Commands.parallel(
+                roller.runStop(),
+                extension.runMotionMagic(
+                        () -> Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())),
+                Commands.runOnce(() -> desiredMode = IntakeMode.EXTENDED_IDLE));
     }
 
     public Command runRetract() {
         return Commands.parallel(
                 roller.runStop(),
                 extension.runMotionMagic(
-                        () -> Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())));
+                        () -> Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())),
+                Commands.runOnce(() -> desiredMode = IntakeMode.RETRACTED));
+    }
+
+    public Command toggleIntake() {
+        return Commands.either(
+                runExtendedIdle(), runIntake(), () -> desiredMode == IntakeMode.INTAKING);
     }
 
     //     public Command runFeed() {
@@ -84,9 +104,27 @@ public class IntakerSubsystem {
     //     }
     public Command runFeed() {
         return Commands.parallel(
-                roller.runVelVolt(
-                        () -> RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
-                extension.runPosition(
-                        () -> Meters.of(IntakerExtensionParamsNT.feedPosMeters.getValue())));
+                        roller.runVelVolt(
+                                () ->
+                                        RotationsPerSecond.of(
+                                                IntakerRollerParamsNT.intakeVelRPS.getValue())),
+                        extension.runPosition(
+                                () -> Meters.of(IntakerExtensionParamsNT.feedPosMeters.getValue())))
+                .finallyDo(
+                        () -> {
+                            switch (desiredMode) {
+                                case INTAKING:
+                                    CommandScheduler.getInstance().schedule(runIntake());
+                                    break;
+                                case EXTENDED_IDLE:
+                                    CommandScheduler.getInstance().schedule(runExtendedIdle());
+                                    break;
+                                case RETRACTED:
+                                    CommandScheduler.getInstance().schedule(runRetract());
+                                    break;
+                                default:
+                                    break;
+                            }
+                        });
     }
 }

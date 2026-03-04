@@ -95,11 +95,7 @@ public class ShootingSuperstructure {
     }
 
     public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
-        return Commands.parallel(
-                runFrame(frame),
-                //                idx.runVelVolt(() -> getIdxSpeed(readyToShoot() ? idxMode :
-                // IdxMode.OFF)));
-                idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
+        return Commands.parallel(runFrame(frame), idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
         // TODO: revert
     }
 

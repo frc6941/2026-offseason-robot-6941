@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -73,8 +72,6 @@ public class RobotContainer {
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
-    private Command intakeLatchedCommand;
-    private boolean isIntakeLatchedOn;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController oprator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
@@ -121,8 +118,6 @@ public class RobotContainer {
         shootingSuperstructure =
                 new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
-        intakeLatchedCommand = intake.runIntake();
-        isIntakeLatchedOn = false;
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
 
         configureBindings();
@@ -193,47 +188,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // INTAKE
-        driver.leftTrigger()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> {
-                                    isIntakeLatchedOn = !isIntakeLatchedOn;
-
-                                    if (!isIntakeLatchedOn) {
-                                        intakeLatchedCommand.cancel();
-                                        return;
-                                    }
-
-                                    if (!driver.leftBumper().getAsBoolean()) {
-                                        CommandScheduler.getInstance()
-                                                .schedule(intakeLatchedCommand);
-                                    }
-                                }));
-        driver.leftBumper()
-                .whileTrue(intake.runFeed())
-                .onFalse(
-                        Commands.runOnce(
-                                () -> {
-                                    if (isIntakeLatchedOn) {
-                                        CommandScheduler.getInstance()
-                                                .schedule(intakeLatchedCommand);
-                                    }
-                                }));
+        driver.leftTrigger().onTrue(intake.toggleIntake());
+        driver.leftBumper().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intakerExtension.zeroCommand());
-        // scoring
-        // oprator.rightTrigger()
-        //         .whileTrue(
-        //                 shootingSuperstructure
-        //                         .shootWhenReady()
-        //                         .alongWith(
-        //                                 Commands.runOnce(
-        //                                         () ->
-        //                                                 swerve.setSwerveModuleLimit(
-        //                                                         SwerveMK5Config
-        //                                                                 .kShootingSwerveLimit)))
-        //                         .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
         oprator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
@@ -350,7 +308,9 @@ public class RobotContainer {
                                                             .resetTransform(
                                                                     TransformRecorder.kFrameWorld,
                                                                     TransformRecorder.kFrameRobot);
-                                                }))
+                                                }),
+                                        indicatorSubsystem.indicateWithTimeout(
+                                                Patterns.RESET_ODOM, 0.3))
                                 .ignoringDisable(true));
 
         new Trigger(DriverStation::isEnabled)
