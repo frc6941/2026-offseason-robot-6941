@@ -47,36 +47,43 @@ public class IntakerSubsystem {
                         () -> Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())));
     }
 
+//     public Command runFeed() {
+//         return Commands.runOnce(
+//                         () -> feedOscillationStartTime = Timer.getFPGATimestamp(), extension)
+//                 .andThen(
+//                         Commands.parallel(
+//                                 roller.runVelVolt(RotationsPerSecond.of(intakeVelRPS)),
+//                                 extension.runPosition(
+//                                         () -> {
+//                                             double t =
+//                                                     Timer.getFPGATimestamp()
+//                                                             - feedOscillationStartTime;
+//                                             double rate =
+//                                                     IntakerExtensionParamsNT.feedOscillationRateHz
+//                                                             .getValue();
+//                                             double deploy =
+//                                                     IntakerExtensionParamsNT.deployPosMeters
+//                                                             .getValue();
+//                                             double feed =
+//                                                     IntakerExtensionParamsNT.feedPosMeters
+//                                                             .getValue();
+//                                             double pos =
+//                                                     feed
+//                                                             + (deploy - feed)
+//                                                                     * (1
+//                                                                             + Math.sin(
+//                                                                                     2 * Math.PI
+//                                                                                             * rate
+//                                                                                             * t))
+//                                                                     / 2;
+//                                             return Meters.of(pos);
+//                                         })));
+//     }
     public Command runFeed() {
-        return Commands.runOnce(
-                        () -> feedOscillationStartTime = Timer.getFPGATimestamp(), extension)
-                .andThen(
-                        Commands.parallel(
-                                roller.runVelVolt(RotationsPerSecond.of(intakeVelRPS)),
-                                extension.runPosition(
-                                        () -> {
-                                            double t =
-                                                    Timer.getFPGATimestamp()
-                                                            - feedOscillationStartTime;
-                                            double rate =
-                                                    IntakerExtensionParamsNT.feedOscillationRateHz
-                                                            .getValue();
-                                            double deploy =
-                                                    IntakerExtensionParamsNT.deployPosMeters
-                                                            .getValue();
-                                            double feed =
-                                                    IntakerExtensionParamsNT.feedPosMeters
-                                                            .getValue();
-                                            double pos =
-                                                    feed
-                                                            + (deploy - feed)
-                                                                    * (1
-                                                                            + Math.sin(
-                                                                                    2 * Math.PI
-                                                                                            * rate
-                                                                                            * t))
-                                                                    / 2;
-                                            return Meters.of(pos);
-                                        })));
+        return Commands.parallel(
+                roller.runVelVolt(
+                        () -> RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
+                extension.runPosition(
+                        () -> Meters.of(IntakerExtensionParamsNT.feedPosMeters.getValue())));
     }
 }
