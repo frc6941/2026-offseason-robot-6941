@@ -206,7 +206,8 @@ public class RobotContainer {
                                     }
 
                                     if (!driver.leftBumper().getAsBoolean()) {
-                                        CommandScheduler.getInstance().schedule(intakeLatchedCommand);
+                                        CommandScheduler.getInstance()
+                                                .schedule(intakeLatchedCommand);
                                     }
                                 }));
         driver.leftBumper()
@@ -215,7 +216,8 @@ public class RobotContainer {
                         Commands.runOnce(
                                 () -> {
                                     if (isIntakeLatchedOn) {
-                                        CommandScheduler.getInstance().schedule(intakeLatchedCommand);
+                                        CommandScheduler.getInstance()
+                                                .schedule(intakeLatchedCommand);
                                     }
                                 }));
         driver.povDown().onTrue(intake.runRetract());
