@@ -20,9 +20,9 @@ public class TurretConfig {
     public static final int TURRET_ENCODER_G1_ID = 59;
     public static final int TURRET_ENCODER_G2_ID = 58;
     public static final Angle TURRET_ENCODER_G1_OFFSET =
-            Rotations.of(is10541 ? -0.58203125 : -0.130615234375);
+            Rotations.of(is10541 ? -0.130615234375 : -0.58203125);
     public static final Angle TURRET_ENCODER_G2_OFFSET =
-            Rotations.of(is10541 ? -0.967529296875 : -0.7705078125);
+            Rotations.of(is10541 ? -0.7705078125 : -0.967529296875);
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 88;
     public static final int G1_TOOTH_COUNT = 16;
@@ -35,8 +35,6 @@ public class TurretConfig {
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =
             TURRET_DOF.unaryMinus().plus(TURRET_ZERO_OFFSET);
-
-    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(2.0);
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
@@ -55,6 +53,7 @@ public class TurretConfig {
                                     .gearRatio(TURRET_GEAR_RATIO)
                                     .build())
                     .build();
+    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(2.0);
 
     private TurretConfig() {}
 

@@ -50,7 +50,7 @@ public class IdxConfig {
     public static final class SpindexerModeParams {
         public static final double feedRPS = 2.2;
 
-        public static final double revRPS = -2.3;
+        public static final double revRPS = -1;
         public static final double idleRPS = 0.0;
     }
 
@@ -63,6 +63,10 @@ public class IdxConfig {
         public static final double kV = 3.7;
         public static final double kA = 1;
         public static final double kS = 0.25;
+
+        public static final double unjammTimeoutSec = 0.1;
+        public static final double unjammTriggerAmps = 60;
+        public static final double unjammTriggerSec = 0.3;
 
         public static final boolean isBrake = true;
 

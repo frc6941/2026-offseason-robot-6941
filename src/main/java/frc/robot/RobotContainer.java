@@ -125,8 +125,6 @@ public class RobotContainer {
         shootingSuperstructure =
                 new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
-        intakeLatchedCommand = intake.runIntake();
-        isIntakeLatchedOn = false;
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
         AutoRoutines.init(swerve);
         autoFile = new AutoFile();
@@ -158,7 +156,13 @@ public class RobotContainer {
                                             indicatorSubsystem.setPattern(Patterns.LOSS);
                                         }
                                     } else {
-                                        indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                        if (intake.getCurrentMode()
+                                                == frc.robot.subsystems.IntakerSubsystem.IntakeMode
+                                                        .INTAKING) {
+                                            indicatorSubsystem.setPattern(Patterns.INTAKE);
+                                        } else {
+                                            indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                        }
                                     }
                                 },
                                 indicatorSubsystem)
@@ -200,60 +204,32 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // INTAKE
-        driver.leftTrigger()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> {
-                                    isIntakeLatchedOn = !isIntakeLatchedOn;
-
-                                    if (!isIntakeLatchedOn) {
-                                        intakeLatchedCommand.cancel();
-                                        return;
-                                    }
-
-                                    if (!driver.leftBumper().getAsBoolean()) {
-                                        CommandScheduler.getInstance()
-                                                .schedule(intakeLatchedCommand);
-                                    }
-                                }));
-        driver.leftBumper()
-                .whileTrue(intake.runFeed())
-                .onFalse(
-                        Commands.runOnce(
-                                () -> {
-                                    if (isIntakeLatchedOn) {
-                                        CommandScheduler.getInstance()
-                                                .schedule(intakeLatchedCommand);
-                                    }
-                                }));
+        driver.leftTrigger().onTrue(intake.toggleIntake());
+        driver.leftBumper().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intakerExtension.zeroCommand());
-        // scoring
-        // oprator.rightTrigger()
-        //         .whileTrue(
-        //                 shootingSuperstructure
-        //                         .shootWhenReady()
-        //                         .alongWith(
-        //                                 Commands.runOnce(
-        //                                         () ->
-        //                                                 swerve.setSwerveModuleLimit(
-        //                                                         SwerveMK5Config
-        //                                                                 .kShootingSwerveLimit)))
-        //                         .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+
+        oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
         oprator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady()
                                 .alongWith(
                                         Commands.parallel(
-                                                indicatorSubsystem.indicate(Patterns.AIMING),
+                                                indicatorSubsystem.indicate(Patterns.SHOOTING),
                                                 Commands.runOnce(
                                                         () ->
                                                                 swerve.setSwerveModuleLimit(
                                                                         SwerveMK5Config
                                                                                 .kShootingSwerveLimit))))
-                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
         driver.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
@@ -264,7 +240,14 @@ public class RobotContainer {
                                                         swerve.setSwerveModuleLimit(
                                                                 SwerveMK5Config
                                                                         .kShootingSwerveLimit)))
-                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -356,7 +339,9 @@ public class RobotContainer {
                                                             .resetTransform(
                                                                     TransformRecorder.kFrameWorld,
                                                                     TransformRecorder.kFrameRobot);
-                                                }))
+                                                }),
+                                        indicatorSubsystem.indicateWithTimeout(
+                                                Patterns.RESET_ODOM, 1))
                                 .ignoringDisable(true));
 
         new Trigger(DriverStation::isEnabled)
