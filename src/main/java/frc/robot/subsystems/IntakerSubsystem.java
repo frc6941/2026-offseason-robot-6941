@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.IntakerRollerParamsNT;
@@ -13,6 +12,7 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class IntakerSubsystem {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
@@ -21,10 +21,15 @@ public class IntakerSubsystem {
     private enum IntakeMode {
         INTAKING,
         EXTENDED_IDLE,
-        RETRACTED
+        RETRACTED,
+        FEEDING
     }
 
-    private IntakeMode desiredMode = IntakeMode.EXTENDED_IDLE;
+    @AutoLogOutput(key = "IntakerRoller/state")
+    private IntakeMode currentMode = IntakeMode.RETRACTED;
+
+    @AutoLogOutput(key = "IntakerRoller/fallbackState")
+    private IntakeMode fallbackMode = IntakeMode.RETRACTED;
 
     public IntakerSubsystem(
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller,
@@ -34,37 +39,70 @@ public class IntakerSubsystem {
     }
 
     public void setDefaultCommand() {
-        roller.setDefaultCommand(roller.runStop());
+        roller.setDefaultCommand(
+                roller.runVelVolt(
+                        () ->
+                                RotationsPerSecond.of(
+                                        currentMode == IntakeMode.INTAKING
+                                                        || currentMode == IntakeMode.FEEDING
+                                                ? IntakerRollerParamsNT.intakeVelRPS.getValue()
+                                                : IntakerRollerParamsNT.idleVelRPS.getValue())));
+        extension.setDefaultCommand(
+                extension.runMotionMagic(
+                        () -> {
+                            switch (currentMode) {
+                                case INTAKING:
+                                    return Meters.of(
+                                            IntakerExtensionParamsNT.deployPosMeters.getValue());
+                                case EXTENDED_IDLE:
+                                    return Meters.of(
+                                            IntakerExtensionParamsNT.deployPosMeters.getValue());
+                                case RETRACTED:
+                                    return Meters.of(
+                                            IntakerExtensionParamsNT.retractPosMeters.getValue());
+                                case FEEDING:
+                                    return Meters.of(
+                                            IntakerExtensionParamsNT.feedPosMeters.getValue());
+                                default:
+                                    return Meters.of(
+                                            IntakerExtensionParamsNT.retractPosMeters.getValue());
+                            }
+                        }));
     }
 
     public Command runIntake() {
-        return Commands.parallel(
-                roller.runVelVolt(
-                        () -> RotationsPerSecond.of(IntakerRollerParamsNT.intakeVelRPS.getValue())),
-                extension.runMotionMagic(
-                        () -> Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())),
-                Commands.runOnce(() -> desiredMode = IntakeMode.INTAKING));
+        return Commands.runOnce(
+                () -> {
+                    fallbackMode = IntakeMode.INTAKING;
+                    if (currentMode != IntakeMode.FEEDING) {
+                        currentMode = IntakeMode.INTAKING;
+                    }
+                });
     }
 
     public Command runExtendedIdle() {
-        return Commands.parallel(
-                roller.runStop(),
-                extension.runMotionMagic(
-                        () -> Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue())),
-                Commands.runOnce(() -> desiredMode = IntakeMode.EXTENDED_IDLE));
+        return Commands.runOnce(
+                () -> {
+                    fallbackMode = IntakeMode.EXTENDED_IDLE;
+                    if (currentMode != IntakeMode.FEEDING) {
+                        currentMode = IntakeMode.EXTENDED_IDLE;
+                    }
+                });
     }
 
     public Command runRetract() {
-        return Commands.parallel(
-                roller.runStop(),
-                extension.runMotionMagic(
-                        () -> Meters.of(IntakerExtensionParamsNT.retractPosMeters.getValue())),
-                Commands.runOnce(() -> desiredMode = IntakeMode.RETRACTED));
+        return Commands.runOnce(
+                () -> {
+                    fallbackMode = IntakeMode.RETRACTED;
+                    if (currentMode != IntakeMode.FEEDING) {
+                        currentMode = IntakeMode.RETRACTED;
+                    }
+                });
     }
 
     public Command toggleIntake() {
         return Commands.either(
-                runExtendedIdle(), runIntake(), () -> desiredMode == IntakeMode.INTAKING);
+                runExtendedIdle(), runIntake(), () -> fallbackMode == IntakeMode.INTAKING);
     }
 
     //     public Command runFeed() {
@@ -104,28 +142,7 @@ public class IntakerSubsystem {
     //                                         })));
     //     }
     public Command runFeed() {
-        return Commands.parallel(
-                        roller.runVelVolt(
-                                () ->
-                                        RotationsPerSecond.of(
-                                                IntakerRollerParamsNT.intakeVelRPS.getValue())),
-                        extension.runPosition(
-                                () -> Meters.of(IntakerExtensionParamsNT.feedPosMeters.getValue())))
-                .finallyDo(
-                        () -> {
-                            switch (desiredMode) {
-                                case INTAKING:
-                                    CommandScheduler.getInstance().schedule(runIntake());
-                                    break;
-                                case EXTENDED_IDLE:
-                                    CommandScheduler.getInstance().schedule(runExtendedIdle());
-                                    break;
-                                case RETRACTED:
-                                    CommandScheduler.getInstance().schedule(runRetract());
-                                    break;
-                                default:
-                                    break;
-                            }
-                        });
+        return Commands.startEnd(
+                () -> currentMode = IntakeMode.FEEDING, () -> currentMode = fallbackMode);
     }
 }
