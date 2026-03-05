@@ -47,7 +47,7 @@ public final class SwerveMK5Config {
 
     public static SwerveModuleLimit kShootingSwerveLimit =
             SwerveModuleLimit.builder()
-                    .maxDriveVelocity(InchesPerSecond.of(3000.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveVelocity(InchesPerSecond.of(2000.0 / 60.0 / 7.03 * Math.PI * 4.0))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
                     // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))

@@ -13,7 +13,6 @@ import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class IntakerSubsystem {

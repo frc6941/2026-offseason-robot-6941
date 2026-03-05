@@ -19,7 +19,7 @@ public final class ShotCalculatorConfig {
         public static final double trajectoryBiasDegGOAL = -2;
         public static final double trajectoryBiasDegFEED = -2.3;
         public static final double loookfwdDistanceScale = 0;
-        public static final double lateralVelocityCompScale = 0.82;
+        public static final double lateralVelocityCompScale = 0.9;
         public static final double lookfwdDelayCycles = 10;
         public static final double lookfwdFlightScale = 0;
 

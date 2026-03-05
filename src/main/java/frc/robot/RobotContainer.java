@@ -147,7 +147,9 @@ public class RobotContainer {
                                             indicatorSubsystem.setPattern(Patterns.LOSS);
                                         }
                                     } else {
-                                        if (intake.getCurrentMode() == frc.robot.subsystems.IntakerSubsystem.IntakeMode.INTAKING) {
+                                        if (intake.getCurrentMode()
+                                                == frc.robot.subsystems.IntakerSubsystem.IntakeMode
+                                                        .INTAKING) {
                                             indicatorSubsystem.setPattern(Patterns.INTAKE);
                                         } else {
                                             indicatorSubsystem.setPattern(Patterns.NORMAL);
@@ -214,7 +216,10 @@ public class RobotContainer {
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();
-                                            CommandScheduler.getInstance().schedule(indicatorSubsystem.indicate(Patterns.AFTER_SHOOTING));
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
                                         }));
         driver.rightTrigger()
                 .whileTrue(
@@ -229,9 +234,11 @@ public class RobotContainer {
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();
-                                            CommandScheduler.getInstance().schedule(indicatorSubsystem.indicate(Patterns.AFTER_SHOOTING));
-                                        })
-                                );
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
