@@ -26,6 +26,8 @@ public class AutoFile {
         autoChooser.setDefaultOption("None", Commands.none());
         autoChooser.addOption("Test", buildTest());
         autoChooser.addOption("quickSweepRight", AutoRoutines.quickSweepRight());
+        autoChooser.addOption("quickSweepLeft", AutoRoutines.quickSweepLeft());
+        autoChooser.addOption("sweepLeftClimb", AutoRoutines.sweepLeftClimb());
     }
 
     private void initializeAutoPaths() {

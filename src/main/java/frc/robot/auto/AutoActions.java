@@ -66,7 +66,7 @@ public class AutoActions {
     public static final Pose2d kStationIntake =
             new Pose2d(0.639, 0.595, new Rotation2d(Degrees.of(180)));
 
-    public static final Pose2d kQuickSweependPoseL =
+    public static final Pose2d kQuickSweepEndPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kQuickSweepEndPoseR =
             new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));

@@ -41,7 +41,7 @@ public class AutoRoutines {
                                 drivePastSlope(true, true),
                                 Commands.deadline(
                                         driveToPose(
-                                                () -> AllianceFlipUtil.apply(kQuickSweependPoseL)),
+                                                () -> AllianceFlipUtil.apply(kQuickSweepEndPoseL)),
                                         Intake()),
                                 drivePastSlope(true, false)),
                 Collections.singleton(swerve));
