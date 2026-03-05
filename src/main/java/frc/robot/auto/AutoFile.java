@@ -23,7 +23,9 @@ public class AutoFile {
     }
 
     private void initializeAutoChooser() {
-        autoChooser.setDefaultOption("Test", buildTest());
+        autoChooser.setDefaultOption("None", Commands.none());
+        autoChooser.addOption("Test", buildTest());
+        autoChooser.addOption("quickSweepRight", AutoRoutines.quickSweepRight());
     }
 
     private void initializeAutoPaths() {
@@ -48,6 +50,6 @@ public class AutoFile {
     }
 
     public Command buildTest() {
-        return Commands.none();
+        return AutoActions.drivePastSlope(false, true);
     }
 }

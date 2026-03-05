@@ -16,9 +16,9 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
+    Timer m_gcTimer = new Timer();
     private Command autonomousCommand;
     private RobotContainer robotContainer;
-    Timer m_gcTimer = new Timer();
 
     public Robot() {
         super(RobotConstants.LOOPER_DT);

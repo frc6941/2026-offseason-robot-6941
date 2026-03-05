@@ -75,8 +75,6 @@ public class RobotContainer {
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
-    private Command intakeLatchedCommand;
-    private boolean isIntakeLatchedOn;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController oprator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
@@ -93,6 +91,8 @@ public class RobotContainer {
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
     private final AutoFile autoFile;
     private final LoggedDashboardChooser<Command> autoChooser;
+    private Command intakeLatchedCommand;
+    private boolean isIntakeLatchedOn;
     private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
@@ -128,6 +128,7 @@ public class RobotContainer {
         intakeLatchedCommand = intake.runIntake();
         isIntakeLatchedOn = false;
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
+        AutoRoutines.init(swerve);
         autoFile = new AutoFile();
         autoChooser =
                 new LoggedDashboardChooser<Command>("Auto Chooser", autoFile.getAutoChooser());
@@ -339,7 +340,6 @@ public class RobotContainer {
 
         driver.a().whileTrue(AutoActions.followPathFile("testPath"));
         driver.b().whileTrue(AutoRoutines.quickSweepRight());
-
         // Swerve
         driver.start()
                 .onTrue(

@@ -25,7 +25,6 @@ public final class RobotConstants {
     public static boolean disableHAL = false;
     public static boolean is10541 =
             RobotController.getSerialNumber().matches(RobotConstants.RIOSerial10541);
-    ;
 
     // auto robot config
     public static RobotConfig AUTO_ROBOT_CONFIG;
