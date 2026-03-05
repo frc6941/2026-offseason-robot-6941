@@ -22,6 +22,8 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
+import lombok.Getter;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ShootingSuperstructure {
@@ -30,6 +32,8 @@ public class ShootingSuperstructure {
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
     private final ShotCalculator calculator;
+    @Getter
+    private boolean isShooting = false;
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
@@ -77,11 +81,14 @@ public class ShootingSuperstructure {
                 runFrame(() -> this.calculator.computeShotFrame()),
                 Commands.waitUntil(() -> shooter.velocityAtGoal())
                         .andThen(
+                                Commands.runOnce(
+                                        () -> isShooting = true),
                                 idx.runVelVolt(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
                                                         ? getIdxSpeed(IdxMode.FEED)
-                                                        : getIdxSpeed(IdxMode.OFF))));
+                                                        : getIdxSpeed(IdxMode.OFF)))
+                        .finallyDo(() -> isShooting = false));
     }
 
     public Command runFrame(Supplier<ShotFrame> frame) {

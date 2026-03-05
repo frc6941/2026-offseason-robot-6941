@@ -156,12 +156,16 @@ public class RobotContainer {
                                             indicatorSubsystem.setPattern(Patterns.LOSS);
                                         }
                                     } else {
+                                        if (shootingSuperstructure.isShooting()) {
+                                            indicatorSubsystem.setPattern(Patterns.SHOOTING);
+                                        }else{
                                         if (intake.getCurrentMode()
                                                 == frc.robot.subsystems.IntakerSubsystem.IntakeMode
                                                         .INTAKING) {
                                             indicatorSubsystem.setPattern(Patterns.INTAKE);
                                         } else {
                                             indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                        }
                                         }
                                     }
                                 },
@@ -215,13 +219,11 @@ public class RobotContainer {
                         shootingSuperstructure
                                 .shootWhenReady()
                                 .alongWith(
-                                        Commands.parallel(
-                                                indicatorSubsystem.indicate(Patterns.SHOOTING),
-                                                Commands.runOnce(
-                                                        () ->
-                                                                swerve.setSwerveModuleLimit(
-                                                                        SwerveMK5Config
-                                                                                .kShootingSwerveLimit))))
+                                        Commands.runOnce(
+                                                () ->
+                                                        swerve.setSwerveModuleLimit(
+                                                                SwerveMK5Config
+                                                                        .kShootingSwerveLimit)))
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();
