@@ -43,8 +43,8 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoActions {
-    public static final double kVerticalSlopelineL = 5.79;
-    public static final double kVerticalSlopelineR = 2.21;
+    public static final double kVerticalSlopelineL = 5.59;
+    public static final double kVerticalSlopelineR = 2.41;
     public static final Pose2d kSweepStartPoseL =
             new Pose2d(7.54, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepStartPoseR =
@@ -64,7 +64,7 @@ public class AutoActions {
             new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
 
     public static final Pose2d kStationIntake =
-            new Pose2d(0.639, 0.595, new Rotation2d(Degrees.of(180)));
+            new Pose2d(0.59, 0.75, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kQuickSweepEndPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));

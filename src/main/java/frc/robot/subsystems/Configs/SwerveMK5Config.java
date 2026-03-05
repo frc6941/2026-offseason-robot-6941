@@ -42,7 +42,7 @@ public final class SwerveMK5Config {
                     .maxAngularVelocity(DegreesPerSecond.of(1000))
                     // accelerate in 0.32s, also must be smaller than the defined module limit to be
                     // actually effective
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000)) // 1000-1472
                     .build();
 
     public static SwerveModuleLimit kShootingSwerveLimit =
