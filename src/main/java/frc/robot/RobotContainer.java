@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -146,7 +147,11 @@ public class RobotContainer {
                                             indicatorSubsystem.setPattern(Patterns.LOSS);
                                         }
                                     } else {
-                                        indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                        if (intake.getCurrentMode() == frc.robot.subsystems.IntakerSubsystem.IntakeMode.INTAKING) {
+                                            indicatorSubsystem.setPattern(Patterns.INTAKE);
+                                        } else {
+                                            indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                        }
                                     }
                                 },
                                 indicatorSubsystem)
@@ -200,13 +205,17 @@ public class RobotContainer {
                                 .shootWhenReady()
                                 .alongWith(
                                         Commands.parallel(
-                                                indicatorSubsystem.indicate(Patterns.AIMING),
+                                                indicatorSubsystem.indicate(Patterns.SHOOTING),
                                                 Commands.runOnce(
                                                         () ->
                                                                 swerve.setSwerveModuleLimit(
                                                                         SwerveMK5Config
                                                                                 .kShootingSwerveLimit))))
-                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance().schedule(indicatorSubsystem.indicate(Patterns.AFTER_SHOOTING));
+                                        }));
         driver.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
@@ -217,7 +226,12 @@ public class RobotContainer {
                                                         swerve.setSwerveModuleLimit(
                                                                 SwerveMK5Config
                                                                         .kShootingSwerveLimit)))
-                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance().schedule(indicatorSubsystem.indicate(Patterns.AFTER_SHOOTING));
+                                        })
+                                );
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -312,7 +326,7 @@ public class RobotContainer {
                                                                     TransformRecorder.kFrameRobot);
                                                 }),
                                         indicatorSubsystem.indicateWithTimeout(
-                                                Patterns.RESET_ODOM, 0.3))
+                                                Patterns.RESET_ODOM, 1))
                                 .ignoringDisable(true));
 
         new Trigger(DriverStation::isEnabled)

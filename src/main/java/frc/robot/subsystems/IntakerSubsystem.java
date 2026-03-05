@@ -12,19 +12,22 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
+import lombok.Getter;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class IntakerSubsystem {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension;
 
-    private enum IntakeMode {
+    public enum IntakeMode {
         INTAKING,
         EXTENDED_IDLE,
         RETRACTED,
         FEEDING
     }
 
+    @Getter
     @AutoLogOutput(key = "IntakerRoller/state")
     private IntakeMode currentMode = IntakeMode.RETRACTED;
 
