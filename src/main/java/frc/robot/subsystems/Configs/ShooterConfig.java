@@ -48,16 +48,16 @@ public class ShooterConfig {
     public static final class ShooterParams {
         // velocity gains
 
-        public static final double kP = 0.25;
+        public static final double kP = 0.36;
         public static final double kI = 0.0;
         public static final double kD = 0.007;
         public static final double kV = 0.12962;
-        public static final double kA = 0.017641;
+        public static final double kA = 0.05;
         public static final double kS = 0.076032;
 
         public static final double velocityAtGoalToleranceRPS = 1;
 
         public static final double testVelRPS = 10;
-        public static final double idleVelRPS = 0;
+        public static final double idleVelRPS = 10;
     }
 }

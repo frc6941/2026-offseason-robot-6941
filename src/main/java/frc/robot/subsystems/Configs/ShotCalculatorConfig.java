@@ -16,7 +16,7 @@ public final class ShotCalculatorConfig {
         // Model tuning (model-space adjustments)
         public static final double speedScale = 1.0;
         public static final double speedOffsetMps = 0.0;
-        public static final double trajectoryBiasDegGOAL = -2;
+        public static final double trajectoryBiasDegGOAL = -2.5;
         public static final double trajectoryBiasDegFEED = -2.3;
         public static final double loookfwdDistanceScale = 0;
         public static final double lateralVelocityCompScale = 0.9;

@@ -158,14 +158,14 @@ public class RobotContainer {
                                     } else {
                                         if (shootingSuperstructure.isShooting()) {
                                             indicatorSubsystem.setPattern(Patterns.SHOOTING);
-                                        }else{
-                                        if (intake.getCurrentMode()
-                                                == frc.robot.subsystems.IntakerSubsystem.IntakeMode
-                                                        .INTAKING) {
-                                            indicatorSubsystem.setPattern(Patterns.INTAKE);
                                         } else {
-                                            indicatorSubsystem.setPattern(Patterns.NORMAL);
-                                        }
+                                            if (intake.getCurrentMode()
+                                                    == frc.robot.subsystems.IntakerSubsystem
+                                                            .IntakeMode.INTAKING) {
+                                                indicatorSubsystem.setPattern(Patterns.INTAKE);
+                                            } else {
+                                                indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                            }
                                         }
                                     }
                                 },
@@ -250,6 +250,7 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+        driver.povUp().onTrue(shootingSuperstructure.runUnjamming());
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -323,7 +324,7 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.followPathFile("testPath"));
+        driver.a().whileTrue(AutoRoutines.sweepRightClimb());
         driver.b().whileTrue(AutoRoutines.quickSweepRight());
         // Swerve
         driver.start()

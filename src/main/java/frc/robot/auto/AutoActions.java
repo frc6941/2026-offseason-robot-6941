@@ -64,7 +64,7 @@ public class AutoActions {
             new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
 
     public static final Pose2d kStationIntake =
-            new Pose2d(0.59, 0.75, new Rotation2d(Degrees.of(180)));
+            new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kQuickSweepEndPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
@@ -205,13 +205,13 @@ public class AutoActions {
                         shiftingDirectionSupplier,
                         swerve.getSwerveLimit(),
                         1.2,
-                        1.0)
+                        1.6)
                 .beforeStarting(
                         Commands.runOnce(
                                 () -> {
                                     Logger.recordOutput("Temp/targetAllignPose", targetPose);
                                     swerve.setSwerveModuleLimit(
-                                            SwerveMK5Config.kShootingSwerveLimit);
+                                            SwerveMK5Config.kAutoLimit);
                                 }))
                 .finallyDo(() -> swerve.setSwerveModuleLimitDefault());
     }
@@ -278,6 +278,10 @@ public class AutoActions {
         return intake.runIntake();
     }
 
+    public static Command runFeed(){
+        return intake.runFeed();
+    }
+
     public static Command retractIntake() {
         return intake.runRetract();
     }
@@ -310,7 +314,7 @@ public class AutoActions {
                 });
     }
 
-    public static Command followPathFile(String pathName) {
+    public static Command followPathFile(String pathName , boolean shouldMirror) {
         return swerve.defer(
                 () -> {
                     PathPlannerPath path;
@@ -321,6 +325,7 @@ public class AutoActions {
                     }
                     if (AllianceFlipUtil.shouldFlip()) {
                         path = path.flipPath();
+                        path = shouldMirror ? path.mirrorPath() : path;
                     }
                     return followPath(path);
                 });
