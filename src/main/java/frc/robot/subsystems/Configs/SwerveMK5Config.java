@@ -42,7 +42,7 @@ public final class SwerveMK5Config {
                     .maxAngularVelocity(DegreesPerSecond.of(1000))
                     // accelerate in 0.32s, also must be smaller than the defined module limit to be
                     // actually effective
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2000)) // 1000-1472
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
                     .build();
 
     public static SwerveModuleLimit kShootingSwerveLimit =
@@ -56,16 +56,16 @@ public final class SwerveMK5Config {
                             RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
                     .build();
 
-                    public static SwerveModuleLimit kAutoLimit =
-                    SwerveModuleLimit.builder()
-                            .maxDriveVelocity(InchesPerSecond.of(2500.0 / 60.0 / 7.03 * Math.PI * 4.0))
-                            .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
-                            // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
-                            .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
-                            // accelerate in 0.2s
-                            .maxSteerAngularAcceleration(
-                                    RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
-                            .build();
+    public static SwerveModuleLimit kAutoLimit =
+            SwerveModuleLimit.builder()
+                    .maxDriveVelocity(InchesPerSecond.of(2500.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
+                    // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
+                    .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
+                    // accelerate in 0.2s
+                    .maxSteerAngularAcceleration(
+                            RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
+                    .build();
 
     public static SwerveLimit kSimSwerveLimit =
             SwerveLimit.builder()

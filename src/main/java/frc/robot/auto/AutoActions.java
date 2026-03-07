@@ -210,8 +210,7 @@ public class AutoActions {
                         Commands.runOnce(
                                 () -> {
                                     Logger.recordOutput("Temp/targetAllignPose", targetPose);
-                                    swerve.setSwerveModuleLimit(
-                                            SwerveMK5Config.kAutoLimit);
+                                    swerve.setSwerveModuleLimit(SwerveMK5Config.kAutoLimit);
                                 }))
                 .finallyDo(() -> swerve.setSwerveModuleLimitDefault());
     }
@@ -278,7 +277,7 @@ public class AutoActions {
         return intake.runIntake();
     }
 
-    public static Command runFeed(){
+    public static Command runFeed() {
         return intake.runFeed();
     }
 
@@ -314,7 +313,7 @@ public class AutoActions {
                 });
     }
 
-    public static Command followPathFile(String pathName , boolean shouldMirror) {
+    public static Command followPathFile(String pathName, boolean shouldMirror) {
         return swerve.defer(
                 () -> {
                     PathPlannerPath path;

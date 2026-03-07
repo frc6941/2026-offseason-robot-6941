@@ -138,9 +138,9 @@ public class ShotCalculator {
         double totalCyclesRaw =
                 ShotCalculatorParamsNT.lookfwdDelayCycles.getValue()
                         + ShotCalculatorParamsNT.loookfwdDistanceScale.getValue()
-                                * currentDistanceMeters;
-        // + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
-        //         * (initialModel.flightTimeSec / RobotConstants.LOOPER_DT);
+                                * currentDistanceMeters
+                        + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
+                                * (initialModel.flightTimeSec / RobotConstants.LOOPER_DT);
 
         double totalCycles =
                 MathUtil.clamp(

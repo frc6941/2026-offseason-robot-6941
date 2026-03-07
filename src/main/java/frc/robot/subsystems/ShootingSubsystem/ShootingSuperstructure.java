@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
-import frc.robot.subsystems.Configs.ShotCalculatorConfig;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
@@ -58,7 +57,7 @@ public class ShootingSuperstructure {
         double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
         double muzzleSpeedMps =
                 (rpm
-                                - ShotCalculatorConfig.ShotCalculatorParams.rpmB * bba.in(Degrees)
+                                - ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
                                 - ShotCalculatorParamsNT.rpmC.getValue())
                         / rpmA;
         return new ShotFrame(turretWorldRotation, modelHood, MetersPerSecond.of(muzzleSpeedMps));
@@ -95,7 +94,8 @@ public class ShootingSuperstructure {
                 hood.runPosition(() -> computeBBA(frame.get().hoodAngle())),
                 shooter.runVelVolt(
                         () -> {
-                            double rpm = computeRpm(frame.get().muzzleSpeed());
+                            Angle bba = computeBBA(frame.get().hoodAngle());
+                            double rpm = computeRpm(frame.get().muzzleSpeed(), bba);
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
     }
@@ -111,9 +111,10 @@ public class ShootingSuperstructure {
                 .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
     }
 
-    private double computeRpm(LinearVelocity muzzleSpeed) {
+    private double computeRpm(LinearVelocity muzzleSpeed, Angle bba) {
 
         return ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
+                + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
                 + ShotCalculatorParamsNT.rpmC.getValue();
     }
 

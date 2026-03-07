@@ -20,7 +20,7 @@ public class AutoRoutines {
                 () ->
                         Commands.sequence(
                                 drivePastSlope(true, true),
-                                Commands.deadline(followPathFile("sweepRight",true), Intake()),
+                                Commands.deadline(followPathFile("sweepRight", true), Intake()),
                                 drivePastSlope(true, false),
                                 shoot()),
                 Collections.singleton(swerve));
@@ -30,19 +30,19 @@ public class AutoRoutines {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                drivePastSlope(false, true),
-                                Commands.deadline(followPathFile("sweepRight",false), Intake()),
-                                drivePastSlope(false, false),
+                                // drivePastSlope(false, true),
+                                // Commands.deadline(followPathFile("sweepRight", false), Intake()),
+                                // drivePastSlope(false, false),
                                 shoot().alongWith(
-                                        Commands.sequence(
-                                                Commands.deadline(
-                                                        allignToStation(), Intake()),
-                                                Commands.waitSeconds(1),
-                                                allignToClimb(false)).alongWith(
-                                                        Commands.waitSeconds(0.5).andThen(
-                                                                runFeed()
-                                                        )
-                                                ))),
+                                                Commands.sequence(
+                                                                Commands.deadline(
+                                                                        allignToStation(),
+                                                                        Intake()),
+                                                                Commands.waitSeconds(1),
+                                                                allignToClimb(false))
+                                                        .alongWith(
+                                                                Commands.waitSeconds(0.5)
+                                                                        .andThen(runFeed())))),
                 Collections.singleton(swerve));
     }
 
