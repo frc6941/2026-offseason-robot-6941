@@ -71,7 +71,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_SWERVE_IO = false;
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
@@ -122,8 +122,7 @@ public class RobotContainer {
                         TargetMode.FEED,
                         deploy.resolve("results_PASS.json")));
 
-        shootingSuperstructure =
-                new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
+        shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
         AutoRoutines.init(swerve);
@@ -203,6 +202,7 @@ public class RobotContainer {
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.putVelocityRobotCmd(now, swerve.getChassisSpeedsCmd());
+        RobotStateRecorder.setCmdFrame(shotCalculator.computeShotFrame());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
     }

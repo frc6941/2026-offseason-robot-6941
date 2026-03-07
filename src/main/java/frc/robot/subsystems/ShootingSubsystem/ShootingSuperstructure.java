@@ -29,20 +29,17 @@ public class ShootingSuperstructure {
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
-    private final ShotCalculator calculator;
     @Getter private boolean isShooting = false;
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
-            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx,
-            ShotCalculator calculator) {
+            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx) {
         this.turret = turret;
         this.hood = hood;
         this.shooter = shooter;
         this.idx = idx;
-        this.calculator = calculator;
     }
 
     public ShotFrame getCurrentFrame() {
@@ -70,12 +67,12 @@ public class ShootingSuperstructure {
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
         hood.setDefaultCommand(
-                hood.runPosition(() -> computeBBA(calculator.computeShotFrame().hoodAngle())));
+                hood.runPosition(() -> computeBBA(RobotStateRecorder.getCmdFrame().hoodAngle())));
     }
 
     public Command shootWhenReady() {
         return Commands.parallel(
-                runFrame(() -> this.calculator.computeShotFrame()),
+                runFrame(),
                 Commands.waitUntil(() -> shooter.velocityAtGoal())
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
@@ -87,21 +84,22 @@ public class ShootingSuperstructure {
                         .finallyDo(() -> isShooting = false));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame) {
+    public Command runFrame() {
         return Commands.parallel(
-                Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
-                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld()),
-                hood.runPosition(() -> computeBBA(frame.get().hoodAngle())),
+                turret.setTurretPoseWorld(
+                        () -> RobotStateRecorder.getCmdFrame().turretAngleWorld()),
+                hood.runPosition(() -> computeBBA(RobotStateRecorder.getCmdFrame().hoodAngle())),
                 shooter.runVelVolt(
                         () -> {
-                            Angle bba = computeBBA(frame.get().hoodAngle());
-                            double rpm = computeRpm(frame.get().muzzleSpeed(), bba);
+                            ShotFrame frame = RobotStateRecorder.getCmdFrame();
+                            Angle bba = computeBBA(frame.hoodAngle());
+                            double rpm = computeRpm(frame.muzzleSpeed(), bba);
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
-        return Commands.parallel(runFrame(frame), idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
+    public Command runFrame(Supplier<IdxMode> idxMode) {
+        return Commands.parallel(runFrame(), idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
         // TODO: revert
     }
 
