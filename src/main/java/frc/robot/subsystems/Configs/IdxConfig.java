@@ -69,7 +69,9 @@ public class IdxConfig {
 
         public static final double unjammTimeoutSec = 0.1;
         public static final double unjammTriggerAmps = 60;
-        public static final double unjammTriggerSec = 0.3;
+        public static final double unjammTriggerBelowRps = 0.4;
+        public static final double unjammTriggerSec = 0.05;
+        public static final double unjammLockoutSec = 0.1;
 
         public static final boolean isBrake = true;
 

@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
-import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
@@ -28,14 +27,14 @@ public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
+    private final SpindexerSubsystem idx;
     @Getter private boolean isShooting = false;
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
-            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx) {
+            SpindexerSubsystem idx) {
         this.turret = turret;
         this.hood = hood;
         this.shooter = shooter;
@@ -62,7 +61,7 @@ public class ShootingSuperstructure {
 
     public void setDefaultCommand() {
         turret.setDefaultCommand(turret.runTurretTargetLoop());
-        idx.setDefaultCommand(idx.runVelVolt(() -> getIdxSpeed(IdxMode.OFF)));
+        idx.setDefaultCommand(idx.runState(() -> IdxMode.OFF));
         shooter.setDefaultCommand(
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
@@ -70,17 +69,17 @@ public class ShootingSuperstructure {
                 hood.runPosition(() -> computeBBA(RobotStateRecorder.getCmdFrame().hoodAngle())));
     }
 
-    public Command shootWhenReady() {
+    public Command shootWhenReady(boolean forceFeed) {
         return Commands.parallel(
                 runFrame(),
                 Commands.waitUntil(() -> shooter.velocityAtGoal())
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
-                                idx.runVelVolt(
+                                idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
-                                                        ? getIdxSpeed(IdxMode.FEED)
-                                                        : getIdxSpeed(IdxMode.OFF)))
+                                                        ? forceFeed ? IdxMode.FORCE_FEED : IdxMode.OFF
+                                                        : IdxMode.OFF))
                         .finallyDo(() -> isShooting = false));
     }
 
@@ -98,9 +97,8 @@ public class ShootingSuperstructure {
                         }));
     }
 
-    public Command runFrame(Supplier<IdxMode> idxMode) {
-        return Commands.parallel(runFrame(), idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
-        // TODO: revert
+    public Command runFrame(Supplier<IdxMode> idxModeSupplier) {
+        return Commands.parallel(runFrame(), idx.runState(idxModeSupplier));
     }
 
     private Angle computeBBA(Angle modelAngle) {
@@ -122,22 +120,18 @@ public class ShootingSuperstructure {
     }
 
     public Command runUnjamming() {
-        return Commands.parallel(
-                idx.runVelVolt(() -> getIdxSpeed(IdxMode.REVERSE))
-                        .withTimeout(Seconds.of(SpindexerParamsNT.unjammTimeoutSec.getValue())));
+        return idx.runState(() -> IdxMode.REVERSE)
+                .withTimeout(Seconds.of(SpindexerParamsNT.unjammTimeoutSec.getValue()));
     }
 
-    public AngularVelocity getIdxSpeed(IdxMode idxMode) {
-        return switch (idxMode) {
-            case OFF -> RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue());
-            case FEED -> RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue());
-            case REVERSE -> RotationsPerSecond.of(SpindexerModeParamsNT.revRPS.getValue());
-        };
+    public Command runForceFeeding() {
+        return idx.runState(() -> IdxMode.FORCE_FEED);
     }
 
     public enum IdxMode {
         OFF,
         FEED,
+        FORCE_FEED,
         REVERSE
     }
 }

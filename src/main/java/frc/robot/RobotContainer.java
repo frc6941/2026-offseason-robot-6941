@@ -34,6 +34,7 @@ import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
+import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class RobotContainer {
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
+    private final SpindexerSubsystem spindexer;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final ShootingSuperstructure shootingSuperstructure;
     private final VelocityMotorSubsystem intakerRoller;
@@ -92,8 +93,6 @@ public class RobotContainer {
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
     private final AutoFile autoFile;
     private final LoggedDashboardChooser<Command> autoChooser;
-    private Command intakeLatchedCommand;
-    private boolean isIntakeLatchedOn;
     private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
@@ -218,7 +217,7 @@ public class RobotContainer {
         oprator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
-                                .shootWhenReady()
+                                .shootWhenReady(true)
                                 .alongWith(
                                         Commands.runOnce(
                                                 () ->
@@ -236,7 +235,7 @@ public class RobotContainer {
         driver.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
-                                .shootWhenReady()
+                                .shootWhenReady(false)
                                 .alongWith(
                                         Commands.runOnce(
                                                 () ->
@@ -366,8 +365,8 @@ public class RobotContainer {
 
     // Helper methods
 
-    private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
-        return new VelocityMotorSubsystem<>(
+    private SpindexerSubsystem buildSpindexer(boolean isReal) {
+        return new SpindexerSubsystem(
                 IdxConfig.SPINDEXER_CFG,
                 new MotorInputsAutoLogged(),
                 isReal
