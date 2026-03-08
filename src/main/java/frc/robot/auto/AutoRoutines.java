@@ -65,15 +65,27 @@ public class AutoRoutines {
                         Commands.sequence(
                                 drivePastSlope(false, true),
                                 Commands.deadline(
-                                        driveToPose(AllianceFlipUtil.apply(kQuickSweepEndPoseR)),
-                                        Intake()),
+                                        followPathFile("quickSweepRight", false), Intake()),
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                allignToStation(), Intake()),
-                                                        Commands.waitSeconds(2.5),
-                                                        allignToClimb(false)))),
+                                                                allignToStation(), Intake())))),
+                Collections.singleton(swerve));
+    }
+
+    public static Command longSweepRight() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                drivePastSlope(false, true),
+                                Commands.deadline(
+                                        followPathFile("longSweepRight", false), Intake()),
+                                drivePastSlope(false, false),
+                                shoot().alongWith(
+                                                Commands.sequence(
+                                                        Commands.deadline(
+                                                                allignToStation(), Intake())))),
                 Collections.singleton(swerve));
     }
 }

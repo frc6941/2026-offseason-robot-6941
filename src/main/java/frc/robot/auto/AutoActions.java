@@ -114,21 +114,6 @@ public class AutoActions {
         return Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(isToNeutral));
     }
 
-    static Command driveSweep(boolean isLeft) {
-        return swerve.defer(
-                () -> {
-                    Pose2d sweepStart =
-                            AllianceFlipUtil.apply(isLeft ? kSweepStartPoseL : kSweepStartPoseR);
-                    Pose2d sweepEnd =
-                            AllianceFlipUtil.apply(isLeft ? kSweepEndPoseR : kSweepEndPoseL);
-                    Pose2d current = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
-                    List<Pose2d> waypoints = List.of(current, sweepStart, sweepEnd);
-                    PathPlannerPath path =
-                            generatePath(waypoints, Collections.emptyList(), 4.2, 10.0, 0.0);
-                    return followPath(path);
-                });
-    }
-
     static Command allignToClimb(boolean isLeft) {
         return swerve.defer(
                 () -> {
@@ -187,7 +172,7 @@ public class AutoActions {
                 });
     }
 
-    static Command driveToPose(Pose2d targetPose) {
+    public static Command driveToPose(Pose2d targetPose) {
         return driveToPose(() -> targetPose);
     }
 

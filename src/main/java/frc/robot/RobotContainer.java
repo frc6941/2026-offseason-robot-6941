@@ -10,6 +10,7 @@ import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -71,7 +72,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = false;
+    private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
@@ -209,7 +210,7 @@ public class RobotContainer {
 
     private void configureBindings() {
         driver.leftTrigger().onTrue(intake.toggleIntake());
-        driver.leftBumper().whileTrue(intake.runFeed());
+        oprator.leftBumper().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intakerExtension.zeroCommand());
 
@@ -325,7 +326,11 @@ public class RobotContainer {
         //                         Degrees.of(2)));
 
         driver.a().whileTrue(AutoRoutines.sweepRightClimb());
-        driver.b().whileTrue(AutoRoutines.quickSweepRight());
+        driver.b()
+                .whileTrue(
+                        AutoActions.driveToPose(
+                                AllianceFlipUtil.apply(
+                                        new Pose2d(2.521, 3.816, new Rotation2d()))));
         // Swerve
         driver.start()
                 .onTrue(
