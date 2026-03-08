@@ -19,8 +19,7 @@ public final class RobotConstants {
     public static final int PIGEON_ID = 14; // Pigeon2 IMU device ID
     public static final int LED_PORT = 0;
     public static final int LED_LENGTH = 40;
-    public static boolean is10541 =
-            RobotController.getSerialNumber().matches(RobotConstants.RIOSerial10541);
+    public static boolean is10541 = RIOSerial10541.equals(RobotController.getSerialNumber());
     // CAN bus configuration
     public static final String CANIVORE_CAN_BUS_NAME = is10541 ? "10541Canivore0" : "6941Canivore0";
     public static final CANBus CANIVORE_CAN_BUS = new CANBus(CANIVORE_CAN_BUS_NAME);

@@ -10,7 +10,6 @@ import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -217,7 +216,7 @@ public class RobotContainer {
         oprator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
-                                .shootWhenReady(true)
+                                .shootWhenReady(false)
                                 .alongWith(
                                         Commands.runOnce(
                                                 () ->
@@ -325,11 +324,7 @@ public class RobotContainer {
         //                         Degrees.of(2)));
 
         driver.a().whileTrue(AutoRoutines.sweepRightClimb());
-        driver.b()
-                .whileTrue(
-                        AutoActions.driveToPose(
-                                AllianceFlipUtil.apply(
-                                        new Pose2d(2.521, 3.816, new Rotation2d()))));
+        driver.b().whileTrue(AutoRoutines.quickSweepRight());
         // Swerve
         driver.start()
                 .onTrue(

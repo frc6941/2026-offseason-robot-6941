@@ -271,7 +271,7 @@ public class AutoActions {
     }
 
     public static Command shoot() {
-        return shooter.shootWhenReady();
+        return shooter.shootWhenReady(false);
     }
 
     // Helpermethod

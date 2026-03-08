@@ -78,7 +78,9 @@ public class ShootingSuperstructure {
                                 idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
-                                                        ? forceFeed ? IdxMode.FORCE_FEED : IdxMode.OFF
+                                                        ? forceFeed
+                                                                ? IdxMode.FORCE_FEED
+                                                                : IdxMode.FEED
                                                         : IdxMode.OFF))
                         .finallyDo(() -> isShooting = false));
     }
