@@ -245,9 +245,7 @@ public class ShotCalculator {
 
     /** Applies tuning offsets in model space. */
     public ShotModel applyModelTuning(ShotModel model, TargetMode mode) {
-        double speed =
-                model.exitSpeedMps * ShotCalculatorParamsNT.speedScale.getValue()
-                        + ShotCalculatorParamsNT.speedOffsetMps.getValue();
+        double speed = model.exitSpeedMps;
         double angle =
                 mode == TargetMode.GOAL
                         ? model.launchAngleDeg

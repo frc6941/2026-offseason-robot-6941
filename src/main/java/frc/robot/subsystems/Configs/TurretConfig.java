@@ -92,7 +92,7 @@ public class TurretConfig {
 
         public static final double maxVelocityRPS = 3.5;
         public static final double maxAccelerationRPS2 = 11;
-        public static final double kchassisVelCompensation = 0.9;
+        public static final double kchassisVelCompensation = 1;
         public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.
         // Must satisfy seekEnterErrorDegrees > trackEnterErrorDegrees.
