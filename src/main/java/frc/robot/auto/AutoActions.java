@@ -26,6 +26,7 @@ import frc.robot.Robot;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.AutoParamsNT;
+import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
@@ -106,7 +107,11 @@ public class AutoActions {
                             AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
                     Pose2d slopeEnd = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
                     Pose2d targetPose = isToNeutral ? slopeFront : slopeEnd;
-                    return Commands.deadline(waitCrossedBump(isToNeutral), driveToPose(targetPose));
+                    return Commands.deadline(waitCrossedBump(isToNeutral), driveToPose(targetPose))
+                            .beforeStarting(
+                                    () ->
+                                            Logger.recordOutput(
+                                                    "Temp/isPitchStable", isPitchStable()));
                 });
     }
 
@@ -264,6 +269,25 @@ public class AutoActions {
 
     public static Command runFeed() {
         return intake.runFeed();
+    }
+
+    public static Command oscillateIntakeFeed() {
+        return Commands.defer(
+                () -> {
+                    double feedOscillationRateHz =
+                            IntakerExtensionParamsNT.feedOscillationRateHz.getValue();
+                    if (feedOscillationRateHz <= 0.0) {
+                        return runFeed();
+                    }
+
+                    double halfCycleSeconds = 0.5 / feedOscillationRateHz;
+                    return Commands.sequence(
+                                    Intake(),
+                                    Commands.waitSeconds(halfCycleSeconds),
+                                    runFeed().withTimeout(halfCycleSeconds))
+                            .repeatedly();
+                },
+                Collections.emptySet());
     }
 
     public static Command retractIntake() {

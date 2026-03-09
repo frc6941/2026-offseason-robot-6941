@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Collections;
 import lib.ironpulse.swerve.Swerve;
-import lib.ironpulse.utils.AllianceFlipUtil;
 
 public class AutoRoutines {
     public static Swerve swerve;
@@ -35,28 +34,13 @@ public class AutoRoutines {
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
-                                                                Commands.deadline(
-                                                                        allignToStation(),
-                                                                        Intake()),
-                                                                Commands.waitSeconds(1),
-                                                                runFeed(),
-                                                                allignToClimb(false))
-                                                        .alongWith(
-                                                                Commands.waitSeconds(0.5)
-                                                                        .andThen(runFeed())))),
-                Collections.singleton(swerve));
-    }
-
-    public static Command quickSweepLeft() {
-        return Commands.defer(
-                () ->
-                        Commands.sequence(
-                                drivePastSlope(true, true),
-                                Commands.deadline(
-                                        driveToPose(
-                                                () -> AllianceFlipUtil.apply(kQuickSweepEndPoseL)),
-                                        Intake()),
-                                drivePastSlope(true, false)),
+                                                        Commands.deadline(
+                                                                allignToStation(),
+                                                                oscillateIntakeFeed()),
+                                                        Commands.waitSeconds(1),
+                                                        Commands.parallel(
+                                                                oscillateIntakeFeed(),
+                                                                allignToClimb(false))))),
                 Collections.singleton(swerve));
     }
 
@@ -89,5 +73,9 @@ public class AutoRoutines {
                                                         Commands.deadline(
                                                                 allignToStation(), Intake())))),
                 Collections.singleton(swerve));
+    }
+
+    public static Command testPath() {
+        return followPathFile("testPath", false);
     }
 }

@@ -12,7 +12,7 @@ import lib.ironpulse.utils.Logging;
 public final class RobotConstants {
     public static final String RIOSerial10541 = "0334EE73";
     // Robot timing constants
-    public static final double LOOPER_DT = 0.01; // 50Hz control loop
+    public static final double LOOPER_DT = 0.02; // 50Hz control loop
     public static final String ROBORIO_CAN_BUS_NAME = "rio";
     public static final CANBus ROBORIO_CAN_BUS = new CANBus(ROBORIO_CAN_BUS_NAME);
     // Hardware device IDs

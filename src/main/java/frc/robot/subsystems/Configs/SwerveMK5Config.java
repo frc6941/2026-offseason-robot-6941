@@ -166,9 +166,9 @@ public final class SwerveMK5Config {
                             })
                     .odometryFrequency(Hertz.of(100))
                     .driveStatorCurrentLimit(Amps.of(80))
-                    .driveSupplyCurrentLimit(Amps.of(80))
-                    .steerStatorCurrentLimit(Amps.of(70))
-                    .steerSupplyCurrentLimit(Amps.of(65))
+                    .driveSupplyCurrentLimit(Amps.of(65))
+                    .steerStatorCurrentLimit(Amps.of(55))
+                    .steerSupplyCurrentLimit(Amps.of(40))
                     .canivoreCanBus(CANIVORE_CAN_BUS)
                     .pigeonId(RobotConstants.PIGEON_ID)
                     .build();
@@ -177,10 +177,10 @@ public final class SwerveMK5Config {
     @SuppressWarnings("unused")
     private static final class SwerveModuleParams {
         private static final class Drive {
-            static final double kP = 8;
+            static final double kP = 6;
             static final double kI = 0;
             static final double kD = 0;
-            static final double kS = 2;
+            static final double kS = 0;
             // CTRE Slot0 kV for VelocityTorqueCurrentFOC with motor velocity units (rotor rps):
             // kV ~= 12V / (5800rpm / 60) = 0.124
             static final double kV = 0.136;
@@ -189,7 +189,7 @@ public final class SwerveMK5Config {
         }
 
         private static final class Steer {
-            static final double kP = 40;
+            static final double kP = 60;
             static final double kI = 0;
             static final double kD = 0.1;
             static final double kS = 0;

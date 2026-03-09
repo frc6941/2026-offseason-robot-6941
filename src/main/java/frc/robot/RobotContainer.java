@@ -325,6 +325,7 @@ public class RobotContainer {
 
         driver.a().whileTrue(AutoRoutines.sweepRightClimb());
         driver.b().whileTrue(AutoRoutines.quickSweepRight());
+        driver.x().whileTrue(AutoRoutines.longSweepRight());
         // Swerve
         driver.start()
                 .onTrue(
