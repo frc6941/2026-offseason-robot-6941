@@ -51,25 +51,46 @@ import org.littletonrobotics.junction.Logger;
  * subsystem using {@code ShotCalculatorParams}.
  */
 public class ShotCalculator {
-    /** Targets supported by the shot calculator. */
-    public enum TargetMode {
-        GOAL,
-        FEED
-    }
-
-    /** Model-space outputs (exit speed, launch angle, flight time). */
-    public record ShotModel(double exitSpeedMps, double launchAngleDeg, double flightTimeSec) {}
-
-    private record ModelPoint(
-            double distance,
-            double robot_vel,
-            double final_vel,
-            double final_angle,
-            double flight_time) {}
-
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
     private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
             tableByTarget = new EnumMap<>(TargetMode.class);
+
+    private static NavigableMap<Double, NavigableMap<Double, ShotModel>> buildTable(
+            List<ModelPoint> points) {
+        NavigableMap<Double, NavigableMap<Double, ShotModel>> table = new TreeMap<>();
+        for (ModelPoint p : points) {
+            table.computeIfAbsent(p.distance, k -> new TreeMap<>())
+                    .put(p.robot_vel, new ShotModel(p.final_vel, p.final_angle, p.flight_time));
+        }
+        return table;
+    }
+
+    private static ShotModel interpolateVelocityPlane(
+            NavigableMap<Double, ShotModel> plane, double velocityParallel) {
+        if (plane.isEmpty()) {
+            return new ShotModel(0.0, 0.0, 0.0);
+        }
+        Map.Entry<Double, ShotModel> v0 = plane.floorEntry(velocityParallel);
+        Map.Entry<Double, ShotModel> v1 = plane.ceilingEntry(velocityParallel);
+        if (v0 == null) {
+            v0 = plane.firstEntry();
+        }
+        if (v1 == null) {
+            v1 = plane.lastEntry();
+        }
+        if (v0.getKey().equals(v1.getKey())) {
+            return v0.getValue();
+        }
+        double t = (velocityParallel - v0.getKey()) / (v1.getKey() - v0.getKey());
+        return interpolateModel(v0.getValue(), v1.getValue(), t);
+    }
+
+    private static ShotModel interpolateModel(ShotModel a, ShotModel b, double t) {
+        double speed = a.exitSpeedMps + (b.exitSpeedMps - a.exitSpeedMps) * t;
+        double angle = a.launchAngleDeg + (b.launchAngleDeg - a.launchAngleDeg) * t;
+        double time = a.flightTimeSec + (b.flightTimeSec - a.flightTimeSec) * t;
+        return new ShotModel(speed, angle, time);
+    }
 
     /** Loads model tables by target. */
     public void initialize(Map<TargetMode, Path> modelJsonByTarget) {
@@ -93,13 +114,7 @@ public class ShotCalculator {
 
     /** Computes the shot frame using automatic zone-based shot decision. */
     public ShotFrame computeShotFrame() {
-        TargetMode mode;
-        double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
-        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
-            mode = TargetMode.GOAL;
-        } else {
-            mode = TargetMode.FEED;
-        }
+        TargetMode mode = decideShotMode();
         String targetFrame;
         if (mode == TargetMode.GOAL) {
             targetFrame = RobotStateRecorder.kFrameGoal;
@@ -115,7 +130,7 @@ public class ShotCalculator {
 
     public TargetMode decideShotMode() {
         double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
-        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
+        if (xAlliance <= FieldConstants.LinesVertical.neutralZoneNear) {
             return TargetMode.GOAL;
         }
         return TargetMode.FEED;
@@ -261,40 +276,19 @@ public class ShotCalculator {
         return baseYaw.plus(yawComp).getMeasure();
     }
 
-    private static NavigableMap<Double, NavigableMap<Double, ShotModel>> buildTable(
-            List<ModelPoint> points) {
-        NavigableMap<Double, NavigableMap<Double, ShotModel>> table = new TreeMap<>();
-        for (ModelPoint p : points) {
-            table.computeIfAbsent(p.distance, k -> new TreeMap<>())
-                    .put(p.robot_vel, new ShotModel(p.final_vel, p.final_angle, p.flight_time));
-        }
-        return table;
+    /** Targets supported by the shot calculator. */
+    public enum TargetMode {
+        GOAL,
+        FEED
     }
 
-    private static ShotModel interpolateVelocityPlane(
-            NavigableMap<Double, ShotModel> plane, double velocityParallel) {
-        if (plane.isEmpty()) {
-            return new ShotModel(0.0, 0.0, 0.0);
-        }
-        Map.Entry<Double, ShotModel> v0 = plane.floorEntry(velocityParallel);
-        Map.Entry<Double, ShotModel> v1 = plane.ceilingEntry(velocityParallel);
-        if (v0 == null) {
-            v0 = plane.firstEntry();
-        }
-        if (v1 == null) {
-            v1 = plane.lastEntry();
-        }
-        if (v0.getKey().equals(v1.getKey())) {
-            return v0.getValue();
-        }
-        double t = (velocityParallel - v0.getKey()) / (v1.getKey() - v0.getKey());
-        return interpolateModel(v0.getValue(), v1.getValue(), t);
-    }
+    /** Model-space outputs (exit speed, launch angle, flight time). */
+    public record ShotModel(double exitSpeedMps, double launchAngleDeg, double flightTimeSec) {}
 
-    private static ShotModel interpolateModel(ShotModel a, ShotModel b, double t) {
-        double speed = a.exitSpeedMps + (b.exitSpeedMps - a.exitSpeedMps) * t;
-        double angle = a.launchAngleDeg + (b.launchAngleDeg - a.launchAngleDeg) * t;
-        double time = a.flightTimeSec + (b.flightTimeSec - a.flightTimeSec) * t;
-        return new ShotModel(speed, angle, time);
-    }
+    private record ModelPoint(
+            double distance,
+            double robot_vel,
+            double final_vel,
+            double final_angle,
+            double flight_time) {}
 }
