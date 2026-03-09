@@ -16,6 +16,8 @@ public class LimelightIOConfig {
     // Higher values (e.g., 0.01): Faster tracking of the reference source (MT1 or external IMU).
     @Builder.Default private final double filterAlpha = 0.2;
     @Builder.Default private final String name = "UNNAMED";
+    @Builder.Default private final int portToForwardStream = 0;
+    @Builder.Default private final int portToForwardPipeline = 0;
 
     private final MountPosition mountPosition;
 

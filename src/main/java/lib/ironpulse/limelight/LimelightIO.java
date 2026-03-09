@@ -27,6 +27,8 @@ public interface LimelightIO {
 
     default void setThrottle(boolean robotEnabled) {}
 
+    default void setPortForwarder(int portStream, int portPipeline) {}
+
     default double[] getVisionStdDevComponents(double reliability) {
         return new double[] {
             0.7 * (2 - reliability),
@@ -89,5 +91,9 @@ public interface LimelightIO {
         public double tagSpan;
         public double avgTagDist;
         public double avgTagArea;
+        public String status;
+        public double lastHeartbeat;
+        public double lastTsBootMs;
+        public double lastSeenTime;
     }
 }

@@ -11,11 +11,15 @@ public class LimeLightConfig {
             LimelightIOConfig.builder()
                     .name(NAME_A)
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
+                    .portToForwardStream(5830)
+                    .portToForwardPipeline(5831)
                     .build();
     public static final LimelightIOConfig limelightBConfig =
             LimelightIOConfig.builder()
                     .name(NAME_B)
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
+                    .portToForwardStream(5840)
+                    .portToForwardPipeline(5841)
                     .limeLight4Config(LimelightIOConfig.Limelight4Config.builder().build())
                     .build();
 
