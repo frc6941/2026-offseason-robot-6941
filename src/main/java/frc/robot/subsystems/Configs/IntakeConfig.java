@@ -105,7 +105,7 @@ public class IntakeConfig {
         public static final double retractPosMeters = 0.05;
 
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
-        public static final double feedOscillationRateHz = 0.5;
+        public static final double feedOscillationRateHz = 2;
 
         public static final boolean isBrake = true;
     }
