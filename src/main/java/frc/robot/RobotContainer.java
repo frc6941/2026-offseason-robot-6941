@@ -231,6 +231,8 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+        oprator.rightBumper().whileTrue(intake.runExtendedReverse());
+
         driver.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
@@ -249,7 +251,6 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
-        driver.povUp().onTrue(shootingSuperstructure.runUnjamming());
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -326,6 +327,18 @@ public class RobotContainer {
         driver.a().whileTrue(AutoRoutines.sweepRightClimb());
         driver.b().whileTrue(AutoRoutines.quickSweepRight());
         driver.x().whileTrue(AutoRoutines.longSweepRight());
+
+        new Trigger(DriverStation::isEnabled)
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
+                                .alongWith(hood.zeroCommand()));
+        // .alongWith(intakerExtension.zeroCommand()));
+
+        new Trigger(DriverStation::isDisabled)
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
+                                .ignoringDisable(true));
+
         // Swerve
         driver.start()
                 .onTrue(
@@ -345,17 +358,6 @@ public class RobotContainer {
                                                 }),
                                         indicatorSubsystem.indicateWithTimeout(
                                                 Patterns.RESET_ODOM, 1))
-                                .ignoringDisable(true));
-
-        new Trigger(DriverStation::isEnabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
-        // .alongWith(intakerExtension.zeroCommand()));
-
-        new Trigger(DriverStation::isDisabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
     }
 

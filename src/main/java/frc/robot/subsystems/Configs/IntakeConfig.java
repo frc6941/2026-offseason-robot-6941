@@ -107,6 +107,6 @@ public class IntakeConfig {
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
         public static final double feedOscillationRateHz = 2;
 
-        public static final boolean isBrake = true;
+        public static final boolean isBrake = false;
     }
 }
