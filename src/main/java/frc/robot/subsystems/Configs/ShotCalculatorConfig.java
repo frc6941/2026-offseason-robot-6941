@@ -32,7 +32,7 @@ public final class ShotCalculatorConfig {
         public static final double rpmB = 4; // 2.3 for 10541
         public static final double rpmC = 150;
 
-        public static final double distanceScaler = 1.5;
+        public static final double distanceScaler = 1.05;
 
         // hood = hoodB * launchAngle + hoodC
         public static final double hoodB = 1;
