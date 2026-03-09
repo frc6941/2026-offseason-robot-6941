@@ -128,9 +128,6 @@ public class ShootingSuperstructure {
             }
         }
 
-        Logger.recordOutput("Shotcalculator/calculatedSpeed", scalingFactor);
-        Logger.recordOutput("Shotcalculator/Distance", getDistance());
-
         return (ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
                         + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
                         + ShotCalculatorParamsNT.rpmC.getValue())
