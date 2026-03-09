@@ -10,10 +10,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.FieldConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
+import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
@@ -22,6 +24,7 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
@@ -111,9 +114,24 @@ public class ShootingSuperstructure {
 
     private double computeRpm(LinearVelocity muzzleSpeed, Angle bba) {
 
-        return ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
-                + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
-                + ShotCalculatorParamsNT.rpmC.getValue();
+        double currentDistance = getDistance();
+        double scalingFactor = 1.0;
+        if (currentDistance > 2.5) {
+            double minDistance = 2.5;
+            double maxDistance = 8;
+            if (currentDistance >= maxDistance) {
+                scalingFactor = ShotCalculatorParamsNT.distanceScaler.getValue();
+            } else {
+                double t_distance = (currentDistance - minDistance) / (maxDistance - minDistance);
+                scalingFactor =
+                        1.0 + (ShotCalculatorParamsNT.distanceScaler.getValue() - 1.0) * t_distance;
+            }
+        }
+
+        return (ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
+                        + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
+                        + ShotCalculatorParamsNT.rpmC.getValue())
+                * scalingFactor;
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
@@ -128,6 +146,29 @@ public class ShootingSuperstructure {
 
     public Command runForceFeeding() {
         return idx.runState(() -> IdxMode.FORCE_FEED);
+    }
+
+    public double getDistance() {
+        TargetMode mode;
+        double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
+        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
+            mode = TargetMode.GOAL;
+        } else {
+            mode = TargetMode.FEED;
+        }
+
+        if (mode == TargetMode.GOAL) {
+            return RobotStateRecorder.getTranslationShotToTargetCurrent(
+                            RobotStateRecorder.kFrameGoal)
+                    .getNorm();
+        } else {
+            double yAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getY();
+            String feedFrame =
+                    yAlliance > FieldConstants.fieldWidth / 2.0
+                            ? RobotStateRecorder.kFrameFeedUp
+                            : RobotStateRecorder.kFrameFeedDown;
+            return RobotStateRecorder.getTranslationShotToTargetCurrent(feedFrame).getNorm();
+        }
     }
 
     public enum IdxMode {
