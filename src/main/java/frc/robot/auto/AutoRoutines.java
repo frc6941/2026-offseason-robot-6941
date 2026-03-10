@@ -15,10 +15,7 @@ public class AutoRoutines {
     }
 
     public static Command buildRoutineWithZeroing(Command routine) {
-        return Commands.parallel(
-                routine,
-                zeroEverything()
-        );
+        return Commands.parallel(routine, zeroEverything());
     }
 
     public static Command sweepLeftClimb() {

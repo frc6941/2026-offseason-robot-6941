@@ -143,11 +143,8 @@ public class AutoActions {
     }
 
     public static Command zeroEverything() {
-        return Commands.parallel(
-                shooter.runZero(),
-                intake.zeroCommand()
-        );
-}
+        return Commands.parallel(shooter.runZero(), intake.zeroCommand());
+    }
 
     public static boolean hasCrossedBump(boolean isToNeutral) {
         return isToNeutral
