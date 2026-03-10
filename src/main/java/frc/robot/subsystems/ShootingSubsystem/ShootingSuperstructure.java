@@ -146,7 +146,7 @@ public class ShootingSuperstructure {
         return idx.runState(() -> IdxMode.FORCE_FEED);
     }
 
-    public Command runZero(){
+    public Command runZero() {
         return hood.zeroCommand();
     }
 

@@ -141,16 +141,18 @@ public class ShotCalculator {
         RobotStateRecorder.setKFrameTarget(targetFrame);
         Translation2d shotToTargetCurrent =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
-        Translation2d velocityWorldRobotActualCurrent =
-                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
-        Translation2d velocityWorldRobotCmdCurrent =
-                RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
-        double velocityCmdBlend = 1.0;
+        // Translation2d velocityWorldRobotActualCurrent =
+        //         RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
+        // Translation2d velocityWorldRobotCmdCurrent =
+        //         RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
+        // double velocityCmdBlend = 1.0;
+        // Translation2d velocityWorldRobotCurrent =
+        //         velocityWorldRobotActualCurrent.plus(
+        //                 velocityWorldRobotCmdCurrent
+        //                         .minus(velocityWorldRobotActualCurrent)
+        //                         .times(velocityCmdBlend));
         Translation2d velocityWorldRobotCurrent =
-                velocityWorldRobotActualCurrent.plus(
-                        velocityWorldRobotCmdCurrent
-                                .minus(velocityWorldRobotActualCurrent)
-                                .times(velocityCmdBlend));
+                RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
 
         double currentDistanceMeters = shotToTargetCurrent.getNorm();
         Translation2d currentTargetVelocity =

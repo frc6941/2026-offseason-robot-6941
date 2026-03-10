@@ -324,9 +324,15 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.followPathFile("quickSweepRight", true).alongWith(AutoActions.Intake()));
-        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true).alongWith(AutoActions.Intake()));
-        driver.x().whileTrue(AutoRoutines.longSweepLeft());
+        driver.a()
+                .whileTrue(
+                        AutoActions.followPathFile("quickSweepRight", false)
+                                .alongWith(AutoActions.Intake()));
+        driver.b()
+                .whileTrue(
+                        AutoActions.followPathFile("longSweepRight", false)
+                                .alongWith(AutoActions.Intake()));
+        driver.x().whileTrue(AutoRoutines.longSweepRight());
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(

@@ -1,5 +1,7 @@
 package frc.robot.auto;
 
+import static frc.robot.auto.AutoRoutines.*;
+
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -11,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import org.json.simple.parser.ParseException;
-import static frc.robot.auto.AutoRoutines.*;
 
 public class AutoFile {
     private final Map<String, PathPlannerPath> autoPaths = new HashMap<>();
@@ -30,7 +31,6 @@ public class AutoFile {
         autoChooser.addOption("quickSweepLeft", buildRoutineWithZeroing(longSweepRight()));
         autoChooser.addOption("sweepLeftClimb", buildRoutineWithZeroing(sweepLeftClimb()));
     }
-
 
     private void initializeAutoPaths() {
         File[] files = new File(Filesystem.getDeployDirectory(), "pathplanner/paths").listFiles();
