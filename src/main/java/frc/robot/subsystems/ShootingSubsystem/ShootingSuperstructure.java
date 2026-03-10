@@ -24,6 +24,7 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
@@ -104,7 +105,6 @@ public class ShootingSuperstructure {
     }
 
     private double computeRpm(LinearVelocity muzzleSpeed, Angle bba) {
-
         double currentDistance = getDistance();
         double scalingFactor = 1.0;
         if (currentDistance > 2.5) {
@@ -119,10 +119,17 @@ public class ShootingSuperstructure {
             }
         }
 
-        return (ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
+        double baseRpm =
+                ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
                         + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
-                        + ShotCalculatorParamsNT.rpmC.getValue())
-                * scalingFactor;
+                        + ShotCalculatorParamsNT.rpmC.getValue();
+        double scaledRpm = baseRpm * scalingFactor;
+
+        Logger.recordOutput("ShootingSuperstructure/Distance/currentMeters", currentDistance);
+        Logger.recordOutput("ShootingSuperstructure/Distance/baseRpm", baseRpm);
+        Logger.recordOutput("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
+
+        return scaledRpm;
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
@@ -137,6 +144,10 @@ public class ShootingSuperstructure {
 
     public Command runForceFeeding() {
         return idx.runState(() -> IdxMode.FORCE_FEED);
+    }
+
+    public Command runZero(){
+        return hood.zeroCommand();
     }
 
     public double getDistance() {

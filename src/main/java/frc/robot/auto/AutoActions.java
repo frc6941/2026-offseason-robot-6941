@@ -67,6 +67,9 @@ public class AutoActions {
     public static final Pose2d kStationIntake =
             new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
 
+    public static final Pose2d kDepotIntake =
+            new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
+
     public static final Pose2d kQuickSweepEndPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kQuickSweepEndPoseR =
@@ -135,6 +138,17 @@ public class AutoActions {
                                 AutoActions::getShiftDirectionTowardBump));
     }
 
+    public static Command intakeDepot() {
+        return Commands.none();
+    }
+
+    public static Command zeroEverything() {
+        return Commands.parallel(
+                shooter.runZero(),
+                intake.zeroCommand()
+        );
+}
+
     public static boolean hasCrossedBump(boolean isToNeutral) {
         return isToNeutral
                 ? AllianceFlipUtil.applyX(getRobotX())
@@ -143,7 +157,8 @@ public class AutoActions {
     }
 
     public static boolean isPitchStable() {
-        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
+        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5
+                && Math.abs(swerve.getPitchPosRad()) < 0.07;
     }
 
     static Command driveToPose(Supplier<Pose2d> targetPoseSupplier) {
@@ -194,13 +209,14 @@ public class AutoActions {
                         () -> targetPose,
                         shiftingDirectionSupplier,
                         swerve.getSwerveLimit(),
-                        1.2,
-                        1.6)
+                        1,
+                        2)
                 .beforeStarting(
                         Commands.runOnce(
                                 () -> {
                                     Logger.recordOutput("Temp/targetAllignPose", targetPose);
-                                    swerve.setSwerveModuleLimit(SwerveMK5Config.kAutoLimit);
+                                    swerve.setSwerveModuleLimit(
+                                            SwerveMK5Config.kShootingSwerveLimit);
                                 }))
                 .finallyDo(() -> swerve.setSwerveModuleLimitDefault());
     }

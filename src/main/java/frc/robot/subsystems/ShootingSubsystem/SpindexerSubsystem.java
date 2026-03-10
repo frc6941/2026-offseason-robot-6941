@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> {
-    private final LinearFilter supplyCurrentFilter = LinearFilter.movingAverage(5);
+    private final LinearFilter statorCurrentFilter = LinearFilter.movingAverage(5);
     private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
     private final TimeDelayedBoolean jamDetectionDelay = new TimeDelayedBoolean(0.0);
 
@@ -37,7 +37,7 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
 
     private double stateStartTimestampSec = Timer.getTimestamp();
     private double jamDetectionLockoutUntilSec = Double.NEGATIVE_INFINITY;
-    private double filteredSupplyCurrentAmps = 0.0;
+    private double filteredStatorCurrentAmps = 0.0;
     private double filteredVelocityRps = 0.0;
 
     public SpindexerSubsystem(
@@ -51,11 +51,11 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
     @Override
     public void periodic() {
         super.periodic();
-        filteredSupplyCurrentAmps = supplyCurrentFilter.calculate(getSupplyCurrent().magnitude());
+        filteredStatorCurrentAmps = statorCurrentFilter.calculate(getStatorCurrent().magnitude());
         filteredVelocityRps =
                 velocityFilter.calculate(Math.abs(getVelocity().in(RotationsPerSecond)));
 
-        Logger.recordOutput(getName() + "/filteredSupplyCurrentAmps", filteredSupplyCurrentAmps);
+        Logger.recordOutput(getName() + "/filteredStatorCurrentAmps", filteredStatorCurrentAmps);
         Logger.recordOutput(getName() + "/filteredVelocityRps", filteredVelocityRps);
         Logger.recordOutput(
                 getName() + "/jamDetectionLockedOut",
@@ -128,7 +128,7 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
             return false;
         }
 
-        return filteredSupplyCurrentAmps > SpindexerParamsNT.unjammTriggerAmps.getValue()
+        return filteredStatorCurrentAmps > SpindexerParamsNT.unjammTriggerAmps.getValue()
                 && filteredVelocityRps < SpindexerParamsNT.unjammTriggerBelowRps.getValue();
     }
 

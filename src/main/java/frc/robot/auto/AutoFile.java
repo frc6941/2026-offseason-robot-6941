@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import org.json.simple.parser.ParseException;
+import static frc.robot.auto.AutoRoutines.*;
 
 public class AutoFile {
     private final Map<String, PathPlannerPath> autoPaths = new HashMap<>();
@@ -25,10 +26,11 @@ public class AutoFile {
     private void initializeAutoChooser() {
         autoChooser.setDefaultOption("None", Commands.none());
         autoChooser.addOption("Test", buildTest());
-        autoChooser.addOption("quickSweepRight", AutoRoutines.quickSweepRight());
-        autoChooser.addOption("quickSweepLeft", AutoRoutines.longSweepRight());
-        autoChooser.addOption("sweepLeftClimb", AutoRoutines.sweepLeftClimb());
+        autoChooser.addOption("quickSweepRight", buildRoutineWithZeroing(quickSweepRight()));
+        autoChooser.addOption("quickSweepLeft", buildRoutineWithZeroing(longSweepRight()));
+        autoChooser.addOption("sweepLeftClimb", buildRoutineWithZeroing(sweepLeftClimb()));
     }
+
 
     private void initializeAutoPaths() {
         File[] files = new File(Filesystem.getDeployDirectory(), "pathplanner/paths").listFiles();

@@ -183,4 +183,8 @@ public class IntakerSubsystem {
         return Commands.startEnd(
                 () -> currentMode = IntakeMode.EXTENDED_REVERSE, () -> currentMode = fallbackMode);
     }
+
+    public Command zeroCommand() {
+        return extension.zeroCommand();
+    }
 }

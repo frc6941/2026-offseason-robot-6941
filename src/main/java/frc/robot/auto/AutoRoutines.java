@@ -14,6 +14,13 @@ public class AutoRoutines {
         AutoRoutines.swerve = swerve;
     }
 
+    public static Command buildRoutineWithZeroing(Command routine) {
+        return Commands.parallel(
+                routine,
+                zeroEverything()
+        );
+    }
+
     public static Command sweepLeftClimb() {
         return Commands.defer(
                 () ->
@@ -72,6 +79,20 @@ public class AutoRoutines {
                                                 Commands.sequence(
                                                         Commands.deadline(
                                                                 allignToStation(), Intake())))),
+                Collections.singleton(swerve));
+    }
+
+    public static Command longSweepLeft() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                drivePastSlope(true, true),
+                                Commands.deadline(followPathFile("longSweepRight", true), Intake()),
+                                drivePastSlope(true, false),
+                                shoot().alongWith(
+                                                Commands.sequence(
+                                                        Commands.deadline(
+                                                                Commands.none(), Intake())))),
                 Collections.singleton(swerve));
     }
 
