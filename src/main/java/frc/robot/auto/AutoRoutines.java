@@ -44,7 +44,7 @@ public class AutoRoutines {
                                                         Commands.waitSeconds(1),
                                                         Commands.parallel(
                                                                 oscillateIntakeFeed(),
-                                                                allignToClimb(false))))),
+                                                                alignToClimb(false))))),
                 Collections.singleton(swerve));
     }
 
