@@ -336,7 +336,7 @@ public class RobotContainer {
                 .whileTrue(
                         AutoActions.followPathFile("longSweepRight", true)
                                 .alongWith(AutoActions.Intake()));
-        driver.x().whileTrue(AutoRoutines.longSweepLeft());
+        driver.x().whileTrue(AutoRoutines.longSweepRight());
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(

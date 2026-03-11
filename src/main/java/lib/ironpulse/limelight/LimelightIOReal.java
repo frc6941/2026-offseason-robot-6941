@@ -183,7 +183,7 @@ public class LimelightIOReal implements LimelightIO {
             Logger.recordOutput("Limelight/IMU/Mode", "seed");
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
-            LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.EXTERNAL_ONLY.getValue());
+            LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.INTERNAL_ONLY.getValue());
             Logger.recordOutput("Limelight/IMU/Mode", "assisted");
         }
     }

@@ -75,7 +75,7 @@ public class AutoRoutines {
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                allignToStation(), Intake())))),
+                                                                allignToStation(), oscillateIntakeFeed())))),
                 Collections.singleton(swerve));
     }
 
