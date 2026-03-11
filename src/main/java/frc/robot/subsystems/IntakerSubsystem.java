@@ -1,11 +1,17 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import frc.robot.Robot;
+import frc.robot.subsystems.Configs.IntakeConfig;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.IntakerRollerParamsNT;
 import lib.ironpulse.io.MotorIO;
@@ -18,6 +24,9 @@ import org.littletonrobotics.junction.AutoLogOutput;
 public class IntakerSubsystem {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension;
+
+    private double currentFilterValue = 0.0;
+    private LinearFilter currentFilter;
 
     public enum IntakeMode {
         INTAKING,
@@ -186,5 +195,63 @@ public class IntakerSubsystem {
 
     public Command zeroCommand() {
         return extension.zeroCommand();
+    }
+
+    public Command outZeroCommand() {
+        double zeroVoltage =
+                MathUtil.clamp(
+                        -IntakeConfig.INTAKER_EXTENSION_CONFIG.zeroingConfig.zeroingVoltage,
+                        -12.0d,
+                        12.0d);
+
+        Command realZero =
+                Commands.runOnce(
+                                () -> {
+                                    extension.setEnableSoftLimits(false, false);
+                                    currentFilter =
+                                            LinearFilter.movingAverage(
+                                                    IntakeConfig.INTAKER_EXTENSION_CONFIG
+                                                            .zeroingConfig
+                                                            .zeroingFilterSize);
+                                    currentFilterValue = 0.0;
+                                },
+                                extension)
+                        .andThen(
+                                Commands.deadline(
+                                        Commands.run(
+                                                        () ->
+                                                                currentFilterValue =
+                                                                        currentFilter.calculate(
+                                                                                extension
+                                                                                        .getStatorCurrent()
+                                                                                        .in(Amps)))
+                                                .until(
+                                                        () ->
+                                                                Math.abs(currentFilterValue)
+                                                                        > IntakeConfig
+                                                                                .INTAKER_EXTENSION_CONFIG
+                                                                                .zeroingConfig
+                                                                                .zeroingCurrentLimit),
+                                        extension.runVoltage(() -> zeroVoltage)))
+                        .andThen(
+                                Commands.runOnce(
+                                        () ->
+                                                extension.setCurrPos(
+                                                        Meters.of(
+                                                                IntakerExtensionParamsNT
+                                                                        .deployPosMeters
+                                                                        .getValue())),
+                                        extension));
+
+        Command simZero =
+                Commands.runOnce(
+                        () ->
+                                extension.setCurrPos(
+                                        Meters.of(
+                                                IntakerExtensionParamsNT.deployPosMeters
+                                                        .getValue())),
+                        extension);
+
+        return new ConditionalCommand(realZero, simZero, Robot::isReal);
     }
 }
