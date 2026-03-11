@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Configs;
 
+import static frc.robot.RobotConstants.is10541;
+
 import lib.ntext.NTParameter;
 
 /**
@@ -28,7 +30,7 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = 229; // 245 for 10541
+        public static final double rpmA = is10541 ? 245 : 229; // 245 for 10541
         public static final double rpmB = 4; // 2.3 for 10541
         public static final double rpmC = 150;
 

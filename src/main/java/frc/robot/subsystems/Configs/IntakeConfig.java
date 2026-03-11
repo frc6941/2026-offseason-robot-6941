@@ -12,17 +12,13 @@ import lib.ntext.NTParameter;
 public class IntakeConfig {
     public static final String INTAKER_ROLLER_NAME = "IntakerRoller";
     public static final String INTAKER_EXTENSION_NAME = "IntakerExtension";
-
+    public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
     private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
-    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
-    public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
+    private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15.0 / 1.0;
     private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 65;
     private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 55;
-    private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
-    private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
-
     public static final SubsystemConfig INTAKER_ROLLER_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_ROLLER_NAME)
@@ -39,7 +35,8 @@ public class IntakeConfig {
                                     .gearRatio(INTAKER_ROLLER_GEAR_RATIO)
                                     .build())
                     .build();
-
+    private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
+    private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
     public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_EXTENSION_NAME)
