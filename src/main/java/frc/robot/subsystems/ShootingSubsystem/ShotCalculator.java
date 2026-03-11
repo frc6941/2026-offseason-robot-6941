@@ -151,6 +151,8 @@ public class ShotCalculator {
                         velocityWorldRobotCmdCurrent
                                 .minus(velocityWorldRobotActualCurrent)
                                 .times(velocityCmdBlend));
+        // Translation2d velocityWorldRobotCurrent =
+        //         RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
 
         double currentDistanceMeters = shotToTargetCurrent.getNorm();
         Translation2d currentTargetVelocity =
