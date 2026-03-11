@@ -63,7 +63,6 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
@@ -92,7 +91,6 @@ public class RobotContainer {
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
     private final AutoFile autoFile;
-    private final LoggedDashboardChooser<Command> autoChooser;
     private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
@@ -127,9 +125,9 @@ public class RobotContainer {
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
         AutoRoutines.init(swerve);
+        AutoFile.init();
         autoFile = new AutoFile();
-        autoChooser =
-                new LoggedDashboardChooser<Command>("Auto Chooser", autoFile.getAutoChooser());
+
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
@@ -512,6 +510,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        return AutoFile.buildAuto();
     }
 }

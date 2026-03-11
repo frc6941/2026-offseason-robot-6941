@@ -122,7 +122,7 @@ public class AutoActions {
         return Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(isToNeutral));
     }
 
-    static Command allignToClimb(boolean isLeft) {
+    static Command alignToClimb(boolean isLeft) {
         return swerve.defer(
                 () -> {
                     Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kclimbL : kclimbR);

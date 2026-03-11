@@ -86,7 +86,7 @@ public class TurretConfig {
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
-        public static final double kpTrack = 20; // 22for 6941
+        public static final double kpTrack = 20;
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.01;
 
