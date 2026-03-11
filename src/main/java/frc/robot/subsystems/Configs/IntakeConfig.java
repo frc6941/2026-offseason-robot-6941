@@ -17,7 +17,6 @@ public class IntakeConfig {
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
-    public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
     private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 45;
     private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 30;
     private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
@@ -39,8 +38,6 @@ public class IntakeConfig {
                                     .gearRatio(INTAKER_ROLLER_GEAR_RATIO)
                                     .build())
                     .build();
-    private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
-    private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
     public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_EXTENSION_NAME)
@@ -101,7 +98,7 @@ public class IntakeConfig {
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.30;
+        public static final double deployPosMeters = 0.305;
         public static final double feedPosMeters = 0.2;
         public static final double retractPosMeters = 0.05;
 
