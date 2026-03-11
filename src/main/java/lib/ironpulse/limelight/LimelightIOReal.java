@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.Logger;
 public class LimelightIOReal implements LimelightIO {
     public final LimelightIOConfig config;
     private final DoubleSupplier yawSupplier;
+    private final DoubleSupplier yawVelocitySupplier;
     private final BooleanSupplier rejectionSupplier;
     private final DeviationParamSources deviationParams;
     private boolean isPrevDisabled = true;
@@ -26,10 +27,12 @@ public class LimelightIOReal implements LimelightIO {
     public LimelightIOReal(
             LimelightIOConfig config,
             DoubleSupplier yawSupplier,
+            DoubleSupplier yawVelocitySupplier,
             BooleanSupplier rejectionSupplier,
             DeviationParamSources deviationParams) {
         this.config = config;
         this.yawSupplier = yawSupplier;
+        this.yawVelocitySupplier = yawVelocitySupplier;
         this.rejectionSupplier = rejectionSupplier;
         this.deviationParams = deviationParams;
         if (useInternalIMU()) {
@@ -234,7 +237,7 @@ public class LimelightIOReal implements LimelightIO {
         LimelightHelpers.SetRobotOrientation(
                 config.getName(),
                 yawSupplier.getAsDouble(),
-                0,
+                yawVelocitySupplier.getAsDouble(),
                 0,
                 0,
                 0,

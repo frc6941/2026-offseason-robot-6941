@@ -418,6 +418,10 @@ public class RobotContainer {
                                                 .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                         .getRotation()
                                                         .getDegrees()
                                                 > 360,
@@ -427,6 +431,10 @@ public class RobotContainer {
                                 () ->
                                         RobotStateRecorder.getPoseWorldRobotCurrent()
                                                 .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
                                                 .getDegrees(),
                                 () ->
