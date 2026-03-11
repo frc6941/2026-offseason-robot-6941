@@ -262,6 +262,14 @@ public class PositionMotorSubsystem<
         return fromAngle(Rotations.of(inputs.positionRot + zeroOffset.in(Rotations)));
     }
 
+    public void setCurrPos(M pos) {
+        io.setCurrentPosition(toAngle(pos).minus(zeroOffset));
+    }
+
+    public void setEnableSoftLimits(boolean forward, boolean reverse) {
+        io.setEnableSoftLimits(forward, reverse);
+    }
+
     public M getCurrSetpoint() {
         return currSetpoint;
     }
