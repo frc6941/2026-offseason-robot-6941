@@ -20,9 +20,9 @@ public class TurretConfig {
     public static final int TURRET_ENCODER_G1_ID = 59;
     public static final int TURRET_ENCODER_G2_ID = 58;
     public static final Angle TURRET_ENCODER_G1_OFFSET =
-            Rotations.of(is10541 ? -0.300488 : -0.859375); // -0.433837890625
+            Rotations.of(is10541 ? -0.18627 : -0.859375); // -0.433837890625
     public static final Angle TURRET_ENCODER_G2_OFFSET =
-            Rotations.of(is10541 ? -0.837890625 : -0.859375); // -0.837890625
+            Rotations.of(is10541 ? -0.30615 : -0.859375); // -0.837890625
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 88;
     public static final int G1_TOOTH_COUNT = 16;

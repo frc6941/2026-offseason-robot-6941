@@ -260,20 +260,6 @@ public class RobotContainer {
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
 
-        driver.povUp()
-                .whileTrue(
-                        climber.runMotionMagic(
-                                () -> Meters.of(ClimberParamsNT.climbedMeters.getValue())));
-
-        driver.povLeft()
-                .whileTrue(
-                        climber.runMotionMagic(
-                                () -> Meters.of(ClimberParamsNT.bottomMeters.getValue())));
-
-        driver.povRight()
-                .whileTrue(
-                        climber.runMotionMagic(
-                                () -> Meters.of(ClimberParamsNT.climbReadyMeters.getValue())));
 
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
@@ -354,9 +340,7 @@ public class RobotContainer {
                                 .alongWith(AutoActions.intake()));
         driver.b()
                 .whileTrue(
-                        AutoActions.followPathFile("longSweepRight", true)
-                                .alongWith(AutoActions.intake()));
-        driver.x().whileTrue(AutoRoutines.longSweepLeft());
+                        AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
@@ -441,6 +425,10 @@ public class RobotContainer {
                                                 .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                         .getRotation()
                                                         .getDegrees()
                                                 > 360,
@@ -450,6 +438,10 @@ public class RobotContainer {
                                 () ->
                                         RobotStateRecorder.getPoseWorldRobotCurrent()
                                                 .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
                                                 .getDegrees(),
                                 () ->
