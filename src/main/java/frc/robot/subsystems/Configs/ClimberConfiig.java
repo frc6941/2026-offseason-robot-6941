@@ -22,7 +22,7 @@ public class ClimberConfiig {
                     .name(CLIMBER_NAME)
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(CLIMBER_MOTOR_MAIN_ID)
-                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
+                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseClosedLoopSign)
                     .SensorToMechanismRatio(CLIMBER_GEAR_RATIO)
@@ -60,8 +60,8 @@ public class ClimberConfiig {
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
         public static final double bottomMeters = 0;
-        public static final double climbedMeters = -0.1;
-        public static final double climbReadyMeters = -0.17;
+        public static final double climbedMeters = 0.1;
+        public static final double climbReadyMeters = 0.26;
 
         public static final boolean isBrake = true;
     }
