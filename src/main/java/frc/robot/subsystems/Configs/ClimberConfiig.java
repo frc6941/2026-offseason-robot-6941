@@ -45,9 +45,9 @@ public class ClimberConfiig {
     @NTParameter(tableName = "Params/" + CLIMBER_NAME)
     public static final class ClimberParams {
 
-        public static final double kP = 2.001;
+        public static final double kP = 115;
         public static final double kI = 0.0;
-        public static final double kD = 0.01;
+        public static final double kD = 0.03;
         public static final double kV = 0.0;
         public static final double kA = 0.0;
         public static final double kS = 0.0;
@@ -59,9 +59,9 @@ public class ClimberConfiig {
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double bottomMeters = 0.01;
-        public static final double climbedMeters = 0.2;
-        public static final double simpleClimbMeters = 0.1;
+        public static final double bottomMeters = 0;
+        public static final double climbedMeters = -0.1;
+        public static final double climbReadyMeters = -0.17;
 
         public static final boolean isBrake = true;
     }

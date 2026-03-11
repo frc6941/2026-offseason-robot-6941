@@ -207,7 +207,10 @@ public class AutoActions {
     }
 
     public static Command simpleClimb() {
-        return climber.runMotionMagic(Meters.of(ClimberParamsNT.simpleClimbMeters.getValue()));
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue())).until(climber::positionAtGoal)
+                .andThen(
+                        climber.runMotionMagic(
+                                Meters.of(ClimberParamsNT.climbedMeters.getValue())));
     }
 
     private static Rotation2d getShiftDirectionTowardBump() {

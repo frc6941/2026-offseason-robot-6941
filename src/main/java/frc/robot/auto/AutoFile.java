@@ -117,7 +117,7 @@ public class AutoFile {
                                         Commands.deadline(
                                                 followPathFile(sweepPathName, isLeft), intake()),
                                         drivePastSlope(isLeft, false),
-                                        shoot().withTimeout(2)),
+                                        shoot()),
 
                                 // station
                                 Commands.sequence(
@@ -129,7 +129,7 @@ public class AutoFile {
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed()),
                                                         () -> isLeft),
-                                                Commands.waitSeconds(1))
+                                                shoot())
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()

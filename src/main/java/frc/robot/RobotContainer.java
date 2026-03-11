@@ -263,11 +263,17 @@ public class RobotContainer {
         driver.povUp()
                 .whileTrue(
                         climber.runMotionMagic(
-                                Meters.of(ClimberParamsNT.climbedMeters.getValue())));
+                                () -> Meters.of(ClimberParamsNT.climbedMeters.getValue())));
 
         driver.povLeft()
                 .whileTrue(
-                        climber.runMotionMagic(Meters.of(ClimberParamsNT.bottomMeters.getValue())));
+                        climber.runMotionMagic(
+                                () -> Meters.of(ClimberParamsNT.bottomMeters.getValue())));
+
+        driver.povRight()
+                .whileTrue(
+                        climber.runMotionMagic(
+                                () -> Meters.of(ClimberParamsNT.climbReadyMeters.getValue())));
 
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
