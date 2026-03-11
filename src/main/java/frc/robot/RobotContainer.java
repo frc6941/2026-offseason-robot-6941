@@ -37,6 +37,7 @@ import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
+import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
@@ -96,6 +97,7 @@ public class RobotContainer {
 
     @SneakyThrows
     public RobotContainer() {
+        FieldView.Init();
         SignalLogger.enableAutoLogging(false);
         final boolean isReal = RobotBase.isReal();
 
@@ -204,6 +206,7 @@ public class RobotContainer {
         RobotStateRecorder.setCmdFrame(shotCalculator.computeShotFrame());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
+        FieldView.updateRobotPose(RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d());
     }
 
     private void configureBindings() {
