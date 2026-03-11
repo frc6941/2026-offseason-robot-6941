@@ -207,7 +207,8 @@ public class AutoActions {
     }
 
     public static Command simpleClimb() {
-        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue())).until(climber::positionAtGoal)
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue()))
+                .until(climber::positionAtGoal)
                 .andThen(
                         climber.runMotionMagic(
                                 Meters.of(ClimberParamsNT.climbedMeters.getValue())));
