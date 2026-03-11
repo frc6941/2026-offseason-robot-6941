@@ -23,7 +23,6 @@ public class NTParameterProcessor extends AbstractProcessor {
                     Map.entry("java.lang.Boolean", "Boolean"),
                     Map.entry("boolean[]", "Boolean[]"),
                     Map.entry("java.lang.Boolean[]", "Boolean[]"),
-
                     // Integers
                     Map.entry("int", "Integer"),
                     Map.entry("java.lang.Integer", "Integer"),
@@ -33,23 +32,19 @@ public class NTParameterProcessor extends AbstractProcessor {
                     Map.entry("java.lang.Long", "Long"),
                     Map.entry("long[]", "Long[]"),
                     Map.entry("java.lang.Long[]", "Long[]"),
-
                     // Floats
                     Map.entry("float", "Float"),
                     Map.entry("java.lang.Float", "Float"),
                     Map.entry("float[]", "Float[]"),
                     Map.entry("java.lang.Float[]", "Float[]"),
-
                     // Doubles
                     Map.entry("double", "Double"),
                     Map.entry("java.lang.Double", "Double"),
                     Map.entry("double[]", "Double[]"),
                     Map.entry("java.lang.Double[]", "Double[]"),
-
                     // Strings
                     Map.entry("java.lang.String", "String"),
                     Map.entry("java.lang.String[]", "String[]"),
-
                     // Raw bytes
                     Map.entry("byte[]", "Byte[]"));
 
@@ -243,8 +238,7 @@ public class NTParameterProcessor extends AbstractProcessor {
         for (VariableElement field : annotatedFields) {
             String fieldName = field.getSimpleName().toString();
             String typeName = NT_TYPES_TABLE.get(field.asType().toString());
-            Object defaultValue = field.getConstantValue();
-            String defaultLiteral = getDefaultLiteral(defaultValue, typeName);
+            String defaultExpr = getDefaultExpression(field);
 
             builder.append("  public static final NTParameterWrapper<")
                     .append(typeName)
@@ -256,7 +250,7 @@ public class NTParameterProcessor extends AbstractProcessor {
                     .append("/")
                     .append(fieldName)
                     .append("\", ")
-                    .append(defaultLiteral)
+                    .append(defaultExpr)
                     .append(");\n");
 
             fieldNames.add(fieldName);
@@ -561,22 +555,29 @@ public class NTParameterProcessor extends AbstractProcessor {
 
         // Fallbacks by type
         switch (typeName) {
+            case "String":
             case "java.lang.String":
-                return "";
+                return "\"\"";
+            case "Boolean":
             case "boolean":
             case "java.lang.Boolean":
                 return "false";
+            case "Integer":
             case "int":
             case "java.lang.Integer":
+            case "Long":
             case "long":
             case "java.lang.Long":
                 return "0";
+            case "Float":
             case "float":
             case "java.lang.Float":
                 return "0.0f";
+            case "Double":
             case "double":
             case "java.lang.Double":
                 return "0.0";
+            case "Byte[]":
             case "byte[]":
                 return "new byte[0]";
             default:
@@ -586,6 +587,19 @@ public class NTParameterProcessor extends AbstractProcessor {
                     return "null";
                 }
         }
+    }
+
+    private String getDefaultExpression(VariableElement field) {
+        String typeName = NT_TYPES_TABLE.get(field.asType().toString());
+        Object defaultValue = field.getConstantValue();
+
+        if (defaultValue != null) {
+            return getDefaultLiteral(defaultValue, typeName);
+        }
+
+        TypeElement owner = (TypeElement) field.getEnclosingElement();
+        String ownerQualifiedName = owner.getQualifiedName().toString();
+        return ownerQualifiedName + "." + field.getSimpleName().toString();
     }
 
     /**
@@ -609,8 +623,7 @@ public class NTParameterProcessor extends AbstractProcessor {
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String typeName = NT_TYPES_TABLE.get(field.asType().toString());
-            Object defaultValue = field.getConstantValue();
-            String defaultLiteral = getDefaultLiteral(defaultValue, typeName);
+            String defaultExpr = getDefaultExpression(field);
             String fullKey = tablePath + "/" + prefix + fieldName;
 
             builder.append(indent)
@@ -622,7 +635,7 @@ public class NTParameterProcessor extends AbstractProcessor {
                     .append("\"")
                     .append(fullKey)
                     .append("\", ")
-                    .append(defaultLiteral)
+                    .append(defaultExpr)
                     .append(");\n");
 
             fieldNames.add(fieldName);
