@@ -74,8 +74,10 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
+    private static final boolean HAS_CLIMBER_IO = true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController oprator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
@@ -105,6 +107,8 @@ public class RobotContainer {
         turret = buildTurret(isReal && HAS_TURRET_IO);
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
         spindexer = buildSpindexer(isReal && HAS_IDX_IO);
+
+        climber = buildClimber(isReal && HAS_CLIMBER_IO);
 
         indicatorSubsystem = buildIndicator(isReal);
 
@@ -140,6 +144,8 @@ public class RobotContainer {
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
         intake.setDefaultCommand();
+
+        climber.setDefaultCommand(climber.runStop());
 
         indicatorSubsystem.setDefaultCommand(
                 Commands.runOnce(
@@ -253,6 +259,16 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+
+        driver.povUp()
+                .whileTrue(
+                        climber.runMotionMagic(
+                                Meters.of(ClimberParamsNT.climbedMeters.getValue())));
+
+        driver.povLeft()
+                .whileTrue(
+                        climber.runMotionMagic(Meters.of(ClimberParamsNT.bottomMeters.getValue())));
+                        
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -340,6 +356,7 @@ public class RobotContainer {
                 .onTrue(
                         new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
                                 .alongWith(hood.zeroCommand()));
+
         // .alongWith(intakerExtension.zeroCommand()));
 
         new Trigger(DriverStation::isDisabled)
@@ -507,6 +524,19 @@ public class RobotContainer {
                 IntakerExtensionParamsNT.asPositionParamSources(),
                 Meters.of(0),
                 IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION);
+    }
+
+    private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> buildClimber(
+            boolean isReal) {
+        return new PositionMotorSubsystem<>(
+                ClimberConfiig.CLIMBER_CONFIG,
+                new MotorInputsAutoLogged(),
+                isReal
+                        ? new MotorIOTalonFX(ClimberConfiig.CLIMBER_CONFIG)
+                        : new MotorIOSim(ClimberConfiig.CLIMBER_CONFIG),
+                ClimberParamsNT.asPositionParamSources(),
+                Meters.of(0),
+                ClimberConfiig.CLIMB_METERS_PER_ROTATION);
     }
 
     public Command getAutonomousCommand() {
