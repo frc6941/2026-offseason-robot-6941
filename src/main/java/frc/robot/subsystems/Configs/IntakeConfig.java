@@ -99,11 +99,11 @@ public class IntakeConfig {
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
         public static final double deployPosMeters = 0.305;
-        public static final double feedPosMeters = 0.2;
+        public static final double feedPosMeters = 0.17;
         public static final double retractPosMeters = 0.05;
 
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
-        public static final double feedOscillationRateHz = 2;
+        public static final double feedOscillationRateHz = 5;
 
         public static final boolean isBrake = false;
     }

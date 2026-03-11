@@ -186,7 +186,8 @@ public class LimelightIOReal implements LimelightIO {
             Logger.recordOutput("Limelight/IMU/Mode", "seed");
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
-            LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.INTERNAL_ONLY.getValue());
+            LimelightHelpers.SetIMUMode(
+                    config.getName(), InternalIMUMode.INTERNAL_EXTERNAL_ASSIST.getValue());
             Logger.recordOutput("Limelight/IMU/Mode", "assisted");
         }
     }
@@ -251,9 +252,6 @@ public class LimelightIOReal implements LimelightIO {
         } else {
             estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(config.getName());
         }
-        // FIXME: need testing - two versions of inputs.pose
-        //        inputs.pose = new Pose3d(estimate.pose).rotateBy(
-        //                new Rotation3d(0, 0, Radians.convertFrom(getIMUYawRobot(), Degrees)));
         inputs.pose = new Pose3d(estimate.pose);
         inputs.timestampSeconds = estimate.timestampSeconds;
         inputs.latency = estimate.latency;
