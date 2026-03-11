@@ -213,7 +213,7 @@ public class RobotContainer {
         driver.leftTrigger().onTrue(intake.toggleIntake());
         oprator.leftBumper().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
-        driver.back().onTrue(intakerExtension.zeroCommand());
+        driver.back().onTrue(intake.zeroCommand());
 
         oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
         oprator.rightTrigger()
@@ -234,6 +234,8 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+        oprator.rightBumper().whileTrue(intake.runExtendedReverse());
+
         driver.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
@@ -252,7 +254,6 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
-        driver.povUp().onTrue(shootingSuperstructure.runUnjamming());
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -326,9 +327,27 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoRoutines.sweepRightClimb());
-        driver.b().whileTrue(AutoRoutines.quickSweepRight());
+        driver.a()
+                .whileTrue(
+                        AutoActions.followPathFile("quickSweepRight", false)
+                                .alongWith(AutoActions.Intake()));
+        driver.b()
+                .whileTrue(
+                        AutoActions.followPathFile("longSweepRight", false)
+                                .alongWith(AutoActions.Intake()));
         driver.x().whileTrue(AutoRoutines.longSweepRight());
+
+        new Trigger(DriverStation::isEnabled)
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
+                                .alongWith(hood.zeroCommand()));
+        // .alongWith(intakerExtension.zeroCommand()));
+
+        new Trigger(DriverStation::isDisabled)
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
+                                .ignoringDisable(true));
+
         // Swerve
         driver.start()
                 .onTrue(
@@ -348,17 +367,6 @@ public class RobotContainer {
                                                 }),
                                         indicatorSubsystem.indicateWithTimeout(
                                                 Patterns.RESET_ODOM, 1))
-                                .ignoringDisable(true));
-
-        new Trigger(DriverStation::isEnabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
-        // .alongWith(intakerExtension.zeroCommand()));
-
-        new Trigger(DriverStation::isDisabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
                                 .ignoringDisable(true));
     }
 

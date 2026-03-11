@@ -45,6 +45,18 @@ public final class SwerveMK5Config {
                     .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
                     .build();
 
+    public static SwerveLimit kShootingChassis =
+            SwerveLimit.builder()
+                    .maxLinearVelocity(MetersPerSecond.of(4)) // theoretically 4.39
+                    // prevents skidding, see orbit archive ytb channel open class for theory
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(20)) // <maxDriveAcceleration
+                    // omega_max ≈ vMax / r.
+                    .maxAngularVelocity(DegreesPerSecond.of(1000))
+                    // accelerate in 0.32s, also must be smaller than the defined module limit to be
+                    // actually effective
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
+                    .build();
+
     public static SwerveModuleLimit kShootingSwerveLimit =
             SwerveModuleLimit.builder()
                     .maxDriveVelocity(InchesPerSecond.of(2000.0 / 60.0 / 7.03 * Math.PI * 4.0))

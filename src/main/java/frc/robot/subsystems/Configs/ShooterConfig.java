@@ -12,7 +12,7 @@ public class ShooterConfig {
     public static final String NAME = "Shooter";
     private static final int SHOOTER_MOTOR_MAIN_ID = 50;
     private static final int SHOOTER_MOTOR_FOLLOWER_ID = 51;
-    private static final double SHOOTER_GEAR_RATIO = 24.0 / 24.0;
+    private static final double SHOOTER_GEAR_RATIO = 33.0 / 24.0;
     private static final double SHOOTER_STATOR_CURRENT_LIMIT_AMPS = 100;
     private static final double SHOOTER_SUPPLY_CURRENT_LIMIT_AMPS = 60;
     public static final SubsystemConfig SHOOTER_CONFIG =
@@ -48,10 +48,10 @@ public class ShooterConfig {
     public static final class ShooterParams {
         // velocity gains
 
-        public static final double kP = 0.36;
+        public static final double kP = 0.65;
         public static final double kI = 0.0;
         public static final double kD = 0.007;
-        public static final double kV = 0.12962;
+        public static final double kV = 0.17;
         public static final double kA = 0.05;
         public static final double kS = 0.076032;
 

@@ -23,7 +23,8 @@ public class IntakerSubsystem {
         INTAKING,
         EXTENDED_IDLE,
         RETRACTED,
-        FEEDING
+        FEEDING,
+        EXTENDED_REVERSE
     }
 
     @Getter
@@ -42,13 +43,39 @@ public class IntakerSubsystem {
 
     public void setDefaultCommand() {
         roller.setDefaultCommand(
-                roller.runVelVolt(
-                        () ->
-                                RotationsPerSecond.of(
+                Commands.either(
+                                roller.runVelVolt(
+                                                () ->
+                                                        RotationsPerSecond.of(
+                                                                currentMode
+                                                                                == IntakeMode
+                                                                                        .EXTENDED_REVERSE
+                                                                        ? IntakerRollerParamsNT
+                                                                                .outtakeVelRPS
+                                                                                .getValue()
+                                                                        : IntakerRollerParamsNT
+                                                                                .intakeVelRPS
+                                                                                .getValue()))
+                                        .until(
+                                                () ->
+                                                        currentMode != IntakeMode.INTAKING
+                                                                && currentMode != IntakeMode.FEEDING
+                                                                && currentMode
+                                                                        != IntakeMode
+                                                                                .EXTENDED_REVERSE),
+                                roller.runStop()
+                                        .until(
+                                                () ->
+                                                        currentMode == IntakeMode.INTAKING
+                                                                || currentMode == IntakeMode.FEEDING
+                                                                || currentMode
+                                                                        == IntakeMode
+                                                                                .EXTENDED_REVERSE),
+                                () ->
                                         currentMode == IntakeMode.INTAKING
-                                                        || currentMode == IntakeMode.FEEDING
-                                                ? IntakerRollerParamsNT.intakeVelRPS.getValue()
-                                                : IntakerRollerParamsNT.idleVelRPS.getValue())));
+                                                || currentMode == IntakeMode.FEEDING
+                                                || currentMode == IntakeMode.EXTENDED_REVERSE)
+                        .repeatedly());
         extension.setDefaultCommand(
                 extension.runMotionMagic(
                         () -> {
@@ -57,6 +84,7 @@ public class IntakerSubsystem {
                                     return Meters.of(
                                             IntakerExtensionParamsNT.deployPosMeters.getValue());
                                 case EXTENDED_IDLE:
+                                case EXTENDED_REVERSE:
                                     return Meters.of(
                                             IntakerExtensionParamsNT.deployPosMeters.getValue());
                                 case RETRACTED:
@@ -76,7 +104,8 @@ public class IntakerSubsystem {
         return Commands.runOnce(
                 () -> {
                     fallbackMode = IntakeMode.INTAKING;
-                    if (currentMode != IntakeMode.FEEDING) {
+                    if (currentMode != IntakeMode.FEEDING
+                            && currentMode != IntakeMode.EXTENDED_REVERSE) {
                         currentMode = IntakeMode.INTAKING;
                     }
                 });
@@ -86,7 +115,8 @@ public class IntakerSubsystem {
         return Commands.runOnce(
                 () -> {
                     fallbackMode = IntakeMode.EXTENDED_IDLE;
-                    if (currentMode != IntakeMode.FEEDING) {
+                    if (currentMode != IntakeMode.FEEDING
+                            && currentMode != IntakeMode.EXTENDED_REVERSE) {
                         currentMode = IntakeMode.EXTENDED_IDLE;
                     }
                 });
@@ -96,7 +126,8 @@ public class IntakerSubsystem {
         return Commands.runOnce(
                 () -> {
                     fallbackMode = IntakeMode.RETRACTED;
-                    if (currentMode != IntakeMode.FEEDING) {
+                    if (currentMode != IntakeMode.FEEDING
+                            && currentMode != IntakeMode.EXTENDED_REVERSE) {
                         currentMode = IntakeMode.RETRACTED;
                     }
                 });
@@ -146,5 +177,14 @@ public class IntakerSubsystem {
     public Command runFeed() {
         return Commands.startEnd(
                 () -> currentMode = IntakeMode.FEEDING, () -> currentMode = fallbackMode);
+    }
+
+    public Command runExtendedReverse() {
+        return Commands.startEnd(
+                () -> currentMode = IntakeMode.EXTENDED_REVERSE, () -> currentMode = fallbackMode);
+    }
+
+    public Command zeroCommand() {
+        return extension.zeroCommand();
     }
 }

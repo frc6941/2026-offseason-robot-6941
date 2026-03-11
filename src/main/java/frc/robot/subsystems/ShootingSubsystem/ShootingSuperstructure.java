@@ -47,9 +47,7 @@ public class ShootingSuperstructure {
         Angle turretWorldRotation =
                 RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation().getMeasure();
         Angle bba = hood.getCurrPos();
-        double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
         double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-        Angle modelHood = bba.minus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue())).div(hoodB);
         AngularVelocity shooterVel = shooter.getVelocity();
 
         double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
@@ -58,7 +56,7 @@ public class ShootingSuperstructure {
                                 - ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
                                 - ShotCalculatorParamsNT.rpmC.getValue())
                         / rpmA;
-        return new ShotFrame(turretWorldRotation, modelHood, MetersPerSecond.of(muzzleSpeedMps));
+        return new ShotFrame(turretWorldRotation, bba, MetersPerSecond.of(muzzleSpeedMps));
     }
 
     public void setDefaultCommand() {
@@ -68,7 +66,7 @@ public class ShootingSuperstructure {
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
         hood.setDefaultCommand(
-                hood.runPosition(() -> computeBBA(RobotStateRecorder.getCmdFrame().hoodAngle())));
+                hood.runPosition(() -> RobotStateRecorder.getCmdFrame().hoodAngle()));
     }
 
     public Command shootWhenReady(boolean forceFeed) {
@@ -91,11 +89,11 @@ public class ShootingSuperstructure {
         return Commands.parallel(
                 turret.setTurretPoseWorld(
                         () -> RobotStateRecorder.getCmdFrame().turretAngleWorld()),
-                hood.runPosition(() -> computeBBA(RobotStateRecorder.getCmdFrame().hoodAngle())),
+                hood.runPosition(() -> RobotStateRecorder.getCmdFrame().hoodAngle()),
                 shooter.runVelVolt(
                         () -> {
                             ShotFrame frame = RobotStateRecorder.getCmdFrame();
-                            Angle bba = computeBBA(frame.hoodAngle());
+                            Angle bba = frame.hoodAngle();
                             double rpm = computeRpm(frame.muzzleSpeed(), bba);
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
@@ -105,14 +103,7 @@ public class ShootingSuperstructure {
         return Commands.parallel(runFrame(), idx.runState(idxModeSupplier));
     }
 
-    private Angle computeBBA(Angle modelAngle) {
-        return modelAngle
-                .times(ShotCalculatorParamsNT.hoodB.getValue())
-                .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
-    }
-
     private double computeRpm(LinearVelocity muzzleSpeed, Angle bba) {
-
         double currentDistance = getDistance();
         double scalingFactor = 1.0;
         if (currentDistance > 2.5) {
@@ -127,10 +118,17 @@ public class ShootingSuperstructure {
             }
         }
 
-        return (ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
+        double baseRpm =
+                ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
                         + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
-                        + ShotCalculatorParamsNT.rpmC.getValue())
-                * scalingFactor;
+                        + ShotCalculatorParamsNT.rpmC.getValue();
+        double scaledRpm = baseRpm * scalingFactor;
+
+        Logger.recordOutput("ShootingSuperstructure/Distance/currentMeters", currentDistance);
+        Logger.recordOutput("ShootingSuperstructure/Distance/baseRpm", baseRpm);
+        Logger.recordOutput("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
+
+        return scaledRpm;
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
@@ -145,6 +143,10 @@ public class ShootingSuperstructure {
 
     public Command runForceFeeding() {
         return idx.runState(() -> IdxMode.FORCE_FEED);
+    }
+
+    public Command runZero() {
+        return hood.zeroCommand();
     }
 
     public double getDistance() {

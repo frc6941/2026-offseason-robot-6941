@@ -141,8 +141,18 @@ public class ShotCalculator {
         RobotStateRecorder.setKFrameTarget(targetFrame);
         Translation2d shotToTargetCurrent =
                 RobotStateRecorder.getTranslationShotToTargetCurrent(targetFrame);
-        Translation2d velocityWorldRobotCurrent =
+        Translation2d velocityWorldRobotActualCurrent =
+                RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
+        Translation2d velocityWorldRobotCmdCurrent =
                 RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
+        double velocityCmdBlend = 1.0;
+        Translation2d velocityWorldRobotCurrent =
+                velocityWorldRobotActualCurrent.plus(
+                        velocityWorldRobotCmdCurrent
+                                .minus(velocityWorldRobotActualCurrent)
+                                .times(velocityCmdBlend));
+        // Translation2d velocityWorldRobotCurrent =
+        //         RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
 
         double currentDistanceMeters = shotToTargetCurrent.getNorm();
         Translation2d currentTargetVelocity =
@@ -245,9 +255,7 @@ public class ShotCalculator {
 
     /** Applies tuning offsets in model space. */
     public ShotModel applyModelTuning(ShotModel model, TargetMode mode) {
-        double speed =
-                model.exitSpeedMps * ShotCalculatorParamsNT.speedScale.getValue()
-                        + ShotCalculatorParamsNT.speedOffsetMps.getValue();
+        double speed = model.exitSpeedMps;
         double angle =
                 mode == TargetMode.GOAL
                         ? model.launchAngleDeg

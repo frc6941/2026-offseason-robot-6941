@@ -1,5 +1,7 @@
 package frc.robot.auto;
 
+import static frc.robot.auto.AutoRoutines.*;
+
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,9 +27,9 @@ public class AutoFile {
     private void initializeAutoChooser() {
         autoChooser.setDefaultOption("None", Commands.none());
         autoChooser.addOption("Test", buildTest());
-        autoChooser.addOption("quickSweepRight", AutoRoutines.quickSweepRight());
-        autoChooser.addOption("quickSweepLeft", AutoRoutines.longSweepRight());
-        autoChooser.addOption("sweepLeftClimb", AutoRoutines.sweepLeftClimb());
+        autoChooser.addOption("quickSweepRight", buildRoutineWithZeroing(quickSweepRight()));
+        autoChooser.addOption("quickSweepLeft", buildRoutineWithZeroing(longSweepRight()));
+        autoChooser.addOption("sweepLeftClimb", buildRoutineWithZeroing(sweepLeftClimb()));
     }
 
     private void initializeAutoPaths() {

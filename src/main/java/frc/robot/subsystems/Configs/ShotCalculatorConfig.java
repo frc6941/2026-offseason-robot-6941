@@ -16,28 +16,22 @@ public final class ShotCalculatorConfig {
     @NTParameter(tableName = "Params/ShotCalculator")
     public static final class ShotCalculatorParams {
         // Model tuning (model-space adjustments)
-        public static final double speedScale = 1.0;
-        public static final double speedOffsetMps = 0.0;
-        public static final double trajectoryBiasDegGOAL = -2.3; // -2.3 for 10541
-        public static final double trajectoryBiasDegFEED = -2.3;
-        public static final double loookfwdDistanceScale = 0;
+        public static final double trajectoryBiasDegGOAL = is10541?-2.3:-3.5;
+        public static final double trajectoryBiasDegFEED = -2;
+        public static final double loookfwdDistanceScale = 1.12;
         public static final double lateralVelocityCompScale = 1; // 1 for 10541
-        public static final double lookfwdDelayCycles = 5;
+        public static final double lookfwdDelayCycles = 1;
         public static final double lookfwdFlightScale = 0;
 
         public static final double lookfwdMinCycles = 0.0;
-        public static final double lookfwdMaxCycles = 100.0;
+        public static final double lookfwdMaxCycles = 20.0;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = is10541 ? 245 : 229; // 245 for 10541
-        public static final double rpmB = 4; // 2.3 for 10541
-        public static final double rpmC = 150;
+        public static final double rpmA = is10541 ? 245 : 409;
+        public static final double rpmB = is10541? 2.3:0;
+        public static final double rpmC = is10541? 150:-753;
 
-        public static final double distanceScaler = 1.05;
-
-        // hood = hoodB * launchAngle + hoodC
-        public static final double hoodB = 1;
-        public static final double hoodC = 0.0;
+        public static final double distanceScaler = 1;
     }
 }

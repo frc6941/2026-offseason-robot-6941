@@ -252,6 +252,10 @@ public class Swerve extends SubsystemBase implements Localizable {
         return imuIOInputs.pitchVelocityRadPerSec;
     }
 
+    public double getPitchPosRad() {
+        return imuIOInputs.pitchPosition.getRadians();
+    }
+
     // ------- Configurations -------
     public SwerveLimit getSwerveLimit() {
         return setpointGenerator.getChassisLimit();
