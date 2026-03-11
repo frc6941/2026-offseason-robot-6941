@@ -19,6 +19,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.FieldConstants;
@@ -26,6 +27,7 @@ import frc.robot.Robot;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.AutoParamsNT;
+import frc.robot.subsystems.Configs.ClimberParamsNT;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.IntakerSubsystem;
@@ -34,7 +36,10 @@ import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import lib.ironpulse.io.MotorIO;
+import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.rbd.TransformRecorder;
+import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
@@ -92,15 +97,19 @@ public class AutoActions {
     private static ShotCalculator shotCalculator;
     private static IntakerSubsystem intake;
 
+    private static PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
+
     public static void init(
             Swerve swerve,
             ShootingSuperstructure shooterSS,
             ShotCalculator shotCalculator,
-            IntakerSubsystem intake) {
+            IntakerSubsystem intake,
+            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber) {
         AutoActions.swerve = swerve;
         AutoActions.shooter = shooterSS;
         AutoActions.shotCalculator = shotCalculator;
         AutoActions.intake = intake;
+        AutoActions.climber = climber;
     }
 
     static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
@@ -138,8 +147,12 @@ public class AutoActions {
                                 AutoActions::getShiftDirectionTowardBump));
     }
 
-    public static Command intakeDepot() {
-        return Commands.none();
+    public static Command allignToDepot() {
+        return swerve.defer(
+                () ->
+                        driveToAllign(
+                                AllianceFlipUtil.apply(kDepotIntake),
+                                AutoActions::getShiftDirectionTowardBump));
     }
 
     public static Command zeroEverything() {
@@ -191,6 +204,10 @@ public class AutoActions {
 
     public static Command driveToPose(Pose2d targetPose) {
         return driveToPose(() -> targetPose);
+    }
+
+    public static Command simpleClimb() {
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.simpleClimbMeters.getValue()));
     }
 
     private static Rotation2d getShiftDirectionTowardBump() {
@@ -276,7 +293,7 @@ public class AutoActions {
         return generatePath(waypoints, rotationTargets, 4.5, 7.0, endVelMps);
     }
 
-    public static Command Intake() {
+    public static Command intake() {
         return intake.runIntake();
     }
 
@@ -295,7 +312,7 @@ public class AutoActions {
 
                     double halfCycleSeconds = 0.5 / feedOscillationRateHz;
                     return Commands.sequence(
-                                    Intake(),
+                                    intake(),
                                     Commands.waitSeconds(halfCycleSeconds),
                                     runFeed().withTimeout(halfCycleSeconds))
                             .repeatedly();

@@ -115,15 +115,16 @@ public class AutoFile {
                                         // sweep
                                         drivePastSlope(isLeft, true),
                                         Commands.deadline(
-                                                followPathFile(sweepPathName, isLeft), Intake()),
+                                                followPathFile(sweepPathName, isLeft), intake()),
                                         drivePastSlope(isLeft, false),
                                         shoot().withTimeout(2)),
 
                                 // station
                                 Commands.sequence(
                                                 new ConditionalCommand(
-                                                        intakeDepot(), // TODO:
-                                                        // depot
+                                                        Commands.deadline(
+                                                                allignToDepot(),
+                                                                oscillateIntakeFeed()),
                                                         Commands.deadline(
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed()),
@@ -135,7 +136,15 @@ public class AutoFile {
                                                                 != EndBehaviour.CLIMB),
 
                                 // climb
-                                Commands.parallel(oscillateIntakeFeed(), alignToClimb(isLeft))
+                                Commands.parallel(
+                                                oscillateIntakeFeed(),
+                                                shoot().withTimeout(2)
+                                                        .onlyIf(
+                                                                () ->
+                                                                        endBehaviourChooser.get()
+                                                                                == EndBehaviour
+                                                                                        .FUEL_CLIMB),
+                                                alignToClimb(isLeft).andThen(simpleClimb()))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()

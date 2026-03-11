@@ -23,7 +23,7 @@ public class AutoRoutines {
                 () ->
                         Commands.sequence(
                                 drivePastSlope(true, true),
-                                Commands.deadline(followPathFile("sweepRight", true), Intake()),
+                                Commands.deadline(followPathFile("sweepRight", true), intake()),
                                 drivePastSlope(true, false),
                                 shoot()),
                 Collections.singleton(swerve));
@@ -34,7 +34,7 @@ public class AutoRoutines {
                 () ->
                         Commands.sequence(
                                 drivePastSlope(false, true),
-                                Commands.deadline(followPathFile("sweepRight", false), Intake()),
+                                Commands.deadline(followPathFile("sweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
@@ -44,7 +44,8 @@ public class AutoRoutines {
                                                         Commands.waitSeconds(1),
                                                         Commands.parallel(
                                                                 oscillateIntakeFeed(),
-                                                                alignToClimb(false))))),
+                                                                alignToClimb(false)
+                                                                        .andThen(simpleClimb()))))),
                 Collections.singleton(swerve));
     }
 
@@ -54,12 +55,12 @@ public class AutoRoutines {
                         Commands.sequence(
                                 drivePastSlope(false, true),
                                 Commands.deadline(
-                                        followPathFile("quickSweepRight", false), Intake()),
+                                        followPathFile("quickSweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                allignToStation(), Intake()),
+                                                                allignToStation(), intake()),
                                                         runFeed()))),
                 Collections.singleton(swerve));
     }
@@ -75,7 +76,7 @@ public class AutoRoutines {
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                allignToStation(), Intake())))),
+                                                                allignToStation(), intake())))),
                 Collections.singleton(swerve));
     }
 
@@ -84,12 +85,12 @@ public class AutoRoutines {
                 () ->
                         Commands.sequence(
                                 drivePastSlope(true, true),
-                                Commands.deadline(followPathFile("longSweepRight", true), Intake()),
+                                Commands.deadline(followPathFile("longSweepRight", true), intake()),
                                 drivePastSlope(true, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                Commands.none(), Intake())))),
+                                                                Commands.none(), intake())))),
                 Collections.singleton(swerve));
     }
 

@@ -45,16 +45,16 @@ public class ClimberConfiig {
     @NTParameter(tableName = "Params/" + CLIMBER_NAME)
     public static final class ClimberParams {
 
-        public static final double kP = 15;
+        public static final double kP = 2.001;
         public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kV = 0.1308;
-        public static final double kA = 0.0068;
-        public static final double kS = 0.13;
+        public static final double kD = 0.01;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+        public static final double kS = 0.0;
 
         // Motion Magic
-        public static final double motionMagicVelRPS = 1000.0;
-        public static final double motionMagicAccelRPS2 = 150.0;
+        public static final double motionMagicVelRPS = 100;
+        public static final double motionMagicAccelRPS2 = 200.0;
         public static final double motionMagicJerkRPS3 = 0.0;
 
         // Tolerances / behavior
@@ -63,6 +63,6 @@ public class ClimberConfiig {
         public static final double climbedMeters = 0.2;
         public static final double simpleClimbMeters = 0.1;
 
-        public static final boolean isBrake = false;
+        public static final boolean isBrake = true;
     }
 }

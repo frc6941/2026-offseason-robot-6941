@@ -127,7 +127,7 @@ public class RobotContainer {
 
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
-        AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
+        AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake, climber);
         AutoRoutines.init(swerve);
         AutoFile.init();
         autoFile = new AutoFile();
@@ -268,7 +268,7 @@ public class RobotContainer {
         driver.povLeft()
                 .whileTrue(
                         climber.runMotionMagic(Meters.of(ClimberParamsNT.bottomMeters.getValue())));
-                        
+
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -345,11 +345,11 @@ public class RobotContainer {
         driver.a()
                 .whileTrue(
                         AutoActions.followPathFile("quickSweepRight", true)
-                                .alongWith(AutoActions.Intake()));
+                                .alongWith(AutoActions.intake()));
         driver.b()
                 .whileTrue(
                         AutoActions.followPathFile("longSweepRight", true)
-                                .alongWith(AutoActions.Intake()));
+                                .alongWith(AutoActions.intake()));
         driver.x().whileTrue(AutoRoutines.longSweepLeft());
 
         new Trigger(DriverStation::isEnabled)
