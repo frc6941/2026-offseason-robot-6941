@@ -18,8 +18,8 @@ public class IntakeConfig {
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
     public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
-    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 65;
-    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 55;
+    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 45;
+    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 30;
     private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
     private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
 

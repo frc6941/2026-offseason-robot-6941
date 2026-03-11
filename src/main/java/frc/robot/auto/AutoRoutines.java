@@ -68,10 +68,10 @@ public class AutoRoutines {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                drivePastSlope(false, true),
-                                Commands.deadline(
-                                        followPathFile("longSweepRight", false), Intake()),
-                                drivePastSlope(false, false),
+                                // drivePastSlope(false, true),
+                                // Commands.deadline(
+                                //         followPathFile("longSweepRight", false), Intake()),
+                                // drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(

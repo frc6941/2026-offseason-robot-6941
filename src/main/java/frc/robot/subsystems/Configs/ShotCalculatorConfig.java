@@ -28,8 +28,8 @@ public final class ShotCalculatorConfig {
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
         public static final double rpmA = 409; // 245 for 10541
         public static final double rpmB = 0; // 2.3 for 10541
-        public static final double rpmC = -753;
+        public static final double rpmC = -843;
 
-        public static final double distanceScaler = 1;
+        public static final double distanceScaler = 1.05;
     }
 }
