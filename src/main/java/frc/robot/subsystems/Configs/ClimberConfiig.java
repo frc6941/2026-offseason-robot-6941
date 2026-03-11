@@ -11,8 +11,7 @@ import lib.ntext.NTParameter;
 
 public class ClimberConfiig {
     public static final String CLIMBER_NAME = "Climber";
-    public static final Distance CLIMB_METERS_PER_ROTATION =
-            Meters.of(0.09971415082494003738880430098529);
+    public static final Distance CLIMB_METERS_PER_ROTATION = Meters.of(0.116);
     private static final int CLIMBER_MOTOR_MAIN_ID = 60;
     private static final double CLIMBER_GEAR_RATIO = 25 * 50 / 34;
     private static final double CLIMBER_STATOR_CURRENT_LIMIT_AMPS = 40;
