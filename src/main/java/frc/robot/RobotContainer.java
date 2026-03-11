@@ -211,7 +211,7 @@ public class RobotContainer {
         oprator.leftBumper().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
-        driver.povLeft().onTrue(intake.zeroCommand());
+        // driver.povLeft().onTrue(intake.zeroCommand());
 
         oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
         oprator.rightTrigger()
