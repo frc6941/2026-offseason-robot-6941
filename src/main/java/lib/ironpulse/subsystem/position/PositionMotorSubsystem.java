@@ -218,7 +218,23 @@ public class PositionMotorSubsystem<
      * @return The zeroing command.
      */
     public Command zeroCommand() {
-        double zeroVoltage = MathUtil.clamp(config.zeroingConfig.zeroingVoltage, -12.0d, 12.0d);
+        return zeroCommand(fromAngle(Rotations.of(0.0)), false);
+    }
+
+    /**
+     * Returns a command that zeroes the mechanism by driving it until a current spike is detected.
+     *
+     * @param zeroingPosition The position to set as zero (in units M)
+     * @return The zeroing command.
+     */
+    public Command zeroCommand(M zeroingPosition, boolean reverseZero) {
+        double zeroVoltage =
+                MathUtil.clamp(
+                        reverseZero
+                                ? config.zeroingConfig.zeroingVoltage
+                                : -config.zeroingConfig.zeroingVoltage,
+                        -12.0d,
+                        12.0d);
 
         Command realZero =
                 Commands.runOnce(
@@ -244,7 +260,12 @@ public class PositionMotorSubsystem<
                                                                         > config.zeroingConfig
                                                                                 .zeroingCurrentLimit),
                                         runVoltage(() -> zeroVoltage)))
-                        .andThen(Commands.runOnce(() -> io.setCurrentPositionAsZero(), this))
+                        .andThen(
+                                Commands.runOnce(
+                                        () ->
+                                                io.setCurrentPosition(
+                                                        toAngle(zeroingPosition).minus(zeroOffset)),
+                                        this))
                         .finallyDo(
                                 () -> {
                                     mode = ControlMode.VOLTAGE;
@@ -253,7 +274,10 @@ public class PositionMotorSubsystem<
                                     io.setEnableSoftLimits(true, true);
                                 });
 
-        Command simZero = Commands.runOnce(() -> io.setCurrentPositionAsZero(), this);
+        Command simZero =
+                Commands.runOnce(
+                        () -> io.setCurrentPosition(toAngle(zeroingPosition).minus(zeroOffset)),
+                        this);
 
         return new ConditionalCommand(realZero, simZero, Robot::isReal);
     }
