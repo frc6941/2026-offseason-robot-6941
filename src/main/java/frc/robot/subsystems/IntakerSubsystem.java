@@ -187,9 +187,4 @@ public class IntakerSubsystem {
     public Command zeroCommand() {
         return extension.zeroCommand();
     }
-
-    public Command outZeroCommand() {
-        return extension.zeroCommand(
-                Meters.of(IntakerExtensionParamsNT.deployPosMeters.getValue()), true);
-    }
 }
