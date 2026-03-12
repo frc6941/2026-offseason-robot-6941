@@ -21,6 +21,7 @@ public final class ShotCalculatorConfig {
         public static final double loookfwdDistanceScale = 0;
         public static final double lateralVelocityCompScale = 1.2;
         public static final double lookfwdDelayCycles = 3;
+
         public static final double lookfwdFlightScale = 0;
 
         public static final double lookfwdMinCycles = 0.0;
