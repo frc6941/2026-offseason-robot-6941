@@ -16,11 +16,11 @@ public final class ShotCalculatorConfig {
     @NTParameter(tableName = "Params/ShotCalculator")
     public static final class ShotCalculatorParams {
         // Model tuning (model-space adjustments)
-        public static final double trajectoryBiasDegGOAL = is10541 ? -3.5 : -3.5;
+        public static final double trajectoryBiasDegGOAL = is10541 ? -6 : -6;
         public static final double trajectoryBiasDegFEED = -2;
-        public static final double loookfwdDistanceScale = 1.12;
-        public static final double lateralVelocityCompScale = 1; // 1 for 10541
-        public static final double lookfwdDelayCycles = 1;
+        public static final double loookfwdDistanceScale = 0;
+        public static final double lateralVelocityCompScale = 1.2;
+        public static final double lookfwdDelayCycles = 3;
         public static final double lookfwdFlightScale = 0;
 
         public static final double lookfwdMinCycles = 0.0;
@@ -28,10 +28,10 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = is10541 ? 409 : 409;
+        public static final double rpmA = is10541 ? 237.1 : 237.1;
         public static final double rpmB = is10541 ? 0 : 0;
-        public static final double rpmC = is10541 ? -843 : -843;
+        public static final double rpmC = is10541 ? 146 : 146;
 
-        public static final double distanceScaler = 1.05;
+        public static final double distanceScaler = 1;
     }
 }
