@@ -342,8 +342,12 @@ public class RobotContainer {
         //                                 AutoParamsNT.kdSpin.getValue()),
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
-        driver.a().onTrue(AutoActions.followPathFile("null", HAS_CLIMBER_IO));
-        driver.povDown().whileTrue((intake.runRetract()));
+
+        driver.a()
+                .whileTrue(
+                        AutoActions.followPathFile("quickSweepRight", true)
+                                .alongWith(AutoActions.intake()));
+        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
