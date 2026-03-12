@@ -70,7 +70,7 @@ public class AutoActions {
             new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kStationIntake =
-            new Pose2d(0.59, 0.67, new Rotation2d(Degrees.of(180)));
+            new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kDepotIntake =
             new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
@@ -133,7 +133,7 @@ public class AutoActions {
         return Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(isToNeutral));
     }
 
-    static Command alignToClimb(boolean isLeft) {
+    public static Command allignToClimb(boolean isLeft) {
         return swerve.defer(
                 () -> {
                     Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kclimbL : kclimbR);
@@ -174,8 +174,8 @@ public class AutoActions {
     }
 
     public static boolean isPitchStable() {
-        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5
-                && Math.abs(swerve.getPitchPosRad()) < 0.07;
+        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
+        // && Math.abs(swerve.getPitchPosRad()) < 0.08;
     }
 
     static Command driveToPose(Supplier<Pose2d> targetPoseSupplier) {
@@ -228,6 +228,10 @@ public class AutoActions {
 
     public static Command climb() {
         return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()));
+    }
+
+    public static Command climbDown() {
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.bottomMeters.getValue()));
     }
 
     private static Rotation2d getShiftDirectionTowardBump() {

@@ -44,7 +44,7 @@ public class AutoRoutines {
                                                         Commands.waitSeconds(1),
                                                         Commands.parallel(
                                                                 oscillateIntakeFeed(),
-                                                                alignToClimb(false)
+                                                                allignToClimb(false)
                                                                         .andThen(simpleClimb()))))),
                 Collections.singleton(swerve));
     }
@@ -53,15 +53,13 @@ public class AutoRoutines {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                drivePastSlope(false, true),
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
                                 Commands.deadline(
                                         followPathFile("quickSweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
-                                                Commands.sequence(
-                                                        Commands.deadline(
-                                                                allignToStation(), intake()),
-                                                        runFeed()))),
+                                                Commands.deadline(
+                                                        allignToStation(), oscillateIntakeFeed()))),
                 Collections.singleton(swerve));
     }
 
@@ -69,7 +67,7 @@ public class AutoRoutines {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                drivePastSlope(false, true),
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
                                 Commands.deadline(
                                         followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
@@ -104,10 +102,10 @@ public class AutoRoutines {
                         Commands.sequence(
                                 Commands.deadline(allignToStation(), oscillateIntakeFeed()),
                                 Commands.waitSeconds(1),
-                                Commands.parallel(oscillateIntakeFeed(), alignToClimb(false))));
+                                Commands.parallel(oscillateIntakeFeed(), allignToClimb(false))));
     }
 
-    public static Command climb() {
-        return alignToClimb(false);
+    public static Command climb(boolean isLeft) {
+        return allignToClimb(isLeft);
     }
 }

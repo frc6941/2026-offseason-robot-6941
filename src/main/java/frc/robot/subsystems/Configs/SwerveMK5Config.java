@@ -94,7 +94,8 @@ public final class SwerveMK5Config {
                     .steerMotorId(6)
                     .encoderId(11)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(is10541 ? -0.11083984375 : 0.165771484375))
+                    .steerMotorEncoderOffset(
+                            Rotations.of(is10541 ? -0.11083984375 : 0.165771484375))
                     .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)

@@ -111,16 +111,20 @@ public class AutoFile {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                zeroEverything(),
-                                Commands.sequence(
-                                        // sweep
-                                        drivePastSlope(isLeft, true),
-                                        Commands.deadline(
-                                                followPathFile(sweepPathName, isLeft), intake()),
-                                        drivePastSlope(isLeft, false)),
+                                Commands.deadline(
+                                        Commands.sequence(
+                                                // sweep
+                                                drivePastSlope(isLeft, true),
+                                                Commands.deadline(
+                                                        followPathFile(sweepPathName, isLeft),
+                                                        intake()),
+                                                drivePastSlope(isLeft, false)),
+                                        // zeroEverything()),
+                                        Commands.none()),
 
                                 // station
                                 Commands.parallel(
+                                                shoot(),
                                                 new ConditionalCommand(
                                                         Commands.deadline(
                                                                 allignToDepot(),
@@ -128,8 +132,7 @@ public class AutoFile {
                                                         Commands.deadline(
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed()),
-                                                        () -> isLeft),
-                                                shoot())
+                                                        () -> isLeft))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
@@ -139,7 +142,7 @@ public class AutoFile {
                                 Commands.parallel(
                                                 oscillateIntakeFeed(),
                                                 climbUp(),
-                                                alignToClimb(isLeft))
+                                                allignToClimb(isLeft))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()

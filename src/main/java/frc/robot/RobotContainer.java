@@ -223,6 +223,10 @@ public class RobotContainer {
         oprator.leftBumper().whileTrue(intake.runFeed());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
+        oprator.povUp().whileTrue(AutoActions.climbUp());
+        oprator.povDown().whileTrue(AutoActions.climb());
+        oprator.back().onTrue(AutoActions.climbDown());
+
         // driver.povLeft().onTrue(intake.zeroCommand());
 
         oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
@@ -343,10 +347,8 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a()
-                .whileTrue(
-                        AutoActions.followPathFile("quickSweepRight", true)
-                                .alongWith(AutoActions.intake()));
+        driver.a().whileTrue(AutoActions.allignToClimb(false));
+        driver.x().onTrue(AutoRoutines.longSweepRight());
         driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
