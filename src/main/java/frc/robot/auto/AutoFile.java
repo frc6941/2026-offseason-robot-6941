@@ -145,7 +145,7 @@ public class AutoFile {
                                                                                 == EndBehaviour
                                                                                         .FUEL_CLIMB),
                                                 climbUp(),
-                                                alignToClimb(isLeft).andThen(climb()))
+                                                alignToClimb(isLeft))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()

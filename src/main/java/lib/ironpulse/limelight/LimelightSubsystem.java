@@ -2,6 +2,7 @@ package lib.ironpulse.limelight;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -115,5 +116,10 @@ public class LimelightSubsystem extends SubsystemBase {
         for (LimelightIO io : ios.keySet()) {
             io.setThrottle(enabled);
         }
+    }
+
+    public Pose2d getPose(String id) {
+        LimelightIOInputsAutoLogged inputs = ios.get(getIoById(id));
+        return inputs.pose.toPose2d();
     }
 }

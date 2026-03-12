@@ -333,9 +333,11 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoRoutines.climb());
-        driver.povUp().onTrue(AutoActions.climbUp());
-        driver.povDown().onTrue(AutoActions.climbCommand());
+        driver.a()
+                .whileTrue(
+                        AutoActions.followPathFile("quickSweepRight", true)
+                                .alongWith(AutoActions.intake()));
+        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
