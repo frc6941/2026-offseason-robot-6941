@@ -71,7 +71,7 @@ public class AutoRoutines {
                         Commands.sequence(
                                 drivePastSlope(false, true),
                                 Commands.deadline(
-                                        followPathFile("longSweepRight", false), Intake()),
+                                        followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
