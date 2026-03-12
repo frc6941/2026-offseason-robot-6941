@@ -214,13 +214,14 @@ public class AutoActions {
                                 Meters.of(ClimberParamsNT.climbedMeters.getValue())));
     }
 
-//     public static void climbUp() {
-//         return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue())).until(climber::positionAtGoal);
-//     }
+    public static Command climbUp() {
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue()))
+                .until(climber::positionAtGoal);
+    }
 
-//     public static void climb{
-//          return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()))
-//     }
+    public static Command climb() {
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()));
+    }
 
     private static Rotation2d getShiftDirectionTowardBump() {
         return AllianceFlipUtil.shouldFlip() ? Rotation2d.kPi : Rotation2d.kZero;

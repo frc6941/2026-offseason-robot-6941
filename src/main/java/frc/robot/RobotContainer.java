@@ -260,7 +260,6 @@ public class RobotContainer {
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
 
-
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -338,9 +337,7 @@ public class RobotContainer {
                 .whileTrue(
                         AutoActions.followPathFile("quickSweepRight", true)
                                 .alongWith(AutoActions.intake()));
-        driver.b()
-                .whileTrue(
-                        AutoActions.followPathFile("longSweepRight", true));
+        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
