@@ -48,7 +48,7 @@ public class ShooterConfig {
     public static final class ShooterParams {
         // velocity gains
 
-        public static final double kP = 0.65;
+        public static final double kP = 0.38;
         public static final double kI = 0.0;
         public static final double kD = 0.00;
         public static final double kV = 0.17;
