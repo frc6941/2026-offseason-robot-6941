@@ -229,7 +229,7 @@ public class RobotContainer {
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
         oprator.povUp().whileTrue(AutoActions.climbUp());
-        oprator.povDown().whileTrue(AutoActions.climb());
+        oprator.povDown().whileTrue(AutoActions.climbed());
         oprator.back().onTrue(AutoActions.climbDown());
 
         // driver.povLeft().onTrue(intake.zeroCommand());
@@ -353,7 +353,7 @@ public class RobotContainer {
         //                         Degrees.of(2)));
 
         driver.a().whileTrue(AutoActions.allignToClimb(false));
-        driver.x().onTrue(AutoRoutines.longSweepRight());
+        driver.x().onTrue(AutoRoutines.rightLongFuel());
         driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)

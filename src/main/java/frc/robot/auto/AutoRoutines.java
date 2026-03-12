@@ -18,38 +18,88 @@ public class AutoRoutines {
         return Commands.parallel(routine, zeroEverything());
     }
 
-    public static Command sweepLeftClimb() {
+    public static Command testRoutine() {
+        return Commands.sequence(resetOnPose(AutoActions.kTestA), testPath());
+    }
+
+    // LEFT side routines
+    public static Command leftFastClimb() {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                drivePastSlope(true, true),
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(
+                                        followPathFile("quickSweepRight", true), intake()),
+                                drivePastSlope(true, false),
+                                Commands.deadline(
+                                        allignToClimb(true),
+                                        Commands.parallel(
+                                                oscillateIntakeFeed().withTimeout(20.0),
+                                                climbUp(),
+                                                shoot().withTimeout(20.0))),
+                                climbed().alongWith(shoot())),
+                Collections.singleton(swerve));
+    }
+
+    public static Command leftFastFuel() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(
+                                        followPathFile("quickSweepRight", true), intake()),
+                                drivePastSlope(true, false),
+                                Commands.parallel(
+                                        shoot(),
+                                        Commands.deadline(allignToDepot(), oscillateIntakeFeed()))),
+                Collections.singleton(swerve));
+    }
+
+    public static Command leftNormalClimb() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
                                 Commands.deadline(followPathFile("sweepRight", true), intake()),
                                 drivePastSlope(true, false),
-                                shoot()),
+                                Commands.deadline(
+                                        allignToClimb(true),
+                                        Commands.parallel(
+                                                oscillateIntakeFeed().withTimeout(20.0),
+                                                climbUp(),
+                                                shoot().withTimeout(20.0))),
+                                climbed().alongWith(shoot())),
                 Collections.singleton(swerve));
     }
 
-    public static Command sweepRightClimb() {
+    public static Command leftNormalFuel() {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                drivePastSlope(false, true),
-                                Commands.deadline(followPathFile("sweepRight", false), intake()),
-                                drivePastSlope(false, false),
-                                shoot().alongWith(
-                                                Commands.sequence(
-                                                        Commands.deadline(
-                                                                allignToStation(),
-                                                                oscillateIntakeFeed()),
-                                                        Commands.waitSeconds(1),
-                                                        Commands.parallel(
-                                                                oscillateIntakeFeed(),
-                                                                allignToClimb(false)
-                                                                        .andThen(simpleClimb()))))),
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(followPathFile("sweepRight", true), intake()),
+                                drivePastSlope(true, false),
+                                Commands.parallel(
+                                        shoot(),
+                                        Commands.deadline(allignToDepot(), oscillateIntakeFeed()))),
                 Collections.singleton(swerve));
     }
 
-    public static Command quickSweepRight() {
+    public static Command leftLongFuel() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(followPathFile("longSweepRight", true), intake()),
+                                drivePastSlope(true, false),
+                                Commands.parallel(
+                                        shoot(),
+                                        Commands.deadline(allignToDepot(), oscillateIntakeFeed()))),
+                Collections.singleton(swerve));
+    }
+
+    // RIGHT side routines
+    public static Command rightFastClimb() {
         return Commands.defer(
                 () ->
                         Commands.sequence(
@@ -57,13 +107,63 @@ public class AutoRoutines {
                                 Commands.deadline(
                                         followPathFile("quickSweepRight", false), intake()),
                                 drivePastSlope(false, false),
-                                shoot().alongWith(
-                                                Commands.deadline(
-                                                        allignToStation(), oscillateIntakeFeed()))),
+                                Commands.deadline(
+                                        allignToClimb(false),
+                                        Commands.parallel(
+                                                oscillateIntakeFeed().withTimeout(20.0),
+                                                climbUp(),
+                                                shoot().withTimeout(20.0))),
+                                climbed().alongWith(shoot())),
                 Collections.singleton(swerve));
     }
 
-    public static Command longSweepRight() {
+    public static Command rightFastFuel() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(
+                                        followPathFile("quickSweepRight", false), intake()),
+                                drivePastSlope(false, false),
+                                Commands.parallel(
+                                        shoot(),
+                                        Commands.deadline(
+                                                allignToStation(), oscillateIntakeFeed()))),
+                Collections.singleton(swerve));
+    }
+
+    public static Command rightNormalClimb() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(followPathFile("sweepRight", false), intake()),
+                                drivePastSlope(false, false),
+                                Commands.deadline(
+                                        allignToClimb(false),
+                                        Commands.parallel(
+                                                oscillateIntakeFeed().withTimeout(20.0),
+                                                climbUp(),
+                                                shoot().withTimeout(20.0))),
+                                climbed().alongWith(shoot())),
+                Collections.singleton(swerve));
+    }
+
+    public static Command rightNormalFuel() {
+        return Commands.defer(
+                () ->
+                        Commands.sequence(
+                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
+                                Commands.deadline(followPathFile("sweepRight", false), intake()),
+                                drivePastSlope(false, false),
+                                Commands.parallel(
+                                        shoot(),
+                                        Commands.deadline(
+                                                allignToStation(), oscillateIntakeFeed()))),
+                Collections.singleton(swerve));
+    }
+
+    public static Command rightLongFuel() {
         return Commands.defer(
                 () ->
                         Commands.sequence(
@@ -71,30 +171,11 @@ public class AutoRoutines {
                                 Commands.deadline(
                                         followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
-                                shoot().alongWith(
-                                                Commands.sequence(
-                                                        Commands.deadline(
-                                                                allignToStation(),
-                                                                oscillateIntakeFeed())))),
+                                Commands.parallel(
+                                        shoot(),
+                                        Commands.deadline(
+                                                allignToStation(), oscillateIntakeFeed()))),
                 Collections.singleton(swerve));
-    }
-
-    public static Command longSweepLeft() {
-        return Commands.defer(
-                () ->
-                        Commands.sequence(
-                                drivePastSlope(true, true),
-                                Commands.deadline(followPathFile("longSweepRight", true), intake()),
-                                drivePastSlope(true, false),
-                                shoot().alongWith(
-                                                Commands.sequence(
-                                                        Commands.deadline(
-                                                                Commands.none(), intake())))),
-                Collections.singleton(swerve));
-    }
-
-    public static Command testPath() {
-        return followPathFile("testPath", false);
     }
 
     public static Command shootAndClimb() {
