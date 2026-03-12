@@ -251,7 +251,7 @@ public class Swerve extends SubsystemBase implements Localizable {
     }
 
     public double getIMUYaw() {
-        return poseEstimator.getEstimatedPosition().getRotation().getAngle();
+        return poseEstimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees();
     }
 
     public double getPitchVelocityRadPerSec() {

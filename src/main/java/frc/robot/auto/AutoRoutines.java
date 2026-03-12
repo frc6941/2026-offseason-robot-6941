@@ -73,7 +73,7 @@ public class AutoRoutines {
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
-                                                        Commands.deadline(
+                                                        Commands.parallel(
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed())))),
                 Collections.singleton(swerve));
@@ -103,9 +103,5 @@ public class AutoRoutines {
                                 Commands.deadline(allignToStation(), oscillateIntakeFeed()),
                                 Commands.waitSeconds(1),
                                 Commands.parallel(oscillateIntakeFeed(), allignToClimb(false))));
-    }
-
-    public static Command climb(boolean isLeft) {
-        return allignToClimb(isLeft);
     }
 }

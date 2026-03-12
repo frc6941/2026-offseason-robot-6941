@@ -347,9 +347,9 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.allignToClimb(false));
-        driver.x().onTrue(AutoRoutines.longSweepRight());
-        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
+        driver.a().whileTrue(AutoRoutines.quickSweepRight());
+        driver.b().whileTrue(AutoRoutines.longSweepRight());
+        // driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
@@ -437,10 +437,12 @@ public class RobotContainer {
                                                 .getRotation()
                                                 .getDegrees(),
                                 () ->
-                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
-                                                        .getRotation()
-                                                        .getDegrees()
-                                                > 360,
+                                        Math.abs(
+                                                        RobotStateRecorder
+                                                                .getVelocityWorldRobotCurrent()
+                                                                .getRotation()
+                                                                .getRadians())
+                                                > 1.2,
                                 LimeLightConfig.asDeviationParams()),
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,

@@ -30,8 +30,8 @@ public class TurretConfig {
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(190);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(30);
     // Zero offset- the position at which the two encoders are set to zero.
-    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-142);
-    public static final Angle TURRET_DOF = Degrees.of(219);
+    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-149);
+    public static final Angle TURRET_DOF = Degrees.of(206);
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =
             TURRET_DOF.unaryMinus().plus(TURRET_ZERO_OFFSET);
@@ -82,16 +82,16 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 8;
+        public static final double kpSeek = 12;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
-        public static final double kpTrack = 20;
+        public static final double kpTrack = 18;
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.01;
 
         public static final double maxVelocityRPS = 3.5;
-        public static final double maxAccelerationRPS2 = 11;
+        public static final double maxAccelerationRPS2 = 9;
         public static final double kchassisVelCompensation = 1;
         public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.
