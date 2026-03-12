@@ -71,12 +71,13 @@ public class AutoRoutines {
                         Commands.sequence(
                                 drivePastSlope(false, true),
                                 Commands.deadline(
-                                        followPathFile("longSweepRight", false), Intake()),
+                                        followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 shoot().alongWith(
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                allignToStation(), intake())))),
+                                                                allignToStation(),
+                                                                oscillateIntakeFeed())))),
                 Collections.singleton(swerve));
     }
 
@@ -96,5 +97,17 @@ public class AutoRoutines {
 
     public static Command testPath() {
         return followPathFile("testPath", false);
+    }
+
+    public static Command shootAndClimb() {
+        return shoot().alongWith(
+                        Commands.sequence(
+                                Commands.deadline(allignToStation(), oscillateIntakeFeed()),
+                                Commands.waitSeconds(1),
+                                Commands.parallel(oscillateIntakeFeed(), alignToClimb(false))));
+    }
+
+    public static Command climb() {
+        return alignToClimb(false);
     }
 }

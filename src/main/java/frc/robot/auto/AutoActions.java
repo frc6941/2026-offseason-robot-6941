@@ -80,8 +80,9 @@ public class AutoActions {
     public static final Pose2d kQuickSweepEndPoseR =
             new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
 
-    public static final Pose2d kclimbL = new Pose2d(1.478, 4.136, new Rotation2d(Degrees.of(0)));
-    public static final Pose2d kclimbR = new Pose2d(1.478, 3.331, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kclimbL =
+            new Pose2d(FieldConstants.fieldLength - 15.15, 4.761, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kclimbR = new Pose2d(FieldConstants.fieldLength - 15.15, 3.331, new Rotation2d(Degrees.of(0)));
 
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));
@@ -135,7 +136,8 @@ public class AutoActions {
         return swerve.defer(
                 () -> {
                     Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kclimbL : kclimbR);
-                    return driveToAllign(climbPose, AutoActions::getShiftDirectionTowardBump);
+                    return driveToAllign(
+                            climbPose, AutoActions::getShiftDirectionTowardBump, 2, 1.5);
                 });
     }
 
@@ -144,7 +146,9 @@ public class AutoActions {
                 () ->
                         driveToAllign(
                                 AllianceFlipUtil.apply(kStationIntake),
-                                AutoActions::getShiftDirectionTowardBump));
+                                AutoActions::getShiftDirectionTowardBump,
+                                1.5,
+                                0.2));
     }
 
     public static Command allignToDepot() {
@@ -152,7 +156,9 @@ public class AutoActions {
                 () ->
                         driveToAllign(
                                 AllianceFlipUtil.apply(kDepotIntake),
-                                AutoActions::getShiftDirectionTowardBump));
+                                AutoActions::getShiftDirectionTowardBump,
+                                1.5,
+                                0.2));
     }
 
     public static Command zeroEverything() {
@@ -214,20 +220,24 @@ public class AutoActions {
                                 Meters.of(ClimberParamsNT.climbedMeters.getValue())));
     }
 
-//     public static void climbUp() {
-//         return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue())).until(climber::positionAtGoal);
-//     }
+    public static Command climbUp() {
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbReadyMeters.getValue()))
+                .until(climber::positionAtGoal);
+    }
 
-//     public static void climb{
-//          return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()))
-//     }
+    public static Command climbCommand() {
+        return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()));
+    }
 
     private static Rotation2d getShiftDirectionTowardBump() {
         return AllianceFlipUtil.shouldFlip() ? Rotation2d.kPi : Rotation2d.kZero;
     }
 
     static Command driveToAllign(
-            Pose2d targetPose, Supplier<Rotation2d> shiftingDirectionSupplier) {
+            Pose2d targetPose,
+            Supplier<Rotation2d> shiftingDirectionSupplier,
+            double shiftPara,
+            double shiftLat) {
         return new SwerveDriveToAllign(
                         swerve,
                         () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
@@ -235,8 +245,8 @@ public class AutoActions {
                         () -> targetPose,
                         shiftingDirectionSupplier,
                         swerve.getSwerveLimit(),
-                        1,
-                        2)
+                        shiftPara,
+                        shiftLat)
                 .beforeStarting(
                         Commands.runOnce(
                                 () -> {
