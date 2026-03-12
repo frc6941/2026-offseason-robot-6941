@@ -24,6 +24,7 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
     private final LinearFilter statorCurrentFilter = LinearFilter.movingAverage(5);
     private final LinearFilter velocityFilter = LinearFilter.movingAverage(5);
     private final TimeDelayedBoolean jamDetectionDelay = new TimeDelayedBoolean(0.0);
+    double now = Timer.getTimestamp();
 
     @Getter
     @AutoLogOutput(key = "Spindexer/state")
@@ -50,7 +51,9 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
 
     @Override
     public void periodic() {
+        now = Timer.getTimestamp();
         super.periodic();
+
         filteredStatorCurrentAmps = statorCurrentFilter.calculate(getStatorCurrent().magnitude());
         filteredVelocityRps =
                 velocityFilter.calculate(Math.abs(getVelocity().in(RotationsPerSecond)));
@@ -60,6 +63,32 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
         Logger.recordOutput(
                 getName() + "/jamDetectionLockedOut",
                 Timer.getTimestamp() < jamDetectionLockoutUntilSec);
+
+        jamCondition = isJamConditionMet(now);
+
+        handleStateTransitions();
+    }
+
+    private void handleStateTransitions() {
+        switch (currentState) {
+            case FEED:
+                if (jamCondition
+                        && jamDetectionDelay.update(
+                                jamCondition, SpindexerParamsNT.unjammTriggerSec.getValue())) {
+                    transitionTo(State.UNJAM_REVERSE, now);
+                }
+                break;
+
+            case UNJAM_REVERSE:
+                if (now - stateStartTimestampSec >= SpindexerParamsNT.unjammTimeoutSec.getValue()) {
+                    transitionTo(State.FEED, now);
+                    armJamDetectionLockout(now);
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
     public Command runState(Supplier<IdxMode> requestedModeSupplier) {
@@ -95,20 +124,11 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
                         transitionToIfNeeded(State.FEED, now);
                         armJamDetectionLockout(now);
                         break;
+
                     case FEED:
-                        jamCondition = isJamConditionMet(now);
-                        if (jamDetectionDelay.update(
-                                jamCondition, SpindexerParamsNT.unjammTriggerSec.getValue())) {
-                            transitionTo(State.UNJAM_REVERSE, now);
-                        }
                         break;
+
                     case UNJAM_REVERSE:
-                        jamCondition = false;
-                        if (now - stateStartTimestampSec
-                                >= SpindexerParamsNT.unjammTimeoutSec.getValue()) {
-                            transitionTo(State.FEED, now);
-                            armJamDetectionLockout(now);
-                        }
                         break;
                 }
                 break;
