@@ -225,7 +225,7 @@ public class AutoActions {
                 .until(climber::positionAtGoal);
     }
 
-    public static Command climbCommand() {
+    public static Command climb() {
         return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()));
     }
 
