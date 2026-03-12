@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
+import static frc.robot.auto.AutoActions.intake;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -160,15 +161,19 @@ public class RobotContainer {
                                             indicatorSubsystem.setPattern(Patterns.LOSS);
                                         }
                                     } else {
-                                        if (shootingSuperstructure.isShooting()) {
-                                            indicatorSubsystem.setPattern(Patterns.SHOOTING);
+                                        if (DriverStation.isAutonomousEnabled()) {
+                                            indicatorSubsystem.setPattern(Patterns.AUTO);
                                         } else {
-                                            if (intake.getCurrentMode()
-                                                    == frc.robot.subsystems.IntakerSubsystem
-                                                            .IntakeMode.INTAKING) {
-                                                indicatorSubsystem.setPattern(Patterns.INTAKE);
+                                            if (shootingSuperstructure.isShooting()) {
+                                                indicatorSubsystem.setPattern(Patterns.SHOOTING);
                                             } else {
-                                                indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                                if (intake.getCurrentMode()
+                                                        == frc.robot.subsystems.IntakerSubsystem
+                                                                .IntakeMode.INTAKING) {
+                                                    indicatorSubsystem.setPattern(Patterns.INTAKE);
+                                                } else {
+                                                    indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                                }
                                             }
                                         }
                                     }
@@ -259,6 +264,11 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+        driver.leftStick()
+                .whileTrue(
+                        Commands.parallel(
+                                SwerveCommands.xLock(swerve),
+                                shootingSuperstructure.shootWhenReady(false)));
 
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
@@ -332,10 +342,8 @@ public class RobotContainer {
         //                                 AutoParamsNT.kdSpin.getValue()),
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
-
-        driver.a().whileTrue(AutoRoutines.climb());
-        driver.povUp().onTrue(AutoActions.climbUp());
-        driver.povDown().onTrue(AutoActions.climbCommand());
+        driver.a().onTrue(AutoActions.followPathFile("null", HAS_CLIMBER_IO));
+        driver.povDown().whileTrue((intake.runRetract()));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(

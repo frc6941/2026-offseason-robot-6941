@@ -111,16 +111,16 @@ public class AutoFile {
         return Commands.defer(
                 () ->
                         Commands.sequence(
+                                zeroEverything(),
                                 Commands.sequence(
                                         // sweep
                                         drivePastSlope(isLeft, true),
                                         Commands.deadline(
                                                 followPathFile(sweepPathName, isLeft), intake()),
-                                        drivePastSlope(isLeft, false),
-                                        shoot()),
+                                        drivePastSlope(isLeft, false)),
 
                                 // station
-                                Commands.sequence(
+                                Commands.parallel(
                                                 new ConditionalCommand(
                                                         Commands.deadline(
                                                                 allignToDepot(),
@@ -138,14 +138,8 @@ public class AutoFile {
                                 // climb
                                 Commands.parallel(
                                                 oscillateIntakeFeed(),
-                                                shoot().withTimeout(2)
-                                                        .onlyIf(
-                                                                () ->
-                                                                        endBehaviourChooser.get()
-                                                                                == EndBehaviour
-                                                                                        .FUEL_CLIMB),
                                                 climbUp(),
-                                                alignToClimb(isLeft).andThen(climb()))
+                                                alignToClimb(isLeft))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
@@ -171,7 +165,6 @@ public class AutoFile {
 
     private enum EndBehaviour {
         CLIMB,
-        FUEL,
-        FUEL_CLIMB
+        FUEL
     }
 }

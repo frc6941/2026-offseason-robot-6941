@@ -70,7 +70,7 @@ public class AutoActions {
             new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kStationIntake =
-            new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
+            new Pose2d(0.59, 0.67, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kDepotIntake =
             new Pose2d(0.59, 0.66, new Rotation2d(Degrees.of(180)));
@@ -82,7 +82,8 @@ public class AutoActions {
 
     public static final Pose2d kclimbL =
             new Pose2d(FieldConstants.fieldLength - 15.15, 4.761, new Rotation2d(Degrees.of(0)));
-    public static final Pose2d kclimbR = new Pose2d(FieldConstants.fieldLength - 15.15, 3.331, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kclimbR =
+            new Pose2d(FieldConstants.fieldLength - 15.15, 3.331, new Rotation2d(Degrees.of(0)));
 
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));

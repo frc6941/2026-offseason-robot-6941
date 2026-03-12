@@ -229,12 +229,7 @@ public class LimelightIOReal implements LimelightIO {
         LimelightHelpers.SetFiducialIDFiltersOverride(config.getName(), ids);
     }
 
-    @Override
-    public void updateInputs(LimelightIOInputs inputs) {
-        if (canUseInternalIMU() && isPrevDisabled != RobotState.isDisabled()) {
-            setIMUMode();
-        }
-        isPrevDisabled = RobotState.isDisabled();
+    public void setRobotOrientation() {
         LimelightHelpers.SetRobotOrientation(
                 config.getName(),
                 yawSupplier.getAsDouble(),
@@ -244,6 +239,14 @@ public class LimelightIOReal implements LimelightIO {
                 0,
                 0); // the last 5 parameters are not necessary
         Logger.recordOutput("Limelight/IMU/Swerve", yawSupplier.getAsDouble());
+    }
+
+    @Override
+    public void updateInputs(LimelightIOInputs inputs) {
+        if (canUseInternalIMU() && isPrevDisabled != RobotState.isDisabled()) {
+            setIMUMode();
+        }
+        isPrevDisabled = RobotState.isDisabled();
 
         // generate pose Estimate
         LimelightHelpers.PoseEstimate estimate;

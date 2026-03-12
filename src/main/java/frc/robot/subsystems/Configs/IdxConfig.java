@@ -68,8 +68,8 @@ public class IdxConfig {
         public static final double kS = 0.25;
 
         public static final double unjammTimeoutSec = 0.15;
-        public static final double unjammTriggerAmps = 65;
-        public static final double unjammTriggerBelowRps = 1.8; // 1.5 for 10541
+        public static final double unjammTriggerAmps = 70;
+        public static final double unjammTriggerBelowRps = 1.65; // 1.5 for 10541
         public static final double unjammTriggerSec = 0.08;
         public static final double unjammLockoutSec = 0.2;
 

@@ -5,6 +5,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotStateRecorder;
 import java.util.HashMap;
 import java.util.Map;
 import lib.ironpulse.math.MathTools;
@@ -57,8 +58,11 @@ public class LimelightSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        double oriDegrees =
+                RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getRotation().getDegrees();
         for (Map.Entry<LimelightIO, LimelightIOInputsAutoLogged> entry : ios.entrySet()) {
             LimelightIO io = entry.getKey();
+            io.setRobotOrientation();
             LimelightIOInputsAutoLogged inputs = entry.getValue();
 
             io.updateInputs(inputs);

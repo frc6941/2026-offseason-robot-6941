@@ -29,6 +29,8 @@ public interface LimelightIO {
 
     default void setPortForwarder(int portStream, int portPipeline) {}
 
+    default void setRobotOrientation() {}
+
     default double[] getVisionStdDevComponents(double reliability) {
         return new double[] {
             0.7 * (2 - reliability),
