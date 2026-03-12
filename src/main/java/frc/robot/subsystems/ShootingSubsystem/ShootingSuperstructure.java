@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.FieldConstants;
@@ -128,6 +129,10 @@ public class ShootingSuperstructure {
         Logger.recordOutput("ShootingSuperstructure/Distance/currentMeters", currentDistance);
         Logger.recordOutput("ShootingSuperstructure/Distance/baseRpm", baseRpm);
         Logger.recordOutput("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
+
+        SmartDashboard.putNumber("ShootingSuperstructure/Distance/currentMeters", currentDistance);
+        SmartDashboard.putNumber("ShootingSuperstructure/Distance/baseRpm", baseRpm);
+        SmartDashboard.putNumber("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
 
         return scaledRpm;
     }

@@ -216,6 +216,11 @@ public class RobotContainer {
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
         FieldView.updateRobotPose(RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d());
+        // TODO: test & fix in sim
+        if (Robot.isReal()) {
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_3g");
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_B), "LL_4");
+        }
     }
 
     private void configureBindings() {

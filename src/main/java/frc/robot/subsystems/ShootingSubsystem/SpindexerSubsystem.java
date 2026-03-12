@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
@@ -63,6 +64,7 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
         Logger.recordOutput(
                 getName() + "/jamDetectionLockedOut",
                 Timer.getTimestamp() < jamDetectionLockoutUntilSec);
+        SmartDashboard.putBoolean("Spindexer/jamCondition", jamCondition);
 
         jamCondition = isJamConditionMet(now);
 

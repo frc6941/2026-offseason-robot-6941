@@ -5,10 +5,12 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotStateRecorder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lib.ironpulse.math.MathTools;
 import lib.ironpulse.utils.LoggedTracer;
 import org.littletonrobotics.junction.Logger;
@@ -77,6 +79,10 @@ public class LimelightSubsystem extends SubsystemBase {
             // FIXME: For debugging only, remove if not needed
             Logger.recordOutput("Limelight/IMU/" + io.getName() + "_INT", io.getIMUYawInternal());
             Logger.recordOutput("Limelight/IMU/" + io.getName() + "_ROBOT", io.getIMUYawRobot());
+
+            SmartDashboard.putBoolean(
+                    "Limelight/" + io.getName() + "alive",
+                    Objects.equals(inputs.status, "Connected"));
 
             if (inputs.reliability >= io.getImuCorrectionReliabilityThreshold()) {
                 // trustworthy enough to correct the swerve's IMU perhaps?
