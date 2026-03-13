@@ -130,6 +130,6 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public Pose2d getPose(String id) {
         LimelightIOInputsAutoLogged inputs = ios.get(getIoById(id));
-        return inputs.pose == null ? inputs.pose.toPose2d() : new Pose2d();
+        return inputs.pose == null ? new Pose2d() : inputs.pose.toPose2d();
     }
 }
