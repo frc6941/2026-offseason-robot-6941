@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -130,7 +131,10 @@ public class AutoFile {
                 };
         return Commands.sequence(
                         // Sweep
-                        Commands.deadline(drivePastSlope(isLeft, true), zeroEverything()),
+                        Commands.deadline(
+                                drivePastSlope(isLeft, true),
+                                Commands.defer(
+                                        AutoActions::zeroEverything, Collections.emptySet())),
                         Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                         drivePastSlope(isLeft, false),
 
