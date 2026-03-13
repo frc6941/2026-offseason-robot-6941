@@ -557,6 +557,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // return AutoFile.buildAuto();
-        return AutoRoutineChooser.buildAuto();
+        return AutoRoutines.rightLongFuel();
     }
 }
