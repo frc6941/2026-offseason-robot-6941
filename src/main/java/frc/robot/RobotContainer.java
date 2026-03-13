@@ -128,7 +128,7 @@ public class RobotContainer {
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake, climber, shooter);
-        AutoRoutines.init(swerve, shooter);
+        AutoRoutines.init(swerve, shooter, spindexer);
         AutoFile.init();
         AutoRoutineChooser.init();
         configureBindings();

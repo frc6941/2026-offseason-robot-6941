@@ -4,6 +4,7 @@ import static frc.robot.auto.AutoActions.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import java.util.Collections;
 import java.util.Set;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
@@ -12,10 +13,13 @@ import lib.ironpulse.swerve.Swerve;
 public class AutoRoutines {
     public static Swerve swerve;
     public static VelocityMotorSubsystem shooter;
+    public static SpindexerSubsystem spindexer;
 
-    public static void init(Swerve swerve, VelocityMotorSubsystem shooter) {
+    public static void init(
+            Swerve swerve, VelocityMotorSubsystem shooter, SpindexerSubsystem spindexer) {
         AutoRoutines.swerve = swerve;
         AutoRoutines.shooter = shooter;
+        AutoRoutines.spindexer = spindexer;
     }
 
     public static Command buildRoutineWithZeroing(Command routine) {
@@ -184,7 +188,7 @@ public class AutoRoutines {
                                                 Commands.deadline(
                                                         allignToStation(),
                                                         oscillateIntakeFeed())))),
-                Set.of(swerve, shooter));
+                Set.of(swerve, shooter, spindexer));
     }
 
     public static Command shootAndClimb() {
