@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
+import static frc.robot.RobotConstants.is10541;
+import static frc.robot.auto.AutoActions.intake;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -20,20 +22,24 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoActions;
+import frc.robot.auto.AutoFile;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
+import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
 import java.nio.file.Path;
 import java.util.Map;
+import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
 import lib.ironpulse.indicator.IndicatorIOSim;
@@ -70,16 +76,17 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
+    private static final boolean HAS_CLIMBER_IO = is10541 ? false : true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController oprator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
-    private TargetMode activeTargetMode = TargetMode.GOAL;
     private final Swerve swerve;
     private final TurretSubsystem turret;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> spindexer;
+    private final SpindexerSubsystem spindexer;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final ShootingSuperstructure shootingSuperstructure;
     private final VelocityMotorSubsystem intakerRoller;
@@ -87,9 +94,12 @@ public class RobotContainer {
     private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
+    private final AutoFile autoFile;
+    private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
     public RobotContainer() {
+        FieldView.Init();
         SignalLogger.enableAutoLogging(false);
         final boolean isReal = RobotBase.isReal();
 
@@ -99,6 +109,8 @@ public class RobotContainer {
         turret = buildTurret(isReal && HAS_TURRET_IO);
         shooter = buildShooter(isReal && HAS_SHOOTER_IO);
         spindexer = buildSpindexer(isReal && HAS_IDX_IO);
+
+        climber = buildClimber(isReal && HAS_CLIMBER_IO);
 
         indicatorSubsystem = buildIndicator(isReal);
 
@@ -115,10 +127,12 @@ public class RobotContainer {
                         TargetMode.FEED,
                         deploy.resolve("results_PASS.json")));
 
-        shootingSuperstructure =
-                new ShootingSuperstructure(turret, hood, shooter, spindexer, shotCalculator);
+        shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
-        AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake);
+        AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake, climber);
+        AutoRoutines.init(swerve);
+        AutoFile.init();
+        autoFile = new AutoFile();
 
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
@@ -133,6 +147,8 @@ public class RobotContainer {
                         DegreesPerSecond.of(3.0)));
         intake.setDefaultCommand();
 
+        climber.setDefaultCommand(climber.runStop());
+
         indicatorSubsystem.setDefaultCommand(
                 Commands.runOnce(
                                 () -> {
@@ -146,7 +162,21 @@ public class RobotContainer {
                                             indicatorSubsystem.setPattern(Patterns.LOSS);
                                         }
                                     } else {
-                                        indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                        if (DriverStation.isAutonomousEnabled()) {
+                                            indicatorSubsystem.setPattern(Patterns.AUTO);
+                                        } else {
+                                            if (shootingSuperstructure.isShooting()) {
+                                                indicatorSubsystem.setPattern(Patterns.SHOOTING);
+                                            } else {
+                                                if (intake.getCurrentMode()
+                                                        == frc.robot.subsystems.IntakerSubsystem
+                                                                .IntakeMode.INTAKING) {
+                                                    indicatorSubsystem.setPattern(Patterns.INTAKE);
+                                                } else {
+                                                    indicatorSubsystem.setPattern(Patterns.NORMAL);
+                                                }
+                                            }
+                                        }
                                     }
                                 },
                                 indicatorSubsystem)
@@ -183,51 +213,73 @@ public class RobotContainer {
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.putVelocityRobotCmd(now, swerve.getChassisSpeedsCmd());
+        RobotStateRecorder.setCmdFrame(shotCalculator.computeShotFrame());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
+        FieldView.updateRobotPose(RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d());
+        // TODO: test & fix in sim
+        if (Robot.isReal()) {
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_3g");
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_B), "LL_4");
+        }
     }
 
     private void configureBindings() {
-        // INTAKE
-        driver.leftTrigger().toggleOnTrue(intake.runIntake());
-        driver.leftBumper().onTrue(intake.runRetract());
-        driver.back().onTrue(intakerExtension.zeroCommand());
-        // scoring
-        // oprator.rightTrigger()
-        //         .whileTrue(
-        //                 shootingSuperstructure
-        //                         .shootWhenReady()
-        //                         .alongWith(
-        //                                 Commands.runOnce(
-        //                                         () ->
-        //                                                 swerve.setSwerveModuleLimit(
-        //                                                         SwerveMK5Config
-        //                                                                 .kShootingSwerveLimit)))
-        //                         .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+        driver.leftTrigger().onTrue(intake.toggleIntake());
+        oprator.leftBumper().whileTrue(intake.runFeed());
+        driver.povDown().onTrue(intake.runRetract());
+        driver.back().onTrue(intake.outZeroCommand());
+        oprator.povUp().whileTrue(AutoActions.climbUp());
+        oprator.povDown().whileTrue(AutoActions.climbed());
+        oprator.back().onTrue(AutoActions.climbDown());
+
+        // driver.povLeft().onTrue(intake.zeroCommand());
+
+        oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
         oprator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
-                                .shootWhenReady()
-                                .alongWith(
-                                        Commands.parallel(
-                                                indicatorSubsystem.indicate(Patterns.AIMING),
-                                                Commands.runOnce(
-                                                        () ->
-                                                                swerve.setSwerveModuleLimit(
-                                                                        SwerveMK5Config
-                                                                                .kShootingSwerveLimit))))
-                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
-        driver.rightTrigger()
-                .whileTrue(
-                        shootingSuperstructure
-                                .shootWhenReady()
+                                .shootWhenReady(false)
                                 .alongWith(
                                         Commands.runOnce(
                                                 () ->
                                                         swerve.setSwerveModuleLimit(
                                                                 SwerveMK5Config
                                                                         .kShootingSwerveLimit)))
-                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
+        oprator.rightBumper().whileTrue(intake.runExtendedReverse());
+
+        driver.rightTrigger()
+                .whileTrue(
+                        shootingSuperstructure
+                                .shootWhenReady(false)
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () ->
+                                                        swerve.setSwerveModuleLimit(
+                                                                SwerveMK5Config
+                                                                        .kShootingSwerveLimit)))
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
+        driver.leftStick()
+                .whileTrue(
+                        Commands.parallel(
+                                SwerveCommands.xLock(swerve),
+                                shootingSuperstructure.shootWhenReady(false)));
+
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
@@ -301,8 +353,22 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.followPathFile("testPath"));
-        driver.b().whileTrue(AutoRoutines.quickSweepLeft());
+        driver.a().whileTrue(AutoActions.allignToClimb(false));
+        driver.x().onTrue(AutoRoutines.rightLongFuel());
+        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
+
+        new Trigger(DriverStation::isEnabled)
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
+                                .alongWith(hood.zeroCommand()));
+
+        // .alongWith(intakerExtension.zeroCommand()));
+
+        new Trigger(DriverStation::isDisabled)
+                .onTrue(
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
+                                .ignoringDisable(true));
+
         // Swerve
         driver.start()
                 .onTrue(
@@ -319,25 +385,16 @@ public class RobotContainer {
                                                             .resetTransform(
                                                                     TransformRecorder.kFrameWorld,
                                                                     TransformRecorder.kFrameRobot);
-                                                }))
-                                .ignoringDisable(true));
-
-        new Trigger(DriverStation::isEnabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
-        // .alongWith(intakerExtension.zeroCommand()));
-
-        new Trigger(DriverStation::isDisabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
+                                                }),
+                                        indicatorSubsystem.indicateWithTimeout(
+                                                Patterns.RESET_ODOM, 1))
                                 .ignoringDisable(true));
     }
 
     // Helper methods
 
-    private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildSpindexer(boolean isReal) {
-        return new VelocityMotorSubsystem<>(
+    private SpindexerSubsystem buildSpindexer(boolean isReal) {
+        return new SpindexerSubsystem(
                 IdxConfig.SPINDEXER_CFG,
                 new MotorInputsAutoLogged(),
                 isReal
@@ -383,15 +440,25 @@ public class RobotContainer {
                                                 .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
-                                                        .getRotation()
-                                                        .getDegrees()
-                                                > 360,
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        Math.abs(
+                                                        RobotStateRecorder
+                                                                .getVelocityWorldRobotCurrent()
+                                                                .getRotation()
+                                                                .getRadians())
+                                                > 1.2,
                                 LimeLightConfig.asDeviationParams()),
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
                                 () ->
                                         RobotStateRecorder.getPoseWorldRobotCurrent()
                                                 .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
                                                 .getDegrees(),
                                 () ->
@@ -474,7 +541,20 @@ public class RobotContainer {
                 IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION);
     }
 
+    private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> buildClimber(
+            boolean isReal) {
+        return new PositionMotorSubsystem<>(
+                ClimberConfiig.CLIMBER_CONFIG,
+                new MotorInputsAutoLogged(),
+                isReal
+                        ? new MotorIOTalonFX(ClimberConfiig.CLIMBER_CONFIG)
+                        : new MotorIOSim(ClimberConfiig.CLIMBER_CONFIG),
+                ClimberParamsNT.asPositionParamSources(),
+                Meters.of(0),
+                ClimberConfiig.CLIMB_METERS_PER_ROTATION);
+    }
+
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return AutoFile.buildAuto();
     }
 }

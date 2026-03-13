@@ -12,14 +12,13 @@ import lib.ntext.NTParameter;
 public class IntakeConfig {
     public static final String INTAKER_ROLLER_NAME = "IntakerRoller";
     public static final String INTAKER_EXTENSION_NAME = "IntakerExtension";
-
+    public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
     private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
-    public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
-    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 35;
-    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 20;
+    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 45;
+    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 40;
     private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
     private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
 
@@ -29,6 +28,8 @@ public class IntakeConfig {
                     .mainBus(CANIVORE_CAN_BUS)
                     .mainId(INTAKER_ROLLER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .statorCurrentLimitAmps(INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS)
+                    .supplyCurrentLimitAmps(INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS)
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(INTAKER_ROLLER_GEAR_RATIO)
@@ -37,7 +38,6 @@ public class IntakeConfig {
                                     .gearRatio(INTAKER_ROLLER_GEAR_RATIO)
                                     .build())
                     .build();
-
     public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_EXTENSION_NAME)
@@ -98,13 +98,13 @@ public class IntakeConfig {
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.31;
-        public static final double feedPosMeters = 0.07;
-        public static final double retractPosMeters = 0.1;
+        public static final double deployPosMeters = 0.305;
+        public static final double feedPosMeters = 0.17;
+        public static final double retractPosMeters = 0.01;
 
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
-        public static final double feedOscillationRateHz = 0.5;
+        public static final double feedOscillationRateHz = 5;
 
-        public static final boolean isBrake = true;
+        public static final boolean isBrake = false;
     }
 }

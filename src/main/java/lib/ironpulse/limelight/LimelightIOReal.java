@@ -1,6 +1,7 @@
 package lib.ironpulse.limelight;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.RobotState;
 import java.util.Arrays;
 import java.util.function.BooleanSupplier;
@@ -15,23 +16,104 @@ import org.littletonrobotics.junction.Logger;
 public class LimelightIOReal implements LimelightIO {
     public final LimelightIOConfig config;
     private final DoubleSupplier yawSupplier;
+    private final DoubleSupplier yawVelocitySupplier;
     private final BooleanSupplier rejectionSupplier;
     private final DeviationParamSources deviationParams;
     private boolean isPrevDisabled = true;
+    private double lastHeartbeat = -1;
+    private double lastTsBootMs = -1;
+    private double lastSeenTime = 0.0;
 
     public LimelightIOReal(
             LimelightIOConfig config,
             DoubleSupplier yawSupplier,
+            DoubleSupplier yawVelocitySupplier,
             BooleanSupplier rejectionSupplier,
             DeviationParamSources deviationParams) {
         this.config = config;
         this.yawSupplier = yawSupplier;
+        this.yawVelocitySupplier = yawVelocitySupplier;
         this.rejectionSupplier = rejectionSupplier;
         this.deviationParams = deviationParams;
         if (useInternalIMU()) {
             LimelightHelpers.SetIMUAssistAlpha(config.getName(), config.getFilterAlpha());
             setIMUMode();
         }
+        if (config.getPortToForwardStream() != 0)
+            PortForwarder.add(config.getPortToForwardStream(), config.getName() + ".local", 5800);
+        if (config.getPortToForwardPipeline() != 0)
+            PortForwarder.add(config.getPortToForwardPipeline(), config.getName() + ".local", 5800);
+    }
+
+    private static double getSpanReliability(double span, double distance, double area) {
+        // --- span reliability ---
+        double rSpan;
+        if (span <= 0.0) {
+            rSpan = 0.0;
+        } else if (span <= 0.3) {
+            // ramp from 0.6 at span=0 to 1.0 at span=0.3
+            rSpan = 0.6 + 0.4 * (span / 0.3);
+        } else if (span <= 0.5) {
+            // ideal plateau
+            rSpan = 1.0;
+        } else if (span <= 1.0) {
+            // gentle decay from 1.0 at 0.5 to 0.3 at 1.0
+            rSpan = 1.0 - 0.7 * ((span - 0.5) / 0.5);
+        } else if (span <= 2.0) {
+            // further decay from 0.3 at 1.0 down towards 0.05 at 2.0 (capped)
+            rSpan = 0.3 - 0.25 * (span - 1.0);
+            if (rSpan < 0.05) rSpan = 0.05;
+        } else {
+            rSpan = 0.05;
+        }
+
+        // --- distance reliability ---
+        double rDist = 1.0 / (1.0 + (distance / 3.0));
+
+        // --- area reliability ---
+        double normArea = (area - 0.1) / 0.9; // map [0.1, 1.0] -> [0, 1]
+        if (normArea < 0.0) normArea = 0.0;
+        if (normArea > 1.0) normArea = 1.0;
+
+        // sqrt: boosts medium values a bit, softer penalty for not-huge areas
+        double rArea = Math.sqrt(normArea);
+
+        double raw = (rSpan + rDist + rArea) / 3.0;
+        // --- combine using geometric mean ---
+        double reliability = Math.pow(raw, 0.8);
+        return Math.max(0.0, Math.min(1.0, reliability));
+    }
+
+    private String updateStatus() {
+        // TODO: fix me, ERR reason not accurate
+        String status = "Connected";
+        double now = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+        double hb = LimelightHelpers.getHeartbeat(config.getName());
+
+        if (now - lastSeenTime > 0.5) {
+            status = "Disconnected";
+        }
+
+        if (hb != lastHeartbeat) {
+            double tsBootMs =
+                    LimelightHelpers.getLatestResults(config.getName()).timestamp_LIMELIGHT_publish;
+
+            if (lastSeenTime > 0 && now - lastSeenTime > 0.5) {
+                if (lastTsBootMs >= 0 && tsBootMs < lastTsBootMs) {
+                    status = "Reconnected, previously likely power ERR";
+                } else {
+                    status = "Reconnected, previously likely network ERR";
+                }
+            } else {
+                status = "Connected";
+            }
+
+            lastHeartbeat = hb;
+            lastTsBootMs = tsBootMs;
+            lastSeenTime = now;
+        }
+
+        return status;
     }
 
     private boolean isLimelight4() {
@@ -76,45 +158,6 @@ public class LimelightIOReal implements LimelightIO {
             // tags >= 2
             return 1 * config.getWeight() * reliability;
         }
-    }
-
-    private static double getSpanReliability(double span, double distance, double area) {
-        // --- span reliability ---
-        double rSpan;
-        if (span <= 0.0) {
-            rSpan = 0.0;
-        } else if (span <= 0.3) {
-            // ramp from 0.6 at span=0 to 1.0 at span=0.3
-            rSpan = 0.6 + 0.4 * (span / 0.3);
-        } else if (span <= 0.5) {
-            // ideal plateau
-            rSpan = 1.0;
-        } else if (span <= 1.0) {
-            // gentle decay from 1.0 at 0.5 to 0.3 at 1.0
-            rSpan = 1.0 - 0.7 * ((span - 0.5) / 0.5);
-        } else if (span <= 2.0) {
-            // further decay from 0.3 at 1.0 down towards 0.05 at 2.0 (capped)
-            rSpan = 0.3 - 0.25 * (span - 1.0);
-            if (rSpan < 0.05) rSpan = 0.05;
-        } else {
-            rSpan = 0.05;
-        }
-
-        // --- distance reliability ---
-        double rDist = 1.0 / (1.0 + (distance / 3.0));
-
-        // --- area reliability ---
-        double normArea = (area - 0.1) / 0.9; // map [0.1, 1.0] -> [0, 1]
-        if (normArea < 0.0) normArea = 0.0;
-        if (normArea > 1.0) normArea = 1.0;
-
-        // sqrt: boosts medium values a bit, softer penalty for not-huge areas
-        double rArea = Math.sqrt(normArea);
-
-        double raw = (rSpan + rDist + rArea) / 3.0;
-        // --- combine using geometric mean ---
-        double reliability = Math.pow(raw, 0.8);
-        return Math.max(0.0, Math.min(1.0, reliability));
     }
 
     @Override
@@ -185,21 +228,24 @@ public class LimelightIOReal implements LimelightIO {
         LimelightHelpers.SetFiducialIDFiltersOverride(config.getName(), ids);
     }
 
+    public void setRobotOrientation() {
+        LimelightHelpers.SetRobotOrientation(
+                config.getName(),
+                yawSupplier.getAsDouble(),
+                yawVelocitySupplier.getAsDouble(),
+                0,
+                0,
+                0,
+                0); // the last 5 parameters are not necessary
+        Logger.recordOutput("Limelight/IMU/Swerve", yawSupplier.getAsDouble());
+    }
+
     @Override
     public void updateInputs(LimelightIOInputs inputs) {
         if (canUseInternalIMU() && isPrevDisabled != RobotState.isDisabled()) {
             setIMUMode();
         }
         isPrevDisabled = RobotState.isDisabled();
-        LimelightHelpers.SetRobotOrientation(
-                config.getName(),
-                yawSupplier.getAsDouble(),
-                0,
-                0,
-                0,
-                0,
-                0); // the last 5 parameters are not necessary
-        Logger.recordOutput("Limelight/IMU/Swerve", yawSupplier.getAsDouble());
 
         // generate pose Estimate
         LimelightHelpers.PoseEstimate estimate;
@@ -208,9 +254,6 @@ public class LimelightIOReal implements LimelightIO {
         } else {
             estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(config.getName());
         }
-        // FIXME: need testing - two versions of inputs.pose
-        //        inputs.pose = new Pose3d(estimate.pose).rotateBy(
-        //                new Rotation3d(0, 0, Radians.convertFrom(getIMUYawRobot(), Degrees)));
         inputs.pose = new Pose3d(estimate.pose);
         inputs.timestampSeconds = estimate.timestampSeconds;
         inputs.latency = estimate.latency;
@@ -219,6 +262,10 @@ public class LimelightIOReal implements LimelightIO {
         inputs.tagSpan = estimate.tagSpan;
         inputs.avgTagArea = estimate.avgTagArea;
         inputs.avgTagDist = estimate.avgTagDist;
+        inputs.status = updateStatus();
+        inputs.lastHeartbeat = lastHeartbeat;
+        inputs.lastTsBootMs = lastTsBootMs;
+        inputs.lastSeenTime = lastSeenTime;
     }
 
     @Override

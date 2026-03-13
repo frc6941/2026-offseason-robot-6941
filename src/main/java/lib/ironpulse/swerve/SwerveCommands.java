@@ -141,7 +141,7 @@ public class SwerveCommands {
     }
 
     public static Command xLock(Swerve swerve) {
-        return Commands.runOnce(swerve::runStopAndLock);
+        return Commands.run(swerve::runStopAndLock);
     }
 
     public static Command reset(Swerve swerve, Pose3d pose) {

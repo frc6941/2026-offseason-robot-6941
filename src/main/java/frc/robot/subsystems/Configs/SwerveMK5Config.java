@@ -42,12 +42,35 @@ public final class SwerveMK5Config {
                     .maxAngularVelocity(DegreesPerSecond.of(1000))
                     // accelerate in 0.32s, also must be smaller than the defined module limit to be
                     // actually effective
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2200)) // 1000-1472
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
+                    .build();
+
+    public static SwerveLimit kShootingChassis =
+            SwerveLimit.builder()
+                    .maxLinearVelocity(MetersPerSecond.of(4)) // theoretically 4.39
+                    // prevents skidding, see orbit archive ytb channel open class for theory
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(20)) // <maxDriveAcceleration
+                    // omega_max ≈ vMax / r.
+                    .maxAngularVelocity(DegreesPerSecond.of(1000))
+                    // accelerate in 0.32s, also must be smaller than the defined module limit to be
+                    // actually effective
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
                     .build();
 
     public static SwerveModuleLimit kShootingSwerveLimit =
             SwerveModuleLimit.builder()
                     .maxDriveVelocity(InchesPerSecond.of(2000.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(7))
+                    // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
+                    .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
+                    // accelerate in 0.2s
+                    .maxSteerAngularAcceleration(
+                            RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
+                    .build();
+
+    public static SwerveModuleLimit kAutoLimit =
+            SwerveModuleLimit.builder()
+                    .maxDriveVelocity(InchesPerSecond.of(2500.0 / 60.0 / 7.03 * Math.PI * 4.0))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(18))
                     // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
@@ -71,7 +94,8 @@ public final class SwerveMK5Config {
                     .steerMotorId(6)
                     .encoderId(11)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(is10541 ? 0.1650390625 : -0.11083984375))
+                    .steerMotorEncoderOffset(
+                            Rotations.of(is10541 ? -0.11083984375 : 0.165771484375))
                     .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -84,7 +108,7 @@ public final class SwerveMK5Config {
                     .steerMotorId(2)
                     .encoderId(9)
                     .driveMotorEncoderOffset(Degree.of(0))
-                    .steerMotorEncoderOffset(Rotations.of(is10541 ? 0.005126953125 : 0.3994140625))
+                    .steerMotorEncoderOffset(Rotations.of(is10541 ? 0.3994140625 : 0.008544921875))
                     .driveInverted(false)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -98,7 +122,7 @@ public final class SwerveMK5Config {
                     .encoderId(12)
                     .driveMotorEncoderOffset(Degree.of(0))
                     .steerMotorEncoderOffset(
-                            Rotations.of(is10541 ? 0.219970703125 : -0.12939453125))
+                            Rotations.of(is10541 ? -0.12939453125 : 0.220947265625))
                     .driveInverted(true)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -112,7 +136,7 @@ public final class SwerveMK5Config {
                     .encoderId(10)
                     .driveMotorEncoderOffset(Degree.of(0))
                     .steerMotorEncoderOffset(
-                            Rotations.of(is10541 ? 0.263916015625 : -0.462158203125))
+                            Rotations.of(is10541 ? -0.462158203125 : 0.26318359375))
                     .driveInverted(true)
                     .steerInverted(false)
                     .encoderInverted(false)
@@ -155,9 +179,9 @@ public final class SwerveMK5Config {
                             })
                     .odometryFrequency(Hertz.of(100))
                     .driveStatorCurrentLimit(Amps.of(80))
-                    .driveSupplyCurrentLimit(Amps.of(80))
-                    .steerStatorCurrentLimit(Amps.of(90))
-                    .steerSupplyCurrentLimit(Amps.of(90))
+                    .driveSupplyCurrentLimit(Amps.of(65))
+                    .steerStatorCurrentLimit(Amps.of(55))
+                    .steerSupplyCurrentLimit(Amps.of(40))
                     .canivoreCanBus(CANIVORE_CAN_BUS)
                     .pigeonId(RobotConstants.PIGEON_ID)
                     .build();
@@ -166,10 +190,10 @@ public final class SwerveMK5Config {
     @SuppressWarnings("unused")
     private static final class SwerveModuleParams {
         private static final class Drive {
-            static final double kP = 8;
+            static final double kP = 6;
             static final double kI = 0;
             static final double kD = 0;
-            static final double kS = 2;
+            static final double kS = 0;
             // CTRE Slot0 kV for VelocityTorqueCurrentFOC with motor velocity units (rotor rps):
             // kV ~= 12V / (5800rpm / 60) = 0.124
             static final double kV = 0.136;
@@ -178,7 +202,7 @@ public final class SwerveMK5Config {
         }
 
         private static final class Steer {
-            static final double kP = 40;
+            static final double kP = 60;
             static final double kI = 0;
             static final double kD = 0.1;
             static final double kS = 0;

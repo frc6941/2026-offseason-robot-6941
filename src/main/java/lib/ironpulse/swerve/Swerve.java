@@ -175,8 +175,14 @@ public class Swerve extends SubsystemBase implements Localizable {
     }
 
     public void runStopAndLock() {
+        mode = MODE.VELOCITY;
+        SwerveModuleState[] lockStates = new SwerveModuleState[config.moduleCount()];
+        for (int i = 0; i < config.moduleCount(); i++) {
+            lockStates[i] = new SwerveModuleState(0.0, xLockAngles.get(i));
+            modules.get(i).runState(lockStates[i]);
+        }
         kinematics.resetHeadings(xLockAngles.toArray(new Rotation2d[0]));
-        runStop();
+        setpointCurr = new SwerveSetpoint(new ChassisSpeeds(), lockStates);
     }
 
     // ------- Getters -------
@@ -245,11 +251,15 @@ public class Swerve extends SubsystemBase implements Localizable {
     }
 
     public double getIMUYaw() {
-        return poseEstimator.getEstimatedPosition().getRotation().getAngle();
+        return poseEstimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees();
     }
 
     public double getPitchVelocityRadPerSec() {
         return imuIOInputs.pitchVelocityRadPerSec;
+    }
+
+    public double getPitchPosRad() {
+        return imuIOInputs.pitchPosition.getRadians();
     }
 
     // ------- Configurations -------

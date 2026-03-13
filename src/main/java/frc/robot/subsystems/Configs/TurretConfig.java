@@ -20,9 +20,9 @@ public class TurretConfig {
     public static final int TURRET_ENCODER_G1_ID = 59;
     public static final int TURRET_ENCODER_G2_ID = 58;
     public static final Angle TURRET_ENCODER_G1_OFFSET =
-            Rotations.of(is10541 ? -0.58203125 : -0.130615234375);
+            Rotations.of(is10541 ? -0.18627 : -0.859375); // -0.433837890625
     public static final Angle TURRET_ENCODER_G2_OFFSET =
-            Rotations.of(is10541 ? -0.967529296875 : -0.7705078125);
+            Rotations.of(is10541 ? -0.30615 : -0.859375); // -0.837890625
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 88;
     public static final int G1_TOOTH_COUNT = 16;
@@ -30,13 +30,11 @@ public class TurretConfig {
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(190);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(30);
     // Zero offset- the position at which the two encoders are set to zero.
-    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-142);
-    public static final Angle TURRET_DOF = Degrees.of(219);
+    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-149);
+    public static final Angle TURRET_DOF = Degrees.of(206);
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =
             TURRET_DOF.unaryMinus().plus(TURRET_ZERO_OFFSET);
-
-    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(2.0);
     public static final SubsystemConfig TURRET_CONFIG =
             SubsystemConfig.builder()
                     .name(NAME)
@@ -55,6 +53,7 @@ public class TurretConfig {
                                     .gearRatio(TURRET_GEAR_RATIO)
                                     .build())
                     .build();
+    public static final Angle TURRET_SOFT_LIMIT_MARGIN = Degrees.of(2.0);
 
     private TurretConfig() {}
 
@@ -83,17 +82,17 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 8;
+        public static final double kpSeek = 12;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
         public static final double kpTrack = 18;
         public static final double kiTrack = 0.0;
-        public static final double kdTrack = 0.0;
+        public static final double kdTrack = 0.01;
 
         public static final double maxVelocityRPS = 3.5;
-        public static final double maxAccelerationRPS2 = 11;
-        public static final double kchassisVelCompensation = 0.9;
+        public static final double maxAccelerationRPS2 = 9;
+        public static final double kchassisVelCompensation = 1;
         public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.
         // Must satisfy seekEnterErrorDegrees > trackEnterErrorDegrees.

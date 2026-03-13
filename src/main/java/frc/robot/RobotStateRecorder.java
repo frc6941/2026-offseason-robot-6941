@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.utils.AllianceFlipUtil;
@@ -25,6 +26,12 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotStateRecorder extends TransformRecorder {
+    public static final String kFrameShot = "Shot";
+    public static final String kFrameGoal = "Goal";
+    public static final String kFrameFeedUp = "FeedUp";
+    public static final String kFrameFeedDown = "FeedDown";
+    public static final Translation3d kRobotToShot =
+            new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotCmdBuffer;
@@ -37,18 +44,10 @@ public class RobotStateRecorder extends TransformRecorder {
     private static ShotFrame cmdFrame =
             new ShotFrame(Degrees.of(0.0), Degrees.of(0.0), MetersPerSecond.of(0.0));
 
-    public static final String kFrameShot = "Shot";
-    public static final String kFrameGoal = "Goal";
-    public static final String kFrameFeedUp = "FeedUp";
-    public static final String kFrameFeedDown = "FeedDown";
-
     @Getter
     @Setter
     @AutoLogOutput(key = "RobotStateRecorder/kFrameTarget")
     private static String kFrameTarget = kFrameGoal;
-
-    public static final Translation3d kRobotToShot =
-            new Translation3d(Meters.of(0), Meters.of(0.0), Meters.of(0.35));
 
     private RobotStateRecorder() {
         setBufferDuration(2.0);
@@ -140,6 +139,9 @@ public class RobotStateRecorder extends TransformRecorder {
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/Distance",
                 getTranslationShotToTargetCurrent(kFrameTarget).getNorm());
+        SmartDashboard.putNumber(
+                "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
+                cmdFrame.muzzleSpeed().in(MetersPerSecond));
     }
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {

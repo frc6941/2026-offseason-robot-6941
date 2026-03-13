@@ -3,116 +3,138 @@ package frc.robot.subsystems.ShootingSubsystem;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.FieldConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
-import frc.robot.subsystems.Configs.ShotCalculatorConfig;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
-import frc.robot.subsystems.Configs.SpindexerModeParamsNT;
+import frc.robot.subsystems.Configs.SpindexerParamsNT;
+import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx;
-    private final ShotCalculator calculator;
+    private final SpindexerSubsystem idx;
+    @Getter private boolean isShooting = false;
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood,
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter,
-            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> idx,
-            ShotCalculator calculator) {
+            SpindexerSubsystem idx) {
         this.turret = turret;
         this.hood = hood;
         this.shooter = shooter;
         this.idx = idx;
-        this.calculator = calculator;
     }
 
     public ShotFrame getCurrentFrame() {
         Angle turretWorldRotation =
                 RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation().getMeasure();
         Angle bba = hood.getCurrPos();
-        double hoodB = ShotCalculatorParamsNT.hoodB.getValue();
         double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-        Angle modelHood = bba.minus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue())).div(hoodB);
         AngularVelocity shooterVel = shooter.getVelocity();
 
         double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
         double muzzleSpeedMps =
                 (rpm
-                                - ShotCalculatorConfig.ShotCalculatorParams.rpmB * bba.in(Degrees)
+                                - ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
                                 - ShotCalculatorParamsNT.rpmC.getValue())
                         / rpmA;
-        return new ShotFrame(turretWorldRotation, modelHood, MetersPerSecond.of(muzzleSpeedMps));
+        return new ShotFrame(turretWorldRotation, bba, MetersPerSecond.of(muzzleSpeedMps));
     }
 
     public void setDefaultCommand() {
         turret.setDefaultCommand(turret.runTurretTargetLoop());
-        idx.setDefaultCommand(idx.runVelVolt(() -> getIdxSpeed(IdxMode.OFF)));
+        idx.setDefaultCommand(idx.runState(() -> IdxMode.OFF));
         shooter.setDefaultCommand(
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
         hood.setDefaultCommand(
-                hood.runPosition(() -> computeBBA(calculator.computeShotFrame().hoodAngle())));
+                hood.runPosition(() -> RobotStateRecorder.getCmdFrame().hoodAngle()));
     }
 
-    public Command shootWhenReady() {
+    public Command shootWhenReady(boolean forceFeed) {
         return Commands.parallel(
-                runFrame(() -> this.calculator.computeShotFrame()),
+                runFrame(),
                 Commands.waitUntil(() -> shooter.velocityAtGoal())
                         .andThen(
-                                idx.runVelVolt(
+                                Commands.runOnce(() -> isShooting = true),
+                                idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
-                                                        ? getIdxSpeed(IdxMode.FEED)
-                                                        : getIdxSpeed(IdxMode.OFF))));
+                                                        ? forceFeed
+                                                                ? IdxMode.FORCE_FEED
+                                                                : IdxMode.FEED
+                                                        : IdxMode.OFF))
+                        .finallyDo(() -> isShooting = false));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame) {
+    public Command runFrame() {
         return Commands.parallel(
-                Commands.run(() -> RobotStateRecorder.setCmdFrame(frame.get())),
-                turret.setTurretPoseWorld(() -> frame.get().turretAngleWorld()),
-                hood.runPosition(() -> computeBBA(frame.get().hoodAngle())),
+                turret.setTurretPoseWorld(
+                        () -> RobotStateRecorder.getCmdFrame().turretAngleWorld()),
+                hood.runPosition(() -> RobotStateRecorder.getCmdFrame().hoodAngle()),
                 shooter.runVelVolt(
                         () -> {
-                            double rpm = computeRpm(frame.get().muzzleSpeed());
+                            ShotFrame frame = RobotStateRecorder.getCmdFrame();
+                            Angle bba = frame.hoodAngle();
+                            double rpm = computeRpm(frame.muzzleSpeed(), bba);
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
     }
 
-    public Command runFrame(Supplier<ShotFrame> frame, Supplier<IdxMode> idxMode) {
-        return Commands.parallel(
-                runFrame(frame),
-                //                idx.runVelVolt(() -> getIdxSpeed(readyToShoot() ? idxMode :
-                // IdxMode.OFF)));
-                idx.runVelTC(() -> getIdxSpeed(idxMode.get())));
-        // TODO: revert
+    public Command runFrame(Supplier<IdxMode> idxModeSupplier) {
+        return Commands.parallel(runFrame(), idx.runState(idxModeSupplier));
     }
 
-    private Angle computeBBA(Angle modelAngle) {
-        return modelAngle
-                .times(ShotCalculatorParamsNT.hoodB.getValue())
-                .plus(Degrees.of(ShotCalculatorParamsNT.hoodC.getValue()));
-    }
+    private double computeRpm(LinearVelocity muzzleSpeed, Angle bba) {
+        double currentDistance = getDistance();
+        double scalingFactor = 1.0;
+        if (currentDistance > 2.5) {
+            double minDistance = 2.5;
+            double maxDistance = 8;
+            if (currentDistance >= maxDistance) {
+                scalingFactor = ShotCalculatorParamsNT.distanceScaler.getValue();
+            } else {
+                double t_distance = (currentDistance - minDistance) / (maxDistance - minDistance);
+                scalingFactor =
+                        1.0 + (ShotCalculatorParamsNT.distanceScaler.getValue() - 1.0) * t_distance;
+            }
+        }
 
-    private double computeRpm(LinearVelocity muzzleSpeed) {
+        double baseRpm =
+                ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
+                        + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
+                        + ShotCalculatorParamsNT.rpmC.getValue();
+        double scaledRpm = baseRpm * scalingFactor;
 
-        return ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
-                + ShotCalculatorParamsNT.rpmC.getValue();
+        Logger.recordOutput("ShootingSuperstructure/Distance/currentMeters", currentDistance);
+        Logger.recordOutput("ShootingSuperstructure/Distance/baseRpm", baseRpm);
+        Logger.recordOutput("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
+
+        SmartDashboard.putNumber("ShootingSuperstructure/Distance/currentMeters", currentDistance);
+        SmartDashboard.putNumber("ShootingSuperstructure/Distance/baseRpm", baseRpm);
+        SmartDashboard.putNumber("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
+
+        return scaledRpm;
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
@@ -120,17 +142,46 @@ public class ShootingSuperstructure {
         return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
     }
 
-    public AngularVelocity getIdxSpeed(IdxMode idxMode) {
-        return switch (idxMode) {
-            case OFF -> RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue());
-            case FEED -> RotationsPerSecond.of(SpindexerModeParamsNT.feedRPS.getValue());
-            case REVERSE -> RotationsPerSecond.of(SpindexerModeParamsNT.revRPS.getValue());
-        };
+    public Command runUnjamming() {
+        return idx.runState(() -> IdxMode.REVERSE)
+                .withTimeout(Seconds.of(SpindexerParamsNT.unjammTimeoutSec.getValue()));
+    }
+
+    public Command runForceFeeding() {
+        return idx.runState(() -> IdxMode.FORCE_FEED);
+    }
+
+    public Command runZero() {
+        return hood.zeroCommand();
+    }
+
+    public double getDistance() {
+        TargetMode mode;
+        double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
+        if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
+            mode = TargetMode.GOAL;
+        } else {
+            mode = TargetMode.FEED;
+        }
+
+        if (mode == TargetMode.GOAL) {
+            return RobotStateRecorder.getTranslationShotToTargetCurrent(
+                            RobotStateRecorder.kFrameGoal)
+                    .getNorm();
+        } else {
+            double yAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getY();
+            String feedFrame =
+                    yAlliance > FieldConstants.fieldWidth / 2.0
+                            ? RobotStateRecorder.kFrameFeedUp
+                            : RobotStateRecorder.kFrameFeedDown;
+            return RobotStateRecorder.getTranslationShotToTargetCurrent(feedFrame).getNorm();
+        }
     }
 
     public enum IdxMode {
         OFF,
         FEED,
+        FORCE_FEED,
         REVERSE
     }
 }

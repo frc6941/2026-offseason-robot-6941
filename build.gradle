@@ -16,6 +16,11 @@ repositories {
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def deployTeamNumber =
+        (project.findProperty("deployTeam")
+                ?: project.findProperty("teamNumber")
+                ?: project.frc.getTeamNumber()) as int
+def deployTeamIp = "10.${(int) (deployTeamNumber / 100)}.${deployTeamNumber % 100}.2"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -26,7 +31,7 @@ deploy {
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
             // want to store a team number in this file.
-            team = project.frc.getTeamNumber()
+            team = deployTeamNumber
             debug = project.frc.getDebugOrDefault(false)
 
             artifacts {
@@ -46,14 +51,14 @@ deploy {
                     jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
                     jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-                    jvmArgs.add("-Djava.rmi.server.hostname=10.69.41.2") // Replace TE.AM with team number
+                    jvmArgs.add("-Djava.rmi.server.hostname=${deployTeamIp}")
                 }
 
                 // Static files artifact
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
-                    deleteOldFiles = false // Change to true to delete files on roboRIO that no
+                    deleteOldFiles = true // Change to true to delete files on roboRIO that no
                     // longer exist in deploy directory of this project
                 }
             }
@@ -195,7 +200,6 @@ spotless {
         endWithNewline()
     }
 }
-
 
 
 // Create commit with working changes on event branches
