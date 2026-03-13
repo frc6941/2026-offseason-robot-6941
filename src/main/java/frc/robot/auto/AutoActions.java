@@ -72,8 +72,7 @@ public class AutoActions {
     public static final Pose2d kStationIntake =
             new Pose2d(0.59, 0.72, new Rotation2d(Degrees.of(180)));
 
-    public static final Pose2d kDepotIntake =
-            new Pose2d(0.59, 0.72, new Rotation2d(Degrees.of(180)));
+    public static final Pose2d kDepotIntake = new Pose2d(0.59, 6, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kQuickSweepEndPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
@@ -81,7 +80,7 @@ public class AutoActions {
             new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
 
     public static final Pose2d kclimbL =
-            new Pose2d(FieldConstants.fieldLength - 15.16, 4.17433, new Rotation2d(Degrees.of(0)));
+            new Pose2d(FieldConstants.fieldLength - 15.15, 4.272, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kclimbR =
             new Pose2d(FieldConstants.fieldLength - 15.16, 3.29, new Rotation2d(Degrees.of(0)));
 
@@ -226,7 +225,7 @@ public class AutoActions {
                 .until(climber::positionAtGoal);
     }
 
-    public static Command climb() {
+    public static Command climbed() {
         return climber.runMotionMagic(Meters.of(ClimberParamsNT.climbedMeters.getValue()));
     }
 

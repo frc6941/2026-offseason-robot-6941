@@ -1,5 +1,6 @@
 package lib.ironpulse.indicator;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,6 +27,7 @@ public class IndicatorSubsystem extends SubsystemBase {
         io.setPattern(currentPattern);
         Logger.processInputs("Indicator", inputs);
         Logger.recordOutput("Indicator/Pattern", currentPattern.toString());
+        SmartDashboard.putString("Indicator/Pattern", currentPattern.toString());
     }
 
     public void reset() {

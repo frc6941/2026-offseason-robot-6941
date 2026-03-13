@@ -111,20 +111,13 @@ public class AutoFile {
         return Commands.defer(
                 () ->
                         Commands.sequence(
-                                Commands.deadline(
-                                        Commands.sequence(
-                                                // sweep
-                                                drivePastSlope(isLeft, true),
-                                                Commands.deadline(
-                                                        followPathFile(sweepPathName, isLeft),
-                                                        intake()),
-                                                drivePastSlope(isLeft, false)),
-                                        // zeroEverything()),
-                                        Commands.none()),
+                                // Sweep phase - 移除无用的 deadline 和 none()
+                                drivePastSlope(isLeft, true),
+                                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+                                drivePastSlope(isLeft, false),
+                                // zeroEverything(),
 
-                                // station
-                                Commands.parallel(
-                                                shoot(),
+                                Commands.deadline(
                                                 new ConditionalCommand(
                                                         Commands.deadline(
                                                                 allignToDepot(),
@@ -132,21 +125,28 @@ public class AutoFile {
                                                         Commands.deadline(
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed()),
-                                                        () -> isLeft))
+                                                        () -> isLeft),
+                                                shoot().withTimeout(20))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
-                                                                != EndBehaviour.CLIMB),
-
-                                // climb
-                                Commands.parallel(
-                                                oscillateIntakeFeed(),
-                                                climbUp(),
-                                                allignToClimb(isLeft))
+                                                                == EndBehaviour.FUEL),
+                                Commands.deadline(
+                                                allignToClimb(isLeft),
+                                                Commands.parallel(
+                                                        oscillateIntakeFeed().withTimeout(20),
+                                                        climbUp(),
+                                                        shoot().withTimeout(20)))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
-                                                                != EndBehaviour.FUEL)),
+                                                                == EndBehaviour.CLIMB),
+                                climbed()
+                                        .alongWith(shoot())
+                                        .onlyIf(
+                                                () ->
+                                                        endBehaviourChooser.get()
+                                                                == EndBehaviour.CLIMB)),
                 Collections.singleton(swerve));
     }
 

@@ -216,6 +216,11 @@ public class RobotContainer {
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
         FieldView.updateRobotPose(RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d());
+        // TODO: test & fix in sim
+        if (Robot.isReal()) {
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_3g");
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_B), "LL_4");
+        }
     }
 
     private void configureBindings() {
@@ -224,7 +229,7 @@ public class RobotContainer {
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
         oprator.povUp().whileTrue(AutoActions.climbUp());
-        oprator.povDown().whileTrue(AutoActions.climb());
+        oprator.povDown().whileTrue(AutoActions.climbed());
         oprator.back().onTrue(AutoActions.climbDown());
 
         // driver.povLeft().onTrue(intake.zeroCommand());
@@ -347,9 +352,9 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoRoutines.quickSweepRight());
-        driver.b().whileTrue(AutoRoutines.longSweepRight());
-        // driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
+        driver.a().whileTrue(AutoActions.allignToClimb(false));
+        driver.x().onTrue(AutoRoutines.rightLongFuel());
+        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
