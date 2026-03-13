@@ -11,6 +11,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotStateRecorder;
@@ -54,7 +55,6 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     private final CANCoderIO encoderG1;
     private final CANCoderIO encoderG2;
-    private Angle unwrappedTurretAngle = Degrees.of(0.0);
     private final CANCoderIOInputsAutoLogged encoderG1Inputs = new CANCoderIOInputsAutoLogged();
     private final CANCoderIOInputsAutoLogged encoderG2Inputs = new CANCoderIOInputsAutoLogged();
     private final Alert wrappingAlert =
@@ -71,6 +71,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                     new TrapezoidProfile.Constraints(
                             TurretPosParamsNT.maxVelocityRPS.getValue() * 360.0,
                             TurretPosParamsNT.maxAccelerationRPS2.getValue() * 360.0));
+    private Angle unwrappedTurretAngle = Degrees.of(0.0);
 
     @Getter
     @Setter
@@ -99,6 +100,36 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         this.encoderG2 = encoderG2;
         updateUnwrappedTurretAngle();
         io.setCurrentPosition(unwrappedTurretAngle);
+    }
+
+    private static Angle unwrapDifferentialAngle(Angle encoderGearAAngle, Angle encoderGearBAngle) {
+        Angle encoderDelta = encoderGearBAngle.minus(encoderGearAAngle);
+        if (encoderDelta.gt(ENCODER_DELTA_WRAP_THRESHOLD)) {
+            encoderDelta = encoderDelta.minus(Degrees.of(360.0));
+        } else if (encoderDelta.lt(ENCODER_DELTA_WRAP_THRESHOLD.unaryMinus())) {
+            encoderDelta = encoderDelta.plus(Degrees.of(360.0));
+        }
+
+        Angle turretAngleFromDelta = encoderDelta.times(DIFFERENTIAL_SLOPE);
+        double encoderARotationsEstimate =
+                (turretAngleFromDelta.in(Degrees) * G0_TOOTH_COUNT / G1_TOOTH_COUNT) / 360.0;
+        double encoderARotationsFloor = Math.floor(encoderARotationsEstimate);
+        Angle turretAngle =
+                Degrees.of(encoderARotationsFloor * 360.0)
+                        .plus(encoderGearAAngle)
+                        .times(G1_TOOTH_COUNT / (double) G0_TOOTH_COUNT);
+        Angle correctionError = turretAngle.minus(turretAngleFromDelta);
+        if (correctionError.lt(ANGLE_CORRECTION_THRESHOLD.unaryMinus())) {
+            turretAngle =
+                    turretAngle.plus(
+                            Degrees.of((G1_TOOTH_COUNT / (double) G0_TOOTH_COUNT) * 360.0));
+        } else if (correctionError.gt(ANGLE_CORRECTION_THRESHOLD)) {
+            turretAngle =
+                    turretAngle.minus(
+                            Degrees.of((G1_TOOTH_COUNT / (double) G0_TOOTH_COUNT) * 360.0));
+        }
+
+        return turretAngle;
     }
 
     @Override
@@ -135,6 +166,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         Logger.recordOutput(getName() + "/atGoal/velocity", velocityAtGoal());
         Logger.recordOutput(getName() + "/atGoal", atGoal());
         Logger.recordOutput(getName() + "/currAngleRobotDeg", getPosition().in(Degrees));
+        SmartDashboard.putNumber(getName() + "/currAngleRobotDeg", getPosition().in(Degrees));
         Logger.recordOutput(getName() + "/currVelocity", getVelocity().in(DegreesPerSecond));
     }
 
@@ -274,36 +306,6 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         Angle encoderG1Angle = Degrees.of(encoderG1Inputs.positionRotations * 360.0);
         Angle encoderG2Angle = Degrees.of(encoderG2Inputs.positionRotations * 360.0);
         unwrappedTurretAngle = unwrapDifferentialAngle(encoderG1Angle, encoderG2Angle);
-    }
-
-    private static Angle unwrapDifferentialAngle(Angle encoderGearAAngle, Angle encoderGearBAngle) {
-        Angle encoderDelta = encoderGearBAngle.minus(encoderGearAAngle);
-        if (encoderDelta.gt(ENCODER_DELTA_WRAP_THRESHOLD)) {
-            encoderDelta = encoderDelta.minus(Degrees.of(360.0));
-        } else if (encoderDelta.lt(ENCODER_DELTA_WRAP_THRESHOLD.unaryMinus())) {
-            encoderDelta = encoderDelta.plus(Degrees.of(360.0));
-        }
-
-        Angle turretAngleFromDelta = encoderDelta.times(DIFFERENTIAL_SLOPE);
-        double encoderARotationsEstimate =
-                (turretAngleFromDelta.in(Degrees) * G0_TOOTH_COUNT / G1_TOOTH_COUNT) / 360.0;
-        double encoderARotationsFloor = Math.floor(encoderARotationsEstimate);
-        Angle turretAngle =
-                Degrees.of(encoderARotationsFloor * 360.0)
-                        .plus(encoderGearAAngle)
-                        .times(G1_TOOTH_COUNT / (double) G0_TOOTH_COUNT);
-        Angle correctionError = turretAngle.minus(turretAngleFromDelta);
-        if (correctionError.lt(ANGLE_CORRECTION_THRESHOLD.unaryMinus())) {
-            turretAngle =
-                    turretAngle.plus(
-                            Degrees.of((G1_TOOTH_COUNT / (double) G0_TOOTH_COUNT) * 360.0));
-        } else if (correctionError.gt(ANGLE_CORRECTION_THRESHOLD)) {
-            turretAngle =
-                    turretAngle.minus(
-                            Degrees.of((G1_TOOTH_COUNT / (double) G0_TOOTH_COUNT) * 360.0));
-        }
-
-        return turretAngle;
     }
 
     public Command setCurrentPosition(Angle pos) {

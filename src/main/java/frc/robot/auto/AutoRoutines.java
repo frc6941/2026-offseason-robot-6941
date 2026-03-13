@@ -171,15 +171,19 @@ public class AutoRoutines {
 
         return Commands.defer(
                 () ->
-                        Commands.sequence(
-                                Commands.deadline(drivePastSlope(false, true), zeroEverything()),
-                                Commands.deadline(
-                                        followPathFile("longSweepRight", false), intake()),
-                                drivePastSlope(false, false),
-                                Commands.parallel(
-                                        AutoActions.shoot(),
+                        Commands.parallel(
+                                shooterDefault(),
+                                Commands.sequence(
                                         Commands.deadline(
-                                                allignToStation(), oscillateIntakeFeed()))),
+                                                drivePastSlope(false, true), zeroEverything()),
+                                        Commands.deadline(
+                                                followPathFile("longSweepRight", false), intake()),
+                                        drivePastSlope(false, false),
+                                        Commands.parallel(
+                                                AutoActions.shoot(),
+                                                Commands.deadline(
+                                                        allignToStation(),
+                                                        oscillateIntakeFeed())))),
                 Set.of(swerve, shooter));
     }
 

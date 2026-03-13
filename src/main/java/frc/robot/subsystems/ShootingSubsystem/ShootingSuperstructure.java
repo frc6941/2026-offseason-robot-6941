@@ -18,7 +18,6 @@ import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
-import java.util.Collections;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -74,7 +73,7 @@ public class ShootingSuperstructure {
 
     public Command shootWhenReady(boolean forceFeed) {
         return Commands.parallel(
-                Commands.defer(this::runFrame, Collections.singleton(shooter)),
+                runFrame(),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),

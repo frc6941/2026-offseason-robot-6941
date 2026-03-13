@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -151,7 +151,7 @@ public class AutoFile {
                                                 () ->
                                                         endBehaviourChooser.get()
                                                                 == EndBehaviour.CLIMB)),
-                Collections.singleton(swerve));
+                Set.of(swerve, shooter));
     }
 
     private enum AutoType {

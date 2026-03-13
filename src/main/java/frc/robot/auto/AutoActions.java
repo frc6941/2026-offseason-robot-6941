@@ -1,11 +1,6 @@
 package frc.robot.auto;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -26,10 +21,7 @@ import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
-import frc.robot.subsystems.Configs.AutoParamsNT;
-import frc.robot.subsystems.Configs.ClimberParamsNT;
-import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
+import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
@@ -40,6 +32,7 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
+import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
@@ -93,10 +86,11 @@ public class AutoActions {
     public static final double kTestRotationBPose = 2;
 
     private static Swerve swerve;
-    private static ShootingSuperstructure shooter;
+    private static ShootingSuperstructure shootingSuperstructure;
 
     private static ShotCalculator shotCalculator;
     private static IntakerSubsystem intake;
+    private static VelocityMotorSubsystem shooter;
 
     private static PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
 
@@ -105,12 +99,14 @@ public class AutoActions {
             ShootingSuperstructure shooterSS,
             ShotCalculator shotCalculator,
             IntakerSubsystem intake,
-            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber) {
+            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber,
+            VelocityMotorSubsystem shooter) {
         AutoActions.swerve = swerve;
-        AutoActions.shooter = shooterSS;
+        AutoActions.shootingSuperstructure = shooterSS;
         AutoActions.shotCalculator = shotCalculator;
         AutoActions.intake = intake;
         AutoActions.climber = climber;
+        AutoActions.shooter = shooter;
     }
 
     static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
@@ -162,7 +158,7 @@ public class AutoActions {
     }
 
     public static Command zeroEverything() {
-        return Commands.parallel(shooter.runZero(), intake.zeroCommand());
+        return Commands.parallel(shootingSuperstructure.runZero(), intake.zeroCommand());
     }
 
     public static boolean hasCrossedBump(boolean isToNeutral) {
@@ -351,8 +347,16 @@ public class AutoActions {
     }
 
     public static Command shoot() {
-        // return (shooter.shootWhenReady(false));
-        return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
+        return shootingSuperstructure.shootWhenReady(false);
+        // return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
+    }
+
+    public static Command shooterDefault() {
+        return Commands.defer(
+                () ->
+                        shooter.runVelVolt(
+                                () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())),
+                Collections.emptySet());
     }
 
     // Helpermethod
@@ -406,12 +410,11 @@ public class AutoActions {
         return SwerveCommands.reset(swerve, resetPose)
                 .alongWith(
                         Commands.runOnce(
-                                () -> {
-                                    RobotStateRecorder.getInstance()
-                                            .resetTransform(
-                                                    TransformRecorder.kFrameWorld,
-                                                    TransformRecorder.kFrameRobot);
-                                }))
+                                () ->
+                                        RobotStateRecorder.getInstance()
+                                                .resetTransform(
+                                                        TransformRecorder.kFrameWorld,
+                                                        TransformRecorder.kFrameRobot)))
                 .onlyIf(Robot::isSimulation)
                 .ignoringDisable(true);
     }
