@@ -230,7 +230,7 @@ public class IntakerSubsystem {
                                 Commands.runOnce(
                                         () ->
                                                 extension.setCurrPos(
-                                                        Meters.of(is10541 ? 0.315766 : 0.315895)),
+                                                        Meters.of(is10541 ? 0.315766 : 0.307895)),
                                         extension));
 
         Command simZero =
