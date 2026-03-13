@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.lang.reflect.Field;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
@@ -27,7 +28,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         // logger initialization
-        // Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
+        if (Robot.isSimulation()) Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
         Logger.addDataReceiver(new WPILOGWriter());
 
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);

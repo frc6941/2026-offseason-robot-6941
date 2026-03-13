@@ -5,13 +5,17 @@ import static frc.robot.auto.AutoActions.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Collections;
+import java.util.Set;
+import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 
 public class AutoRoutines {
     public static Swerve swerve;
+    public static VelocityMotorSubsystem shooter;
 
-    public static void init(Swerve swerve) {
+    public static void init(Swerve swerve, VelocityMotorSubsystem shooter) {
         AutoRoutines.swerve = swerve;
+        AutoRoutines.shooter = shooter;
     }
 
     public static Command buildRoutineWithZeroing(Command routine) {
@@ -164,6 +168,7 @@ public class AutoRoutines {
     }
 
     public static Command rightLongFuel() {
+
         return Commands.defer(
                 () ->
                         Commands.sequence(
@@ -172,10 +177,10 @@ public class AutoRoutines {
                                         followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 Commands.parallel(
-                                        Commands.defer(AutoActions::shoot, Collections.emptySet()),
+                                        AutoActions.shoot(),
                                         Commands.deadline(
                                                 allignToStation(), oscillateIntakeFeed()))),
-                Collections.singleton(swerve));
+                Set.of(swerve, shooter));
     }
 
     public static Command shootAndClimb() {

@@ -128,7 +128,7 @@ public class RobotContainer {
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
         AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake, climber);
-        AutoRoutines.init(swerve);
+        AutoRoutines.init(swerve, shooter);
         AutoFile.init();
         AutoRoutineChooser.init();
 
@@ -553,6 +553,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         // return AutoFile.buildAuto();
         return AutoRoutines.rightLongFuel();
+        // return Commands.defer(AutoRoutines::rightLongFuel, Collections.singleton(shooter));
         // return Commands.defer(AutoActions::shoot, Collections.singleton(shooter));
     }
 }

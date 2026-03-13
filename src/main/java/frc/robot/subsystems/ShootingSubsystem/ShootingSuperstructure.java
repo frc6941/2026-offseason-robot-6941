@@ -18,6 +18,7 @@ import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
+import java.util.Collections;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -30,7 +31,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
+    @Getter private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final SpindexerSubsystem idx;
     @Getter private boolean isShooting = false;
 
@@ -73,8 +74,8 @@ public class ShootingSuperstructure {
 
     public Command shootWhenReady(boolean forceFeed) {
         return Commands.parallel(
-                runFrame(),
-                Commands.waitUntil(() -> shooter.velocityAtGoal())
+                Commands.defer(this::runFrame, Collections.singleton(shooter)),
+                Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
                                 idx.runState(
