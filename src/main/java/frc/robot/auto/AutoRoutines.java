@@ -181,7 +181,7 @@ public class AutoRoutines {
                                         Commands.deadline(
                                                 drivePastSlope(false, true), zeroEverything()),
                                         Commands.deadline(
-                                                followPathFile("longSweepRight", false), intake()),
+                                                followPathFile("quickSweepRight", false), intake()),
                                         drivePastSlope(false, false),
                                         Commands.parallel(
                                                 AutoActions.shoot(),

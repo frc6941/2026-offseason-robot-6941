@@ -33,6 +33,6 @@ public final class ShotCalculatorConfig {
         public static final double rpmB = is10541 ? 0 : 0;
         public static final double rpmC = is10541 ? -368.8 : 146;
 
-        public static final double distanceScaler = 1;
+        public static final double distanceScaler = 1.05;
     }
 }
