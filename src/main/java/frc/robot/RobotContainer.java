@@ -221,7 +221,7 @@ public class RobotContainer {
   private void configureBindings() {
     driver.leftTrigger().onTrue(intake.toggleIntake());
     oprator.leftBumper().whileTrue(intake.runFeed());
-    driver.leftBumper().whileTrue(intake.outZeroCommand());
+    driver.leftBumper().onTrue(intake.outZeroCommand());
     driver.povDown().onTrue(intake.runRetract());
     driver.back().onTrue(intake.outZeroCommand());
     oprator.povUp().whileTrue(AutoActions.climbUp());
