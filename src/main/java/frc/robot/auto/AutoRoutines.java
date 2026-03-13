@@ -172,7 +172,7 @@ public class AutoRoutines {
                                         followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
                                 Commands.parallel(
-                                        shoot(),
+                                        Commands.defer(AutoActions::shoot, Collections.emptySet()),
                                         Commands.deadline(
                                                 allignToStation(), oscillateIntakeFeed()))),
                 Collections.singleton(swerve));

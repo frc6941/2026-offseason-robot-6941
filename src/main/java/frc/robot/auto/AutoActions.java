@@ -351,7 +351,8 @@ public class AutoActions {
     }
 
     public static Command shoot() {
-        return shooter.shootWhenReady(false);
+        return (shooter.shootWhenReady(false));
+        // return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
     }
 
     // Helpermethod
