@@ -262,6 +262,9 @@ public class RobotContainer {
                                             Logger.recordOutput("Competition/AutoResultSent", true);
                                             SmartDashboard.putBoolean(
                                                     "Competition/AutoResultSent", true);
+                                            Logger.recordOutput("Competition/AutoResultWin", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultWin", true);
                                         })
                                 .ignoringDisable(true));
         oprator.b() // R win
@@ -274,6 +277,9 @@ public class RobotContainer {
                                                     "Competition/AutoResultSent", true);
                                             SmartDashboard.putBoolean(
                                                     "Competition/AutoResultSent", true);
+                                            Logger.recordOutput("Competition/AutoResultWin", false);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultWin", false);
                                         })
                                 .ignoringDisable(true));
         driver.leftTrigger().onTrue(intake.toggleIntake());

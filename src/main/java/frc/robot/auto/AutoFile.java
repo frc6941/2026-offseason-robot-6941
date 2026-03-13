@@ -6,6 +6,7 @@ import static frc.robot.auto.AutoRoutines.*;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -44,8 +45,9 @@ public class AutoFile {
                     Alert.AlertType.kError);
 
     private static <E extends Enum<E>> void initializeChooser(
-            LoggedDashboardChooser<E> chooser, E[] values) {
+            LoggedDashboardChooser<E> chooser, E[] values, E defaultValue) {
         chooser.onChange((value) -> verifyOption());
+        chooser.addDefaultOption(defaultValue.toString(), defaultValue);
         for (E e : values) {
             chooser.addOption(e.toString(), e);
         }
@@ -53,10 +55,10 @@ public class AutoFile {
 
     public static void init() {
         initializeAutoPaths();
-        initializeChooser(autoChooser, AutoType.values());
-        initializeChooser(sideChooser, AutoSide.values());
-        initializeChooser(endBehaviourChooser, EndBehaviour.values());
-        initializeChooser(sweepModeChooser, SweepMode.values());
+        initializeChooser(autoChooser, AutoType.values(), AutoType.COMPETITION);
+        initializeChooser(sideChooser, AutoSide.values(), AutoSide.RIGHT);
+        initializeChooser(endBehaviourChooser, EndBehaviour.values(), EndBehaviour.FUEL);
+        initializeChooser(sweepModeChooser, SweepMode.values(), SweepMode.LONG);
     }
 
     private static void initializeAutoPaths() {
@@ -104,6 +106,7 @@ public class AutoFile {
                 || endBehaviourChooser.get() == null
                 || sideChooser.get() == null) {
             nullConfigAlert.set(true);
+            SmartDashboard.putBoolean("Auto/Verified", false);
             return;
         } else {
             nullConfigAlert.set(false);
@@ -118,6 +121,8 @@ public class AutoFile {
             competitionNotSelectedAlert.set(true);
             invalidConfigAlert.set(false);
         }
+        SmartDashboard.putBoolean(
+                "Auto/Verified", !invalidConfigAlert.get() && !competitionNotSelectedAlert.get());
     }
 
     private static Command buildCompetition() {

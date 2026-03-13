@@ -30,10 +30,10 @@
           },
           {
             "title": "jamCondition",
-            "x": 512.0,
+            "x": 768.0,
             "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
+            "width": 128.0,
+            "height": 256.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Spindexer/jamCondition",
@@ -152,7 +152,7 @@
           },
           {
             "title": "Hub Phase",
-            "x": 256.0,
+            "x": 512.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -209,8 +209,8 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "true_icon": "Checkmark",
+              "false_icon": "Exclamation Point"
             }
           },
           {
@@ -226,6 +226,23 @@
               "data_type": "double",
               "show_submit_button": true
             }
+          },
+          {
+            "title": "AutoResultWin",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/AutoResultWin",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
           }
         ]
       }
@@ -237,7 +254,7 @@
         "containers": [
           {
             "title": "errors",
-            "x": 256.0,
+            "x": 512.0,
             "y": 0.0,
             "width": 512.0,
             "height": 128.0,
@@ -250,7 +267,7 @@
           },
           {
             "title": "warnings",
-            "x": 256.0,
+            "x": 512.0,
             "y": 128.0,
             "width": 512.0,
             "height": 128.0,
@@ -332,6 +349,23 @@
               "topic": "/SmartDashboard/End Behaviour Chooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "Verified",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/Verified",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "Exclamation Point"
             }
           }
         ]
