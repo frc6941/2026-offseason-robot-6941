@@ -20,6 +20,7 @@ public class LimelightSubsystem extends SubsystemBase {
     private final HashMap<LimelightIO, LimelightIOInputsAutoLogged> ios = new HashMap<>();
     private final Localizable localizationProvider;
     private final boolean robotEnabledPrev = true;
+    private int suppressVisionFrames = 0;
 
     public LimelightSubsystem(Localizable localizationProvider, LimelightIO... ios) {
         super("Limelight");
@@ -47,15 +48,26 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     private void addVisionMeasurement() {
+        if (suppressVisionFrames > 0) {
+            suppressVisionFrames--;
+            return;
+        }
+
         for (Map.Entry<LimelightIO, LimelightIOInputsAutoLogged> entry : ios.entrySet()) {
             LimelightIO io = entry.getKey();
             LimelightIOInputsAutoLogged input = entry.getValue();
             if (MathTools.epsilonEquals(input.reliability, 0)) {
-                // reliability ~= zero, do not trust this limelight
                 continue;
             }
             localizationProvider.addVisionMeasurement(
                     input.pose, input.timestampSeconds, getVisionStdDev(io, input.reliability));
+        }
+    }
+
+    public void requestInternalIMUReseedAll() {
+        suppressVisionFrames = Math.max(suppressVisionFrames, 5);
+        for (LimelightIO io : ios.keySet()) {
+            io.requestInternalIMUReseed();
         }
     }
 
