@@ -28,9 +28,11 @@ public class IntakerSubsystem {
 
     private double currentFilterValue = 0.0;
     private LinearFilter currentFilter;
+
     @Getter
     @AutoLogOutput(key = "IntakerRoller/state")
     private IntakeMode currentMode = IntakeMode.RETRACTED;
+
     @AutoLogOutput(key = "IntakerRoller/fallbackState")
     private IntakeMode fallbackMode = IntakeMode.RETRACTED;
 
