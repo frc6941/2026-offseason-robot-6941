@@ -31,7 +31,7 @@
           {
             "title": "jamCondition",
             "x": 0.0,
-            "y": 0.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -48,7 +48,7 @@
           {
             "title": "Pattern",
             "x": 0.0,
-            "y": 128.0,
+            "y": 512.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Large Text Display",
@@ -60,8 +60,8 @@
           },
           {
             "title": "muzzleSpeedMps",
-            "x": 512.0,
-            "y": 0.0,
+            "x": 1408.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Large Text Display",
@@ -73,7 +73,7 @@
           },
           {
             "title": "baseRpm",
-            "x": 768.0,
+            "x": 1152.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -86,7 +86,7 @@
           },
           {
             "title": "currentMeters",
-            "x": 1024.0,
+            "x": 1408.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -99,7 +99,7 @@
           },
           {
             "title": "scaledRpm",
-            "x": 768.0,
+            "x": 1152.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
@@ -113,7 +113,7 @@
           {
             "title": "LL3G Alive",
             "x": 0.0,
-            "y": 256.0,
+            "y": 640.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -126,7 +126,7 @@
           {
             "title": "LL4 Alive",
             "x": 0.0,
-            "y": 384.0,
+            "y": 768.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -138,7 +138,7 @@
           },
           {
             "title": "currAngleRobotDeg",
-            "x": 256.0,
+            "x": 896.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -149,6 +149,85 @@
               "data_type": "double",
               "show_submit_button": false
             }
+          },
+          {
+            "title": "Hub Phase",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/Hub Phase",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Hub Remaining",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Number Bar",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/Hub Remaining",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 25.0,
+              "divisions": 3,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "isHubActive",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/isHubActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "AutoResultSent",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/AutoResultSent",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "deployPosMeters",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/IntakerExtension/deployPosMeters",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
           }
         ]
       }
@@ -158,19 +237,6 @@
       "grid_layout": {
         "layouts": [],
         "containers": [
-          {
-            "title": "End Behaviour Chooser",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/End Behaviour Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
           {
             "title": "errors",
             "x": 256.0,
@@ -268,6 +334,19 @@
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Auto Routine Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "End Behaviour Chooser",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/End Behaviour Chooser",
               "period": 0.06,
               "sort_options": false
             }
