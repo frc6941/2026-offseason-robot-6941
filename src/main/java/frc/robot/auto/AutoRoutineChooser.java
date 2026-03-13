@@ -13,11 +13,11 @@ public class AutoRoutineChooser {
 
     @Getter
     private static final LoggedDashboardChooser<AutoType> autoChooser =
-            new LoggedDashboardChooser<>("Auto Type Chooser");
+            new LoggedDashboardChooser<>("Auto Type Chooser222");
 
     @Getter
     private static final LoggedDashboardChooser<AutoRoutine> routineChooser =
-            new LoggedDashboardChooser<>("Auto Routine Chooser");
+            new LoggedDashboardChooser<>("Auto Routine Chooser222");
 
     private static final Alert invalidConfigAlert =
             new Alert("Auto configuration is invalid", Alert.AlertType.kError);

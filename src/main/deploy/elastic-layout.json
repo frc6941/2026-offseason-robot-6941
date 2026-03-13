@@ -30,8 +30,8 @@
           },
           {
             "title": "jamCondition",
-            "x": 0.0,
-            "y": 384.0,
+            "x": 512.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -47,8 +47,8 @@
           },
           {
             "title": "Pattern",
-            "x": 0.0,
-            "y": 512.0,
+            "x": 512.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Large Text Display",
@@ -113,7 +113,7 @@
           {
             "title": "LL3G Alive",
             "x": 0.0,
-            "y": 640.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -126,7 +126,7 @@
           {
             "title": "LL4 Alive",
             "x": 0.0,
-            "y": 768.0,
+            "y": 512.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -152,7 +152,7 @@
           },
           {
             "title": "Hub Phase",
-            "x": 0.0,
+            "x": 256.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -165,20 +165,18 @@
           },
           {
             "title": "Hub Remaining",
-            "x": 256.0,
+            "x": 0.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
-            "type": "Number Bar",
+            "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Competition/Hub Remaining",
               "period": 0.06,
               "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 25.0,
-              "divisions": 3,
-              "inverted": false,
-              "orientation": "horizontal"
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 5,
+              "yellow_start_time": 10
             }
           },
           {
@@ -217,8 +215,8 @@
           },
           {
             "title": "deployPosMeters",
-            "x": 512.0,
-            "y": 0.0,
+            "x": 896.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -243,12 +241,11 @@
             "y": 0.0,
             "width": 512.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Alerts/errors",
               "period": 0.06,
-              "data_type": "string[]",
-              "show_submit_button": false
+              "data_type": "string[]"
             }
           },
           {
@@ -257,12 +254,11 @@
             "y": 128.0,
             "width": 512.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Alerts/warnings",
               "period": 0.06,
-              "data_type": "string[]",
-              "show_submit_button": false
+              "data_type": "string[]"
             }
           },
           {
@@ -321,19 +317,6 @@
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Auto Type Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
-            "title": "Auto Routine Chooser",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Auto Routine Chooser",
               "period": 0.06,
               "sort_options": false
             }

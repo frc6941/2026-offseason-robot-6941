@@ -84,15 +84,13 @@ public class AutoActions {
     public static final double kTestRotationAPose = 1;
     public static final Rotation2d kTestRotationB = new Rotation2d(Degrees.of(45));
     public static final double kTestRotationBPose = 2;
-
+    public static IntakerSubsystem intake;
     private static Swerve swerve;
     private static ShootingSuperstructure shootingSuperstructure;
-
     private static ShotCalculator shotCalculator;
-    private static IntakerSubsystem intake;
     private static VelocityMotorSubsystem shooter;
-
     private static PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
+    private static PositionMotorSubsystem intakerExtension;
 
     public static void init(
             Swerve swerve,
@@ -100,13 +98,15 @@ public class AutoActions {
             ShotCalculator shotCalculator,
             IntakerSubsystem intake,
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber,
-            VelocityMotorSubsystem shooter) {
+            VelocityMotorSubsystem shooter,
+            PositionMotorSubsystem intakerExtension) {
         AutoActions.swerve = swerve;
         AutoActions.shootingSuperstructure = shooterSS;
         AutoActions.shotCalculator = shotCalculator;
         AutoActions.intake = intake;
         AutoActions.climber = climber;
         AutoActions.shooter = shooter;
+        AutoActions.intakerExtension = intakerExtension;
     }
 
     static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
@@ -179,9 +179,9 @@ public class AutoActions {
                     Pose2d targetPose = targetPoseSupplier.get();
                     return new SwerveDriveToPose(
                                     swerve,
-                                    () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                                    RobotStateRecorder::getPoseWorldRobotCurrent,
                                     () -> new Pose3d(targetPose),
-                                    () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                                    RobotStateRecorder::getVelocityWorldRobotCurrent,
                                     new PIDController(
                                             AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
                                             AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
@@ -240,8 +240,8 @@ public class AutoActions {
             double shiftLat) {
         return new SwerveDriveToAllign(
                         swerve,
-                        () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                        RobotStateRecorder::getPoseWorldRobotCurrent,
+                        RobotStateRecorder::getVelocityWorldRobotCurrent,
                         () -> targetPose,
                         shiftingDirectionSupplier,
                         swerve.getSwerveLimit(),
@@ -267,7 +267,6 @@ public class AutoActions {
                             if (vel != null) {
                                 Logger.recordOutput("Temp/", vel);
                             }
-                            ;
                         },
                         new PPHolonomicDriveController(
                                 new PIDConstants(

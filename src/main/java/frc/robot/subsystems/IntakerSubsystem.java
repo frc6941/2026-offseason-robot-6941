@@ -8,6 +8,7 @@ import static frc.robot.RobotConstants.is10541;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -25,7 +26,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 public class IntakerSubsystem {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension;
-
+    private Timer zeroTimer = new Timer();
     private double currentFilterValue = 0.0;
     private LinearFilter currentFilter;
 

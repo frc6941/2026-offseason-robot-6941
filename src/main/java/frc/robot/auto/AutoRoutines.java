@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import java.util.Collections;
 import java.util.Set;
+import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 
@@ -14,12 +15,17 @@ public class AutoRoutines {
     public static Swerve swerve;
     public static VelocityMotorSubsystem shooter;
     public static SpindexerSubsystem spindexer;
+    public static PositionMotorSubsystem intakerExtension;
 
     public static void init(
-            Swerve swerve, VelocityMotorSubsystem shooter, SpindexerSubsystem spindexer) {
+            Swerve swerve,
+            VelocityMotorSubsystem shooter,
+            SpindexerSubsystem spindexer,
+            PositionMotorSubsystem intakerExtension) {
         AutoRoutines.swerve = swerve;
         AutoRoutines.shooter = shooter;
         AutoRoutines.spindexer = spindexer;
+        AutoRoutines.intakerExtension = intakerExtension;
     }
 
     public static Command buildRoutineWithZeroing(Command routine) {
