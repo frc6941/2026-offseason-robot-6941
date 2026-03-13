@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
+import static frc.robot.RobotConstants.is10541;
 import static frc.robot.auto.AutoActions.intake;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -75,7 +76,7 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
-    private static final boolean HAS_CLIMBER_IO = true;
+    private static final boolean HAS_CLIMBER_IO = is10541 ? false : true;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
