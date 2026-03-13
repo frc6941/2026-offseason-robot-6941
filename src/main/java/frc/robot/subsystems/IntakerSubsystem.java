@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.RobotConstants.is10541;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -235,7 +236,9 @@ public class IntakerSubsystem {
                                         extension.runVoltage(() -> zeroVoltage)))
                         .andThen(
                                 Commands.runOnce(
-                                        () -> extension.setCurrPos(Meters.of(0.315766)),
+                                        () ->
+                                                extension.setCurrPos(
+                                                        Meters.of(is10541 ? 0.315766 : 0.316)),
                                         extension));
 
         Command simZero =
