@@ -28,19 +28,9 @@ public class IntakerSubsystem {
 
     private double currentFilterValue = 0.0;
     private LinearFilter currentFilter;
-
-    public enum IntakeMode {
-        INTAKING,
-        EXTENDED_IDLE,
-        RETRACTED,
-        FEEDING,
-        EXTENDED_REVERSE
-    }
-
     @Getter
     @AutoLogOutput(key = "IntakerRoller/state")
     private IntakeMode currentMode = IntakeMode.RETRACTED;
-
     @AutoLogOutput(key = "IntakerRoller/fallbackState")
     private IntakeMode fallbackMode = IntakeMode.RETRACTED;
 
@@ -238,7 +228,7 @@ public class IntakerSubsystem {
                                 Commands.runOnce(
                                         () ->
                                                 extension.setCurrPos(
-                                                        Meters.of(is10541 ? 0.315766 : 0.316)),
+                                                        Meters.of(is10541 ? 0.315766 : 0.315895)),
                                         extension));
 
         Command simZero =
@@ -251,5 +241,13 @@ public class IntakerSubsystem {
                         extension);
 
         return new ConditionalCommand(realZero, simZero, Robot::isReal);
+    }
+
+    public enum IntakeMode {
+        INTAKING,
+        EXTENDED_IDLE,
+        RETRACTED,
+        FEEDING,
+        EXTENDED_REVERSE
     }
 }
