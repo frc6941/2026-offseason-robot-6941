@@ -118,6 +118,7 @@ public class AutoFile {
                                 // zeroEverything(),
 
                                 Commands.deadline(
+                                                shoot().withTimeout(20),
                                                 new ConditionalCommand(
                                                         Commands.deadline(
                                                                 allignToDepot(),
@@ -125,9 +126,12 @@ public class AutoFile {
                                                         Commands.deadline(
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed()),
-                                                        () -> isLeft),
-                                                shoot().withTimeout(20))
+                                                        () -> isLeft))
                                         .onlyIf(
+                                                () ->
+                                                        endBehaviourChooser.get()
+                                                                == EndBehaviour.FUEL),
+                                shoot().onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
                                                                 == EndBehaviour.FUEL),
