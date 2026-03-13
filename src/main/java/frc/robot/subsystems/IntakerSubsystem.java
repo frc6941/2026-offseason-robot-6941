@@ -235,7 +235,8 @@ public class IntakerSubsystem {
                                         extension.runVoltage(() -> zeroVoltage)))
                         .andThen(
                                 Commands.runOnce(
-                                        () -> extension.setCurrPos(Meters.of(0.316)), extension));
+                                        () -> extension.setCurrPos(Meters.of(0.315766)),
+                                        extension));
 
         Command simZero =
                 Commands.runOnce(
