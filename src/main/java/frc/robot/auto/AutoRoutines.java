@@ -171,18 +171,10 @@ public class AutoRoutines {
                                 Commands.deadline(
                                         followPathFile("longSweepRight", false), intake()),
                                 drivePastSlope(false, false),
-<<<<<<< HEAD
-                                shoot().alongWith(
-                                                Commands.sequence(
-                                                        Commands.parallel(
-                                                                allignToStation(),
-                                                                oscillateIntakeFeed())))),
-=======
                                 Commands.parallel(
                                         shoot(),
                                         Commands.deadline(
                                                 allignToStation(), oscillateIntakeFeed()))),
->>>>>>> test/elastic
                 Collections.singleton(swerve));
     }
 
