@@ -10,7 +10,6 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Robot;
 import frc.robot.subsystems.Configs.IntakeConfig;
