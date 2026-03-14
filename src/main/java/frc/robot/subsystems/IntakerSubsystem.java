@@ -189,7 +189,6 @@ public class IntakerSubsystem extends SubsystemBase {
     }
 
     public Command zeroCommand() {
-        SmartDashboard.putBoolean("Zero", true);
         return extension.zeroCommand();
     }
 
