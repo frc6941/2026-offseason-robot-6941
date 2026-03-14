@@ -273,6 +273,7 @@ public class RobotContainer {
     oprator.povUp().whileTrue(AutoActions.climbUp());
     oprator.povDown().whileTrue(AutoActions.climbed());
     oprator.back().onTrue(AutoActions.climbDown());
+    oprator.a().onTrue(shootingSuperstructure.runZero());
 
     driver.povLeft().onTrue(intake.zeroCommand());
 

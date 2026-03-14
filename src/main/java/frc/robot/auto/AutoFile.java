@@ -134,36 +134,48 @@ public class AutoFile {
                     case LONG -> "longSweepRight";
                     case NORMAL -> "sweepRight";
                 };
-        return Commands.sequence(
-                        // Sweep
-                        Commands.deadline(
-                                drivePastSlope(isLeft, true),
-                                Commands.defer(
-                                        AutoActions::zeroEverything, Collections.emptySet())),
-                        Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                        drivePastSlope(isLeft, false),
-
-                        // FUEL
-                        Commands.parallel(
-                                        shoot(),
-                                        new ConditionalCommand(
-                                                Commands.deadline(
-                                                        allignToDepot(), oscillateIntakeFeed()),
-                                                Commands.deadline(
-                                                        allignToStation(), oscillateIntakeFeed()),
-                                                () -> isLeft))
-                                .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.FUEL),
-
-                        // CLIMB
+        return Commands.parallel(
+                       // shooterDefault(),
                         Commands.sequence(
-                                        Commands.deadline(
-                                                allignToClimb(isLeft),
-                                                Commands.parallel(
-                                                        oscillateIntakeFeed().withTimeout(20),
-                                                        climbUp(),
-                                                        shoot().withTimeout(20))),
-                                        climbed().alongWith(shoot()))
-                                .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.CLIMB))
+                                // Sweep
+                                Commands.deadline(
+                                        drivePastSlope(isLeft, true),
+                                        Commands.defer(
+                                                AutoActions::zeroEverything,
+                                                Collections.emptySet())),
+                                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+                                drivePastSlope(isLeft, false),
+
+                                // FUEL
+                                Commands.parallel(
+                                                shoot(),
+                                                new ConditionalCommand(
+                                                        Commands.deadline(
+                                                                allignToDepot(),
+                                                                oscillateIntakeFeed()),
+                                                        Commands.deadline(
+                                                                allignToStation(),
+                                                                oscillateIntakeFeed()),
+                                                        () -> isLeft))
+                                        .onlyIf(
+                                                () ->
+                                                        endBehaviourChooser.get()
+                                                                == EndBehaviour.FUEL),
+
+                                // CLIMB
+                                Commands.sequence(
+                                                Commands.deadline(
+                                                        allignToClimb(isLeft),
+                                                        Commands.parallel(
+                                                                oscillateIntakeFeed()
+                                                                        .withTimeout(20),
+                                                                climbUp(),
+                                                                shoot().withTimeout(20))),
+                                                climbed().alongWith(shoot()))
+                                        .onlyIf(
+                                                () ->
+                                                        endBehaviourChooser.get()
+                                                                == EndBehaviour.CLIMB)))
                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
         // .beforeStarting(() -> swerve.removeDefaultCommand());
     }
