@@ -267,7 +267,7 @@ public class RobotContainer {
                                                     "Competition/AutoResultWin", true);
                                         })
                                 .ignoringDisable(true));
-        oprator.b() // R win
+        oprator.b() // R lose
                 .onTrue(
                         Commands.runOnce(
                                         () -> {
@@ -429,6 +429,7 @@ public class RobotContainer {
         // Swerve
         driver.start()
                 .onTrue(
+                        Commands.sequence(
                         SwerveCommands.resetAngle(
                                         swerve,
                                         () ->
@@ -440,9 +441,14 @@ public class RobotContainer {
                                                 () -> {
                                                     RobotStateRecorder.getInstance()
                                                             .resetTransform(
-                                                                    TransformRecorder.kFrameWorld,
-                                                                    TransformRecorder.kFrameRobot);
-                                                }),
+                                                                                    TransformRecorder
+                                                                                            .kFrameWorld,
+                                                                                    TransformRecorder
+                                                                                            .kFrameRobot);
+                                                                })),
+                                        Commands.runOnce(
+                                                limelightSubsystem::requestInternalIMUReseedAll))
+                                .alongWith(
                                         indicatorSubsystem.indicateWithTimeout(
                                                 Patterns.RESET_ODOM, 1))
                                 .ignoringDisable(true));
@@ -614,7 +620,5 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return AutoFile.buildAuto();
         // return AutoRoutines.rightLongFuel();
-        // return Commands.defer(AutoRoutines::rightLongFuel, Collections.singleton(shooter));
-        // return Commands.defer(AutoActions::shoot, Collections.singleton(shooter));
     }
 }

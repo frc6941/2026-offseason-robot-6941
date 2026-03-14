@@ -23,6 +23,7 @@ public class LimelightIOReal implements LimelightIO {
     private double lastHeartbeat = -1;
     private double lastTsBootMs = -1;
     private double lastSeenTime = 0.0;
+    private int reseedFramesRemaining = 0;
 
     public LimelightIOReal(
             LimelightIOConfig config,
@@ -180,15 +181,24 @@ public class LimelightIOReal implements LimelightIO {
             Logger.recordOutput("Limelight/IMU/Mode", "external");
             return;
         }
-        if (RobotState.isDisabled()) {
+        if (RobotState.isDisabled() || reseedFramesRemaining > 0) {
             // disabled; use IMU mode 1 - seed internal IMU with data
             LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.EXTERNAL_SEED.getValue());
             Logger.recordOutput("Limelight/IMU/Mode", "seed");
         } else {
             // enabled - use IMU mode 4 - externally assisted internal IMU MegaTag2
             LimelightHelpers.SetIMUMode(config.getName(), InternalIMUMode.INTERNAL_ONLY.getValue());
-            Logger.recordOutput("Limelight/IMU/Mode", "assisted");
+            Logger.recordOutput("Limelight/IMU/Mode", "internal");
         }
+    }
+
+    @Override
+    public void requestInternalIMUReseed() {
+        if (!canUseInternalIMU() || RobotState.isDisabled()) {
+            return;
+        }
+        reseedFramesRemaining = 3;
+        setIMUMode();
     }
 
     @Override
@@ -242,8 +252,15 @@ public class LimelightIOReal implements LimelightIO {
 
     @Override
     public void updateInputs(LimelightIOInputs inputs) {
-        if (canUseInternalIMU() && isPrevDisabled != RobotState.isDisabled()) {
-            setIMUMode();
+        if (canUseInternalIMU()) {
+            if (isPrevDisabled != RobotState.isDisabled()) {
+                setIMUMode();
+            } else if (reseedFramesRemaining > 0) {
+                reseedFramesRemaining--;
+                if (reseedFramesRemaining == 0 && !RobotState.isDisabled()) {
+                    setIMUMode();
+                }
+            }
         }
         isPrevDisabled = RobotState.isDisabled();
 

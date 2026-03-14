@@ -85,8 +85,8 @@ public class AutoActions {
     public static final Rotation2d kTestRotationB = new Rotation2d(Degrees.of(45));
     public static final double kTestRotationBPose = 2;
     public static IntakerSubsystem intake;
+    public static ShootingSuperstructure shootingSuperstructure;
     private static Swerve swerve;
-    private static ShootingSuperstructure shootingSuperstructure;
     private static ShotCalculator shotCalculator;
     private static VelocityMotorSubsystem shooter;
     private static PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;

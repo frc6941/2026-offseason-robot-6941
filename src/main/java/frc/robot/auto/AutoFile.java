@@ -97,6 +97,9 @@ public class AutoFile {
         return switch (selected) {
             case TEST -> buildTest();
             case COMPETITION -> buildCompetition();
+            case SHOOT -> Commands.defer(
+                    () -> shootingSuperstructure.shootWhenReady(false),
+                    Collections.singleton(shooter));
         };
     }
 
@@ -182,7 +185,8 @@ public class AutoFile {
 
     private enum AutoType {
         COMPETITION,
-        TEST
+        TEST,
+        SHOOT
     }
 
     private enum AutoSide {
