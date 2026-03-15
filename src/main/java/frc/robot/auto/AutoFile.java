@@ -135,44 +135,45 @@ public class AutoFile {
           case NORMAL -> "sweepRight";
         };
     return Commands.parallel(
-            // shooterDefault(),
-            Commands.sequence(
-                // Sweep
-                Commands.deadline(
-                    drivePastSlope(isLeft, true),
-                    Commands.defer(AutoActions::zeroEverything, Collections.emptySet())),
-                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                drivePastSlope(isLeft, false),
+        // shooterDefault(),
+        Commands.sequence(
+            // Sweep
+            Commands.deadline(
+                drivePastSlope(isLeft, true),
+                Commands.defer(AutoActions::zeroEverything, Collections.emptySet())),
+            Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+            drivePastSlope(isLeft, false),
 
-                // FUEL
-                Commands.parallel(
-                        shoot(),
-                        new ConditionalCommand(
-                            Commands.deadline(allignToDepot(), oscillateIntakeFeed()),
-                            Commands.deadline(allignToStation(), oscillateIntakeFeed()),
-                            () -> isLeft))
-                    .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.FUEL),
+            // FUEL
+            Commands.parallel(
+                    shoot(),
+                    new ConditionalCommand(
+                        Commands.deadline(allignToDepot(), oscillateIntakeFeed()),
+                        Commands.deadline(allignToStation(), oscillateIntakeFeed()),
+                        () -> isLeft))
+                .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.FUEL),
 
-                // CLIMB
-                Commands.sequence(
-                        Commands.deadline(
-                            allignToClimb(isLeft),
-                            Commands.parallel(
-                                oscillateIntakeFeed().withTimeout(20),
-                                climbUp(),
-                                shoot().withTimeout(20))),
-                        climbed().alongWith(shoot()))
-                    .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.CLIMB)),
+            // CLIMB
             Commands.sequence(
-                    Commands.waitUntil(()-> DriverStation.isAutonomous() && DriverStation.getMatchTime()<=2),
-            Commands.parallel(intake.zeroCommand(), intake()))
-        .onlyIf(
-            () ->
-                isLeft
-                    && autoChooser.get() == AutoType.COMPETITION
-                    && sweepModeChooser.get() == SweepMode.LONG
-                    && endBehaviourChooser.get() == EndBehaviour.FUEL)
-        .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+                    Commands.deadline(
+                        allignToClimb(isLeft),
+                        Commands.parallel(
+                            oscillateIntakeFeed().withTimeout(20),
+                            climbUp(),
+                            shoot().withTimeout(20))),
+                    climbed().alongWith(shoot()))
+                .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.CLIMB)),
+        Commands.sequence(
+                Commands.waitUntil(
+                    () -> DriverStation.isAutonomous() && DriverStation.getMatchTime() <= 2),
+                Commands.parallel(intake.zeroCommand(), intake()))
+            .onlyIf(
+                () ->
+                    isLeft
+                        && autoChooser.get() == AutoType.COMPETITION
+                        && sweepModeChooser.get() == SweepMode.LONG
+                        && endBehaviourChooser.get() == EndBehaviour.FUEL)
+            .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
     // .beforeStarting(() -> swerve.removeDefaultCommand());
   }
 
