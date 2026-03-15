@@ -178,6 +178,20 @@ public class ShootingSuperstructure {
         }
     }
 
+    public Command runSetFrame() {
+        return Commands.parallel(
+                turret.runTurretToZero(),
+                hood.runPosition(() -> Degrees.of(19)),
+                idx.runState(() -> IdxMode.FEED),
+                shooter.runVelVolt(
+                        () -> {
+                            ShotFrame frame = RobotStateRecorder.getCmdFrame();
+                            Angle bba = Degrees.of(77);
+                            double rpm = computeRpm(MetersPerSecond.of(6), bba);
+                            return RotationsPerSecond.of(rpm / 60.0);
+                        }));
+    }
+
     public enum IdxMode {
         OFF,
         FEED,

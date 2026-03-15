@@ -182,6 +182,20 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 .andThen(runVelVolt(() -> calculateTargetVelocity(targetAngleRobot)));
     }
 
+    public Command runTurretToZero() {
+        return Commands.runOnce(() -> posVelCtl.reset(getPosition().in(Degrees)))
+                .andThen(
+                        Commands.parallel(
+                                Commands.run(
+                                        () -> {
+                                            targetAngleRobotWrapped = Degrees.of(0.0);
+                                            targetAngleRobot =
+                                                    unwrapTargetAngle(
+                                                            targetAngleRobotWrapped, getPosition());
+                                        }),
+                                runVelVolt(() -> calculateTargetVelocity(targetAngleRobot))));
+    }
+
     private void updateController(TurretMode mode) {
         if (mode != lastControllerMode || TurretPosParamsNT.isAnyChanged()) {
 

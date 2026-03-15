@@ -75,14 +75,14 @@ public class RobotContainer {
   private static final boolean HAS_IDX_IO = true;
   private static final boolean HAS_INTAKER_ROLLER_IO = true;
   private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-  private static final boolean HAS_SWERVE_IO = true;
+  private static final boolean HAS_SWERVE_IO = false;
   private static final boolean HAS_LL_IO = true;
   private static final boolean HAS_CLIMBER_IO = !is10541;
   private final LimelightSubsystem limelightSubsystem;
   private final IntakerSubsystem intake;
   private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
   private final CommandXboxController driver = new CommandXboxController(0);
-  private final CommandXboxController oprator = new CommandXboxController(1);
+  private final CommandXboxController operator = new CommandXboxController(1);
   private final ShotCalculator shotCalculator = new ShotCalculator();
   private final Swerve swerve;
   private final TurretSubsystem turret;
@@ -241,7 +241,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    oprator
+    operator
         .x() // L win
         .onTrue(
             Commands.runOnce(
@@ -253,7 +253,7 @@ public class RobotContainer {
                       SmartDashboard.putBoolean("Competition/AutoResultWin", true);
                     })
                 .ignoringDisable(true));
-    oprator
+    operator
         .b() // R lose
         .onTrue(
             Commands.runOnce(
@@ -266,19 +266,20 @@ public class RobotContainer {
                     })
                 .ignoringDisable(true));
     driver.leftTrigger().onTrue(intake.toggleIntake());
-    oprator.leftBumper().whileTrue(intake.runFeed());
+    operator.leftBumper().whileTrue(intake.runFeed());
     driver.leftBumper().onTrue(intake.outZeroCommand());
     driver.povDown().onTrue(intake.runRetract());
     driver.back().onTrue(intake.outZeroCommand());
-    oprator.povUp().whileTrue(AutoActions.climbUp());
-    oprator.povDown().whileTrue(AutoActions.climbed());
-    oprator.back().onTrue(AutoActions.climbDown());
-    oprator.a().onTrue(shootingSuperstructure.runZero());
+    operator.povUp().whileTrue(AutoActions.climbUp());
+    operator.povDown().whileTrue(AutoActions.climbed());
+    operator.back().onTrue(AutoActions.climbDown());
+    operator.a().onTrue(shootingSuperstructure.runZero());
+    operator.y().whileTrue(shootingSuperstructure.runSetFrame());
 
     driver.povLeft().onTrue(intake.zeroCommand());
 
-    oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
-    oprator
+    operator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
+    operator
         .rightTrigger()
         .whileTrue(
             shootingSuperstructure
@@ -293,7 +294,7 @@ public class RobotContainer {
                           .schedule(
                               indicatorSubsystem.indicateWithTimeout(Patterns.AFTER_SHOOTING, 0.5));
                     }));
-    oprator.rightBumper().whileTrue(intake.runExtendedReverse());
+    operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
     driver
         .rightTrigger()
