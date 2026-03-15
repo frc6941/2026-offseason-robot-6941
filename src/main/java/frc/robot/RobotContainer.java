@@ -95,8 +95,6 @@ public class RobotContainer {
   private final IndicatorSubsystem indicatorSubsystem;
   private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
   private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
-  // private final AutoFile autoFile;
-  // private final AutoRoutineChooser autoRoutineChooser;
   private TargetMode activeTargetMode = TargetMode.GOAL;
 
   @SneakyThrows
@@ -140,7 +138,6 @@ public class RobotContainer {
         swerve, shootingSuperstructure, shotCalculator, intake, climber, shooter, intakerExtension);
     AutoRoutines.init(swerve, shooter, spindexer, intakerExtension);
     AutoFile.init();
-    // AutoRoutineChooser.init();
     configureBindings();
     shootingSuperstructure.setDefaultCommand();
     swerve.setDefaultCommand(

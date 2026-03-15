@@ -43,7 +43,7 @@ public class LimelightIOReal implements LimelightIO {
         if (config.getPortToForwardStream() != 0)
             PortForwarder.add(config.getPortToForwardStream(), config.getName() + ".local", 5800);
         if (config.getPortToForwardPipeline() != 0)
-            PortForwarder.add(config.getPortToForwardPipeline(), config.getName() + ".local", 5800);
+            PortForwarder.add(config.getPortToForwardPipeline(), config.getName() + ".local", 5801);
     }
 
     private static double getSpanReliability(double span, double distance, double area) {
