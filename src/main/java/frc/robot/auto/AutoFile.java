@@ -162,18 +162,20 @@ public class AutoFile {
                             climbUp(),
                             shoot().withTimeout(20))),
                     climbed().alongWith(shoot()))
-                .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.CLIMB)),
-        Commands.sequence(
-                Commands.waitUntil(
-                    () -> DriverStation.isAutonomous() && DriverStation.getMatchTime() <= 2),
-                Commands.parallel(intake.zeroCommand(), intake()))
-            .onlyIf(
-                () ->
-                    isLeft
-                        && autoChooser.get() == AutoType.COMPETITION
-                        && sweepModeChooser.get() == SweepMode.LONG
-                        && endBehaviourChooser.get() == EndBehaviour.FUEL)
-            .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
+                .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.CLIMB),
+
+            // LEFT LONG FUEL
+            Commands.sequence(
+                    Commands.waitUntil(
+                        () -> DriverStation.isAutonomous() && DriverStation.getMatchTime() <= 2),
+                    Commands.parallel(intake.zeroCommand(), intake()))
+                .onlyIf(
+                    () ->
+                        isLeft
+                            && autoChooser.get() == AutoType.COMPETITION
+                            && sweepModeChooser.get() == SweepMode.LONG
+                            && endBehaviourChooser.get() == EndBehaviour.FUEL)
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)));
     // .beforeStarting(() -> swerve.removeDefaultCommand());
   }
 
