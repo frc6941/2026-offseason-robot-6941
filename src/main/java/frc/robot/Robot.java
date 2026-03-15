@@ -16,96 +16,97 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
-    Timer m_gcTimer = new Timer();
-    private Command autonomousCommand;
-    private RobotContainer robotContainer;
+  Timer m_gcTimer = new Timer();
+  private Command autonomousCommand;
+  private RobotContainer robotContainer;
 
-    public Robot() {
-        super(RobotConstants.LOOPER_DT);
-        m_gcTimer.start();
+  public Robot() {
+    super(RobotConstants.LOOPER_DT);
+    m_gcTimer.start();
+  }
+
+  @Override
+  public void robotInit() {
+    // logger initialization
+    // if (Robot.isSimulation())
+    Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
+    Logger.addDataReceiver(new WPILOGWriter());
+
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.start();
+
+    // config watchdog
+    try {
+      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+      watchdogField.setAccessible(true);
+      Watchdog watchdog = (Watchdog) watchdogField.get(this);
+      watchdog.setTimeout(0.2);
+    } catch (Exception e) {
+      DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
     }
+    CommandScheduler.getInstance().setPeriod(0.2);
 
-    @Override
-    public void robotInit() {
-        // logger initialization
-        if (Robot.isSimulation()) Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
-        Logger.addDataReceiver(new WPILOGWriter());
+    robotContainer = new RobotContainer();
 
-        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-        Logger.start();
+    // elastic
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
-        // config watchdog
-        try {
-            Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
-            watchdogField.setAccessible(true);
-            Watchdog watchdog = (Watchdog) watchdogField.get(this);
-            watchdog.setTimeout(0.2);
-        } catch (Exception e) {
-            DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
-        }
-        CommandScheduler.getInstance().setPeriod(0.2);
+    // warm-up path-following
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+  }
 
-        robotContainer = new RobotContainer();
+  @Override
+  public void robotPeriodic() {
+    robotContainer.robotPeriodic();
+    CommandScheduler.getInstance().run();
+  }
 
-        // elastic
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+  @Override
+  public void disabledInit() {}
 
-        // warm-up path-following
-        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+  @Override
+  public void disabledPeriodic() {}
+
+  @Override
+  public void disabledExit() {}
+
+  @Override
+  public void autonomousInit() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
+
+    if (autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(autonomousCommand);
     }
+  }
 
-    @Override
-    public void robotPeriodic() {
-        robotContainer.robotPeriodic();
-        CommandScheduler.getInstance().run();
+  @Override
+  public void autonomousPeriodic() {}
+
+  @Override
+  public void autonomousExit() {}
+
+  @Override
+  public void teleopInit() {
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
+    CommandScheduler.getInstance().cancelAll();
+  }
 
-    @Override
-    public void disabledInit() {}
+  @Override
+  public void teleopPeriodic() {}
 
-    @Override
-    public void disabledPeriodic() {}
+  @Override
+  public void teleopExit() {}
 
-    @Override
-    public void disabledExit() {}
+  @Override
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
-    @Override
-    public void autonomousInit() {
-        autonomousCommand = robotContainer.getAutonomousCommand();
+  @Override
+  public void testPeriodic() {}
 
-        if (autonomousCommand != null) {
-            CommandScheduler.getInstance().schedule(autonomousCommand);
-        }
-    }
-
-    @Override
-    public void autonomousPeriodic() {}
-
-    @Override
-    public void autonomousExit() {}
-
-    @Override
-    public void teleopInit() {
-        if (autonomousCommand != null) {
-            autonomousCommand.cancel();
-        }
-        CommandScheduler.getInstance().cancelAll();
-    }
-
-    @Override
-    public void teleopPeriodic() {}
-
-    @Override
-    public void teleopExit() {}
-
-    @Override
-    public void testInit() {
-        CommandScheduler.getInstance().cancelAll();
-    }
-
-    @Override
-    public void testPeriodic() {}
-
-    @Override
-    public void testExit() {}
+  @Override
+  public void testExit() {}
 }
