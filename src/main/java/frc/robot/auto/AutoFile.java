@@ -5,6 +5,7 @@ import static frc.robot.auto.AutoRoutines.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -162,7 +163,15 @@ public class AutoFile {
                                 shoot().withTimeout(20))),
                         climbed().alongWith(shoot()))
                     .onlyIf(() -> endBehaviourChooser.get() == EndBehaviour.CLIMB)),
+            Commands.sequence(
+                    Commands.waitUntil(()-> DriverStation.isAutonomous() && DriverStation.getMatchTime()<=2),
             Commands.parallel(intake.zeroCommand(), intake()))
+        .onlyIf(
+            () ->
+                isLeft
+                    && autoChooser.get() == AutoType.COMPETITION
+                    && sweepModeChooser.get() == SweepMode.LONG
+                    && endBehaviourChooser.get() == EndBehaviour.FUEL)
         .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
     // .beforeStarting(() -> swerve.removeDefaultCommand());
   }
