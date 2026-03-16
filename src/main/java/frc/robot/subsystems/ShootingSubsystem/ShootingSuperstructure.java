@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -30,7 +31,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
+    @Getter private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final SpindexerSubsystem idx;
     @Getter private boolean isShooting = false;
 
@@ -68,13 +69,21 @@ public class ShootingSuperstructure {
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())));
         hood.setDefaultCommand(
-                hood.runPosition(() -> RobotStateRecorder.getCmdFrame().hoodAngle()));
+                hood.runPosition(
+                        () ->
+                                Degrees.of(
+                                        MathUtil.clamp(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .hoodAngle()
+                                                        .in(Degrees),
+                                                0,
+                                                51))));
     }
 
     public Command shootWhenReady(boolean forceFeed) {
         return Commands.parallel(
                 runFrame(),
-                Commands.waitUntil(() -> shooter.velocityAtGoal())
+                Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
                                 idx.runState(
@@ -91,7 +100,15 @@ public class ShootingSuperstructure {
         return Commands.parallel(
                 turret.setTurretPoseWorld(
                         () -> RobotStateRecorder.getCmdFrame().turretAngleWorld()),
-                hood.runPosition(() -> RobotStateRecorder.getCmdFrame().hoodAngle()),
+                hood.runPosition(
+                        () ->
+                                Degrees.of(
+                                        MathUtil.clamp(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .hoodAngle()
+                                                        .in(Degrees),
+                                                0,
+                                                51))),
                 shooter.runVelVolt(
                         () -> {
                             ShotFrame frame = RobotStateRecorder.getCmdFrame();
@@ -176,6 +193,20 @@ public class ShootingSuperstructure {
                             : RobotStateRecorder.kFrameFeedDown;
             return RobotStateRecorder.getTranslationShotToTargetCurrent(feedFrame).getNorm();
         }
+    }
+
+    public Command runSetFrame() {
+        return Commands.parallel(
+                turret.runTurretToZero(),
+                hood.runPosition(() -> Degrees.of(19)),
+                idx.runState(() -> IdxMode.FEED),
+                shooter.runVelVolt(
+                        () -> {
+                            ShotFrame frame = RobotStateRecorder.getCmdFrame();
+                            Angle bba = Degrees.of(77);
+                            double rpm = computeRpm(MetersPerSecond.of(6), bba);
+                            return RotationsPerSecond.of(rpm / 60.0);
+                        }));
     }
 
     public enum IdxMode {

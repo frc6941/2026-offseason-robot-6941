@@ -1,11 +1,6 @@
 package frc.robot.auto;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
@@ -26,10 +21,7 @@ import frc.robot.FieldConstants;
 import frc.robot.Robot;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
-import frc.robot.subsystems.Configs.AutoParamsNT;
-import frc.robot.subsystems.Configs.ClimberParamsNT;
-import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
+import frc.robot.subsystems.Configs.*;
 import frc.robot.subsystems.IntakerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
@@ -40,6 +32,7 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
+import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
@@ -72,7 +65,8 @@ public class AutoActions {
     public static final Pose2d kStationIntake =
             new Pose2d(0.59, 0.72, new Rotation2d(Degrees.of(180)));
 
-    public static final Pose2d kDepotIntake = new Pose2d(0.59, 6, new Rotation2d(Degrees.of(180)));
+    public static final Pose2d kDepotIntake =
+            new Pose2d(1.013, 5.987, new Rotation2d(Degrees.of(180)));
 
     public static final Pose2d kQuickSweepEndPoseL =
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
@@ -91,26 +85,29 @@ public class AutoActions {
     public static final double kTestRotationAPose = 1;
     public static final Rotation2d kTestRotationB = new Rotation2d(Degrees.of(45));
     public static final double kTestRotationBPose = 2;
-
+    public static IntakerSubsystem intake;
+    public static ShootingSuperstructure shootingSuperstructure;
     private static Swerve swerve;
-    private static ShootingSuperstructure shooter;
-
     private static ShotCalculator shotCalculator;
-    private static IntakerSubsystem intake;
-
+    private static VelocityMotorSubsystem shooter;
     private static PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
+    private static PositionMotorSubsystem intakerExtension;
 
     public static void init(
             Swerve swerve,
             ShootingSuperstructure shooterSS,
             ShotCalculator shotCalculator,
             IntakerSubsystem intake,
-            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber) {
+            PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber,
+            VelocityMotorSubsystem shooter,
+            PositionMotorSubsystem intakerExtension) {
         AutoActions.swerve = swerve;
-        AutoActions.shooter = shooterSS;
+        AutoActions.shootingSuperstructure = shooterSS;
         AutoActions.shotCalculator = shotCalculator;
         AutoActions.intake = intake;
         AutoActions.climber = climber;
+        AutoActions.shooter = shooter;
+        AutoActions.intakerExtension = intakerExtension;
     }
 
     static Command drivePastSlope(boolean isLeft, boolean isToNeutral) {
@@ -162,7 +159,7 @@ public class AutoActions {
     }
 
     public static Command zeroEverything() {
-        return Commands.parallel(shooter.runZero(), intake.zeroCommand());
+        return Commands.parallel(shootingSuperstructure.runZero(), intake.zeroCommand());
     }
 
     public static boolean hasCrossedBump(boolean isToNeutral) {
@@ -183,9 +180,9 @@ public class AutoActions {
                     Pose2d targetPose = targetPoseSupplier.get();
                     return new SwerveDriveToPose(
                                     swerve,
-                                    () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
+                                    RobotStateRecorder::getPoseWorldRobotCurrent,
                                     () -> new Pose3d(targetPose),
-                                    () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                                    RobotStateRecorder::getVelocityWorldRobotCurrent,
                                     new PIDController(
                                             AutoParamsNT.AutoPoseParams.kpStrave.getValue(),
                                             AutoParamsNT.AutoPoseParams.kiStrave.getValue(),
@@ -244,8 +241,8 @@ public class AutoActions {
             double shiftLat) {
         return new SwerveDriveToAllign(
                         swerve,
-                        () -> RobotStateRecorder.getPoseWorldRobotCurrent(),
-                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent(),
+                        RobotStateRecorder::getPoseWorldRobotCurrent,
+                        RobotStateRecorder::getVelocityWorldRobotCurrent,
                         () -> targetPose,
                         shiftingDirectionSupplier,
                         swerve.getSwerveLimit(),
@@ -271,7 +268,6 @@ public class AutoActions {
                             if (vel != null) {
                                 Logger.recordOutput("Temp/", vel);
                             }
-                            ;
                         },
                         new PPHolonomicDriveController(
                                 new PIDConstants(
@@ -351,7 +347,16 @@ public class AutoActions {
     }
 
     public static Command shoot() {
-        return shooter.shootWhenReady(false);
+        return shootingSuperstructure.shootWhenReady(false);
+        // return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
+    }
+
+    public static Command shooterDefault() {
+        return Commands.defer(
+                () ->
+                        shooter.runVelVolt(
+                                () -> RotationsPerSecond.of(ShooterParamsNT.idleVelRPS.getValue())),
+                Collections.emptySet());
     }
 
     // Helpermethod
@@ -387,9 +392,9 @@ public class AutoActions {
                     } catch (java.io.IOException | org.json.simple.parser.ParseException e) {
                         throw new RuntimeException("Failed to load path file: " + pathName, e);
                     }
+                    path = shouldMirror ? path.mirrorPath() : path;
                     if (AllianceFlipUtil.shouldFlip()) {
                         path = path.flipPath();
-                        path = shouldMirror ? path.mirrorPath() : path;
                     }
                     return followPath(path);
                 });
@@ -405,12 +410,11 @@ public class AutoActions {
         return SwerveCommands.reset(swerve, resetPose)
                 .alongWith(
                         Commands.runOnce(
-                                () -> {
-                                    RobotStateRecorder.getInstance()
-                                            .resetTransform(
-                                                    TransformRecorder.kFrameWorld,
-                                                    TransformRecorder.kFrameRobot);
-                                }))
+                                () ->
+                                        RobotStateRecorder.getInstance()
+                                                .resetTransform(
+                                                        TransformRecorder.kFrameWorld,
+                                                        TransformRecorder.kFrameRobot)))
                 .onlyIf(Robot::isSimulation)
                 .ignoringDisable(true);
     }

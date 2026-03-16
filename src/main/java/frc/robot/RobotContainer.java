@@ -9,7 +9,6 @@ import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 import static frc.robot.RobotConstants.is10541;
-import static frc.robot.auto.AutoActions.intake;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -21,11 +20,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoActions;
 import frc.robot.auto.AutoFile;
@@ -37,8 +35,10 @@ import frc.robot.subsystems.ShootingSubsystem.ShotCalculator;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.SpindexerSubsystem;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem;
+import frc.robot.utils.HubShiftUtil;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -65,6 +65,7 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import lib.ironpulse.utils.PhoenixUtils;
 import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
+import org.littletonrobotics.junction.Logger;
 
 @SuppressWarnings("rawtypes")
 public class RobotContainer {
@@ -76,12 +77,12 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
-    private static final boolean HAS_CLIMBER_IO = is10541 ? false : true;
+    private static final boolean HAS_CLIMBER_IO = !is10541;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
     private final CommandXboxController driver = new CommandXboxController(0);
-    private final CommandXboxController oprator = new CommandXboxController(1);
+    private final CommandXboxController operator = new CommandXboxController(1);
     private final ShotCalculator shotCalculator = new ShotCalculator();
     private final Swerve swerve;
     private final TurretSubsystem turret;
@@ -94,11 +95,15 @@ public class RobotContainer {
     private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
-    private final AutoFile autoFile;
     private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
     public RobotContainer() {
+
+        RobotModeTriggers.teleop().onTrue(Commands.runOnce(HubShiftUtil::initialize));
+        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(HubShiftUtil::initialize));
+        RobotModeTriggers.disabled()
+                .onTrue(Commands.runOnce(HubShiftUtil::initialize).ignoringDisable(true));
         FieldView.Init();
         SignalLogger.enableAutoLogging(false);
         final boolean isReal = RobotBase.isReal();
@@ -129,11 +134,16 @@ public class RobotContainer {
 
         shootingSuperstructure = new ShootingSuperstructure(turret, hood, shooter, spindexer);
         intake = new IntakerSubsystem(intakerRoller, intakerExtension);
-        AutoActions.init(swerve, shootingSuperstructure, shotCalculator, intake, climber);
-        AutoRoutines.init(swerve);
+        AutoActions.init(
+                swerve,
+                shootingSuperstructure,
+                shotCalculator,
+                intake,
+                climber,
+                shooter,
+                intakerExtension);
+        AutoRoutines.init(swerve, shooter, spindexer, intakerExtension);
         AutoFile.init();
-        autoFile = new AutoFile();
-
         configureBindings();
         shootingSuperstructure.setDefaultCommand();
         swerve.setDefaultCommand(
@@ -222,21 +232,68 @@ public class RobotContainer {
             FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_3g");
             FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_B), "LL_4");
         }
+
+        Logger.recordOutput(
+                "Competition/isHubActive", HubShiftUtil.getOfficialShiftInfo().active());
+        Logger.recordOutput(
+                "Competition/Hub Phase",
+                HubShiftUtil.getOfficialShiftInfo().currentShift().toString());
+        Logger.recordOutput(
+                "Competition/Hub Remaining", HubShiftUtil.getOfficialShiftInfo().remainingTime());
+        SmartDashboard.putBoolean(
+                "Competition/isHubActive", HubShiftUtil.getOfficialShiftInfo().active());
+        SmartDashboard.putString(
+                "Competition/Hub Phase",
+                HubShiftUtil.getOfficialShiftInfo().currentShift().toString());
+        SmartDashboard.putNumber(
+                "Competition/Hub Remaining", HubShiftUtil.getOfficialShiftInfo().remainingTime());
     }
 
     private void configureBindings() {
+        operator.x() // L win
+                .onTrue(
+                        Commands.runOnce(
+                                        () -> {
+                                            HubShiftUtil.setAllianceWinOverride(
+                                                    () -> Optional.of(true));
+                                            Logger.recordOutput("Competition/AutoResultSent", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultSent", true);
+                                            Logger.recordOutput("Competition/AutoResultWin", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultWin", true);
+                                        })
+                                .ignoringDisable(true));
+        operator.b() // R lose
+                .onTrue(
+                        Commands.runOnce(
+                                        () -> {
+                                            HubShiftUtil.setAllianceWinOverride(
+                                                    () -> Optional.of(false));
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultSent", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultSent", true);
+                                            Logger.recordOutput("Competition/AutoResultWin", false);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultWin", false);
+                                        })
+                                .ignoringDisable(true));
         driver.leftTrigger().onTrue(intake.toggleIntake());
-        oprator.leftBumper().whileTrue(intake.runFeed());
+        operator.leftBumper().whileTrue(intake.runFeed());
+        driver.leftBumper().onTrue(intake.outZeroCommand());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
-        oprator.povUp().whileTrue(AutoActions.climbUp());
-        oprator.povDown().whileTrue(AutoActions.climbed());
-        oprator.back().onTrue(AutoActions.climbDown());
+        operator.povUp().whileTrue(AutoActions.climbUp());
+        operator.povDown().whileTrue(AutoActions.climbed());
+        operator.back().onTrue(AutoActions.climbDown());
+        operator.a().onTrue(shootingSuperstructure.runZero());
+        operator.y().whileTrue(shootingSuperstructure.runSetFrame());
 
-        // driver.povLeft().onTrue(intake.zeroCommand());
+        driver.povLeft().onTrue(intake.zeroCommand());
 
-        oprator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
-        oprator.rightTrigger()
+        operator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
+        operator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady(false)
@@ -254,7 +311,7 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
-        oprator.rightBumper().whileTrue(intake.runExtendedReverse());
+        operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
         driver.rightTrigger()
                 .whileTrue(
@@ -354,8 +411,6 @@ public class RobotContainer {
         //                         Degrees.of(2)));
 
         driver.a().whileTrue(AutoActions.allignToClimb(false));
-        driver.x().onTrue(AutoRoutines.rightLongFuel());
-        driver.b().whileTrue(AutoActions.followPathFile("longSweepRight", true));
 
         new Trigger(DriverStation::isEnabled)
                 .onTrue(
@@ -372,20 +427,26 @@ public class RobotContainer {
         // Swerve
         driver.start()
                 .onTrue(
-                        SwerveCommands.resetAngle(
-                                        swerve,
-                                        () ->
-                                                AllianceFlipUtil.shouldFlip()
-                                                        ? Rotation2d.k180deg
-                                                        : Rotation2d.kZero)
-                                .alongWith(
+                        Commands.sequence(
+                                        SwerveCommands.resetAngle(
+                                                        swerve,
+                                                        () ->
+                                                                AllianceFlipUtil.shouldFlip()
+                                                                        ? Rotation2d.k180deg
+                                                                        : Rotation2d.kZero)
+                                                .alongWith(
+                                                        Commands.runOnce(
+                                                                () -> {
+                                                                    RobotStateRecorder.getInstance()
+                                                                            .resetTransform(
+                                                                                    TransformRecorder
+                                                                                            .kFrameWorld,
+                                                                                    TransformRecorder
+                                                                                            .kFrameRobot);
+                                                                })),
                                         Commands.runOnce(
-                                                () -> {
-                                                    RobotStateRecorder.getInstance()
-                                                            .resetTransform(
-                                                                    TransformRecorder.kFrameWorld,
-                                                                    TransformRecorder.kFrameRobot);
-                                                }),
+                                                limelightSubsystem::requestInternalIMUReseedAll))
+                                .alongWith(
                                         indicatorSubsystem.indicateWithTimeout(
                                                 Patterns.RESET_ODOM, 1))
                                 .ignoringDisable(true));
@@ -556,5 +617,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return AutoFile.buildAuto();
+        // return AutoRoutines.rightLongFuel();
     }
 }

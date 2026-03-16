@@ -17,11 +17,8 @@ public class IntakeConfig {
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
-    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 45;
-    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 40;
-    private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
-    private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
-
+    private static final double INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 60;
+    private static final double INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 55;
     public static final SubsystemConfig INTAKER_ROLLER_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_ROLLER_NAME)
@@ -38,6 +35,8 @@ public class IntakeConfig {
                                     .gearRatio(INTAKER_ROLLER_GEAR_RATIO)
                                     .build())
                     .build();
+    private static final double INTAKER_EXTENSION_STATOR_CURRENT_LIMIT_AMPS = 35;
+    private static final double INTAKER_EXTENSION_SUPPLY_CURRENT_LIMIT_AMPS = 20;
     public static final SubsystemConfig INTAKER_EXTENSION_CONFIG =
             SubsystemConfig.builder()
                     .name(INTAKER_EXTENSION_NAME)
@@ -103,7 +102,7 @@ public class IntakeConfig {
         public static final double retractPosMeters = 0.01;
 
         /** Oscillation rate (Hz) for runFeed: deploy <-> feed cycles per second */
-        public static final double feedOscillationRateHz = 5;
+        public static final double feedOscillationRateHz = 2;
 
         public static final boolean isBrake = false;
     }

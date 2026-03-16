@@ -8,9 +8,9 @@ import static frc.robot.RobotConstants.is10541;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Robot;
 import frc.robot.subsystems.Configs.IntakeConfig;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
@@ -22,20 +22,13 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
-public class IntakerSubsystem {
+public class IntakerSubsystem extends SubsystemBase {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
     private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension;
-
+    private Timer zeroTimer = new Timer();
     private double currentFilterValue = 0.0;
     private LinearFilter currentFilter;
-
-    public enum IntakeMode {
-        INTAKING,
-        EXTENDED_IDLE,
-        RETRACTED,
-        FEEDING,
-        EXTENDED_REVERSE
-    }
+    private boolean autoOutZeroRunning = false;
 
     @Getter
     @AutoLogOutput(key = "IntakerRoller/state")
@@ -49,6 +42,13 @@ public class IntakerSubsystem {
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension) {
         this.roller = roller;
         this.extension = extension;
+    }
+
+    private boolean isDeployMode() {
+        return (currentMode == IntakeMode.INTAKING
+                        || currentMode == IntakeMode.EXTENDED_IDLE
+                        || currentMode == IntakeMode.EXTENDED_REVERSE)
+                && !RobotState.isAutonomous();
     }
 
     public void setDefaultCommand() {
@@ -88,26 +88,19 @@ public class IntakerSubsystem {
                         .repeatedly());
         extension.setDefaultCommand(
                 extension.runMotionMagic(
-                        () -> {
-                            switch (currentMode) {
-                                case INTAKING:
-                                    return Meters.of(
+                        () ->
+                                switch (currentMode) {
+                                    case INTAKING -> Meters.of(
                                             IntakerExtensionParamsNT.deployPosMeters.getValue());
-                                case EXTENDED_IDLE:
-                                case EXTENDED_REVERSE:
-                                    return Meters.of(
+                                    case EXTENDED_IDLE, EXTENDED_REVERSE -> Meters.of(
                                             IntakerExtensionParamsNT.deployPosMeters.getValue());
-                                case RETRACTED:
-                                    return Meters.of(
+                                    case RETRACTED -> Meters.of(
                                             IntakerExtensionParamsNT.retractPosMeters.getValue());
-                                case FEEDING:
-                                    return Meters.of(
+                                    case FEEDING -> Meters.of(
                                             IntakerExtensionParamsNT.feedPosMeters.getValue());
-                                default:
-                                    return Meters.of(
+                                    default -> Meters.of(
                                             IntakerExtensionParamsNT.retractPosMeters.getValue());
-                            }
-                        }));
+                                }));
     }
 
     public Command runIntake() {
@@ -219,37 +212,82 @@ public class IntakerSubsystem {
                                 extension)
                         .andThen(
                                 Commands.deadline(
-                                        Commands.run(
-                                                        () ->
-                                                                currentFilterValue =
-                                                                        currentFilter.calculate(
-                                                                                extension
-                                                                                        .getStatorCurrent()
-                                                                                        .in(Amps)))
-                                                .until(
-                                                        () ->
-                                                                Math.abs(currentFilterValue)
-                                                                        > IntakeConfig
-                                                                                .INTAKER_EXTENSION_CONFIG
-                                                                                .zeroingConfig
-                                                                                .zeroingCurrentLimit),
-                                        extension.runVoltage(() -> zeroVoltage)))
-                        .andThen(
-                                Commands.runOnce(
-                                        () ->
-                                                extension.setCurrPos(
-                                                        Meters.of(is10541 ? 0.315766 : 0.316)),
-                                        extension));
+                                                Commands.run(
+                                                                () ->
+                                                                        currentFilterValue =
+                                                                                currentFilter
+                                                                                        .calculate(
+                                                                                                extension
+                                                                                                        .getStatorCurrent()
+                                                                                                        .in(
+                                                                                                                Amps)))
+                                                        .until(
+                                                                () ->
+                                                                        Math.abs(currentFilterValue)
+                                                                                >= IntakeConfig
+                                                                                        .INTAKER_EXTENSION_CONFIG
+                                                                                        .zeroingConfig
+                                                                                        .zeroingCurrentLimit),
+                                                extension.runVoltage(() -> zeroVoltage))
+                                        .finallyDo(
+                                                interrupted -> {
+                                                    if (!interrupted) {
+                                                        extension.setCurrPos(
+                                                                Meters.of(
+                                                                        is10541
+                                                                                ? 0.315766
+                                                                                : 0.307895));
+                                                    }
+                                                })
+                                        .onlyWhile(this::isDeployMode));
 
         Command simZero =
-                Commands.runOnce(
-                        () ->
-                                extension.setCurrPos(
-                                        Meters.of(
-                                                IntakerExtensionParamsNT.deployPosMeters
-                                                        .getValue())),
-                        extension);
+                Commands.sequence(
+                        Commands.runOnce(
+                                () ->
+                                        extension.setCurrPos(
+                                                Meters.of(is10541 ? 0.315766 : 0.307895))),
+                        new WaitCommand(0.2),
+                        Commands.runOnce(
+                                () ->
+                                        extension.setCurrPos(
+                                                Meters.of(
+                                                        IntakerExtensionParamsNT.deployPosMeters
+                                                                .getValue()))));
 
-        return new ConditionalCommand(realZero, simZero, Robot::isReal);
+        return new ConditionalCommand(realZero, simZero, Robot::isReal)
+                .finallyDo(
+                        () -> {
+                            extension.setEnableSoftLimits(true, true);
+                            autoOutZeroRunning = false;
+                            zeroTimer.restart();
+                        });
+    }
+
+    @Override
+    public void periodic() {
+        if (!isDeployMode()) {
+            zeroTimer.stop();
+            zeroTimer.reset();
+        } else if (!zeroTimer.isRunning()) {
+            zeroTimer.start();
+        }
+        if (!autoOutZeroRunning && zeroTimer.hasElapsed(2.0)) {
+            autoOutZeroRunning = true;
+            CommandScheduler.getInstance()
+                    .schedule(
+                            outZeroCommand()
+                                    .withInterruptBehavior(
+                                            Command.InterruptionBehavior.kCancelSelf));
+            zeroTimer.restart();
+        }
+    }
+
+    public enum IntakeMode {
+        INTAKING,
+        EXTENDED_IDLE,
+        RETRACTED,
+        FEEDING,
+        EXTENDED_REVERSE
     }
 }

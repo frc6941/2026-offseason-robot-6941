@@ -5,10 +5,13 @@ import static frc.robot.auto.AutoRoutines.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -38,10 +41,15 @@ public class AutoFile {
             new Alert(
                     "Auto configuration is invalid, fallback to Command.None()",
                     Alert.AlertType.kError);
+    private static final Alert nullConfigAlert =
+            new Alert(
+                    "Auto configuration is null, fallback to Command.None()",
+                    Alert.AlertType.kError);
 
     private static <E extends Enum<E>> void initializeChooser(
-            LoggedDashboardChooser<E> chooser, E[] values) {
+            LoggedDashboardChooser<E> chooser, E[] values, E defaultValue) {
         chooser.onChange((value) -> verifyOption());
+        chooser.addDefaultOption(defaultValue.toString(), defaultValue);
         for (E e : values) {
             chooser.addOption(e.toString(), e);
         }
@@ -49,10 +57,10 @@ public class AutoFile {
 
     public static void init() {
         initializeAutoPaths();
-        initializeChooser(autoChooser, AutoType.values());
-        initializeChooser(sideChooser, AutoSide.values());
-        initializeChooser(endBehaviourChooser, EndBehaviour.values());
-        initializeChooser(sweepModeChooser, SweepMode.values());
+        initializeChooser(autoChooser, AutoType.values(), AutoType.COMPETITION);
+        initializeChooser(sideChooser, AutoSide.values(), AutoSide.RIGHT);
+        initializeChooser(endBehaviourChooser, EndBehaviour.values(), EndBehaviour.FUEL);
+        initializeChooser(sweepModeChooser, SweepMode.values(), SweepMode.LONG);
     }
 
     private static void initializeAutoPaths() {
@@ -81,13 +89,34 @@ public class AutoFile {
     }
 
     public static Command buildAuto() {
-        return switch (autoChooser.get()) {
+
+        AutoType selected = autoChooser.get();
+        if (selected == null) {
+            invalidConfigAlert.set(true);
+            return Commands.none();
+        }
+
+        return switch (selected) {
             case TEST -> buildTest();
             case COMPETITION -> buildCompetition();
+            case SHOOT -> Commands.defer(
+                    () -> shootingSuperstructure.shootWhenReady(false),
+                    Collections.singleton(shooter));
         };
     }
 
     private static void verifyOption() {
+        if (autoChooser.get() == null
+                || sweepModeChooser.get() == null
+                || endBehaviourChooser.get() == null
+                || sideChooser.get() == null) {
+            nullConfigAlert.set(true);
+            SmartDashboard.putBoolean("Auto/Verified", false);
+            return;
+        } else {
+            nullConfigAlert.set(false);
+        }
+
         if (autoChooser.get() == AutoType.COMPETITION) {
             competitionNotSelectedAlert.set(false);
             invalidConfigAlert.set(
@@ -97,6 +126,8 @@ public class AutoFile {
             competitionNotSelectedAlert.set(true);
             invalidConfigAlert.set(false);
         }
+        SmartDashboard.putBoolean(
+                "Auto/Verified", !invalidConfigAlert.get() && !competitionNotSelectedAlert.get());
     }
 
     private static Command buildCompetition() {
@@ -108,16 +139,22 @@ public class AutoFile {
                     case LONG -> "longSweepRight";
                     case NORMAL -> "sweepRight";
                 };
-        return Commands.defer(
-                () ->
+
+        return Commands.parallel(
+                        // shooterDefault(),
                         Commands.sequence(
-                                // Sweep phase - 移除无用的 deadline 和 none()
-                                drivePastSlope(isLeft, true),
+                                // Sweep
+                                Commands.deadline(
+                                        drivePastSlope(isLeft, true),
+                                        Commands.defer(
+                                                AutoActions::zeroEverything,
+                                                Collections.emptySet())),
                                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                                 drivePastSlope(isLeft, false),
-                                // zeroEverything(),
 
-                                Commands.deadline(
+                                // FUEL
+                                Commands.parallel(
+                                                shoot(),
                                                 new ConditionalCommand(
                                                         Commands.deadline(
                                                                 allignToDepot(),
@@ -126,33 +163,59 @@ public class AutoFile {
                                                                 allignToStation(),
                                                                 oscillateIntakeFeed()),
                                                         () -> isLeft),
-                                                shoot().withTimeout(20))
+                                                new WaitUntilCommand(
+                                                                () ->
+                                                                        isLeft
+                                                                                && autoChooser.get()
+                                                                                        == AutoType
+                                                                                                .COMPETITION
+                                                                                && sweepModeChooser
+                                                                                                .get()
+                                                                                        == SweepMode
+                                                                                                .LONG
+                                                                                && endBehaviourChooser
+                                                                                                .get()
+                                                                                        == EndBehaviour
+                                                                                                .FUEL
+                                                                                && DriverStation
+                                                                                        .isAutonomous()
+                                                                                && DriverStation
+                                                                                                .getMatchTime()
+                                                                                        <= 2)
+                                                        .andThen(
+                                                                Commands.parallel(
+                                                                        Commands.defer(
+                                                                                intake::zeroCommand,
+                                                                                Collections
+                                                                                        .emptySet()),
+                                                                        intake())))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
                                                                 == EndBehaviour.FUEL),
-                                Commands.deadline(
-                                                allignToClimb(isLeft),
-                                                Commands.parallel(
-                                                        oscillateIntakeFeed().withTimeout(20),
-                                                        climbUp(),
-                                                        shoot().withTimeout(20)))
+
+                                // CLIMB
+                                Commands.sequence(
+                                                Commands.deadline(
+                                                        allignToClimb(isLeft),
+                                                        Commands.parallel(
+                                                                oscillateIntakeFeed()
+                                                                        .withTimeout(20),
+                                                                climbUp(),
+                                                                shoot().withTimeout(20))),
+                                                climbed().alongWith(shoot()))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
-                                                                == EndBehaviour.CLIMB),
-                                climbed()
-                                        .alongWith(shoot())
-                                        .onlyIf(
-                                                () ->
-                                                        endBehaviourChooser.get()
-                                                                == EndBehaviour.CLIMB)),
-                Collections.singleton(swerve));
+                                                                == EndBehaviour.CLIMB)))
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+        // .beforeStarting(() -> swerve.removeDefaultCommand());
     }
 
     private enum AutoType {
         COMPETITION,
-        TEST
+        TEST,
+        SHOOT
     }
 
     private enum AutoSide {

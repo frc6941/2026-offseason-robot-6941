@@ -244,7 +244,7 @@ public class PositionMotorSubsystem<
                                                                         > config.zeroingConfig
                                                                                 .zeroingCurrentLimit),
                                         runVoltage(() -> zeroVoltage)))
-                        .andThen(Commands.runOnce(() -> io.setCurrentPositionAsZero(), this))
+                        .andThen(Commands.runOnce(io::setCurrentPositionAsZero, this))
                         .finallyDo(
                                 () -> {
                                     mode = ControlMode.VOLTAGE;
@@ -253,7 +253,7 @@ public class PositionMotorSubsystem<
                                     io.setEnableSoftLimits(true, true);
                                 });
 
-        Command simZero = Commands.runOnce(() -> io.setCurrentPositionAsZero(), this);
+        Command simZero = Commands.runOnce(io::setCurrentPositionAsZero, this);
 
         return new ConditionalCommand(realZero, simZero, Robot::isReal);
     }
