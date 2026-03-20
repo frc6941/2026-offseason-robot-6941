@@ -11,6 +11,7 @@ import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 import static frc.robot.RobotConstants.is10541;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -495,10 +496,13 @@ public class RobotContainer {
                         new LimelightIOReal(
                                 LimeLightConfig.limelightAConfig,
                                 () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .toPose2d()
-                                                .getRotation()
-                                                .getDegrees(),
+                                        MathUtil.inputModulus(
+                                                swerve.imuIOInputs.yawPosition.getDegrees()
+                                                        - 45
+                                                        - 180
+                                                        + 5,
+                                                -180,
+                                                180),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
@@ -514,10 +518,13 @@ public class RobotContainer {
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
                                 () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .toPose2d()
-                                                .getRotation()
-                                                .getDegrees(),
+                                        MathUtil.inputModulus(
+                                                swerve.imuIOInputs.yawPosition.getDegrees()
+                                                        - 45
+                                                        - 180
+                                                        + 5,
+                                                -180,
+                                                180),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
