@@ -13,6 +13,7 @@ public class LimeLightConfig {
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
                     .portToForwardStream(5830)
                     .portToForwardPipeline(5831)
+                    .limeLight4Config(LimelightIOConfig.Limelight4Config.builder().build())
                     .build();
     public static final LimelightIOConfig limelightBConfig =
             LimelightIOConfig.builder()
@@ -57,7 +58,7 @@ public class LimeLightConfig {
         public static final double xStdDev = 0.7;
         public static final double yStdDev = 0.7;
         public static final double zStdDev = 1.0;
-        public static final double angleStdDev = 9999999.0;
+        public static final double angleStdDev = 99999;
         public static final double imuCorrectionReliabilityThreshold = 0.9;
     }
 }
