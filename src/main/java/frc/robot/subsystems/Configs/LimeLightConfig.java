@@ -13,6 +13,7 @@ public class LimeLightConfig {
                     .mountPosition(LimelightIOConfig.MountPosition.ON_ROBOT)
                     .portToForwardStream(5830)
                     .portToForwardPipeline(5831)
+                    .limeLight4Config(LimelightIOConfig.Limelight4Config.builder().build())
                     .build();
     public static final LimelightIOConfig limelightBConfig =
             LimelightIOConfig.builder()

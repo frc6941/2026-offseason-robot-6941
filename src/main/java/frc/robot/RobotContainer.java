@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
-import static frc.robot.RobotConstants.is10541;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -77,7 +76,7 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
-    private static final boolean HAS_CLIMBER_IO = !is10541;
+    private static final boolean HAS_CLIMBER_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
@@ -495,10 +494,10 @@ public class RobotContainer {
                         new LimelightIOReal(
                                 LimeLightConfig.limelightAConfig,
                                 () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .toPose2d()
-                                                .getRotation()
-                                                .getDegrees(),
+                                        swerve.imuIOInputs.odometryYawPositions.length > 0
+                                                ? swerve.imuIOInputs.odometryYawPositions[0]
+                                                        .getDegrees()
+                                                : swerve.imuIOInputs.yawPosition.getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
@@ -514,10 +513,10 @@ public class RobotContainer {
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
                                 () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .toPose2d()
-                                                .getRotation()
-                                                .getDegrees(),
+                                        swerve.imuIOInputs.odometryYawPositions.length > 0
+                                                ? swerve.imuIOInputs.odometryYawPositions[0]
+                                                        .getDegrees()
+                                                : swerve.imuIOInputs.yawPosition.getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()

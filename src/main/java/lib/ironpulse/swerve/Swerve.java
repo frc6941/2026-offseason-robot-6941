@@ -43,7 +43,7 @@ public class Swerve extends SubsystemBase implements Localizable {
     private final SwerveDrivePoseEstimator3d poseEstimator;
     // precomputed
     private final List<Rotation2d> xLockAngles;
-    private final ImuIOInputsAutoLogged imuIOInputs;
+    public final ImuIOInputsAutoLogged imuIOInputs;
     private SwerveSetpoint setpointCurr;
     @Getter private Voltage previouslyAppliedVoltage;
     private MODE mode = MODE.VELOCITY;
