@@ -34,6 +34,8 @@ public class AutoFile {
             new LoggedDashboardChooser<SweepMode>("Sweep Mode Chooser");
     private static final LoggedDashboardChooser<EndBehaviour> endBehaviourChooser =
             new LoggedDashboardChooser<EndBehaviour>("End Behaviour Chooser");
+    private static final LoggedDashboardChooser<Integer> sweepCyclesChooser =
+            new LoggedDashboardChooser<Integer>("Sweep Cycles Chooser");
 
     private static final Alert competitionNotSelectedAlert =
             new Alert("Competition auto is not running", Alert.AlertType.kWarning);
@@ -61,6 +63,11 @@ public class AutoFile {
         initializeChooser(sideChooser, AutoSide.values(), AutoSide.RIGHT);
         initializeChooser(endBehaviourChooser, EndBehaviour.values(), EndBehaviour.FUEL);
         initializeChooser(sweepModeChooser, SweepMode.values(), SweepMode.LONG);
+        
+        // Initialize sweep cycles chooser (only for FAST mode)
+        sweepCyclesChooser.addDefaultOption("1", 1);
+        sweepCyclesChooser.addOption("2", 2);
+        sweepCyclesChooser.addOption("3", 3);
     }
 
     private static void initializeAutoPaths() {
@@ -130,27 +137,58 @@ public class AutoFile {
                 "Auto/Verified", !invalidConfigAlert.get() && !competitionNotSelectedAlert.get());
     }
 
+    /**
+     * Builds a single sweep and shoot cycle.
+     * @param sweepPathName The path to follow for sweeping
+     * @param isLeft Whether this is the left side
+     * @return Command for one sweep/shoot cycle
+     */
+    private static Command buildSweepShootCycle(String sweepPathName, boolean isLeft) {
+        return Commands.sequence(
+                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+                drivePastSlope(isLeft, false),
+                shoot().withTimeout(2.0));
+    }
+
     private static Command buildCompetition() {
         if (invalidConfigAlert.get()) return Commands.none();
         boolean isLeft = sideChooser.get() == AutoSide.LEFT;
+        SweepMode sweepMode = sweepModeChooser.get();
         String sweepPathName =
-                switch (sweepModeChooser.get()) {
+                switch (sweepMode) {
                     case FAST -> "quickSweepRight";
                     case LONG -> "longSweepRight";
                     case NORMAL -> "sweepRight";
                 };
 
+        // Build sweep/shoot cycles for FAST mode
+        Command sweepSequence;
+        if (sweepMode == SweepMode.FAST) {
+            int cycles = sweepCyclesChooser.get() != null ? sweepCyclesChooser.get() : 1;
+            Command[] cycleCommands = new Command[cycles];
+            for (int i = 0; i < cycles; i++) {
+                cycleCommands[i] = buildSweepShootCycle(sweepPathName, isLeft);
+            }
+            sweepSequence = Commands.sequence(cycleCommands);
+        } else {
+            // For LONG and NORMAL modes, use original single sweep logic
+            sweepSequence = Commands.sequence(
+                    Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+                    drivePastSlope(isLeft, false));
+        }
+
         return Commands.parallel(
                         // shooterDefault(),
                         Commands.sequence(
-                                // Sweep
+                                // Initial drive past slope with zeroing
                                 Commands.deadline(
                                         drivePastSlope(isLeft, true),
                                         Commands.defer(
                                                 AutoActions::zeroEverything,
                                                 Collections.emptySet())),
-                                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                                drivePastSlope(isLeft, false),
+                                
+                                // Sweep sequence (single or multiple cycles)
+                                sweepSequence,
 
                                 // FUEL
                                 Commands.parallel(

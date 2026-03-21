@@ -420,7 +420,7 @@ public class RobotContainer {
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
                                 .ignoringDisable(true));
 
         // Swerve
@@ -494,10 +494,10 @@ public class RobotContainer {
                         new LimelightIOReal(
                                 LimeLightConfig.limelightAConfig,
                                 () ->
-                                        swerve.imuIOInputs.odometryYawPositions.length > 0
-                                                ? swerve.imuIOInputs.odometryYawPositions[0]
-                                                        .getDegrees()
-                                                : swerve.imuIOInputs.yawPosition.getDegrees(),
+                                        RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
@@ -513,10 +513,10 @@ public class RobotContainer {
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
                                 () ->
-                                        swerve.imuIOInputs.odometryYawPositions.length > 0
-                                                ? swerve.imuIOInputs.odometryYawPositions[0]
-                                                        .getDegrees()
-                                                : swerve.imuIOInputs.yawPosition.getDegrees(),
+                                        RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
