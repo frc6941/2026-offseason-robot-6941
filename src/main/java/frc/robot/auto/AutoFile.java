@@ -63,7 +63,7 @@ public class AutoFile {
         initializeChooser(sideChooser, AutoSide.values(), AutoSide.RIGHT);
         initializeChooser(endBehaviourChooser, EndBehaviour.values(), EndBehaviour.FUEL);
         initializeChooser(sweepModeChooser, SweepMode.values(), SweepMode.LONG);
-        
+
         // Initialize sweep cycles chooser (only for FAST mode)
         sweepCyclesChooser.addDefaultOption("1", 1);
         sweepCyclesChooser.addOption("2", 2);
@@ -127,8 +127,8 @@ public class AutoFile {
         if (autoChooser.get() == AutoType.COMPETITION) {
             competitionNotSelectedAlert.set(false);
             invalidConfigAlert.set(
-                    sweepModeChooser.get() == SweepMode.LONG
-                            && endBehaviourChooser.get() != EndBehaviour.FUEL);
+                    (sweepModeChooser.get() == SweepMode.LONG
+                            && endBehaviourChooser.get() != EndBehaviour.FUEL));
         } else {
             competitionNotSelectedAlert.set(true);
             invalidConfigAlert.set(false);
@@ -139,6 +139,7 @@ public class AutoFile {
 
     /**
      * Builds a single sweep and shoot cycle.
+     *
      * @param sweepPathName The path to follow for sweeping
      * @param isLeft Whether this is the left side
      * @return Command for one sweep/shoot cycle
@@ -147,7 +148,7 @@ public class AutoFile {
         return Commands.sequence(
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                 drivePastSlope(isLeft, false),
-                shoot().withTimeout(2.0));
+                Commands.deadline(allignToShoot(isLeft), shoot().withTimeout(3.0)));
     }
 
     private static Command buildCompetition() {
@@ -172,9 +173,12 @@ public class AutoFile {
             sweepSequence = Commands.sequence(cycleCommands);
         } else {
             // For LONG and NORMAL modes, use original single sweep logic
-            sweepSequence = Commands.sequence(
-                    Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                    drivePastSlope(isLeft, false));
+            sweepSequence =
+                    Commands.sequence(
+                                    Commands.deadline(
+                                            followPathFile(sweepPathName, isLeft), intake()),
+                                    drivePastSlope(isLeft, false))
+                            .alongWith();
         }
 
         return Commands.parallel(
@@ -186,7 +190,7 @@ public class AutoFile {
                                         Commands.defer(
                                                 AutoActions::zeroEverything,
                                                 Collections.emptySet())),
-                                
+
                                 // Sweep sequence (single or multiple cycles)
                                 sweepSequence,
 
@@ -232,20 +236,18 @@ public class AutoFile {
                                                         endBehaviourChooser.get()
                                                                 == EndBehaviour.FUEL),
 
-                                // CLIMB
+                                // INTAKE
                                 Commands.sequence(
+                                                allignToShoot(isLeft),
+                                                shoot().withTimeout(2.0),
+                                                drivePastSlope(isLeft, false),
                                                 Commands.deadline(
-                                                        allignToClimb(isLeft),
-                                                        Commands.parallel(
-                                                                oscillateIntakeFeed()
-                                                                        .withTimeout(20),
-                                                                climbUp(),
-                                                                shoot().withTimeout(20))),
-                                                climbed().alongWith(shoot()))
+                                                        followPathFile("rightIntake", isLeft),
+                                                        intake()))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()
-                                                                == EndBehaviour.CLIMB)))
+                                                                == EndBehaviour.INTAKE)))
                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
         // .beforeStarting(() -> swerve.removeDefaultCommand());
     }
@@ -268,7 +270,7 @@ public class AutoFile {
     }
 
     private enum EndBehaviour {
-        CLIMB,
+        INTAKE,
         FUEL
     }
 }
