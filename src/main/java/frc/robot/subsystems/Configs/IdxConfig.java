@@ -15,8 +15,9 @@ public class IdxConfig {
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 90;
     public static final double SPINDEXER_GEAR_RATIO =
             is10541
-                    ? 16 / 1 * 30 / 22 * 42 / 20
-                    : 9.0 / 1.0 * 34 / 18 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
+
+                    ? 16.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0
+                    : 9.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     private static final int SPINDEXER_ID = 58;
 
     private static final int SPINDEXER_FOLLOWER_ID = 59;
@@ -51,7 +52,7 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/IdxModes")
     public static final class SpindexerModeParams {
-        public static final double feedRPS = 2.2; // 1.6 for 10541
+        public static final double feedRPS = 3.7; // 1.6 for 10541
 
         public static final double revRPS = -1;
         public static final double idleRPS = 0.0;
@@ -69,7 +70,7 @@ public class IdxConfig {
 
         public static final double unjammTimeoutSec = 0.15;
         public static final double unjammTriggerAmps = 70;
-        public static final double unjammTriggerBelowRps = 1.65; // 1.5 for 10541
+        public static final double unjammTriggerBelowRps = 2.8; // 1.5 for 10541
         public static final double unjammTriggerSec = 0.08;
         public static final double unjammLockoutSec = 0.2;
 
