@@ -62,6 +62,11 @@ public class AutoActions {
     public static final Pose2d kSlopeEndR =
             new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
 
+    public static final Pose2d kSlopeEndLNormal =
+            new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(45)));
+    public static final Pose2d kSlopeEndRNormal =
+            new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(-45)));
+
     public static final Pose2d kStationIntake =
             new Pose2d(0.59, 0.72, new Rotation2d(Degrees.of(180)));
 
@@ -72,6 +77,16 @@ public class AutoActions {
             new Pose2d(8.45, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kQuickSweepEndPoseR =
             new Pose2d(8.45, kVerticalSlopelineR, new Rotation2d(Degrees.of(0)));
+
+    public static final Pose2d kMiddleIntakeL = new Pose2d(7, 5, new Rotation2d(Degrees.of(-90)));
+
+    public static final Pose2d kMiddleIntakeR = new Pose2d(7, 2, new Rotation2d(Degrees.of(90)));
+
+    public static final Pose2d kShootL =
+            new Pose2d(2, kVerticalSlopelineL, new Rotation2d(Degrees.of(-45)));
+
+    public static final Pose2d kShootR =
+            new Pose2d(2, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
 
     public static final Pose2d kclimbL =
             new Pose2d(FieldConstants.fieldLength - 15.15, 4.272, new Rotation2d(Degrees.of(0)));
@@ -125,6 +140,22 @@ public class AutoActions {
                 });
     }
 
+    static Command drivePastSlopeNormal(boolean isLeft, boolean isToNeutral) {
+        return swerve.defer(
+                () -> {
+                    Pose2d slopeFront =
+                            AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
+                    Pose2d slopeEnd =
+                            AllianceFlipUtil.apply(isLeft ? kSlopeEndLNormal : kSlopeEndRNormal);
+                    Pose2d targetPose = isToNeutral ? slopeFront : slopeEnd;
+                    return Commands.deadline(waitCrossedBump(isToNeutral), driveToPose(targetPose))
+                            .beforeStarting(
+                                    () ->
+                                            Logger.recordOutput(
+                                                    "Temp/isPitchStable", isPitchStable()));
+                });
+    }
+
     static Command waitCrossedBump(boolean isToNeutral) {
         return Commands.waitUntil(() -> isPitchStable() && hasCrossedBump(isToNeutral));
     }
@@ -135,6 +166,34 @@ public class AutoActions {
                     Pose2d climbPose = AllianceFlipUtil.apply(isLeft ? kclimbL : kclimbR);
                     return driveToAllign(
                             climbPose, AutoActions::getShiftDirectionTowardBump, 1.2, 0.2);
+                });
+    }
+
+    public static Command allignToStarting(boolean isLeft) {
+        return swerve.defer(
+                () -> {
+                    Pose2d startPose = AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
+                    return driveToAllign(
+                            startPose, AutoActions::getShiftDirectionTowardBump, 1.2, 0.2);
+                });
+    }
+
+    public static Command allignToIntake(boolean isLeft) {
+        return swerve.defer(
+                () -> {
+                    Pose2d intakePose =
+                            AllianceFlipUtil.apply(isLeft ? kMiddleIntakeL : kMiddleIntakeR);
+                    return driveToAllign(
+                            intakePose, AutoActions::getShiftDirectionTowardBump, 1.2, 0.2);
+                });
+    }
+
+    public static Command allignToShoot(boolean isLeft) {
+        return swerve.defer(
+                () -> {
+                    Pose2d shootPose = AllianceFlipUtil.apply(isLeft ? kShootL : kShootR);
+                    return driveToAllign(
+                            shootPose, AutoActions::getShiftDirectionTowardBump, 1.2, 0.2);
                 });
     }
 

@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
-import static frc.robot.RobotConstants.is10541;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
@@ -78,7 +77,7 @@ public class RobotContainer {
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
-    private static final boolean HAS_CLIMBER_IO = !is10541;
+    private static final boolean HAS_CLIMBER_IO = false;
     private final LimelightSubsystem limelightSubsystem;
     private final IntakerSubsystem intake;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> climber;
@@ -280,9 +279,9 @@ public class RobotContainer {
                                                     "Competition/AutoResultWin", false);
                                         })
                                 .ignoringDisable(true));
-        driver.leftTrigger().onTrue(intake.toggleIntake());
+        driver.leftBumper().onTrue(intake.toggleIntake());
         operator.leftBumper().whileTrue(intake.runFeed());
-        driver.leftBumper().onTrue(intake.outZeroCommand());
+        driver.leftTrigger().onTrue(intake.outZeroCommand());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
         operator.povUp().whileTrue(AutoActions.climbUp());
@@ -314,7 +313,7 @@ public class RobotContainer {
                                         }));
         operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
-        driver.rightTrigger()
+        driver.rightBumper()
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady(false)
@@ -422,7 +421,7 @@ public class RobotContainer {
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(false))
+                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
                                 .ignoringDisable(true));
 
         // Swerve

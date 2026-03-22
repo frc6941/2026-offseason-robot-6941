@@ -32,7 +32,7 @@ public class ShootingSuperstructure {
     private final TurretSubsystem turret;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     @Getter private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
-    private final SpindexerSubsystem idx;
+    @Getter private final SpindexerSubsystem idx;
     @Getter private boolean isShooting = false;
 
     public ShootingSuperstructure(
