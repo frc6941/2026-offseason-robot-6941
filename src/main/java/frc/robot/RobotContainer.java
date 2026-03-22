@@ -278,9 +278,9 @@ public class RobotContainer {
                                                     "Competition/AutoResultWin", false);
                                         })
                                 .ignoringDisable(true));
-        driver.leftTrigger().onTrue(intake.toggleIntake());
+        driver.leftBumper().onTrue(intake.toggleIntake());
         operator.leftBumper().whileTrue(intake.runFeed());
-        driver.leftBumper().onTrue(intake.outZeroCommand());
+        driver.leftTrigger().onTrue(intake.outZeroCommand());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
         operator.povUp().whileTrue(AutoActions.climbUp());
@@ -312,7 +312,7 @@ public class RobotContainer {
                                         }));
         operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
-        driver.rightTrigger()
+        driver.rightBumper()
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady(false)

@@ -5,13 +5,14 @@ import static frc.robot.auto.AutoRoutines.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure.IdxMode;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutoFile {
     private static final Map<String, PathPlannerPath> autoPaths = new HashMap<>();
+    private static final Timer autoTimer = new Timer();
 
     @Getter
     private static final LoggedDashboardChooser<AutoType> autoChooser =
@@ -86,17 +88,11 @@ public class AutoFile {
         }
     }
 
-    private static PathPlannerPath getAutoPath(String path) {
-        assert autoPaths.containsKey(path);
-        return autoPaths.get(path);
-    }
-
     public static Command buildTest() {
         return AutoActions.drivePastSlope(false, true);
     }
 
     public static Command buildAuto() {
-
         AutoType selected = autoChooser.get();
         if (selected == null) {
             invalidConfigAlert.set(true);
@@ -126,9 +122,7 @@ public class AutoFile {
 
         if (autoChooser.get() == AutoType.COMPETITION) {
             competitionNotSelectedAlert.set(false);
-            invalidConfigAlert.set(
-                    (sweepModeChooser.get() == SweepMode.LONG
-                            && endBehaviourChooser.get() != EndBehaviour.FUEL));
+            invalidConfigAlert.set(false);
         } else {
             competitionNotSelectedAlert.set(true);
             invalidConfigAlert.set(false);
@@ -148,7 +142,13 @@ public class AutoFile {
         return Commands.sequence(
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                 drivePastSlope(isLeft, false),
-                Commands.deadline(allignToShoot(isLeft), shoot().withTimeout(3.0)));
+                Commands.deadline(allignToShoot(isLeft), shoot().withTimeout(20.0)),
+                allignToStarting(isLeft),
+                Commands.runOnce(() -> {})
+                        .withTimeout(0.1)
+                        .deadlineWith(
+                                shooterDefault(),
+                                shootingSuperstructure.getIdx().runState(() -> IdxMode.OFF)));
     }
 
     private static Command buildCompetition() {
@@ -168,7 +168,17 @@ public class AutoFile {
             int cycles = sweepCyclesChooser.get() != null ? sweepCyclesChooser.get() : 1;
             Command[] cycleCommands = new Command[cycles];
             for (int i = 0; i < cycles; i++) {
-                cycleCommands[i] = buildSweepShootCycle(sweepPathName, isLeft);
+                if (i == cycles - 1) {
+                    // Last cycle: only sweep and drive, no shoot
+                    cycleCommands[i] =
+                            Commands.sequence(
+                                    Commands.deadline(
+                                            followPathFile(sweepPathName, isLeft), intake()),
+                                    drivePastSlope(isLeft, false));
+                } else {
+                    // All other cycles: full sweep/shoot cycle
+                    cycleCommands[i] = buildSweepShootCycle(sweepPathName, isLeft);
+                }
             }
             sweepSequence = Commands.sequence(cycleCommands);
         } else {
@@ -183,6 +193,12 @@ public class AutoFile {
 
         return Commands.parallel(
                         // shooterDefault(),
+                        // Start and run timer in parallel
+                        Commands.runOnce(
+                                () -> {
+                                    autoTimer.reset();
+                                    autoTimer.start();
+                                }),
                         Commands.sequence(
                                 // Initial drive past slope with zeroing
                                 Commands.deadline(
@@ -197,14 +213,21 @@ public class AutoFile {
                                 // FUEL
                                 Commands.parallel(
                                                 shoot(),
-                                                new ConditionalCommand(
+                                                Commands.sequence(
                                                         Commands.deadline(
-                                                                allignToDepot(),
-                                                                oscillateIntakeFeed()),
-                                                        Commands.deadline(
-                                                                allignToStation(),
-                                                                oscillateIntakeFeed()),
-                                                        () -> isLeft),
+                                                                new WaitUntilCommand(
+                                                                        () ->
+                                                                                autoTimer.get()
+                                                                                        >= 17),
+                                                                new ConditionalCommand(
+                                                                        Commands.deadline(
+                                                                                allignToDepot(),
+                                                                                oscillateIntakeFeed()),
+                                                                        Commands.deadline(
+                                                                                allignToStation(),
+                                                                                oscillateIntakeFeed()),
+                                                                        () -> isLeft)),
+                                                        allignToShoot(isLeft)),
                                                 new WaitUntilCommand(
                                                                 () ->
                                                                         isLeft
@@ -219,11 +242,8 @@ public class AutoFile {
                                                                                                 .get()
                                                                                         == EndBehaviour
                                                                                                 .FUEL
-                                                                                && DriverStation
-                                                                                        .isAutonomous()
-                                                                                && DriverStation
-                                                                                                .getMatchTime()
-                                                                                        <= 2)
+                                                                                && autoTimer.get()
+                                                                                        >= 18)
                                                         .andThen(
                                                                 Commands.parallel(
                                                                         Commands.defer(
@@ -239,7 +259,16 @@ public class AutoFile {
                                 // INTAKE
                                 Commands.sequence(
                                                 allignToShoot(isLeft),
-                                                shoot().withTimeout(2.0),
+                                                shoot().withTimeout(5.0),
+                                                allignToStarting(isLeft),
+                                                Commands.runOnce(() -> {})
+                                                        .withTimeout(0.1)
+                                                        .deadlineWith(
+                                                                shooterDefault(),
+                                                                shootingSuperstructure
+                                                                        .getIdx()
+                                                                        .runState(
+                                                                                () -> IdxMode.OFF)),
                                                 drivePastSlope(isLeft, false),
                                                 Commands.deadline(
                                                         followPathFile("rightIntake", isLeft),
