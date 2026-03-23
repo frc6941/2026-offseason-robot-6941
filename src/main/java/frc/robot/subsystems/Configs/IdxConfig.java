@@ -68,7 +68,7 @@ public class IdxConfig {
     public static final double unjammTriggerAmps = 85;
     public static final double unjammTriggerBelowRps = 2.0; // 1.5 for 10541
     public static final double unjammTriggerSec = 0.08;
-    public static final double unjammLockoutSec = 0.2;
+    public static final double unjammLockoutSec = 1.0; // TODO maybe lower
 
     public static final boolean isBrake = true;
 
