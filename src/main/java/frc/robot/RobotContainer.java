@@ -411,17 +411,9 @@ public class RobotContainer {
 
         driver.a().whileTrue(AutoActions.allignToClimb(false));
 
-        new Trigger(DriverStation::isEnabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .alongWith(hood.zeroCommand()));
+        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
 
         // .alongWith(intakerExtension.zeroCommand()));
-
-        new Trigger(DriverStation::isDisabled)
-                .onTrue(
-                        new InstantCommand(() -> limelightSubsystem.setThrottleAll(true))
-                                .ignoringDisable(true));
 
         // Swerve
         driver.start()
@@ -485,6 +477,11 @@ public class RobotContainer {
     private IndicatorSubsystem buildIndicator(boolean isReal) {
         return new IndicatorSubsystem(
                 isReal ? new IndicatorIOARGB(LED_PORT, LED_LENGTH) : new IndicatorIOSim());
+    }
+
+    public void setThrottle(boolean enabled) {
+
+        limelightSubsystem.setThrottleAll(enabled);
     }
 
     private LimelightSubsystem buildLimelight(boolean isReal, Swerve swerve) {

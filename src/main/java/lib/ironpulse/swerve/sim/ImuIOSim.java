@@ -9,6 +9,7 @@ public class ImuIOSim implements ImuIO {
     public ImuIOSim() {}
 
     private double lastTimestamp = Timer.getTimestamp();
+    private Rotation2d simulatedYawPosition = new Rotation2d();
 
     @Override
     public void updateInputs(ImuIOInputs inputs) {
@@ -17,8 +18,10 @@ public class ImuIOSim implements ImuIO {
         lastTimestamp = now;
 
         inputs.connected = true;
-        inputs.yawPosition =
-                inputs.yawPosition.plus(new Rotation2d(inputs.yawVelocityRadPerSecCmd * dt));
+        // Update simulated yaw position based on commanded velocity
+        simulatedYawPosition =
+                simulatedYawPosition.plus(new Rotation2d(inputs.yawVelocityRadPerSecCmd * dt));
+        inputs.yawPosition = simulatedYawPosition;
         inputs.yawVelocityRadPerSec = inputs.yawVelocityRadPerSecCmd;
         inputs.pitchPosition = new Rotation2d();
         inputs.pitchVelocityRadPerSec = 0.0;
@@ -37,12 +40,17 @@ public class ImuIOSim implements ImuIO {
 
     @Override
     public void setYawDeg(double yaw) {
-        // FIXME
+        simulatedYawPosition = Rotation2d.fromDegrees(yaw);
+    }
+
+    @Override
+    public void reset() {
+        simulatedYawPosition = new Rotation2d();
+        lastTimestamp = Timer.getTimestamp();
     }
 
     @Override
     public double getYawDeg() {
-        // FIXME
-        return 0;
+        return simulatedYawPosition.getDegrees();
     }
 }

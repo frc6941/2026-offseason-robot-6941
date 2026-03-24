@@ -31,7 +31,6 @@ public class HoodConfig {
                                     .build())
                     .forwardSoftLimitDegrees(Degrees.of(HOOD_ANGLE_ZEROED_DEG + HOOD_DOF_DEG))
                     .reverseSoftLimitDegrees(Degrees.of(0))
-                    // TODO: set this so the target angle represents the Real angle of the hood
                     .zeroOffset(Degrees.of(HOOD_ANGLE_ZEROED_DEG))
                     .simConfig(
                             SubsystemConfig.SimConfig.builder().gearRatio(HOOD_GEAR_RATIO).build())

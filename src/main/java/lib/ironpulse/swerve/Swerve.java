@@ -234,7 +234,13 @@ public class Swerve extends SubsystemBase implements Localizable {
 
     public void resetEstimatedPose(Pose3d pose) {
         odometryLock.lock();
-        poseEstimator.resetPosition(imuIOInputs.odometryRotations[0], getModulePositions(), pose);
+        // Reset IMU hardware to match the new pose rotation
+        double newYawDegrees = pose.getRotation().toRotation2d().getDegrees();
+        imuIO.setYawDeg(newYawDegrees);
+        // Reset pose estimator with the new pose
+        // Use the new rotation from pose parameter, not stale imuIOInputs.odometryRotations[0]
+        Rotation3d newRotation = pose.getRotation();
+        poseEstimator.resetPosition(newRotation, getModulePositions(), pose);
         odometryLock.unlock();
     }
 

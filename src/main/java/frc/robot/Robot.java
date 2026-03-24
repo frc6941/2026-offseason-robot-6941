@@ -46,6 +46,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().setPeriod(0.2);
 
         robotContainer = new RobotContainer();
+        robotContainer.setThrottle(false);
 
         // elastic
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
@@ -61,7 +62,9 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        robotContainer.setThrottle(false);
+    }
 
     @Override
     public void disabledPeriodic() {}
@@ -72,7 +75,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
-
+        robotContainer.setThrottle(true);
         if (autonomousCommand != null) {
             CommandScheduler.getInstance().schedule(autonomousCommand);
         }
@@ -86,6 +89,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
+        robotContainer.setThrottle(true);
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
@@ -100,6 +104,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
+        robotContainer.setThrottle(true);
         CommandScheduler.getInstance().cancelAll();
     }
 
