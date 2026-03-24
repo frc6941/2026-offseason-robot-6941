@@ -11,12 +11,12 @@ import lib.ntext.NTParameter;
 
 public class IdxConfig {
     public static final String SPINDEXER = "Spindexer";
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 90;
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 90;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 100;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 100;
     public static final double SPINDEXER_GEAR_RATIO =
             is10541
                     ? 16.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0
-                    : 9.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
+                    : 12.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     private static final int SPINDEXER_ID = 58;
 
     private static final int SPINDEXER_FOLLOWER_ID = 59;
@@ -51,7 +51,7 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/IdxModes")
     public static final class SpindexerModeParams {
-        public static final double feedRPS = 3.5; // 1.6 for 10541
+        public static final double feedRPS = 2.7; // 1.6 for 10541
 
         public static final double revRPS = -1;
         public static final double idleRPS = 0.0;
@@ -67,8 +67,8 @@ public class IdxConfig {
         public static final double kS = 0.25;
 
         public static final double unjammTimeoutSec = 0.15;
-        public static final double unjammTriggerAmps = 85;
-        public static final double unjammTriggerBelowRps = 2.0; // 1.5 for 10541
+        public static final double unjammTriggerAmps = 95;
+        public static final double unjammTriggerBelowRps = 1.3; // 1.5 for 10541
         public static final double unjammTriggerSec = 0.08;
         public static final double unjammLockoutSec = 0.2;
 
