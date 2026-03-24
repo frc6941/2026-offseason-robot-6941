@@ -145,7 +145,8 @@ public class AutoFile {
                 Commands.deadline(allignToShoot(isLeft), shoot().withTimeout(20.0)),
                 allignToStarting(isLeft),
                 Commands.runOnce(() -> {})
-                        .withTimeout(0.1).deadlineWith(
+                        .withTimeout(0.1)
+                        .deadlineWith(
                                 shooterDefault(),
                                 shootingSuperstructure.getIdx().runState(() -> IdxMode.OFF)));
     }
