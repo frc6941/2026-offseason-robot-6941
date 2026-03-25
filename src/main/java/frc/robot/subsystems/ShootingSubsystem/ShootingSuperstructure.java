@@ -22,6 +22,7 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.filter.EdgeFilter;
 import lib.ironpulse.math.filter.LowPassFilter;
+import lib.ironpulse.math.filter.MovingAverageFilter;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
@@ -37,6 +38,7 @@ public class ShootingSuperstructure {
     private final EdgeFilter edgeFilter = new EdgeFilter(EdgeFilter.EdgeType.RISING, 20.0, 1.0, 1);
     private int ballCounter = 0;
     @Getter private boolean isShooting = false;
+    private MovingAverageFilter BPSCalculator = new MovingAverageFilter(2, 0);
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
@@ -162,12 +164,16 @@ public class ShootingSuperstructure {
                 edgeFilter.compute() == 1.0
                         && shooter.velocityAtGoal(RotationsPerSecond.of(5.0))
                         && idx.getCurrentState() == SpindexerSubsystem.State.FEED;
-        if (shot) ballCounter++;
+        ballCounter += shot ? 1 : 0;
+        BPSCalculator.input(shot ? 1.0 : 0.0, RobotConstants.LOOPER_DT);
+
         Logger.recordOutput("ShotCounter/RpsCurr", shooterRpsCurr);
         Logger.recordOutput("ShotCounter/RpsDes", shooterRpsDes);
         Logger.recordOutput("ShotCounter/Current", shooterCurrent);
         Logger.recordOutput("ShotCounter/BallDetected", shot);
         Logger.recordOutput("ShotCounter/BallCount", ballCounter);
+        Logger.recordOutput(
+                "ShotCounter/AvgBPS", BPSCalculator.compute() * BPSCalculator.getWindowSize());
 
         return scaledRpm;
     }

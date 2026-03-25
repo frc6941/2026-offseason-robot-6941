@@ -2,11 +2,12 @@ package lib.ironpulse.math.filter;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import lombok.Getter;
 
 public class MovingAverageFilter implements DigitalFilter<Double> {
     private final double cutoffHz;
     private final Queue<Double> window = new LinkedList<>();
-    private int windowSize = 1;
+    @Getter private int windowSize = 1;
     private double sum = 0;
 
     public MovingAverageFilter(double cutoffHz, double initVal) {
