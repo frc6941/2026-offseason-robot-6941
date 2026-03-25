@@ -146,7 +146,7 @@ public class AutoFile {
                 allignToStarting(isLeft),
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
-                        .deadlineWith(
+                        .deadlineFor(
                                 shooterDefault(),
                                 shootingSuperstructure.getIdx().runState(() -> IdxMode.OFF)));
     }
@@ -263,7 +263,7 @@ public class AutoFile {
                                                 allignToStarting(isLeft),
                                                 Commands.runOnce(() -> {})
                                                         .withTimeout(0.1)
-                                                        .deadlineWith(
+                                                        .deadlineFor(
                                                                 shooterDefault(),
                                                                 shootingSuperstructure
                                                                         .getIdx()
