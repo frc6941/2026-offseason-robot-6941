@@ -311,6 +311,7 @@ public class RobotContainer {
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
         operator.rightBumper().whileTrue(intake.runExtendedReverse());
+        operator.rightTrigger().onTrue(shootingSuperstructure.runResetBallCounter());
 
         driver.rightBumper()
                 .whileTrue(

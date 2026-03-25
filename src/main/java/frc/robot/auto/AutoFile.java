@@ -5,8 +5,8 @@ import static frc.robot.auto.AutoRoutines.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,7 +24,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutoFile {
     private static final Map<String, PathPlannerPath> autoPaths = new HashMap<>();
-    private static final Timer autoTimer = new Timer();
 
     @Getter
     private static final LoggedDashboardChooser<AutoType> autoChooser =
@@ -146,7 +145,7 @@ public class AutoFile {
                 allignToStarting(isLeft),
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
-                        .deadlineWith(
+                        .deadlineFor(
                                 shooterDefault(),
                                 shootingSuperstructure.getIdx().runState(() -> IdxMode.OFF)));
     }
@@ -193,12 +192,6 @@ public class AutoFile {
 
         return Commands.parallel(
                         // shooterDefault(),
-                        // Start and run timer in parallel
-                        Commands.runOnce(
-                                () -> {
-                                    autoTimer.reset();
-                                    autoTimer.start();
-                                }),
                         Commands.sequence(
                                 // Initial drive past slope with zeroing
                                 Commands.deadline(
@@ -214,8 +207,9 @@ public class AutoFile {
                                                         Commands.deadline(
                                                                 new WaitUntilCommand(
                                                                         () ->
-                                                                                autoTimer.get()
-                                                                                        >= 17),
+                                                                                DriverStation
+                                                                                                .getMatchTime()
+                                                                                        <= 3),
                                                                 new ConditionalCommand(
                                                                         Commands.deadline(
                                                                                 allignToDepot(),
@@ -231,16 +225,13 @@ public class AutoFile {
                                                                                 && autoChooser.get()
                                                                                         == AutoType
                                                                                                 .COMPETITION
-                                                                                && sweepModeChooser
-                                                                                                .get()
-                                                                                        == SweepMode
-                                                                                                .LONG
                                                                                 && endBehaviourChooser
                                                                                                 .get()
                                                                                         == EndBehaviour
                                                                                                 .FUEL
-                                                                                && autoTimer.get()
-                                                                                        >= 18)
+                                                                                && DriverStation
+                                                                                                .getMatchTime()
+                                                                                        <= 2)
                                                         .andThen(
                                                                 Commands.parallel(
                                                                         Commands.defer(
@@ -260,7 +251,7 @@ public class AutoFile {
                                                 allignToStarting(isLeft),
                                                 Commands.runOnce(() -> {})
                                                         .withTimeout(0.1)
-                                                        .deadlineWith(
+                                                        .deadlineFor(
                                                                 shooterDefault(),
                                                                 shootingSuperstructure
                                                                         .getIdx()

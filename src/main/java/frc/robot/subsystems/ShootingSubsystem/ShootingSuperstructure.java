@@ -1,9 +1,6 @@
 package frc.robot.subsystems.ShootingSubsystem;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
@@ -13,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.FieldConstants;
+import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
@@ -22,6 +20,8 @@ import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import java.util.function.Supplier;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
+import lib.ironpulse.math.filter.EdgeFilter;
+import lib.ironpulse.math.filter.LowPassFilter;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
@@ -33,6 +33,9 @@ public class ShootingSuperstructure {
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     @Getter private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     @Getter private final SpindexerSubsystem idx;
+    private final LowPassFilter shooterVelocityLPF = new LowPassFilter(10, 0.0);
+    private final EdgeFilter edgeFilter = new EdgeFilter(EdgeFilter.EdgeType.RISING, 20.0, 1.0, 1);
+    private int ballCounter = 0;
     @Getter private boolean isShooting = false;
 
     public ShootingSuperstructure(
@@ -146,10 +149,25 @@ public class ShootingSuperstructure {
         Logger.recordOutput("ShootingSuperstructure/Distance/currentMeters", currentDistance);
         Logger.recordOutput("ShootingSuperstructure/Distance/baseRpm", baseRpm);
         Logger.recordOutput("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
-
         SmartDashboard.putNumber("ShootingSuperstructure/Distance/currentMeters", currentDistance);
         SmartDashboard.putNumber("ShootingSuperstructure/Distance/baseRpm", baseRpm);
         SmartDashboard.putNumber("ShootingSuperstructure/Distance/scaledRpm", scaledRpm);
+
+        double shooterRpsCurr = shooter.getVelocity().in(RotationsPerSecond);
+        double shooterRpsDes = shooter.getCurrSetpoint().in(RotationsPerSecond);
+        double shooterCurrent = shooter.getSupplyCurrent().in(Amp);
+        shooterVelocityLPF.input(shooterRpsCurr, RobotConstants.LOOPER_DT);
+        edgeFilter.input(shooterCurrent, RobotConstants.LOOPER_DT);
+        boolean shot =
+                edgeFilter.compute() == 1.0
+                        && shooter.velocityAtGoal(RotationsPerSecond.of(5.0))
+                        && idx.getCurrentState() == SpindexerSubsystem.State.FEED;
+        if (shot) ballCounter++;
+        Logger.recordOutput("ShotCounter/RpsCurr", shooterRpsCurr);
+        Logger.recordOutput("ShotCounter/RpsDes", shooterRpsDes);
+        Logger.recordOutput("ShotCounter/Current", shooterCurrent);
+        Logger.recordOutput("ShotCounter/BallDetected", shot);
+        Logger.recordOutput("ShotCounter/BallCount", ballCounter);
 
         return scaledRpm;
     }
@@ -207,6 +225,13 @@ public class ShootingSuperstructure {
                             double rpm = computeRpm(MetersPerSecond.of(6), bba);
                             return RotationsPerSecond.of(rpm / 60.0);
                         }));
+    }
+
+    public Command runResetBallCounter() {
+        return Commands.runOnce(
+                () -> {
+                    ballCounter = 0;
+                });
     }
 
     public enum IdxMode {
