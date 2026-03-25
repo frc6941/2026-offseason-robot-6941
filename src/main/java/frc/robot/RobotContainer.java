@@ -311,7 +311,6 @@ public class RobotContainer {
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
         operator.rightBumper().whileTrue(intake.runExtendedReverse());
-        operator.rightTrigger().onTrue(shootingSuperstructure.runResetBallCounter());
 
         driver.rightBumper()
                 .whileTrue(
@@ -414,6 +413,8 @@ public class RobotContainer {
 
         new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
 
+        operator.rightTrigger().onTrue(shootingSuperstructure.runResetBallCounter());
+
         // .alongWith(intakerExtension.zeroCommand()));
 
         // Swerve
@@ -491,11 +492,7 @@ public class RobotContainer {
                         swerve,
                         new LimelightIOReal(
                                 LimeLightConfig.limelightAConfig,
-                                () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .toPose2d()
-                                                .getRotation()
-                                                .getDegrees(),
+                                () -> swerve.imuIOInputs.yawPosition.getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
@@ -510,11 +507,7 @@ public class RobotContainer {
                                 LimeLightConfig.asDeviationParams()),
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
-                                () ->
-                                        RobotStateRecorder.getPoseWorldRobotCurrent()
-                                                .toPose2d()
-                                                .getRotation()
-                                                .getDegrees(),
+                                () -> swerve.imuIOInputs.yawPosition.getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
