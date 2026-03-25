@@ -3,251 +3,6 @@
   "grid_size": 128,
   "tabs": [
     {
-      "name": "Teleop",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
-          {
-            "title": "Field",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 1408.0,
-            "height": 640.0,
-            "type": "Field",
-            "properties": {
-              "topic": "/SmartDashboard/Field",
-              "period": 0.06,
-              "field_game": "Rebuilt",
-              "robot_width": 0.85,
-              "robot_length": 0.85,
-              "show_other_objects": true,
-              "show_trajectories": true,
-              "field_rotation": 0.0,
-              "robot_color": 4294198070,
-              "trajectory_color": 4294967295,
-              "show_robot_outside_widget": true
-            }
-          },
-          {
-            "title": "jamCondition",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Spindexer/jamCondition",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Pattern",
-            "x": 512.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Indicator/Pattern",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
-            "title": "muzzleSpeedMps",
-            "x": 1408.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
-              "period": 0.06,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "baseRpm",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/ShootingSuperstructure/Distance/baseRpm",
-              "period": 0.06,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "currentMeters",
-            "x": 1408.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/ShootingSuperstructure/Distance/currentMeters",
-              "period": 0.06,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "scaledRpm",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/ShootingSuperstructure/Distance/scaledRpm",
-              "period": 0.06,
-              "data_type": "double"
-            }
-          },
-          {
-            "title": "LL3G Alive",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Limelight/limelight-a/alive",
-              "period": 0.06,
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "LL4 Alive",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Limelight/limelight-b/alive",
-              "period": 0.06,
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "currAngleRobotDeg",
-            "x": 896.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Turret/currAngleRobotDeg",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Hub Phase",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Competition/Hub Phase",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
-            "title": "Hub Remaining",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/SmartDashboard/Competition/Hub Remaining",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 5,
-              "yellow_start_time": 10
-            }
-          },
-          {
-            "title": "isHubActive",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Competition/isHubActive",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "AutoResultSent",
-            "x": 256.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Competition/AutoResultSent",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "Checkmark",
-              "false_icon": "Exclamation Point"
-            }
-          },
-          {
-            "title": "deployPosMeters",
-            "x": 896.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "Params/IntakerExtension/deployPosMeters",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "AutoResultWin",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Competition/AutoResultWin",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "Checkmark",
-              "false_icon": "X"
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "Auto",
       "grid_layout": {
         "layouts": [],
@@ -276,27 +31,6 @@
               "topic": "/SmartDashboard/Alerts/warnings",
               "period": 0.06,
               "data_type": "string[]"
-            }
-          },
-          {
-            "title": "Field",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 1408.0,
-            "height": 640.0,
-            "type": "Field",
-            "properties": {
-              "topic": "/SmartDashboard/Field",
-              "period": 0.06,
-              "field_game": "Rebuilt",
-              "robot_width": 0.85,
-              "robot_length": 0.85,
-              "show_other_objects": true,
-              "show_trajectories": true,
-              "field_rotation": 0.0,
-              "robot_color": 4294198070,
-              "trajectory_color": 4294967295,
-              "show_robot_outside_widget": true
             }
           },
           {
@@ -352,19 +86,6 @@
             }
           },
           {
-            "title": "Sweep Cycles Chooser",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Sweep Cycles Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
             "title": "Verified",
             "x": 256.0,
             "y": 0.0,
@@ -379,6 +100,40 @@
               "false_color": 4294198070,
               "true_icon": "Checkmark",
               "false_icon": "Exclamation Point"
+            }
+          },
+          {
+            "title": "Field",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 1024.0,
+            "height": 512.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Rebuilt",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295,
+              "show_robot_outside_widget": true
+            }
+          },
+          {
+            "title": "Sweep Cycles Chooser",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Sweep Cycles Chooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
@@ -555,6 +310,251 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Teleop",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "jamCondition",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Spindexer/jamCondition",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Pattern",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Indicator/Pattern",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "muzzleSpeedMps",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "baseRpm",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/ShootingSuperstructure/Distance/baseRpm",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "currentMeters",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/ShootingSuperstructure/Distance/currentMeters",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "scaledRpm",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/ShootingSuperstructure/Distance/scaledRpm",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "LL3G Alive",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Limelight/limelight-a/alive",
+              "period": 0.06,
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "LL4 Alive",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Limelight/limelight-b/alive",
+              "period": 0.06,
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "currAngleRobotDeg",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Turret/currAngleRobotDeg",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Hub Phase",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/Hub Phase",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Hub Remaining",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/Hub Remaining",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 5,
+              "yellow_start_time": 10
+            }
+          },
+          {
+            "title": "isHubActive",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/isHubActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "AutoResultSent",
+            "x": 128.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/AutoResultSent",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "Exclamation Point"
+            }
+          },
+          {
+            "title": "deployPosMeters",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/IntakerExtension/deployPosMeters",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "AutoResultWin",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Competition/AutoResultWin",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
+          },
+          {
+            "title": "Field",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 1024.0,
+            "height": 512.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Rebuilt",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295,
+              "show_robot_outside_widget": true
             }
           }
         ]

@@ -83,10 +83,10 @@ public class AutoActions {
     public static final Pose2d kMiddleIntakeR = new Pose2d(7, 2, new Rotation2d(Degrees.of(90)));
 
     public static final Pose2d kShootL =
-            new Pose2d(2, kVerticalSlopelineL, new Rotation2d(Degrees.of(-45)));
+            new Pose2d(3, kVerticalSlopelineL, new Rotation2d(Degrees.of(-45)));
 
     public static final Pose2d kShootR =
-            new Pose2d(2, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
+            new Pose2d(3, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
 
     public static final Pose2d kclimbL =
             new Pose2d(FieldConstants.fieldLength - 15.15, 4.272, new Rotation2d(Degrees.of(0)));
@@ -188,12 +188,11 @@ public class AutoActions {
                 });
     }
 
-    public static Command allignToShoot(boolean isLeft) {
+    public static Command driveToShoot(boolean isLeft) {
         return swerve.defer(
                 () -> {
                     Pose2d shootPose = AllianceFlipUtil.apply(isLeft ? kShootL : kShootR);
-                    return driveToAllign(
-                            shootPose, AutoActions::getShiftDirectionTowardBump, 1.2, 0.2);
+                    return driveToPose(shootPose);
                 });
     }
 

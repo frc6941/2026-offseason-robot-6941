@@ -142,7 +142,7 @@ public class AutoFile {
         return Commands.sequence(
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                 drivePastSlope(isLeft, false),
-                Commands.deadline(allignToShoot(isLeft), shoot().withTimeout(20.0)),
+                Commands.deadline(driveToShoot(isLeft), shoot().withTimeout(20.0)),
                 allignToStarting(isLeft),
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
@@ -227,7 +227,7 @@ public class AutoFile {
                                                                                 allignToStation(),
                                                                                 oscillateIntakeFeed()),
                                                                         () -> isLeft)),
-                                                        allignToShoot(isLeft)),
+                                                        driveToShoot(isLeft)),
                                                 new WaitUntilCommand(
                                                                 () ->
                                                                         isLeft
@@ -258,7 +258,7 @@ public class AutoFile {
 
                                 // INTAKE
                                 Commands.sequence(
-                                                allignToShoot(isLeft),
+                                                driveToShoot(isLeft),
                                                 shoot().withTimeout(5.0),
                                                 allignToStarting(isLeft),
                                                 Commands.runOnce(() -> {})
