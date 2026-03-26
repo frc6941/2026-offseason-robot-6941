@@ -54,7 +54,7 @@ public class IntakeConfig {
                                     .build())
                     .zeroingConfig(
                             SubsystemConfig.ZeroingConfig.builder()
-                                    .zeroingCurrentLimit(35)
+                                    .zeroingCurrentLimit(30)
                                     .zeroingFilterSize(5)
                                     .zeroingVoltage(-2)
                                     .build())

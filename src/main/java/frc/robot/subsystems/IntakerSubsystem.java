@@ -236,7 +236,7 @@ public class IntakerSubsystem extends SubsystemBase {
                                                                 Meters.of(
                                                                         is10541
                                                                                 ? 0.315766
-                                                                                : 0.307895));
+                                                                                : 0.319718));
                                                     }
                                                 })
                                         .onlyWhile(this::isDeployMode));
@@ -246,7 +246,7 @@ public class IntakerSubsystem extends SubsystemBase {
                         Commands.runOnce(
                                 () ->
                                         extension.setCurrPos(
-                                                Meters.of(is10541 ? 0.315766 : 0.307895))),
+                                                Meters.of(is10541 ? 0.315766 : 0.319718))),
                         new WaitCommand(0.2),
                         Commands.runOnce(
                                 () ->
