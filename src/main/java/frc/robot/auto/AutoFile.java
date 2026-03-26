@@ -1,10 +1,12 @@
 package frc.robot.auto;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.auto.AutoActions.*;
 import static frc.robot.auto.AutoRoutines.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -102,6 +104,7 @@ public class AutoFile {
         return switch (selected) {
             case TEST -> buildTest();
             case COMPETITION -> buildCompetition();
+            case HUNT -> buildHunt();
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false),
                     Collections.singleton(shooter));
@@ -281,10 +284,47 @@ public class AutoFile {
         // .beforeStarting(() -> swerve.removeDefaultCommand());
     }
 
+    private static Command buildHunt() {
+        if (invalidConfigAlert.get()) return Commands.none();
+        boolean isLeft = sideChooser.get() == AutoSide.LEFT;
+        Command driveToNeutral =
+                deadline(
+                        drivePastSlope(isLeft, true),
+                        defer(AutoActions::zeroEverything, Collections.emptySet()));
+        Command hunt =
+                deadline(followPathFile("huntRight", isLeft), intake(), shootBackWhenSuitable());
+        Command driveBack = drivePastSlope(isLeft, false);
+        Command driveToCorner =
+                either(
+                        deadline(allignToDepot(), oscillateIntakeFeed()),
+                        deadline(allignToStation(), oscillateIntakeFeed()),
+                        () -> isLeft);
+        Command sweepToClimb =
+                either(
+                        deadline(driveToClimbSweepLeft(), oscillateIntakeFeed()),
+                        deadline(driveToClimbSweepRight(), oscillateIntakeFeed()),
+                        () -> isLeft);
+        var resetWhenNeeded =
+                waitUntil(() -> isLeft && DriverStation.isAutonomous() && autoTimer.get() >= 18)
+                        .andThen(
+                                parallel(
+                                        defer(intake::zeroCommand, Collections.emptySet()),
+                                        intake()));
+        return sequence(
+                        driveToNeutral, //
+                        hunt, //
+                        driveBack, //
+                        parallel( //
+                                sequence(driveToCorner, waitSeconds(1.5), sweepToClimb),
+                                resetWhenNeeded))
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+    }
+
     private enum AutoType {
         COMPETITION,
         TEST,
-        SHOOT
+        SHOOT,
+        HUNT
     }
 
     private enum AutoSide {

@@ -92,6 +92,10 @@ public class AutoActions {
             new Pose2d(FieldConstants.fieldLength - 15.15, 4.272, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kclimbR =
             new Pose2d(FieldConstants.fieldLength - 15.16, 3.29, new Rotation2d(Degrees.of(0)));
+    public static final Pose2d kClimbSweepR =
+            new Pose2d(0.556, 2.618, new Rotation2d(Degrees.of(90)));
+    public static final Pose2d kClimbSweepL =
+            new Pose2d(0.556, 4.665, new Rotation2d(Degrees.of(-90)));
 
     public static final Pose2d kTestA = new Pose2d(1.509, 6.14, new Rotation2d(Degrees.of(6.3)));
     public static final Pose2d kTestB = new Pose2d(2.79, 5.2, new Rotation2d(Degrees.of(-72)));
@@ -236,6 +240,42 @@ public class AutoActions {
                 () ->
                         driveToAllign(
                                 AllianceFlipUtil.apply(kDepotIntake),
+                                AutoActions::getShiftDirectionTowardBump,
+                                1.5,
+                                0.2));
+    }
+
+    public static Command driveToClimbSweepLeft() {
+        return swerve.defer(
+                () ->
+                        driveToPose(AllianceFlipUtil.apply(kClimbSweepL))
+                                .beforeStarting(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    swerve.setSwerveModuleLimit(
+                                                            SwerveMK5Config.kShootingSwerveLimit);
+                                                }))
+                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+    }
+
+    public static Command driveToClimbSweepRight() {
+        return swerve.defer(
+                () ->
+                        driveToPose(AllianceFlipUtil.apply(kClimbSweepR))
+                                .beforeStarting(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    swerve.setSwerveModuleLimit(
+                                                            SwerveMK5Config.kShootingSwerveLimit);
+                                                }))
+                                .finallyDo(() -> swerve.setSwerveModuleLimitDefault()));
+    }
+
+    public static Command allignToClimbSweepRight() {
+        return swerve.defer(
+                () ->
+                        driveToAllign(
+                                AllianceFlipUtil.apply(kClimbSweepR),
                                 AutoActions::getShiftDirectionTowardBump,
                                 1.5,
                                 0.2));
@@ -432,6 +472,21 @@ public class AutoActions {
     public static Command shoot() {
         return shootingSuperstructure.shootWhenReady(false);
         // return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
+    }
+
+    public static double shootBackLimitY = 3.7;
+    public static double shootBackLimitYOther = FieldConstants.fieldWidth - shootBackLimitY;
+
+    public static Command shootBackWhenSuitable() {
+        Supplier<Boolean> conditional =
+                () -> {
+                    var robotY =
+                            RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().getY();
+                    var isInBlindZone = robotY > shootBackLimitY && robotY < shootBackLimitYOther;
+                    var isAvailable = !isInBlindZone;
+                    return isAvailable;
+                };
+        return shootingSuperstructure.shootOnCondition(conditional);
     }
 
     public static Command shooterDefault() {
