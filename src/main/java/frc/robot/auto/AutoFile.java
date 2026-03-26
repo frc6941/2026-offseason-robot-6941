@@ -202,10 +202,7 @@ public class AutoFile {
                         Commands.sequence(
                                 // Initial drive past slope with zeroing
                                 Commands.deadline(
-                                        drivePastSlope(isLeft, true),
-                                        Commands.defer(
-                                                AutoActions::zeroEverything,
-                                                Collections.emptySet())),
+                                        AutoActions.zeroEverything(), drivePastSlope(isLeft, true)),
 
                                 // Sweep sequence (single or multiple cycles)
                                 sweepSequence,
