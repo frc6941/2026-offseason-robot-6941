@@ -96,6 +96,20 @@ public class ShootingSuperstructure {
                         .finallyDo(() -> isShooting = false));
     }
 
+    public Command shootOnCondition(Supplier<Boolean> conditional) {
+        return Commands.parallel(
+                runFrame(),
+                Commands.waitUntil(shooter::velocityAtGoal)
+                        .andThen(
+                                Commands.runOnce(() -> isShooting = true),
+                                idx.runState(
+                                        () ->
+                                                conditional.get().booleanValue()
+                                                        ? IdxMode.FEED
+                                                        : IdxMode.OFF))
+                        .finallyDo(() -> isShooting = false));
+    }
+
     public Command runFrame() {
         return Commands.parallel(
                 turret.setTurretPoseWorld(

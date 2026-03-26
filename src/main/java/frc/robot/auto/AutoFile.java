@@ -1,5 +1,6 @@
 package frc.robot.auto;
 
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import static frc.robot.auto.AutoActions.*;
 import static frc.robot.auto.AutoRoutines.*;
 
@@ -99,6 +100,7 @@ public class AutoFile {
         return switch (selected) {
             case TEST -> buildTest();
             case COMPETITION -> buildCompetition();
+            case HUNT -> buildHunt();
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false),
                     Collections.singleton(shooter));
@@ -212,10 +214,41 @@ public class AutoFile {
         // .beforeStarting(() -> swerve.removeDefaultCommand());
     }
 
+    private static Command buildHunt() {
+        if (invalidConfigAlert.get()) return Commands.none();
+        boolean isLeft = sideChooser.get() == AutoSide.LEFT;
+        var driveToNeutral =
+                deadline(
+                        drivePastSlope(isLeft, true),
+                        defer(AutoActions::zeroEverything, Collections.emptySet()));
+        var hunt = deadline(followPathFile("huntRight", isLeft), intake(), shootBackWhenSuitable());
+        var driveBack = drivePastSlope(isLeft, false);
+        var fuel =
+                parallel(
+                        shoot(),
+                        either(
+                                deadline(allignToDepot(), oscillateIntakeFeed()),
+                                deadline(allignToStation(), oscillateIntakeFeed()),
+                                () -> isLeft));
+        var resetWhenNeeded =
+                waitUntil(
+                                () ->
+                                        isLeft
+                                                && DriverStation.isAutonomous()
+                                                && DriverStation.getMatchTime() <= 2)
+                        .andThen(
+                                parallel(
+                                        defer(intake::zeroCommand, Collections.emptySet()),
+                                        intake()));
+        return sequence(driveToNeutral, hunt, driveBack, parallel(fuel, resetWhenNeeded))
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+    }
+
     private enum AutoType {
         COMPETITION,
         TEST,
-        SHOOT
+        SHOOT,
+        HUNT
     }
 
     private enum AutoSide {

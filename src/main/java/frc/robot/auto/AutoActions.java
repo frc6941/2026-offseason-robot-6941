@@ -351,6 +351,21 @@ public class AutoActions {
         // return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
     }
 
+    public static double shootBackLimitY = 3.7;
+    public static double shootBackLimitYOther = FieldConstants.fieldWidth - shootBackLimitY;
+
+    public static Command shootBackWhenSuitable() {
+        Supplier<Boolean> conditional =
+                () -> {
+                    var robotY =
+                            RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().getY();
+                    var isInBlindZone = robotY > shootBackLimitY && robotY < shootBackLimitYOther;
+                    var isAvailable = !isInBlindZone;
+                    return isAvailable;
+                };
+        return shootingSuperstructure.shootOnCondition(conditional);
+    }
+
     public static Command shooterDefault() {
         return Commands.defer(
                 () ->
