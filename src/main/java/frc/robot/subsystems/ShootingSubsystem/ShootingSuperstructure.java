@@ -37,6 +37,8 @@ public class ShootingSuperstructure {
     private final LowPassFilter shooterVelocityLPF = new LowPassFilter(10, 0.0);
     private final EdgeFilter edgeFilter = new EdgeFilter(EdgeFilter.EdgeType.RISING, 20.0, 1.0, 1);
     private int ballCounter = 0;
+    private int ballCounterShoot = 0;
+    private TargetMode mode;
     @Getter private boolean isShooting = false;
     private MovingAverageFilter BPSCalculator = new MovingAverageFilter(2, 0);
 
@@ -165,13 +167,15 @@ public class ShootingSuperstructure {
                         && shooter.velocityAtGoal(RotationsPerSecond.of(5.0))
                         && idx.getCurrentState() == SpindexerSubsystem.State.FEED;
         ballCounter += shot ? 1 : 0;
+        ballCounterShoot += (shot && mode == TargetMode.GOAL) ? 1 : 0;
         BPSCalculator.input(shot ? 1.0 : 0.0, RobotConstants.LOOPER_DT);
 
         Logger.recordOutput("ShotCounter/RpsCurr", shooterRpsCurr);
         Logger.recordOutput("ShotCounter/RpsDes", shooterRpsDes);
         Logger.recordOutput("ShotCounter/Current", shooterCurrent);
         Logger.recordOutput("ShotCounter/BallDetected", shot);
-        Logger.recordOutput("ShotCounter/BallCount", ballCounter);
+        Logger.recordOutput("ShotCounter/BallCountAll", ballCounter);
+        Logger.recordOutput("ShotCounter/BallCountShoot", ballCounterShoot);
         Logger.recordOutput(
                 "ShotCounter/AvgBPS", BPSCalculator.compute() * BPSCalculator.getWindowSize());
 
@@ -197,7 +201,6 @@ public class ShootingSuperstructure {
     }
 
     public double getDistance() {
-        TargetMode mode;
         double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
         if (xAlliance <= FieldConstants.LinesVertical.allianceZone) {
             mode = TargetMode.GOAL;
