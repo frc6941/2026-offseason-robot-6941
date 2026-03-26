@@ -217,19 +217,23 @@ public class AutoFile {
     private static Command buildHunt() {
         if (invalidConfigAlert.get()) return Commands.none();
         boolean isLeft = sideChooser.get() == AutoSide.LEFT;
-        var driveToNeutral =
+        Command driveToNeutral =
                 deadline(
                         drivePastSlope(isLeft, true),
                         defer(AutoActions::zeroEverything, Collections.emptySet()));
-        var hunt = deadline(followPathFile("huntRight", isLeft), intake(), shootBackWhenSuitable());
-        var driveBack = drivePastSlope(isLeft, false);
-        var fuel =
-                parallel(
-                        shoot(),
-                        either(
-                                deadline(allignToDepot(), oscillateIntakeFeed()),
-                                deadline(allignToStation(), oscillateIntakeFeed()),
-                                () -> isLeft));
+        Command hunt =
+                deadline(followPathFile("huntRight", isLeft), intake(), shootBackWhenSuitable());
+        Command driveBack = drivePastSlope(isLeft, false);
+        Command driveToCorner =
+                either(
+                        deadline(allignToDepot(), oscillateIntakeFeed()),
+                        deadline(allignToStation(), oscillateIntakeFeed()),
+                        () -> isLeft);
+        Command sweepToClimb =
+                either(
+                        deadline(driveToClimbSweepLeft(), oscillateIntakeFeed()),
+                        deadline(driveToClimbSweepRight(), oscillateIntakeFeed()),
+                        () -> isLeft);
         var resetWhenNeeded =
                 waitUntil(
                                 () ->
@@ -240,7 +244,13 @@ public class AutoFile {
                                 parallel(
                                         defer(intake::zeroCommand, Collections.emptySet()),
                                         intake()));
-        return sequence(driveToNeutral, hunt, driveBack, parallel(fuel, resetWhenNeeded))
+        return sequence(
+                        driveToNeutral, //
+                        hunt, //
+                        driveBack, //
+                        parallel( //
+                                sequence(driveToCorner, waitSeconds(1.5), sweepToClimb),
+                                resetWhenNeeded))
                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
     }
 
