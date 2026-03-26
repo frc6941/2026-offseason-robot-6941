@@ -140,6 +140,31 @@ public class AutoActions {
                 });
     }
 
+    public static Command drivePastNearestSlope() {
+
+        return swerve.defer(
+                        () -> {
+                            boolean isLeft =
+                                    AllianceFlipUtil.applyY(getRobotY())
+                                            > FieldConstants.fieldWidth / 2.0;
+                            boolean isToNeutral =
+                                    AllianceFlipUtil.applyX(getRobotX())
+                                            < FieldConstants.LinesVertical.neutralZoneNear;
+                            Pose2d slopeFront =
+                                    AllianceFlipUtil.apply(isLeft ? kSlopeFrontL : kSlopeFrontR);
+                            Pose2d slopeEnd =
+                                    AllianceFlipUtil.apply(isLeft ? kSlopeEndL : kSlopeEndR);
+                            Pose2d targetPose = isToNeutral ? slopeFront : slopeEnd;
+                            return Commands.deadline(
+                                            waitCrossedBump(isToNeutral), driveToPose(targetPose))
+                                    .beforeStarting(
+                                            () ->
+                                                    Logger.recordOutput(
+                                                            "Temp/isPitchStable", isPitchStable()));
+                        })
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+    }
+
     static Command drivePastSlopeNormal(boolean isLeft, boolean isToNeutral) {
         return swerve.defer(
                 () -> {
@@ -460,6 +485,10 @@ public class AutoActions {
 
     private static double getRobotX() {
         return RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getX();
+    }
+
+    private static double getRobotY() {
+        return RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d().getY();
     }
 
     public static Command resetOnPose(Pose2d pose) {

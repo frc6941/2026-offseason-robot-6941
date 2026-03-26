@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
+import static frc.robot.auto.AutoActions.drivePastNearestSlope;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -283,11 +284,10 @@ public class RobotContainer {
         driver.leftTrigger().onTrue(intake.outZeroCommand());
         driver.povDown().onTrue(intake.runRetract());
         driver.back().onTrue(intake.outZeroCommand());
-        operator.povUp().whileTrue(AutoActions.climbUp());
-        operator.povDown().whileTrue(AutoActions.climbed());
-        operator.back().onTrue(AutoActions.climbDown());
         operator.a().onTrue(shootingSuperstructure.runZero());
         operator.y().whileTrue(shootingSuperstructure.runSetFrame());
+
+        driver.x().whileTrue(drivePastNearestSlope());
 
         driver.povLeft().onTrue(intake.zeroCommand());
 
@@ -409,7 +409,7 @@ public class RobotContainer {
         //                         Meters.of(0.2),
         //                         Degrees.of(2)));
 
-        driver.a().whileTrue(AutoActions.allignToClimb(false));
+        // driver.a().whileTrue(AutoActions.allignToClimb(false));
 
         new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
 
