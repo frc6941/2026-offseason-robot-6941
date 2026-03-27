@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.ShootingSubsystem.ShootingSuperstructure.IdxMode;
 import java.io.File;
@@ -146,6 +147,7 @@ public class AutoFile {
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                 drivePastSlope(isLeft, false),
                 Commands.deadline(driveToShoot(isLeft), shoot().withTimeout(20.0)),
+                new WaitCommand(3),
                 allignToStarting(isLeft),
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
