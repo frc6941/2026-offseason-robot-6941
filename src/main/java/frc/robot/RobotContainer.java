@@ -315,7 +315,7 @@ public class RobotContainer {
         driver.rightBumper()
                 .whileTrue(
                         shootingSuperstructure
-                                .shootWhenReady(false)
+                                .shootWhenReady(false, driver.getHID(), operator.getHID())
                                 .alongWith(
                                         Commands.runOnce(
                                                 () ->

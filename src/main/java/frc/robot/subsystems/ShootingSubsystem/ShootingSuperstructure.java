@@ -6,6 +6,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -17,7 +18,9 @@ import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
+import frc.robot.utils.HubShiftUtil;
 import java.util.function.Supplier;
+import lib.ironpulse.command.RumbleWhenCommand;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.math.filter.EdgeFilter;
@@ -36,11 +39,11 @@ public class ShootingSuperstructure {
     @Getter private final SpindexerSubsystem idx;
     private final LowPassFilter shooterVelocityLPF = new LowPassFilter(10, 0.0);
     private final EdgeFilter edgeFilter = new EdgeFilter(EdgeFilter.EdgeType.RISING, 20.0, 1.0, 1);
+    private final MovingAverageFilter BPSCalculator = new MovingAverageFilter(2, 0);
     private int ballCounter = 0;
     private int ballCounterShoot = 0;
     private TargetMode mode;
     @Getter private boolean isShooting = false;
-    private MovingAverageFilter BPSCalculator = new MovingAverageFilter(2, 0);
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
@@ -103,17 +106,34 @@ public class ShootingSuperstructure {
                         .finallyDo(() -> isShooting = false));
     }
 
+    public Command shootWhenReady(boolean forceFeed, GenericHID... hids) {
+        return Commands.parallel(
+                runFrame(),
+                new RumbleWhenCommand(
+                        () ->
+                                (mode != TargetMode.GOAL
+                                        && HubShiftUtil.getOfficialShiftInfo().active()),
+                        hids),
+                Commands.waitUntil(shooter::velocityAtGoal)
+                        .andThen(
+                                Commands.runOnce(() -> isShooting = true),
+                                idx.runState(
+                                        () ->
+                                                turret.getCurrentMode() == TurretMode.TRACKING
+                                                        ? forceFeed
+                                                                ? IdxMode.FORCE_FEED
+                                                                : IdxMode.FEED
+                                                        : IdxMode.OFF))
+                        .finallyDo(() -> isShooting = false));
+    }
+
     public Command shootOnCondition(Supplier<Boolean> conditional) {
         return Commands.parallel(
                 runFrame(),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
-                                idx.runState(
-                                        () ->
-                                                conditional.get().booleanValue()
-                                                        ? IdxMode.FEED
-                                                        : IdxMode.OFF))
+                                idx.runState(() -> conditional.get() ? IdxMode.FEED : IdxMode.OFF))
                         .finallyDo(() -> isShooting = false));
     }
 
@@ -251,10 +271,7 @@ public class ShootingSuperstructure {
     }
 
     public Command runResetBallCounter() {
-        return Commands.runOnce(
-                () -> {
-                    ballCounter = 0;
-                });
+        return Commands.runOnce(() -> ballCounter = 0);
     }
 
     public enum IdxMode {
