@@ -28,7 +28,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         // logger initialization
-        Logger.addDataReceiver(new NT4Publisher()); // REMOVE before comp
+        if (!DriverStation.isFMSAttached()) {
+            Logger.addDataReceiver(new NT4Publisher());
+        } // REMOVE before comp
         Logger.addDataReceiver(new WPILOGWriter());
 
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
