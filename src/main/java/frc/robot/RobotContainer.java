@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
-import static frc.robot.auto.AutoActions.drivePastNearestSlope;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -280,6 +279,36 @@ public class RobotContainer {
                                                     "Competition/AutoResultWin", false);
                                         })
                                 .ignoringDisable(true));
+
+        driver.x() // L win
+                .onTrue(
+                        Commands.runOnce(
+                                        () -> {
+                                            HubShiftUtil.setAllianceWinOverride(
+                                                    () -> Optional.of(true));
+                                            Logger.recordOutput("Competition/AutoResultSent", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultSent", true);
+                                            Logger.recordOutput("Competition/AutoResultWin", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultWin", true);
+                                        })
+                                .ignoringDisable(true));
+        driver.b() // R lose
+                .onTrue(
+                        Commands.runOnce(
+                                        () -> {
+                                            HubShiftUtil.setAllianceWinOverride(
+                                                    () -> Optional.of(false));
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultSent", true);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultSent", true);
+                                            Logger.recordOutput("Competition/AutoResultWin", false);
+                                            SmartDashboard.putBoolean(
+                                                    "Competition/AutoResultWin", false);
+                                        })
+                                .ignoringDisable(true));
         driver.leftBumper().onTrue(intake.toggleIntake());
         operator.leftBumper().whileTrue(intake.runFeed());
         driver.leftTrigger().onTrue(intake.outZeroCommand());
@@ -288,11 +317,12 @@ public class RobotContainer {
         operator.y().onTrue(shootingSuperstructure.runZero());
         operator.a().whileTrue(shootingSuperstructure.runSetFrame());
 
-        driver.rightTrigger().whileTrue(drivePastNearestSlope());
+        // driver.rightTrigger().whileTrue(drivePastNearestSlope());
 
         driver.povLeft().onTrue(intake.zeroCommand());
 
         operator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
+        driver.rightTrigger().onTrue(shootingSuperstructure.runUnjamming());
         operator.rightTrigger()
                 .whileTrue(
                         shootingSuperstructure

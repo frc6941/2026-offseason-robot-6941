@@ -56,6 +56,8 @@ public class SubsystemConfig {
     /** Optional supply current limit in amps, set to NaN to disable. */
     @Default public final double supplyCurrentLimitAmps = Double.NaN;
 
+    @Default public final double ramp = Double.NaN;
+
     // other close loop configs
     @Default public final GravityTypeValue gravityType = GravityTypeValue.Elevator_Static;
 
@@ -76,6 +78,27 @@ public class SubsystemConfig {
     @Default public final Angle zeroOffset = Degree.of(0.0);
 
     @Default public final ZeroingConfig zeroingConfig = ZeroingConfig.builder().build();
+    @Default public SimConfig simConfig = SimConfig.builder().build();
+
+    /**
+     * Creates a simple SubsystemConfig with only the essential parameters for a basic motor
+     * subsystem.
+     *
+     * @param name The name of the subsystem (for logging/diagnostics)
+     * @param mainId The CAN ID of the main motor
+     * @param mainBus The CAN bus name (e.g., "rio" or "canivore")
+     * @param motorInvertedValue The motor inversion setting
+     * @return A SubsystemConfig with default values for all other parameters
+     */
+    public static SubsystemConfig simpleMotorCfg(
+            String name, int mainId, CANBus mainBus, InvertedValue motorInvertedValue) {
+        return SubsystemConfig.builder()
+                .name(name)
+                .mainId(mainId)
+                .mainBus(mainBus)
+                .motorInvertedValue(motorInvertedValue)
+                .build();
+    }
 
     /** Optional remote CANcoder configuration summary. */
     @Builder
@@ -117,6 +140,8 @@ public class SubsystemConfig {
 
         @Default public final double statorCurrentLimitAmps = Double.NaN;
         @Default public final double supplyCurrentLimitAmps = Double.NaN;
+
+        @Default public final double ramp = Double.NaN;
     }
 
     @Builder
@@ -127,27 +152,5 @@ public class SubsystemConfig {
         @Default
         public final TrapezoidProfile.Constraints profile =
                 new TrapezoidProfile.Constraints(50.0, 100.0);
-    }
-
-    @Default public SimConfig simConfig = SimConfig.builder().build();
-
-    /**
-     * Creates a simple SubsystemConfig with only the essential parameters for a basic motor
-     * subsystem.
-     *
-     * @param name The name of the subsystem (for logging/diagnostics)
-     * @param mainId The CAN ID of the main motor
-     * @param mainBus The CAN bus name (e.g., "rio" or "canivore")
-     * @param motorInvertedValue The motor inversion setting
-     * @return A SubsystemConfig with default values for all other parameters
-     */
-    public static SubsystemConfig simpleMotorCfg(
-            String name, int mainId, CANBus mainBus, InvertedValue motorInvertedValue) {
-        return SubsystemConfig.builder()
-                .name(name)
-                .mainId(mainId)
-                .mainBus(mainBus)
-                .motorInvertedValue(motorInvertedValue)
-                .build();
     }
 }

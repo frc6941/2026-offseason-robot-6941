@@ -4,10 +4,7 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
@@ -52,9 +49,9 @@ public class MotorIOTalonFX implements MotorIO {
     private final StatusSignal<Current> statorSig;
     private final StatusSignal<Current> supplySig;
     private final BaseStatusSignal[] signals;
-    private boolean connected = false;
     private final TalonFXConfiguration fx;
     private final SubsystemConfig config;
+    private boolean connected = false;
 
     public MotorIOTalonFX(SubsystemConfig cfg) {
         this.main = new TalonFX(cfg.mainId, cfg.mainBus);
@@ -76,6 +73,10 @@ public class MotorIOTalonFX implements MotorIO {
             fx.CurrentLimits.SupplyCurrentLimit = cfg.supplyCurrentLimitAmps;
         } else {
             fx.CurrentLimits.SupplyCurrentLimitEnable = false;
+        }
+        if (!Double.isNaN(cfg.ramp)) {
+            fx.withClosedLoopRamps(
+                    new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(cfg.ramp));
         }
         // Optional: remote CANcoder feedback configuration
         if (cfg.enableRemoteCANcoder && cfg.remoteCANcoder != null) {
@@ -126,6 +127,13 @@ public class MotorIOTalonFX implements MotorIO {
                 if (!Double.isNaN(f.supplyCurrentLimitAmps)) {
                     followerCurrentLimits.SupplyCurrentLimitEnable = true;
                     followerCurrentLimits.SupplyCurrentLimit = f.supplyCurrentLimitAmps;
+                }
+                if (!Double.isNaN(f.ramp)) {
+                    followers[i]
+                            .getConfigurator()
+                            .apply(
+                                    new ClosedLoopRampsConfigs()
+                                            .withVoltageClosedLoopRampPeriod(f.ramp));
                 }
                 followers[i].getConfigurator().apply(followerCurrentLimits);
             }
