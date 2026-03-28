@@ -199,9 +199,9 @@ public class RobotContainer {
         // update IO inputs
         PhoenixUtils.refreshAll();
         // update NTparameters
-        if (!DriverStation.isFMSAttached()) {
-            NTParameterRegistry.refresh();
-        }
+        // if (!DriverStation.isFMSAttached()) {
+        NTParameterRegistry.refresh();
+        // }
         // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
         RobotStateRecorder.getInstance()
@@ -431,14 +431,14 @@ public class RobotContainer {
                                                                         : Rotation2d.kZero)
                                                 .alongWith(
                                                         Commands.runOnce(
-                                                                () -> {
-                                                                    RobotStateRecorder.getInstance()
-                                                                            .resetTransform(
-                                                                                    TransformRecorder
-                                                                                            .kFrameWorld,
-                                                                                    TransformRecorder
-                                                                                            .kFrameRobot);
-                                                                })),
+                                                                () ->
+                                                                        RobotStateRecorder
+                                                                                .getInstance()
+                                                                                .resetTransform(
+                                                                                        TransformRecorder
+                                                                                                .kFrameWorld,
+                                                                                        TransformRecorder
+                                                                                                .kFrameRobot))),
                                         Commands.runOnce(
                                                 limelightSubsystem::requestInternalIMUReseedAll))
                                 .alongWith(
