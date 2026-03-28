@@ -272,7 +272,7 @@ public class RobotContainer {
     operator.y().onTrue(shootingSuperstructure.runZero());
     operator.a().whileTrue(shootingSuperstructure.runSetFrame());
 
-    driver.a().whileTrue(drivePastNearestSlope());
+    driver.rightTrigger().whileTrue(drivePastNearestSlope());
 
     driver.povLeft().onTrue(intake.zeroCommand());
 
