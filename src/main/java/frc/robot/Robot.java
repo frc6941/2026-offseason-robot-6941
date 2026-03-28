@@ -28,7 +28,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         // logger initialization
-        if (!DriverStation.isFMSAttached()) {
+        if (!Robot.isReal()) {
             Logger.addDataReceiver(new NT4Publisher());
         } // REMOVE before comp
         Logger.addDataReceiver(new WPILOGWriter());
