@@ -38,6 +38,7 @@ public class IdxConfig {
                     .opposeMain(MotorAlignmentValue.Aligned)
                     .statorCurrentLimitAmps(STATOR_CURRENT_LIMIT_AMPS)
                     .supplyCurrentLimitAmps(SUPPLY_CURRENT_LIMIT_AMPS)
+                    .ramp(0.5)
                     .build()
               })
           .statorCurrentLimitAmps(STATOR_CURRENT_LIMIT_AMPS)
