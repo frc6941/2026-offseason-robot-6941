@@ -29,10 +29,10 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = is10541 ? 337 : 225;
+        public static final double rpmA = is10541 ? 337 : 237.1;
         public static final double rpmB = is10541 ? 0 : 0;
-        public static final double rpmC = is10541 ? -368.8 : 260;
+        public static final double rpmC = is10541 ? -368.8 : 146;
 
-        public static final double distanceScaler = 1.00;
+        public static final double distanceScaler = 0.98;
     }
 }
