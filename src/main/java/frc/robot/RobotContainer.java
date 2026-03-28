@@ -198,9 +198,9 @@ public class RobotContainer {
         // update IO inputs
         PhoenixUtils.refreshAll();
         // update NTparameters
-        // if (!DriverStation.isFMSAttached()) {
+        if (!Robot.isReal()) {
         NTParameterRegistry.refresh();
-        // }
+        }
         // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
         RobotStateRecorder.getInstance()
