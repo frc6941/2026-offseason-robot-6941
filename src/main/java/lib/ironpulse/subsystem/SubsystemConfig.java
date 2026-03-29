@@ -140,6 +140,7 @@ public class SubsystemConfig {
     @Default public final double statorCurrentLimitAmps = Double.NaN;
     @Default public final double supplyCurrentLimitAmps = Double.NaN;
 
+    // TODO: FIX ME
     @Default public final double ramp = Double.NaN;
   }
 
