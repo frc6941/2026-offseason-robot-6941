@@ -268,12 +268,14 @@ public class RobotContainer {
     operator.y().onTrue(shootingSuperstructure.runZero());
     operator.a().whileTrue(shootingSuperstructure.runSetFrame());
     operator.leftTrigger().onTrue(shootingSuperstructure.runUnjamming());
+    operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
     driver.leftBumper().onTrue(intake.toggleIntake());
     driver.povUp().onTrue(intake.outZeroCommand());
     driver.povLeft().onTrue(intake.zeroCommand());
     driver.povDown().onTrue(intake.runRetract());
-    driver.rightTrigger().whileTrue(intake.runFeed());
+    driver.leftTrigger().whileTrue(intake.runFeed());
+    driver.rightTrigger().whileTrue(shootingSuperstructure.runSetFrame());
 
     // driver.rightTrigger().whileTrue(drivePastNearestSlope());
 
@@ -292,7 +294,6 @@ public class RobotContainer {
                           .schedule(
                               indicatorSubsystem.indicateWithTimeout(Patterns.AFTER_SHOOTING, 0.5));
                     }));
-    operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
     driver
         .rightBumper()
