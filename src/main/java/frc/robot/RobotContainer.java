@@ -199,7 +199,7 @@ public class RobotContainer {
         PhoenixUtils.refreshAll();
         // update NTparameters
         if (!Robot.isReal()) {
-        NTParameterRegistry.refresh();
+            NTParameterRegistry.refresh();
         }
         // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
