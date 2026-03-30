@@ -190,6 +190,7 @@ public class AutoFile {
             // For LONG and NORMAL modes, use original single sweep logic
             sweepSequence =
                     Commands.sequence(
+                                    new WaitCommand(2),
                                     Commands.deadline(
                                             followPathFile(sweepPathName, isLeft), intake()),
                                     drivePastSlope(isLeft, false))

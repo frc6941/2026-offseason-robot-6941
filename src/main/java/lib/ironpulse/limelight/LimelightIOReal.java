@@ -283,6 +283,7 @@ public class LimelightIOReal implements LimelightIO {
         inputs.lastHeartbeat = lastHeartbeat;
         inputs.lastTsBootMs = lastTsBootMs;
         inputs.lastSeenTime = lastSeenTime;
+        inputs.temperature = LimelightHelpers.getTemperature(config.getName());
     }
 
     @Override

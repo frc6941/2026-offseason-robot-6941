@@ -74,7 +74,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_SWERVE_IO = false;
     private static final boolean HAS_LL_IO = true;
     private static final boolean HAS_CLIMBER_IO = false;
     private final LimelightSubsystem limelightSubsystem;

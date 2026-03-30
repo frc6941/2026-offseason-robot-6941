@@ -99,5 +99,6 @@ public interface LimelightIO {
         public double lastHeartbeat;
         public double lastTsBootMs;
         public double lastSeenTime;
+        public double temperature;
     }
 }

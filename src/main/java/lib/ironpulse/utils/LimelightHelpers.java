@@ -1421,6 +1421,18 @@ public class LimelightHelpers {
         return getLimelightNTDouble(limelightName, "hb");
     }
 
+    /**
+     * Gets the temperature of the Limelight in degrees Celsius. Temperature is the first element of
+     * the hw array: [cpu_temp_celsius, cpu_usage, ram_usage_percent, fps]
+     *
+     * @param limelightName Name of the Limelight camera
+     * @return Temperature in degrees Celsius
+     */
+    public static double getTemperature(String limelightName) {
+        double[] hw = getLimelightNTDoubleArray(limelightName, "hw");
+        return hw.length > 0 ? hw[0] : 0.0;
+    }
+
     public static String getNeuralClassID(String limelightName) {
         return getLimelightNTString(limelightName, "tclass");
     }

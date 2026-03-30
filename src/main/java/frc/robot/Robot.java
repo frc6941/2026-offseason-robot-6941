@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.commands.FollowPathCommand;
-import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,9 +26,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         // logger initialization
-        if (Robot.isSimulation()) {
-            Logger.addDataReceiver(new NT4Publisher());
-        } // REMOVE before comp
+        // if (Robot.isSimulation()) {
+        Logger.addDataReceiver(new NT4Publisher());
+        // } // REMOVE before comp
         Logger.addDataReceiver(new WPILOGWriter());
 
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -46,15 +44,8 @@ public class Robot extends LoggedRobot {
             DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
         }
         CommandScheduler.getInstance().setPeriod(0.2);
-
         robotContainer = new RobotContainer();
         robotContainer.setThrottle(true);
-
-        // elastic
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-
-        // warm-up path-following
-        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
     }
 
     @Override
