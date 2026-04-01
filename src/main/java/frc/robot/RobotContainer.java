@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.auto.AutoActions;
 import frc.robot.auto.AutoFile;
 import frc.robot.auto.AutoRoutines;
@@ -38,6 +39,7 @@ import frc.robot.utils.HubShiftUtil;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import lib.ironpulse.command.SysIdCommand;
 import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -74,7 +76,7 @@ public class RobotContainer {
     private static final boolean HAS_IDX_IO = true;
     private static final boolean HAS_INTAKER_ROLLER_IO = true;
     private static final boolean HAS_INTAKER_EXTENSION_IO = true;
-    private static final boolean HAS_SWERVE_IO = false;
+    private static final boolean HAS_SWERVE_IO = true;
     private static final boolean HAS_LL_IO = true;
     private static final boolean HAS_CLIMBER_IO = false;
     private final LimelightSubsystem limelightSubsystem;
@@ -287,9 +289,9 @@ public class RobotContainer {
         operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
         driver.leftBumper().onTrue(intake.toggleIntake());
-        driver.povUp().onTrue(intake.outZeroCommand());
-        driver.povLeft().onTrue(intake.zeroCommand());
-        driver.povDown().onTrue(intake.runRetract());
+        // driver.povUp().onTrue(intake.outZeroCommand());
+        // driver.povLeft().onTrue(intake.zeroCommand());
+        // driver.povDown().onTrue(intake.runRetract());
         driver.leftTrigger().whileTrue(intake.runFeed());
         driver.rightTrigger().whileTrue(shootingSuperstructure.runSetFrame());
 
@@ -345,11 +347,11 @@ public class RobotContainer {
         // driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
 
-        // SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
-        // driver.povDown().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kForward));
-        // driver.povRight().whileTrue(spindexerSysId.quasistatic(SysIdRoutine.Direction.kReverse));
-        // driver.povLeft().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kForward));
-        // driver.povUp().whileTrue(spindexerSysId.dynamic(SysIdRoutine.Direction.kReverse));
+        SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
+        driver.povDown().whileTrue(spindexerSysId.quasistatic(Direction.kForward));
+        driver.povRight().whileTrue(spindexerSysId.quasistatic(Direction.kReverse));
+        driver.povLeft().whileTrue(spindexerSysId.dynamic(Direction.kForward));
+        driver.povUp().whileTrue(spindexerSysId.dynamic(Direction.kReverse));
         // driver.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // driver.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
         // driver.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));

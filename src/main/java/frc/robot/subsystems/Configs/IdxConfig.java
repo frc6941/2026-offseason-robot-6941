@@ -15,7 +15,7 @@ public class IdxConfig {
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 95;
     public static final double SPINDEXER_GEAR_RATIO =
             is10541
-                    ? 16.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0
+                    ? 16.0 / 1.0 * 32.0 / 18 * 42.0 / 20.0
                     : 12.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     private static final int SPINDEXER_ID = 58;
 
