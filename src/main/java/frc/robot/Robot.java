@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -12,6 +13,8 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.pathplanner.lib.commands.FollowPathCommand;
 
 public class Robot extends LoggedRobot {
     Timer m_gcTimer = new Timer();
@@ -45,7 +48,13 @@ public class Robot extends LoggedRobot {
         }
         CommandScheduler.getInstance().setPeriod(0.2);
         robotContainer = new RobotContainer();
-        robotContainer.setThrottle(true);
+        robotContainer.setThrottle(false);
+
+        // elastic
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+        // warm-up path-following
+        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
     }
 
     @Override
@@ -56,7 +65,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-        robotContainer.setThrottle(true);
+        robotContainer.setThrottle(false);
     }
 
     @Override
