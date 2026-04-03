@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.FieldConstants;
-import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
@@ -23,9 +22,6 @@ import java.util.function.Supplier;
 import lib.ironpulse.command.RumbleWhenCommand;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
-import lib.ironpulse.math.filter.EdgeFilter;
-import lib.ironpulse.math.filter.LowPassFilter;
-import lib.ironpulse.math.filter.MovingAverageFilter;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
@@ -37,11 +33,7 @@ public class ShootingSuperstructure {
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     @Getter private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     @Getter private final SpindexerSubsystem idx;
-    private final LowPassFilter shooterVelocityLPF = new LowPassFilter(10, 0.0);
-    private final EdgeFilter edgeFilter = new EdgeFilter(EdgeFilter.EdgeType.RISING, 20.0, 1.0, 1);
-    private final MovingAverageFilter BPSCalculator = new MovingAverageFilter(2, 0);
-    private int ballCounter = 0;
-    private int ballCounterShoot = 0;
+    @Getter private final BallCounter ballCounter;
     private TargetMode mode;
     @Getter private boolean isShooting = false;
 
@@ -54,6 +46,7 @@ public class ShootingSuperstructure {
         this.hood = hood;
         this.shooter = shooter;
         this.idx = idx;
+        this.ballCounter = new BallCounter(this);
     }
 
     public ShotFrame getCurrentFrame() {
@@ -132,6 +125,8 @@ public class ShootingSuperstructure {
                 runFrame(),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
+                                idx.runState(() -> IdxMode.REVERSE)
+                                        .withTimeout(SpindexerParamsNT.unjammTimeoutSec.getValue()),
                                 Commands.runOnce(() -> isShooting = true),
                                 idx.runState(() -> conditional.get() ? IdxMode.FEED : IdxMode.OFF))
                         .finallyDo(() -> isShooting = false));
@@ -193,25 +188,9 @@ public class ShootingSuperstructure {
 
         double shooterRpsCurr = shooter.getVelocity().in(RotationsPerSecond);
         double shooterRpsDes = shooter.getCurrSetpoint().in(RotationsPerSecond);
-        double shooterCurrent = shooter.getSupplyCurrent().in(Amp);
-        shooterVelocityLPF.input(shooterRpsCurr, RobotConstants.LOOPER_DT);
-        edgeFilter.input(shooterCurrent, RobotConstants.LOOPER_DT);
-        boolean shot =
-                edgeFilter.compute() == 1.0
-                        && shooter.velocityAtGoal(RotationsPerSecond.of(5.0))
-                        && idx.getCurrentState() == SpindexerSubsystem.State.FEED;
-        ballCounter += shot ? 1 : 0;
-        ballCounterShoot += (shot && mode == TargetMode.GOAL) ? 1 : 0;
-        BPSCalculator.input(shot ? 1.0 : 0.0, RobotConstants.LOOPER_DT);
 
-        Logger.recordOutput("ShotCounter/RpsCurr", shooterRpsCurr);
-        Logger.recordOutput("ShotCounter/RpsDes", shooterRpsDes);
-        Logger.recordOutput("ShotCounter/Current", shooterCurrent);
-        Logger.recordOutput("ShotCounter/BallDetected", shot);
-        Logger.recordOutput("ShotCounter/BallCountAll", ballCounter);
-        Logger.recordOutput("ShotCounter/BallCountShoot", ballCounterShoot);
-        Logger.recordOutput(
-                "ShotCounter/AvgBPS", BPSCalculator.compute() * BPSCalculator.getWindowSize());
+        // Update ball counter with current shooter state
+        ballCounter.update(shooterRpsCurr, shooterRpsDes, shooter.getSupplyCurrent(), mode);
 
         return scaledRpm;
     }
@@ -265,12 +244,12 @@ public class ShootingSuperstructure {
                         () -> {
                             Angle bba = Degrees.of(77);
                             double rpm = computeRpm(MetersPerSecond.of(6), bba);
-                            return RotationsPerSecond.of(rpm / 60.0);
+                            return RotationsPerSecond.of(rpm / 60);
                         }));
     }
 
     public Command runResetBallCounter() {
-        return Commands.runOnce(() -> ballCounter = 0);
+        return Commands.runOnce(() -> ballCounter.resetAll());
     }
 
     public enum IdxMode {

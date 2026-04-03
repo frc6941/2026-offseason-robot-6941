@@ -608,6 +608,10 @@ public class RobotContainer {
                 ClimberConfiig.CLIMB_METERS_PER_ROTATION);
     }
 
+    public Command zeroIntake() {
+        return intake.zeroCommand();
+    }
+
     public Command getAutonomousCommand() {
         return AutoFile.buildAuto();
         // return AutoRoutines.rightLongFuel();

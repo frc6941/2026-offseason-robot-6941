@@ -41,6 +41,8 @@ public class AutoFile {
             new LoggedDashboardChooser<EndBehaviour>("End Behaviour Chooser");
     private static final LoggedDashboardChooser<Integer> sweepCyclesChooser =
             new LoggedDashboardChooser<Integer>("Sweep Cycles Chooser");
+    private static final LoggedDashboardChooser<Boolean> waitingChooser =
+            new LoggedDashboardChooser<Boolean>("Waiting Chooser");
 
     private static final Alert competitionNotSelectedAlert =
             new Alert("Competition auto is not running", Alert.AlertType.kWarning);
@@ -73,6 +75,9 @@ public class AutoFile {
         sweepCyclesChooser.addDefaultOption("1", 1);
         sweepCyclesChooser.addOption("2", 2);
         sweepCyclesChooser.addOption("3", 3);
+
+        waitingChooser.addDefaultOption("Wait", true);
+        waitingChooser.addOption("No Waiting", false);
     }
 
     private static void initializeAutoPaths() {
@@ -160,6 +165,7 @@ public class AutoFile {
         if (invalidConfigAlert.get()) return Commands.none();
         boolean isLeft = sideChooser.get() == AutoSide.LEFT;
         SweepMode sweepMode = sweepModeChooser.get();
+
         String sweepPathName =
                 switch (sweepMode) {
                     case FAST -> "quickSweepRight";
@@ -190,7 +196,7 @@ public class AutoFile {
             // For LONG and NORMAL modes, use original single sweep logic
             sweepSequence =
                     Commands.sequence(
-                                    new WaitCommand(2),
+                                    new WaitCommand(waitingChooser.get() ? 2 : 0),
                                     Commands.deadline(
                                             followPathFile(sweepPathName, isLeft), intake()),
                                     drivePastSlope(isLeft, false))
@@ -207,11 +213,7 @@ public class AutoFile {
                                 }),
                         Commands.sequence(
                                 // Initial drive past slope with zeroing
-                                Commands.deadline(
-                                        drivePastSlope(isLeft, true),
-                                        Commands.defer(
-                                                AutoActions::zeroEverything,
-                                                Collections.emptySet())),
+                                drivePastSlope(isLeft, true),
 
                                 // Sweep sequence (single or multiple cycles)
                                 sweepSequence,

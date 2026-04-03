@@ -16,11 +16,11 @@ public final class ShotCalculatorConfig {
     @NTParameter(tableName = "Params/ShotCalculator")
     public static final class ShotCalculatorParams {
         // Model tuning (model-space adjustments)
-        public static final double trajectoryBiasDegGOAL = is10541 ? -6 : -6;
+        public static final double trajectoryBiasDegGOAL = is10541 ? -5.5 : -6;
         public static final double trajectoryBiasDegFEED = -2;
         public static final double loookfwdDistanceScale = 0;
         public static final double lateralVelocityCompScale = is10541 ? 1.01 : 1.1;
-        public static final double lookfwdDelayCycles = is10541 ? 1 : 3;
+        public static final double lookfwdDelayCycles = is10541 ? 3 : 3;
 
         public static final double lookfwdFlightScale = 0;
 

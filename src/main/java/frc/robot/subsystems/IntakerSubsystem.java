@@ -8,7 +8,6 @@ import static frc.robot.RobotConstants.is10541;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Robot;
@@ -46,9 +45,8 @@ public class IntakerSubsystem extends SubsystemBase {
 
     private boolean isDeployMode() {
         return (currentMode == IntakeMode.INTAKING
-                        || currentMode == IntakeMode.EXTENDED_IDLE
-                        || currentMode == IntakeMode.EXTENDED_REVERSE)
-                && !RobotState.isAutonomous();
+                || currentMode == IntakeMode.EXTENDED_IDLE
+                || currentMode == IntakeMode.EXTENDED_REVERSE);
     }
 
     public void setDefaultCommand() {
@@ -243,10 +241,7 @@ public class IntakerSubsystem extends SubsystemBase {
 
         Command simZero =
                 Commands.sequence(
-                        Commands.runOnce(
-                                () ->
-                                        extension.setCurrPos(
-                                                Meters.of(is10541 ? 0.315766 : 0.319718))),
+                        Commands.runOnce(() -> extension.setCurrPos(Meters.of(0))),
                         new WaitCommand(0.2),
                         Commands.runOnce(
                                 () ->
