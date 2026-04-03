@@ -95,7 +95,7 @@ public class ShootingSuperstructure {
                 runFrame(),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
-                                // Commands.runOnce(() -> isShooting = true),
+                                Commands.runOnce(() -> isShooting = true),
                                 idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
@@ -116,8 +116,6 @@ public class ShootingSuperstructure {
                         hids),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
-                                // idx.runState(() -> IdxMode.REVERSE)
-                                //         .withTimeout(SpindexerParamsNT.unjammLockoutSec.getValue()),
                                 Commands.runOnce(() -> isShooting = true),
                                 idx.runState(
                                         () ->
@@ -134,8 +132,6 @@ public class ShootingSuperstructure {
                 runFrame(),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
-                                idx.runState(() -> IdxMode.REVERSE)
-                                        .withTimeout(SpindexerParamsNT.unjammLockoutSec.getValue()),
                                 Commands.runOnce(() -> isShooting = true),
                                 idx.runState(() -> conditional.get() ? IdxMode.FEED : IdxMode.OFF))
                         .finallyDo(() -> isShooting = false));
