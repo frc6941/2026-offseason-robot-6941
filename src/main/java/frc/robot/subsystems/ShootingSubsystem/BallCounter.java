@@ -10,6 +10,7 @@ import frc.robot.utils.HubShiftUtil;
 import frc.robot.utils.HubShiftUtil.ShiftEnum;
 import lib.ironpulse.math.filter.EdgeFilter;
 import lib.ironpulse.math.filter.LowPassFilter;
+import lib.ironpulse.math.filter.MovingAverageFilter;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -29,6 +30,7 @@ public class BallCounter {
     private static final double BPS_TIMEOUT = 1.0; // Reset BPS to 0 after 1 second of no shots
     private double lastShotTime = 0.0;
     private double currentBPS = 0.0;
+    private final MovingAverageFilter bpsFilter = new MovingAverageFilter(3, 0.0);
 
     // Overall counters
     private int ballCountAll = 0;
@@ -77,6 +79,7 @@ public class BallCounter {
                 double timeBetweenShots = currentTime - lastShotTime;
                 if (timeBetweenShots > 0) {
                     currentBPS = 1.0 / timeBetweenShots;
+                    bpsFilter.input(currentBPS, RobotConstants.LOOPER_DT);
                 }
             }
             lastShotTime = currentTime;
@@ -86,6 +89,7 @@ public class BallCounter {
         double timeSinceLastShot = Timer.getFPGATimestamp() - lastShotTime;
         if (timeSinceLastShot > BPS_TIMEOUT) {
             currentBPS = 0.0;
+            bpsFilter.input(0.0, RobotConstants.LOOPER_DT);
         }
 
         // Log outputs
@@ -99,7 +103,7 @@ public class BallCounter {
         Logger.recordOutput("ShotCounter/BallDetected", shot);
         Logger.recordOutput("ShotCounter/BallCountAll", ballCountAll);
         Logger.recordOutput("ShotCounter/BallCountGoal", ballCountGoal);
-        Logger.recordOutput("ShotCounter/AvgBPS", currentBPS);
+        Logger.recordOutput("ShotCounter/AvgBPS", bpsFilter.compute());
 
         // Log per-shift counters (game sequence: AUTO, TRANSITION, SHIFT1-4, ENDGAME)
         Logger.recordOutput("ShotCounter/Auto", shiftCounters[0]);
@@ -168,6 +172,6 @@ public class BallCounter {
     }
 
     public double getBallsPerSecond() {
-        return currentBPS;
+        return bpsFilter.compute();
     }
 }

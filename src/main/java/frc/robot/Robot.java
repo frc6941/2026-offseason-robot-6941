@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,8 +14,6 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import com.pathplanner.lib.commands.FollowPathCommand;
 
 public class Robot extends LoggedRobot {
     Timer m_gcTimer = new Timer();
@@ -36,6 +35,8 @@ public class Robot extends LoggedRobot {
 
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.start();
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.start();
 
         // config watchdog
         try {
@@ -47,9 +48,12 @@ public class Robot extends LoggedRobot {
             DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
         }
         CommandScheduler.getInstance().setPeriod(0.2);
+
         robotContainer = new RobotContainer();
         robotContainer.setThrottle(false);
 
+        // elastic
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         // elastic
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
