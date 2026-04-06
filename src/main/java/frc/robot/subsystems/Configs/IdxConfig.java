@@ -15,7 +15,7 @@ public class IdxConfig {
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 95;
     public static final double SPINDEXER_GEAR_RATIO =
             is10541
-                    ? 12.0 / 1.0 * 30 / 22 * 32 / 18
+                    ? 12.0 / 1.0 * 30 / 22 * 32/18
                     : 12.0 / 1.0 * 30.0 / 22.0 * 42.0 / 20.0; // RATIO FROM MOTOR TO SPIN
     private static final int SPINDEXER_ID = 58;
 
@@ -51,7 +51,7 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/IdxModes")
     public static final class SpindexerModeParams {
-        public static final double feedRPS = 2.1; // 1.6 for 10541
+        public static final double feedRPS = 2.2; // 1.6 for 10541
 
         public static final double revRPS = -1;
         public static final double idleRPS = 0.0;
@@ -59,18 +59,21 @@ public class IdxConfig {
 
     @NTParameter(tableName = "Params/" + SPINDEXER)
     public static final class SpindexerParams {
-        public static final double kP = 3.713;
-        public static final double kI = 0.0;
+        public static final double kP = 5;
+        public static final double kI = 0.05;
         public static final double kD = 0.0;
-        public static final double kV = 2.8194;
-        public static final double kA = 0.42496;
-        public static final double kS = 0.29639;
+        public static final double kV = 4.1251;
+        public static final double kA = 1.2866;
+        public static final double kS = 0.24452;
 
         public static final double unjammTimeoutSec = 0.08;
-        public static final double unjammTriggerAmps = 90;
+        public static final double unjammTriggerAmps = 85;
         public static final double unjammTriggerBelowRps = 1.65; // 1.5 for 10541
         public static final double unjammTriggerSec = 0.08;
         public static final double unjammLockoutSec = 0.2;
+        public static final boolean periodicUnjamEnabled = false;
+        public static final double periodicUnjamIntervalSec = 1.0;
+        public static final boolean unjamBeforeFeedEnabled = false;
 
         public static final boolean isBrake = true;
 

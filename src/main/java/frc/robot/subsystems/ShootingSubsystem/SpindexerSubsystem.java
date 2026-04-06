@@ -38,6 +38,7 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
     private boolean jamCondition = false;
 
     private double stateStartTimestampSec = Timer.getTimestamp();
+    private double offUnjamTimer = Timer.getFPGATimestamp();
     private double jamDetectionLockoutUntilSec = Double.NEGATIVE_INFINITY;
     private double filteredStatorCurrentAmps = 0.0;
     private double filteredVelocityRps = 0.0;
@@ -137,7 +138,16 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
         }
 
         return switch (currentState) {
-            case OFF -> RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue());
+            case OFF -> SpindexerParamsNT.periodicUnjamEnabled.getValue()
+                    ? (RotationsPerSecond.of(
+                            (0.5
+                                    * Math.sin(
+                                            2
+                                                    * Math.PI
+                                                    / SpindexerParamsNT.periodicUnjamIntervalSec
+                                                            .getValue()
+                                                    * now))))
+                    : RotationsPerSecond.of(SpindexerModeParamsNT.idleRPS.getValue());
             case FEED, MANUAL_FEED -> RotationsPerSecond.of(
                     SpindexerModeParamsNT.feedRPS.getValue());
             case UNJAM_REVERSE, MANUAL_REVERSE -> RotationsPerSecond.of(

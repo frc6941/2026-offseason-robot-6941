@@ -320,6 +320,7 @@ public class AutoFile {
                         hunt, //
                         driveBack, //
                         parallel( //
+                                shoot(),
                                 sequence(driveToCorner, waitSeconds(1.5), sweepToClimb),
                                 resetWhenNeeded))
                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
