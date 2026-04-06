@@ -21,11 +21,11 @@ public class BallCounter {
 
     private final ShootingSuperstructure shootingSuperstructure;
 
-    // Shot detection filters
+    // Shot detection filters - same as old code
     private final LowPassFilter shooterVelocityLPF = new LowPassFilter(10, 0.0);
     private final EdgeFilter edgeFilter = new EdgeFilter(EdgeFilter.EdgeType.RISING, 20.0, 1.0, 1);
 
-    // BPS calculation
+    // BPS calculation using time between shots
     private static final double BPS_TIMEOUT = 1.0; // Reset BPS to 0 after 1 second of no shots
     private double lastShotTime = 0.0;
     private double currentBPS = 0.0;
@@ -34,21 +34,21 @@ public class BallCounter {
     private int ballCountAll = 0;
     private int ballCountGoal = 0;
 
-    // Per-shift counters
+    // Per-shift counters (AUTO, TRANSITION, SHIFT1-4, ENDGAME)
     private final int[] shiftCounters = new int[NUM_SHIFTS];
 
     public BallCounter(ShootingSuperstructure shootingSuperstructure) {
         this.shootingSuperstructure = shootingSuperstructure;
     }
 
-    /** Updates the ball counter. Should be called periodically. */
+    /** Updates the ball counter. Should be called periodically from computeRpm. */
     public void update(
             double shooterRpsCurr, double shooterRpsDes, Current shooterCurrent, TargetMode mode) {
-        // Update filters
+        // Update filters - same as old code
         shooterVelocityLPF.input(shooterRpsCurr, RobotConstants.LOOPER_DT);
         edgeFilter.input(shooterCurrent.in(Amp), RobotConstants.LOOPER_DT);
 
-        // Detect shot: rising edge on current + at velocity + feeding
+        // Detect shot - EXACT same logic as old code
         boolean shot =
                 edgeFilter.compute() == 1.0
                         && shootingSuperstructure
