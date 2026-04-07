@@ -252,13 +252,7 @@ public class AutoFile {
                                                                                                 .FUEL
                                                                                 && autoTimer.get()
                                                                                         >= 18)
-                                                        .andThen(
-                                                                Commands.parallel(
-                                                                        Commands.defer(
-                                                                                intake::zeroCommand,
-                                                                                Collections
-                                                                                        .emptySet()),
-                                                                        intake())))
+                                                        .andThen(intake()))
                                         .onlyIf(
                                                 () ->
                                                         endBehaviourChooser.get()

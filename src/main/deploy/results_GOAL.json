@@ -2,30 +2,30 @@
     {
         "distance": 1.3,
         "robot_vel": -4.5,
-        "final_vel": 8.2,
-        "final_angle": 44.0,
-        "flight_time": 0.97
+        "final_vel": 8.4,
+        "final_angle": 46.5,
+        "flight_time": 1.065
     },
     {
         "distance": 1.3,
         "robot_vel": -4.3,
-        "final_vel": 8.0,
-        "final_angle": 44.0,
-        "flight_time": 0.93
+        "final_vel": 8.2,
+        "final_angle": 47.0,
+        "flight_time": 1.055
     },
     {
         "distance": 1.3,
         "robot_vel": -4.1,
-        "final_vel": 7.8,
-        "final_angle": 44.0,
-        "flight_time": 0.895
+        "final_vel": 8.0,
+        "final_angle": 47.0,
+        "flight_time": 1.0
     },
     {
         "distance": 1.3,
         "robot_vel": -3.9,
-        "final_vel": 7.6,
-        "final_angle": 44.0,
-        "flight_time": 0.86
+        "final_vel": 7.8,
+        "final_angle": 47.5,
+        "flight_time": 0.99
     },
     {
         "distance": 1.3,
@@ -163,23 +163,23 @@
     {
         "distance": 1.4,
         "robot_vel": -4.5,
-        "final_vel": 8.2,
-        "final_angle": 42,
-        "flight_time": 0.915
+        "final_vel": 8.4,
+        "final_angle": 45,
+        "flight_time": 1.02
     },
     {
         "distance": 1.4,
         "robot_vel": -4.3,
-        "final_vel": 8.0,
-        "final_angle": 42,
-        "flight_time": 0.885
+        "final_vel": 8.2,
+        "final_angle": 45.5,
+        "flight_time": 1.01
     },
     {
         "distance": 1.4,
         "robot_vel": -4.1,
-        "final_vel": 7.8,
-        "final_angle": 42,
-        "flight_time": 0.855
+        "final_vel": 8.0,
+        "final_angle": 45.5,
+        "flight_time": 0.97
     },
     {
         "distance": 1.4,
@@ -331,37 +331,37 @@
     {
         "distance": 1.5,
         "robot_vel": -4.5,
-        "final_vel": 8.4,
-        "final_angle": 43.5,
-        "flight_time": 0.985
+        "final_vel": 9.0,
+        "final_angle": 50.0,
+        "flight_time": 1.24
     },
     {
         "distance": 1.5,
         "robot_vel": -4.3,
-        "final_vel": 8.2,
-        "final_angle": 43.5,
-        "flight_time": 0.95
+        "final_vel": 8.4,
+        "final_angle": 46.5,
+        "flight_time": 1.06
     },
     {
         "distance": 1.5,
         "robot_vel": -4.1,
-        "final_vel": 8.0,
-        "final_angle": 43.5,
-        "flight_time": 0.915
+        "final_vel": 8.2,
+        "final_angle": 47.0,
+        "flight_time": 1.055
     },
     {
         "distance": 1.5,
         "robot_vel": -3.9,
-        "final_vel": 7.8,
-        "final_angle": 43.5,
-        "flight_time": 0.885
+        "final_vel": 8.0,
+        "final_angle": 47.0,
+        "flight_time": 1.01
     },
     {
         "distance": 1.5,
         "robot_vel": -3.7,
-        "final_vel": 7.6,
-        "final_angle": 43.0,
-        "flight_time": 0.84
+        "final_vel": 7.8,
+        "final_angle": 47.0,
+        "flight_time": 0.965
     },
     {
         "distance": 1.5,
@@ -499,23 +499,23 @@
     {
         "distance": 1.6,
         "robot_vel": -4.5,
-        "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.96
+        "final_vel": 8.6,
+        "final_angle": 45,
+        "flight_time": 1.06
     },
     {
         "distance": 1.6,
         "robot_vel": -4.3,
-        "final_vel": 8.2,
-        "final_angle": 42,
-        "flight_time": 0.93
+        "final_vel": 8.4,
+        "final_angle": 45,
+        "flight_time": 1.02
     },
     {
         "distance": 1.6,
         "robot_vel": -4.1,
-        "final_vel": 8.0,
-        "final_angle": 42,
-        "flight_time": 0.9
+        "final_vel": 8.2,
+        "final_angle": 45,
+        "flight_time": 0.985
     },
     {
         "distance": 1.6,
@@ -528,22 +528,22 @@
         "distance": 1.6,
         "robot_vel": -3.7,
         "final_vel": 7.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.92
     },
     {
         "distance": 1.6,
         "robot_vel": -3.5,
         "final_vel": 7.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.89
     },
     {
         "distance": 1.6,
         "robot_vel": -3.3,
         "final_vel": 7.4,
-        "final_angle": 44.5,
-        "flight_time": 0.84
+        "final_angle": 45,
+        "flight_time": 0.86
     },
     {
         "distance": 1.6,
@@ -674,44 +674,44 @@
     {
         "distance": 1.7,
         "robot_vel": -4.5,
-        "final_vel": 8.6,
-        "final_angle": 43.5,
-        "flight_time": 1.025
+        "final_vel": 8.8,
+        "final_angle": 46.0,
+        "flight_time": 1.11
     },
     {
         "distance": 1.7,
         "robot_vel": -4.3,
-        "final_vel": 8.4,
-        "final_angle": 43.5,
-        "flight_time": 0.99
+        "final_vel": 8.6,
+        "final_angle": 46.5,
+        "flight_time": 1.105
     },
     {
         "distance": 1.7,
         "robot_vel": -4.1,
-        "final_vel": 8.2,
-        "final_angle": 43.5,
-        "flight_time": 0.96
+        "final_vel": 8.4,
+        "final_angle": 46.5,
+        "flight_time": 1.06
     },
     {
         "distance": 1.7,
         "robot_vel": -3.9,
-        "final_vel": 8.0,
-        "final_angle": 43.0,
-        "flight_time": 0.91
+        "final_vel": 8.2,
+        "final_angle": 46.5,
+        "flight_time": 1.02
     },
     {
         "distance": 1.7,
         "robot_vel": -3.7,
-        "final_vel": 7.8,
-        "final_angle": 42,
-        "flight_time": 0.845
+        "final_vel": 8.0,
+        "final_angle": 47.0,
+        "flight_time": 1.015
     },
     {
         "distance": 1.7,
         "robot_vel": -3.5,
-        "final_vel": 7.6,
-        "final_angle": 43.0,
-        "flight_time": 0.86
+        "final_vel": 7.8,
+        "final_angle": 47.0,
+        "flight_time": 0.975
     },
     {
         "distance": 1.7,
@@ -849,51 +849,51 @@
     {
         "distance": 1.8,
         "robot_vel": -4.5,
-        "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.995
+        "final_vel": 8.8,
+        "final_angle": 45,
+        "flight_time": 1.1
     },
     {
         "distance": 1.8,
         "robot_vel": -4.3,
         "final_vel": 8.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.06
     },
     {
         "distance": 1.8,
         "robot_vel": -4.1,
         "final_vel": 8.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.025
     },
     {
         "distance": 1.8,
         "robot_vel": -3.9,
         "final_vel": 8.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.99
     },
     {
         "distance": 1.8,
         "robot_vel": -3.7,
         "final_vel": 8.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.96
     },
     {
         "distance": 1.8,
         "robot_vel": -3.5,
         "final_vel": 7.8,
-        "final_angle": 44.5,
-        "flight_time": 0.91
+        "final_angle": 45,
+        "flight_time": 0.93
     },
     {
         "distance": 1.8,
         "robot_vel": -3.3,
         "final_vel": 7.6,
-        "final_angle": 43.5,
-        "flight_time": 0.845
+        "final_angle": 45,
+        "flight_time": 0.905
     },
     {
         "distance": 1.8,
@@ -1031,44 +1031,44 @@
     {
         "distance": 1.9,
         "robot_vel": -4.5,
-        "final_vel": 8.8,
-        "final_angle": 43.5,
-        "flight_time": 1.06
+        "final_vel": 9.0,
+        "final_angle": 46.0,
+        "flight_time": 1.145
     },
     {
         "distance": 1.9,
         "robot_vel": -4.3,
-        "final_vel": 8.6,
-        "final_angle": 43.0,
-        "flight_time": 1.0
+        "final_vel": 9.0,
+        "final_angle": 48.5,
+        "flight_time": 1.21
     },
     {
         "distance": 1.9,
         "robot_vel": -4.1,
-        "final_vel": 8.4,
-        "final_angle": 43.0,
-        "flight_time": 0.975
+        "final_vel": 8.6,
+        "final_angle": 46.5,
+        "flight_time": 1.1
     },
     {
         "distance": 1.9,
         "robot_vel": -3.9,
-        "final_vel": 8.2,
-        "final_angle": 42.5,
-        "flight_time": 0.925
+        "final_vel": 8.4,
+        "final_angle": 46.5,
+        "flight_time": 1.06
     },
     {
         "distance": 1.9,
         "robot_vel": -3.7,
-        "final_vel": 8.0,
-        "final_angle": 42,
-        "flight_time": 0.88
+        "final_vel": 8.2,
+        "final_angle": 46.5,
+        "flight_time": 1.025
     },
     {
         "distance": 1.9,
         "robot_vel": -3.5,
-        "final_vel": 7.8,
-        "final_angle": 42,
-        "flight_time": 0.86
+        "final_vel": 8.0,
+        "final_angle": 46.5,
+        "flight_time": 0.99
     },
     {
         "distance": 1.9,
@@ -1088,7 +1088,7 @@
         "distance": 1.9,
         "robot_vel": -2.9,
         "final_vel": 7.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.845
     },
     {
@@ -1213,58 +1213,58 @@
     {
         "distance": 2.0,
         "robot_vel": -4.5,
-        "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.03
+        "final_vel": 9.0,
+        "final_angle": 45,
+        "flight_time": 1.135
     },
     {
         "distance": 2.0,
         "robot_vel": -4.3,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.095
     },
     {
         "distance": 2.0,
         "robot_vel": -4.1,
         "final_vel": 8.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.06
     },
     {
         "distance": 2.0,
         "robot_vel": -3.9,
         "final_vel": 8.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.03
     },
     {
         "distance": 2.0,
         "robot_vel": -3.7,
         "final_vel": 8.2,
-        "final_angle": 44.5,
-        "flight_time": 0.975
+        "final_angle": 45,
+        "flight_time": 1.0
     },
     {
         "distance": 2.0,
         "robot_vel": -3.5,
         "final_vel": 8.0,
-        "final_angle": 44.0,
-        "flight_time": 0.925
+        "final_angle": 45,
+        "flight_time": 0.97
     },
     {
         "distance": 2.0,
         "robot_vel": -3.3,
         "final_vel": 7.8,
-        "final_angle": 43.0,
-        "flight_time": 0.865
+        "final_angle": 45,
+        "flight_time": 0.945
     },
     {
         "distance": 2.0,
         "robot_vel": -3.1,
-        "final_vel": 7.6,
-        "final_angle": 43.5,
-        "flight_time": 0.865
+        "final_vel": 7.8,
+        "final_angle": 48.0,
+        "flight_time": 0.99
     },
     {
         "distance": 2.0,
@@ -1402,44 +1402,44 @@
     {
         "distance": 2.1,
         "robot_vel": -4.5,
-        "final_vel": 9.0,
-        "final_angle": 43.5,
-        "flight_time": 1.09
+        "final_vel": 9.2,
+        "final_angle": 46.0,
+        "flight_time": 1.175
     },
     {
         "distance": 2.1,
         "robot_vel": -4.3,
-        "final_vel": 8.8,
-        "final_angle": 43.0,
-        "flight_time": 1.035
+        "final_vel": 9.0,
+        "final_angle": 46.0,
+        "flight_time": 1.135
     },
     {
         "distance": 2.1,
         "robot_vel": -4.1,
-        "final_vel": 8.6,
-        "final_angle": 43.0,
-        "flight_time": 1.005
+        "final_vel": 8.8,
+        "final_angle": 46.5,
+        "flight_time": 1.135
     },
     {
         "distance": 2.1,
         "robot_vel": -3.9,
-        "final_vel": 8.4,
-        "final_angle": 42.5,
-        "flight_time": 0.96
+        "final_vel": 8.6,
+        "final_angle": 46.5,
+        "flight_time": 1.095
     },
     {
         "distance": 2.1,
         "robot_vel": -3.7,
-        "final_vel": 8.2,
-        "final_angle": 42,
-        "flight_time": 0.915
+        "final_vel": 8.4,
+        "final_angle": 46.5,
+        "flight_time": 1.06
     },
     {
         "distance": 2.1,
         "robot_vel": -3.5,
-        "final_vel": 8.0,
-        "final_angle": 42,
-        "flight_time": 0.895
+        "final_vel": 8.2,
+        "final_angle": 46.5,
+        "flight_time": 1.03
     },
     {
         "distance": 2.1,
@@ -1459,8 +1459,8 @@
         "distance": 2.1,
         "robot_vel": -2.9,
         "final_vel": 7.6,
-        "final_angle": 44.5,
-        "flight_time": 0.87
+        "final_angle": 45,
+        "flight_time": 0.885
     },
     {
         "distance": 2.1,
@@ -1591,58 +1591,58 @@
     {
         "distance": 2.2,
         "robot_vel": -4.5,
-        "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.06
+        "final_vel": 9.2,
+        "final_angle": 45,
+        "flight_time": 1.16
     },
     {
         "distance": 2.2,
         "robot_vel": -4.3,
         "final_vel": 9.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.125
     },
     {
         "distance": 2.2,
         "robot_vel": -4.1,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.095
     },
     {
         "distance": 2.2,
         "robot_vel": -3.9,
         "final_vel": 8.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.06
     },
     {
         "distance": 2.2,
         "robot_vel": -3.7,
         "final_vel": 8.4,
-        "final_angle": 44.5,
-        "flight_time": 1.01
+        "final_angle": 45,
+        "flight_time": 1.03
     },
     {
         "distance": 2.2,
         "robot_vel": -3.5,
         "final_vel": 8.2,
-        "final_angle": 44.0,
-        "flight_time": 0.96
+        "final_angle": 45,
+        "flight_time": 1.005
     },
     {
         "distance": 2.2,
         "robot_vel": -3.3,
-        "final_vel": 8.0,
-        "final_angle": 43.0,
-        "flight_time": 0.9
+        "final_vel": 8.2,
+        "final_angle": 48.0,
+        "flight_time": 1.06
     },
     {
         "distance": 2.2,
         "robot_vel": -3.1,
-        "final_vel": 7.8,
-        "final_angle": 42.5,
-        "flight_time": 0.865
+        "final_vel": 8.0,
+        "final_angle": 48.0,
+        "flight_time": 1.025
     },
     {
         "distance": 2.2,
@@ -1787,44 +1787,44 @@
     {
         "distance": 2.3,
         "robot_vel": -4.5,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.12
+        "final_vel": 9.4,
+        "final_angle": 46.0,
+        "flight_time": 1.205
     },
     {
         "distance": 2.3,
         "robot_vel": -4.3,
-        "final_vel": 9.0,
-        "final_angle": 43.0,
-        "flight_time": 1.06
+        "final_vel": 9.4,
+        "final_angle": 48.5,
+        "flight_time": 1.27
     },
     {
         "distance": 2.3,
         "robot_vel": -4.1,
-        "final_vel": 8.8,
-        "final_angle": 43.0,
-        "flight_time": 1.035
+        "final_vel": 9.0,
+        "final_angle": 46.5,
+        "flight_time": 1.165
     },
     {
         "distance": 2.3,
         "robot_vel": -3.9,
-        "final_vel": 8.6,
-        "final_angle": 42.5,
-        "flight_time": 0.99
+        "final_vel": 8.8,
+        "final_angle": 46.5,
+        "flight_time": 1.125
     },
     {
         "distance": 2.3,
         "robot_vel": -3.7,
-        "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.95
+        "final_vel": 8.6,
+        "final_angle": 46.5,
+        "flight_time": 1.095
     },
     {
         "distance": 2.3,
         "robot_vel": -3.5,
-        "final_vel": 8.2,
-        "final_angle": 42,
-        "flight_time": 0.93
+        "final_vel": 8.4,
+        "final_angle": 46.5,
+        "flight_time": 1.06
     },
     {
         "distance": 2.3,
@@ -1844,15 +1844,15 @@
         "distance": 2.3,
         "robot_vel": -2.9,
         "final_vel": 7.8,
-        "final_angle": 44.5,
-        "flight_time": 0.905
+        "final_angle": 45,
+        "flight_time": 0.92
     },
     {
         "distance": 2.3,
         "robot_vel": -2.7,
         "final_vel": 7.6,
-        "final_angle": 44.5,
-        "flight_time": 0.885
+        "final_angle": 45,
+        "flight_time": 0.9
     },
     {
         "distance": 2.3,
@@ -1983,58 +1983,58 @@
     {
         "distance": 2.4,
         "robot_vel": -4.5,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.085
+        "final_vel": 9.4,
+        "final_angle": 45,
+        "flight_time": 1.185
     },
     {
         "distance": 2.4,
         "robot_vel": -4.3,
         "final_vel": 9.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.155
     },
     {
         "distance": 2.4,
         "robot_vel": -4.1,
         "final_vel": 9.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.12
     },
     {
         "distance": 2.4,
         "robot_vel": -3.9,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.09
     },
     {
         "distance": 2.4,
         "robot_vel": -3.7,
         "final_vel": 8.6,
-        "final_angle": 44.5,
-        "flight_time": 1.04
+        "final_angle": 45,
+        "flight_time": 1.06
     },
     {
         "distance": 2.4,
         "robot_vel": -3.5,
         "final_vel": 8.4,
-        "final_angle": 44.0,
-        "flight_time": 0.99
+        "final_angle": 45,
+        "flight_time": 1.035
     },
     {
         "distance": 2.4,
         "robot_vel": -3.3,
-        "final_vel": 8.2,
-        "final_angle": 43.5,
-        "flight_time": 0.95
+        "final_vel": 8.4,
+        "final_angle": 48.0,
+        "flight_time": 1.09
     },
     {
         "distance": 2.4,
         "robot_vel": -3.1,
-        "final_vel": 8.0,
-        "final_angle": 42,
-        "flight_time": 0.88
+        "final_vel": 8.2,
+        "final_angle": 48.0,
+        "flight_time": 1.06
     },
     {
         "distance": 2.4,
@@ -2186,44 +2186,44 @@
     {
         "distance": 2.5,
         "robot_vel": -4.5,
-        "final_vel": 9.4,
-        "final_angle": 43.5,
-        "flight_time": 1.14
+        "final_vel": 10.0,
+        "final_angle": 50.0,
+        "flight_time": 1.4
     },
     {
         "distance": 2.5,
         "robot_vel": -4.3,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.115
+        "final_vel": 9.4,
+        "final_angle": 46.5,
+        "flight_time": 1.225
     },
     {
         "distance": 2.5,
         "robot_vel": -4.1,
-        "final_vel": 9.0,
-        "final_angle": 43.0,
-        "flight_time": 1.06
+        "final_vel": 9.2,
+        "final_angle": 46.5,
+        "flight_time": 1.19
     },
     {
         "distance": 2.5,
         "robot_vel": -3.9,
-        "final_vel": 8.8,
-        "final_angle": 42.5,
-        "flight_time": 1.015
+        "final_vel": 9.0,
+        "final_angle": 46.5,
+        "flight_time": 1.155
     },
     {
         "distance": 2.5,
         "robot_vel": -3.7,
-        "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.975
+        "final_vel": 8.8,
+        "final_angle": 46.5,
+        "flight_time": 1.12
     },
     {
         "distance": 2.5,
         "robot_vel": -3.5,
-        "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.955
+        "final_vel": 8.6,
+        "final_angle": 46.5,
+        "flight_time": 1.09
     },
     {
         "distance": 2.5,
@@ -2243,15 +2243,15 @@
         "distance": 2.5,
         "robot_vel": -2.9,
         "final_vel": 8.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.95
     },
     {
         "distance": 2.5,
         "robot_vel": -2.7,
         "final_vel": 7.8,
-        "final_angle": 43.5,
-        "flight_time": 0.885
+        "final_angle": 45,
+        "flight_time": 0.93
     },
     {
         "distance": 2.5,
@@ -2389,65 +2389,65 @@
     {
         "distance": 2.6,
         "robot_vel": -4.5,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.105
+        "final_vel": 9.6,
+        "final_angle": 45,
+        "flight_time": 1.21
     },
     {
         "distance": 2.6,
         "robot_vel": -4.3,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.08
+        "final_vel": 9.4,
+        "final_angle": 45,
+        "flight_time": 1.175
     },
     {
         "distance": 2.6,
         "robot_vel": -4.1,
         "final_vel": 9.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.145
     },
     {
         "distance": 2.6,
         "robot_vel": -3.9,
         "final_vel": 9.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.115
     },
     {
         "distance": 2.6,
         "robot_vel": -3.7,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.09
     },
     {
         "distance": 2.6,
         "robot_vel": -3.5,
         "final_vel": 8.6,
-        "final_angle": 44.5,
-        "flight_time": 1.04
+        "final_angle": 45,
+        "flight_time": 1.065
     },
     {
         "distance": 2.6,
         "robot_vel": -3.3,
         "final_vel": 8.4,
-        "final_angle": 43.5,
-        "flight_time": 0.98
+        "final_angle": 45,
+        "flight_time": 1.035
     },
     {
         "distance": 2.6,
         "robot_vel": -3.1,
-        "final_vel": 8.2,
-        "final_angle": 42,
-        "flight_time": 0.91
+        "final_vel": 8.4,
+        "final_angle": 48.0,
+        "flight_time": 1.09
     },
     {
         "distance": 2.6,
         "robot_vel": -2.9,
-        "final_vel": 8.0,
-        "final_angle": 42.5,
-        "flight_time": 0.91
+        "final_vel": 8.2,
+        "final_angle": 48.0,
+        "flight_time": 1.06
     },
     {
         "distance": 2.6,
@@ -2467,7 +2467,7 @@
         "distance": 2.6,
         "robot_vel": -2.3,
         "final_vel": 7.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.885
     },
     {
@@ -2599,51 +2599,51 @@
     {
         "distance": 2.7,
         "robot_vel": -4.5,
-        "final_vel": 9.6,
-        "final_angle": 44.0,
-        "flight_time": 1.195
+        "final_vel": 9.8,
+        "final_angle": 46.5,
+        "flight_time": 1.285
     },
     {
         "distance": 2.7,
         "robot_vel": -4.3,
-        "final_vel": 9.4,
-        "final_angle": 43.5,
-        "flight_time": 1.135
+        "final_vel": 9.6,
+        "final_angle": 46.5,
+        "flight_time": 1.25
     },
     {
         "distance": 2.7,
         "robot_vel": -4.1,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.11
+        "final_vel": 9.4,
+        "final_angle": 46.5,
+        "flight_time": 1.215
     },
     {
         "distance": 2.7,
         "robot_vel": -3.9,
-        "final_vel": 9.0,
-        "final_angle": 43.0,
-        "flight_time": 1.065
+        "final_vel": 9.2,
+        "final_angle": 46.5,
+        "flight_time": 1.18
     },
     {
         "distance": 2.7,
         "robot_vel": -3.7,
-        "final_vel": 8.8,
-        "final_angle": 42.5,
-        "flight_time": 1.02
+        "final_vel": 9.0,
+        "final_angle": 46.5,
+        "flight_time": 1.15
     },
     {
         "distance": 2.7,
         "robot_vel": -3.5,
-        "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.98
+        "final_vel": 8.8,
+        "final_angle": 46.5,
+        "flight_time": 1.12
     },
     {
         "distance": 2.7,
         "robot_vel": -3.3,
-        "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.965
+        "final_vel": 8.6,
+        "final_angle": 46.5,
+        "flight_time": 1.09
     },
     {
         "distance": 2.7,
@@ -2663,15 +2663,15 @@
         "distance": 2.7,
         "robot_vel": -2.7,
         "final_vel": 8.0,
-        "final_angle": 43.0,
-        "flight_time": 0.9
+        "final_angle": 45,
+        "flight_time": 0.96
     },
     {
         "distance": 2.7,
         "robot_vel": -2.5,
         "final_vel": 7.8,
-        "final_angle": 44.5,
-        "flight_time": 0.925
+        "final_angle": 45,
+        "flight_time": 0.94
     },
     {
         "distance": 2.7,
@@ -2816,23 +2816,23 @@
     {
         "distance": 2.8,
         "robot_vel": -4.5,
-        "final_vel": 9.6,
-        "final_angle": 42,
-        "flight_time": 1.125
+        "final_vel": 9.8,
+        "final_angle": 45.5,
+        "flight_time": 1.265
     },
     {
         "distance": 2.8,
         "robot_vel": -4.3,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.105
+        "final_vel": 9.6,
+        "final_angle": 45.5,
+        "flight_time": 1.23
     },
     {
         "distance": 2.8,
         "robot_vel": -4.1,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.08
+        "final_vel": 9.4,
+        "final_angle": 45.5,
+        "flight_time": 1.2
     },
     {
         "distance": 2.8,
@@ -2845,36 +2845,36 @@
         "distance": 2.8,
         "robot_vel": -3.7,
         "final_vel": 9.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.115
     },
     {
         "distance": 2.8,
         "robot_vel": -3.5,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.09
     },
     {
         "distance": 2.8,
         "robot_vel": -3.3,
         "final_vel": 8.6,
-        "final_angle": 44.0,
-        "flight_time": 1.025
+        "final_angle": 45,
+        "flight_time": 1.065
     },
     {
         "distance": 2.8,
         "robot_vel": -3.1,
-        "final_vel": 8.4,
-        "final_angle": 42.5,
-        "flight_time": 0.95
+        "final_vel": 8.6,
+        "final_angle": 48.0,
+        "flight_time": 1.12
     },
     {
         "distance": 2.8,
         "robot_vel": -2.9,
-        "final_vel": 8.2,
-        "final_angle": 42,
-        "flight_time": 0.92
+        "final_vel": 8.4,
+        "final_angle": 48.0,
+        "flight_time": 1.09
     },
     {
         "distance": 2.8,
@@ -2894,7 +2894,7 @@
         "distance": 2.8,
         "robot_vel": -2.3,
         "final_vel": 7.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.915
     },
     {
@@ -3033,51 +3033,51 @@
     {
         "distance": 2.9,
         "robot_vel": -4.5,
-        "final_vel": 9.8,
-        "final_angle": 44.0,
-        "flight_time": 1.215
+        "final_vel": 10.0,
+        "final_angle": 46.5,
+        "flight_time": 1.305
     },
     {
         "distance": 2.9,
         "robot_vel": -4.3,
-        "final_vel": 9.6,
-        "final_angle": 44.0,
-        "flight_time": 1.185
+        "final_vel": 10.2,
+        "final_angle": 50.5,
+        "flight_time": 1.435
     },
     {
         "distance": 2.9,
         "robot_vel": -4.1,
-        "final_vel": 9.4,
-        "final_angle": 44.0,
-        "flight_time": 1.16
+        "final_vel": 9.6,
+        "final_angle": 47.0,
+        "flight_time": 1.27
     },
     {
         "distance": 2.9,
         "robot_vel": -3.9,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.11
+        "final_vel": 9.4,
+        "final_angle": 47.0,
+        "flight_time": 1.235
     },
     {
         "distance": 2.9,
         "robot_vel": -3.7,
-        "final_vel": 9.0,
-        "final_angle": 43.0,
-        "flight_time": 1.065
+        "final_vel": 9.2,
+        "final_angle": 47.0,
+        "flight_time": 1.2
     },
     {
         "distance": 2.9,
         "robot_vel": -3.5,
-        "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.005
+        "final_vel": 9.0,
+        "final_angle": 47.0,
+        "flight_time": 1.17
     },
     {
         "distance": 2.9,
         "robot_vel": -3.3,
-        "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.99
+        "final_vel": 8.8,
+        "final_angle": 46.5,
+        "flight_time": 1.115
     },
     {
         "distance": 2.9,
@@ -3097,15 +3097,15 @@
         "distance": 2.9,
         "robot_vel": -2.7,
         "final_vel": 8.2,
-        "final_angle": 44.5,
-        "flight_time": 0.97
+        "final_angle": 45,
+        "flight_time": 0.985
     },
     {
         "distance": 2.9,
         "robot_vel": -2.5,
         "final_vel": 8.0,
-        "final_angle": 43.5,
-        "flight_time": 0.925
+        "final_angle": 45,
+        "flight_time": 0.965
     },
     {
         "distance": 2.9,
@@ -3257,30 +3257,30 @@
     {
         "distance": 3.0,
         "robot_vel": -4.5,
-        "final_vel": 9.8,
-        "final_angle": 42.5,
-        "flight_time": 1.17
+        "final_vel": 10.0,
+        "final_angle": 45.5,
+        "flight_time": 1.28
     },
     {
         "distance": 3.0,
         "robot_vel": -4.3,
-        "final_vel": 9.6,
-        "final_angle": 42,
-        "flight_time": 1.125
+        "final_vel": 9.8,
+        "final_angle": 45.5,
+        "flight_time": 1.25
     },
     {
         "distance": 3.0,
         "robot_vel": -4.1,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 45.5,
+        "flight_time": 1.22
     },
     {
         "distance": 3.0,
         "robot_vel": -3.9,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.08
+        "final_vel": 9.4,
+        "final_angle": 45.5,
+        "flight_time": 1.19
     },
     {
         "distance": 3.0,
@@ -3293,36 +3293,36 @@
         "distance": 3.0,
         "robot_vel": -3.5,
         "final_vel": 9.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.11
     },
     {
         "distance": 3.0,
         "robot_vel": -3.3,
         "final_vel": 8.8,
-        "final_angle": 44.5,
-        "flight_time": 1.065
+        "final_angle": 45,
+        "flight_time": 1.085
     },
     {
         "distance": 3.0,
         "robot_vel": -3.1,
         "final_vel": 8.6,
-        "final_angle": 43.5,
-        "flight_time": 1.01
+        "final_angle": 45,
+        "flight_time": 1.065
     },
     {
         "distance": 3.0,
         "robot_vel": -2.9,
-        "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.945
+        "final_vel": 8.6,
+        "final_angle": 48.5,
+        "flight_time": 1.14
     },
     {
         "distance": 3.0,
         "robot_vel": -2.7,
-        "final_vel": 8.2,
-        "final_angle": 43.0,
-        "flight_time": 0.96
+        "final_vel": 8.4,
+        "final_angle": 48.0,
+        "flight_time": 1.09
     },
     {
         "distance": 3.0,
@@ -3342,7 +3342,7 @@
         "distance": 3.0,
         "robot_vel": -2.1,
         "final_vel": 7.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.925
     },
     {
@@ -3481,58 +3481,58 @@
     {
         "distance": 3.1,
         "robot_vel": -4.5,
-        "final_vel": 10.0,
-        "final_angle": 44.5,
-        "flight_time": 1.26
+        "final_vel": 10.2,
+        "final_angle": 47.0,
+        "flight_time": 1.36
     },
     {
         "distance": 3.1,
         "robot_vel": -4.3,
-        "final_vel": 9.8,
-        "final_angle": 44.5,
-        "flight_time": 1.23
+        "final_vel": 10.0,
+        "final_angle": 47.0,
+        "flight_time": 1.325
     },
     {
         "distance": 3.1,
         "robot_vel": -4.1,
-        "final_vel": 9.6,
-        "final_angle": 44.0,
-        "flight_time": 1.175
+        "final_vel": 9.8,
+        "final_angle": 47.0,
+        "flight_time": 1.285
     },
     {
         "distance": 3.1,
         "robot_vel": -3.9,
-        "final_vel": 9.4,
-        "final_angle": 44.0,
-        "flight_time": 1.15
+        "final_vel": 9.6,
+        "final_angle": 47.0,
+        "flight_time": 1.255
     },
     {
         "distance": 3.1,
         "robot_vel": -3.7,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.105
+        "final_vel": 9.4,
+        "final_angle": 47.5,
+        "flight_time": 1.25
     },
     {
         "distance": 3.1,
         "robot_vel": -3.5,
-        "final_vel": 9.0,
-        "final_angle": 42.5,
-        "flight_time": 1.045
+        "final_vel": 9.2,
+        "final_angle": 47.0,
+        "flight_time": 1.19
     },
     {
         "distance": 3.1,
         "robot_vel": -3.3,
-        "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.01
+        "final_vel": 9.0,
+        "final_angle": 47.0,
+        "flight_time": 1.165
     },
     {
         "distance": 3.1,
         "robot_vel": -3.1,
-        "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.995
+        "final_vel": 8.8,
+        "final_angle": 47.0,
+        "flight_time": 1.135
     },
     {
         "distance": 3.1,
@@ -3552,15 +3552,15 @@
         "distance": 3.1,
         "robot_vel": -2.5,
         "final_vel": 8.2,
-        "final_angle": 42.5,
-        "flight_time": 0.92
+        "final_angle": 45,
+        "flight_time": 0.99
     },
     {
         "distance": 3.1,
         "robot_vel": -2.3,
-        "final_vel": 8.0,
-        "final_angle": 44.5,
-        "flight_time": 0.96
+        "final_vel": 8.2,
+        "final_angle": 49.5,
+        "flight_time": 1.085
     },
     {
         "distance": 3.1,
@@ -3712,37 +3712,37 @@
     {
         "distance": 3.2,
         "robot_vel": -4.5,
-        "final_vel": 10.0,
-        "final_angle": 43.0,
-        "flight_time": 1.215
+        "final_vel": 10.2,
+        "final_angle": 46.0,
+        "flight_time": 1.33
     },
     {
         "distance": 3.2,
         "robot_vel": -4.3,
-        "final_vel": 9.8,
-        "final_angle": 43.0,
-        "flight_time": 1.19
+        "final_vel": 10.0,
+        "final_angle": 46.0,
+        "flight_time": 1.3
     },
     {
         "distance": 3.2,
         "robot_vel": -4.1,
-        "final_vel": 9.6,
-        "final_angle": 42.5,
-        "flight_time": 1.145
+        "final_vel": 9.8,
+        "final_angle": 46.0,
+        "flight_time": 1.265
     },
     {
         "distance": 3.2,
         "robot_vel": -3.9,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 46.0,
+        "flight_time": 1.235
     },
     {
         "distance": 3.2,
         "robot_vel": -3.7,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.08
+        "final_vel": 9.4,
+        "final_angle": 46.0,
+        "flight_time": 1.205
     },
     {
         "distance": 3.2,
@@ -3762,22 +3762,22 @@
         "distance": 3.2,
         "robot_vel": -3.1,
         "final_vel": 8.8,
-        "final_angle": 44.5,
-        "flight_time": 1.07
+        "final_angle": 45,
+        "flight_time": 1.085
     },
     {
         "distance": 3.2,
         "robot_vel": -2.9,
         "final_vel": 8.6,
-        "final_angle": 43.0,
-        "flight_time": 1.0
+        "final_angle": 45,
+        "flight_time": 1.065
     },
     {
         "distance": 3.2,
         "robot_vel": -2.7,
-        "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.955
+        "final_vel": 8.6,
+        "final_angle": 48.5,
+        "flight_time": 1.135
     },
     {
         "distance": 3.2,
@@ -3797,8 +3797,8 @@
         "distance": 3.2,
         "robot_vel": -2.1,
         "final_vel": 8.0,
-        "final_angle": 44.0,
-        "flight_time": 0.92
+        "final_angle": 45,
+        "flight_time": 0.95
     },
     {
         "distance": 3.2,
@@ -3944,57 +3944,57 @@
         "distance": 3.3,
         "robot_vel": -4.5,
         "final_vel": 10.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.31
     },
     {
         "distance": 3.3,
         "robot_vel": -4.3,
         "final_vel": 10.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.28
     },
     {
         "distance": 3.3,
         "robot_vel": -4.1,
         "final_vel": 9.8,
-        "final_angle": 44.5,
-        "flight_time": 1.22
+        "final_angle": 45,
+        "flight_time": 1.25
     },
     {
         "distance": 3.3,
         "robot_vel": -3.9,
         "final_vel": 9.6,
-        "final_angle": 44.5,
-        "flight_time": 1.195
+        "final_angle": 45,
+        "flight_time": 1.22
     },
     {
         "distance": 3.3,
         "robot_vel": -3.7,
-        "final_vel": 9.4,
-        "final_angle": 44.0,
-        "flight_time": 1.15
+        "final_vel": 9.6,
+        "final_angle": 47.5,
+        "flight_time": 1.27
     },
     {
         "distance": 3.3,
         "robot_vel": -3.5,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.105
+        "final_vel": 9.4,
+        "final_angle": 47.5,
+        "flight_time": 1.24
     },
     {
         "distance": 3.3,
         "robot_vel": -3.3,
-        "final_vel": 9.0,
-        "final_angle": 42.5,
-        "flight_time": 1.05
+        "final_vel": 9.2,
+        "final_angle": 47.5,
+        "flight_time": 1.21
     },
     {
         "distance": 3.3,
         "robot_vel": -3.1,
-        "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.015
+        "final_vel": 9.0,
+        "final_angle": 47.5,
+        "flight_time": 1.18
     },
     {
         "distance": 3.3,
@@ -4014,15 +4014,15 @@
         "distance": 3.3,
         "robot_vel": -2.5,
         "final_vel": 8.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.015
     },
     {
         "distance": 3.3,
         "robot_vel": -2.3,
         "final_vel": 8.2,
-        "final_angle": 43.5,
-        "flight_time": 0.955
+        "final_angle": 45,
+        "flight_time": 0.995
     },
     {
         "distance": 3.3,
@@ -4181,44 +4181,44 @@
     {
         "distance": 3.4,
         "robot_vel": -4.5,
-        "final_vel": 10.2,
-        "final_angle": 43.5,
-        "flight_time": 1.26
+        "final_vel": 10.8,
+        "final_angle": 50.0,
+        "flight_time": 1.52
     },
     {
         "distance": 3.4,
         "robot_vel": -4.3,
-        "final_vel": 10.0,
-        "final_angle": 43.5,
-        "flight_time": 1.235
+        "final_vel": 10.2,
+        "final_angle": 46.5,
+        "flight_time": 1.35
     },
     {
         "distance": 3.4,
         "robot_vel": -4.1,
-        "final_vel": 9.8,
-        "final_angle": 43.0,
-        "flight_time": 1.185
+        "final_vel": 10.0,
+        "final_angle": 46.5,
+        "flight_time": 1.315
     },
     {
         "distance": 3.4,
         "robot_vel": -3.9,
-        "final_vel": 9.6,
-        "final_angle": 42.5,
-        "flight_time": 1.14
+        "final_vel": 9.8,
+        "final_angle": 46.5,
+        "flight_time": 1.285
     },
     {
         "distance": 3.4,
         "robot_vel": -3.7,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 46.5,
+        "flight_time": 1.255
     },
     {
         "distance": 3.4,
         "robot_vel": -3.5,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.08
+        "final_vel": 9.4,
+        "final_angle": 46.0,
+        "flight_time": 1.2
     },
     {
         "distance": 3.4,
@@ -4238,22 +4238,22 @@
         "distance": 3.4,
         "robot_vel": -2.9,
         "final_vel": 8.8,
-        "final_angle": 44.5,
-        "flight_time": 1.07
+        "final_angle": 45,
+        "flight_time": 1.085
     },
     {
         "distance": 3.4,
         "robot_vel": -2.7,
         "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.975
+        "final_angle": 45,
+        "flight_time": 1.065
     },
     {
         "distance": 3.4,
         "robot_vel": -2.5,
-        "final_vel": 8.4,
-        "final_angle": 43.0,
-        "flight_time": 0.985
+        "final_vel": 8.6,
+        "final_angle": 48.5,
+        "flight_time": 1.13
     },
     {
         "distance": 3.4,
@@ -4273,7 +4273,7 @@
         "distance": 3.4,
         "robot_vel": -1.9,
         "final_vel": 8.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.955
     },
     {
@@ -4419,65 +4419,65 @@
     {
         "distance": 3.5,
         "robot_vel": -4.5,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.215
+        "final_vel": 10.4,
+        "final_angle": 45,
+        "flight_time": 1.32
     },
     {
         "distance": 3.5,
         "robot_vel": -4.3,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.195
+        "final_vel": 10.2,
+        "final_angle": 45,
+        "flight_time": 1.295
     },
     {
         "distance": 3.5,
         "robot_vel": -4.1,
         "final_vel": 10.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.265
     },
     {
         "distance": 3.5,
         "robot_vel": -3.9,
         "final_vel": 9.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.24
     },
     {
         "distance": 3.5,
         "robot_vel": -3.7,
         "final_vel": 9.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.215
     },
     {
         "distance": 3.5,
         "robot_vel": -3.5,
         "final_vel": 9.4,
-        "final_angle": 44.5,
-        "flight_time": 1.165
+        "final_angle": 45,
+        "flight_time": 1.19
     },
     {
         "distance": 3.5,
         "robot_vel": -3.3,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.105
+        "final_vel": 9.4,
+        "final_angle": 48.0,
+        "flight_time": 1.255
     },
     {
         "distance": 3.5,
         "robot_vel": -3.1,
-        "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.035
+        "final_vel": 9.2,
+        "final_angle": 47.5,
+        "flight_time": 1.2
     },
     {
         "distance": 3.5,
         "robot_vel": -2.9,
-        "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.02
+        "final_vel": 9.0,
+        "final_angle": 47.5,
+        "flight_time": 1.175
     },
     {
         "distance": 3.5,
@@ -4497,15 +4497,15 @@
         "distance": 3.5,
         "robot_vel": -2.3,
         "final_vel": 8.4,
-        "final_angle": 42,
-        "flight_time": 0.94
+        "final_angle": 45,
+        "flight_time": 1.02
     },
     {
         "distance": 3.5,
         "robot_vel": -2.1,
         "final_vel": 8.2,
-        "final_angle": 44.5,
-        "flight_time": 0.99
+        "final_angle": 45,
+        "flight_time": 1.0
     },
     {
         "distance": 3.5,
@@ -4664,51 +4664,51 @@
     {
         "distance": 3.6,
         "robot_vel": -4.5,
-        "final_vel": 10.4,
-        "final_angle": 44.0,
-        "flight_time": 1.3
+        "final_vel": 10.6,
+        "final_angle": 46.5,
+        "flight_time": 1.395
     },
     {
         "distance": 3.6,
         "robot_vel": -4.3,
-        "final_vel": 10.2,
-        "final_angle": 44.0,
-        "flight_time": 1.275
+        "final_vel": 10.4,
+        "final_angle": 46.5,
+        "flight_time": 1.36
     },
     {
         "distance": 3.6,
         "robot_vel": -4.1,
-        "final_vel": 10.0,
-        "final_angle": 43.5,
-        "flight_time": 1.225
+        "final_vel": 10.4,
+        "final_angle": 49.0,
+        "flight_time": 1.435
     },
     {
         "distance": 3.6,
         "robot_vel": -3.9,
-        "final_vel": 9.8,
-        "final_angle": 43.5,
-        "flight_time": 1.2
+        "final_vel": 10.0,
+        "final_angle": 47.0,
+        "flight_time": 1.33
     },
     {
         "distance": 3.6,
         "robot_vel": -3.7,
-        "final_vel": 9.6,
-        "final_angle": 42.5,
-        "flight_time": 1.135
+        "final_vel": 9.8,
+        "final_angle": 46.5,
+        "flight_time": 1.27
     },
     {
         "distance": 3.6,
         "robot_vel": -3.5,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 46.5,
+        "flight_time": 1.245
     },
     {
         "distance": 3.6,
         "robot_vel": -3.3,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.08
+        "final_vel": 9.4,
+        "final_angle": 46.5,
+        "flight_time": 1.215
     },
     {
         "distance": 3.6,
@@ -4728,15 +4728,15 @@
         "distance": 3.6,
         "robot_vel": -2.7,
         "final_vel": 8.8,
-        "final_angle": 44.0,
-        "flight_time": 1.055
+        "final_angle": 45,
+        "flight_time": 1.085
     },
     {
         "distance": 3.6,
         "robot_vel": -2.5,
-        "final_vel": 8.6,
-        "final_angle": 42,
-        "flight_time": 0.98
+        "final_vel": 8.8,
+        "final_angle": 49.0,
+        "flight_time": 1.175
     },
     {
         "distance": 3.6,
@@ -4756,7 +4756,7 @@
         "distance": 3.6,
         "robot_vel": -1.9,
         "final_vel": 8.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 0.98
     },
     {
@@ -4916,30 +4916,30 @@
     {
         "distance": 3.7,
         "robot_vel": -4.5,
-        "final_vel": 10.4,
-        "final_angle": 42.5,
-        "flight_time": 1.255
+        "final_vel": 10.6,
+        "final_angle": 45.5,
+        "flight_time": 1.365
     },
     {
         "distance": 3.7,
         "robot_vel": -4.3,
-        "final_vel": 10.2,
-        "final_angle": 42.5,
-        "flight_time": 1.235
+        "final_vel": 10.4,
+        "final_angle": 45.5,
+        "flight_time": 1.335
     },
     {
         "distance": 3.7,
         "robot_vel": -4.1,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.19
+        "final_vel": 10.2,
+        "final_angle": 45.5,
+        "flight_time": 1.31
     },
     {
         "distance": 3.7,
         "robot_vel": -3.9,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.17
+        "final_vel": 10.0,
+        "final_angle": 45.5,
+        "flight_time": 1.28
     },
     {
         "distance": 3.7,
@@ -4952,36 +4952,36 @@
         "distance": 3.7,
         "robot_vel": -3.5,
         "final_vel": 9.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.205
     },
     {
         "distance": 3.7,
         "robot_vel": -3.3,
         "final_vel": 9.4,
-        "final_angle": 44.5,
-        "flight_time": 1.16
+        "final_angle": 45,
+        "flight_time": 1.185
     },
     {
         "distance": 3.7,
         "robot_vel": -3.1,
-        "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.105
+        "final_vel": 9.4,
+        "final_angle": 48.0,
+        "flight_time": 1.245
     },
     {
         "distance": 3.7,
         "robot_vel": -2.9,
-        "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.04
+        "final_vel": 9.2,
+        "final_angle": 48.0,
+        "flight_time": 1.22
     },
     {
         "distance": 3.7,
         "robot_vel": -2.7,
-        "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.025
+        "final_vel": 9.0,
+        "final_angle": 47.5,
+        "flight_time": 1.17
     },
     {
         "distance": 3.7,
@@ -5001,8 +5001,8 @@
         "distance": 3.7,
         "robot_vel": -2.1,
         "final_vel": 8.4,
-        "final_angle": 43.0,
-        "flight_time": 0.97
+        "final_angle": 45,
+        "flight_time": 1.025
     },
     {
         "distance": 3.7,
@@ -5168,58 +5168,58 @@
     {
         "distance": 3.8,
         "robot_vel": -4.5,
-        "final_vel": 10.6,
-        "final_angle": 44.5,
-        "flight_time": 1.345
+        "final_vel": 10.8,
+        "final_angle": 47.0,
+        "flight_time": 1.445
     },
     {
         "distance": 3.8,
         "robot_vel": -4.3,
-        "final_vel": 10.4,
-        "final_angle": 44.5,
-        "flight_time": 1.315
+        "final_vel": 10.6,
+        "final_angle": 47.0,
+        "flight_time": 1.41
     },
     {
         "distance": 3.8,
         "robot_vel": -4.1,
-        "final_vel": 10.2,
-        "final_angle": 44.5,
-        "flight_time": 1.29
+        "final_vel": 10.4,
+        "final_angle": 47.0,
+        "flight_time": 1.375
     },
     {
         "distance": 3.8,
         "robot_vel": -3.9,
-        "final_vel": 10.0,
-        "final_angle": 44.0,
-        "flight_time": 1.24
+        "final_vel": 10.2,
+        "final_angle": 47.0,
+        "flight_time": 1.345
     },
     {
         "distance": 3.8,
         "robot_vel": -3.7,
-        "final_vel": 9.8,
-        "final_angle": 43.5,
-        "flight_time": 1.195
+        "final_vel": 10.0,
+        "final_angle": 47.0,
+        "flight_time": 1.315
     },
     {
         "distance": 3.8,
         "robot_vel": -3.5,
-        "final_vel": 9.6,
-        "final_angle": 43.0,
-        "flight_time": 1.155
+        "final_vel": 9.8,
+        "final_angle": 47.0,
+        "flight_time": 1.285
     },
     {
         "distance": 3.8,
         "robot_vel": -3.3,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 47.0,
+        "flight_time": 1.26
     },
     {
         "distance": 3.8,
         "robot_vel": -3.1,
-        "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.085
+        "final_vel": 9.4,
+        "final_angle": 46.5,
+        "flight_time": 1.21
     },
     {
         "distance": 3.8,
@@ -5239,15 +5239,15 @@
         "distance": 3.8,
         "robot_vel": -2.5,
         "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.0
+        "final_angle": 45,
+        "flight_time": 1.09
     },
     {
         "distance": 3.8,
         "robot_vel": -2.3,
-        "final_vel": 8.6,
-        "final_angle": 42.5,
-        "flight_time": 1.0
+        "final_vel": 8.8,
+        "final_angle": 49.0,
+        "flight_time": 1.17
     },
     {
         "distance": 3.8,
@@ -5267,8 +5267,8 @@
         "distance": 3.8,
         "robot_vel": -1.7,
         "final_vel": 8.2,
-        "final_angle": 44.5,
-        "flight_time": 0.97
+        "final_angle": 45,
+        "flight_time": 0.985
     },
     {
         "distance": 3.8,
@@ -5427,37 +5427,37 @@
     {
         "distance": 3.9,
         "robot_vel": -4.5,
-        "final_vel": 10.6,
-        "final_angle": 43.5,
-        "flight_time": 1.32
+        "final_vel": 10.8,
+        "final_angle": 46.0,
+        "flight_time": 1.41
     },
     {
         "distance": 3.9,
         "robot_vel": -4.3,
-        "final_vel": 10.4,
-        "final_angle": 43.0,
-        "flight_time": 1.27
+        "final_vel": 10.6,
+        "final_angle": 46.0,
+        "flight_time": 1.38
     },
     {
         "distance": 3.9,
         "robot_vel": -4.1,
-        "final_vel": 10.2,
-        "final_angle": 42.5,
-        "flight_time": 1.225
+        "final_vel": 10.4,
+        "final_angle": 46.0,
+        "flight_time": 1.35
     },
     {
         "distance": 3.9,
         "robot_vel": -3.9,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.185
+        "final_vel": 10.2,
+        "final_angle": 46.0,
+        "flight_time": 1.325
     },
     {
         "distance": 3.9,
         "robot_vel": -3.7,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.165
+        "final_vel": 10.0,
+        "final_angle": 46.0,
+        "flight_time": 1.295
     },
     {
         "distance": 3.9,
@@ -5477,22 +5477,22 @@
         "distance": 3.9,
         "robot_vel": -3.1,
         "final_vel": 9.4,
-        "final_angle": 44.5,
-        "flight_time": 1.16
+        "final_angle": 45,
+        "flight_time": 1.18
     },
     {
         "distance": 3.9,
         "robot_vel": -2.9,
         "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.105
+        "final_angle": 45,
+        "flight_time": 1.155
     },
     {
         "distance": 3.9,
         "robot_vel": -2.7,
-        "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.04
+        "final_vel": 9.2,
+        "final_angle": 48.0,
+        "flight_time": 1.21
     },
     {
         "distance": 3.9,
@@ -5519,8 +5519,8 @@
         "distance": 3.9,
         "robot_vel": -1.9,
         "final_vel": 8.4,
-        "final_angle": 44.0,
-        "flight_time": 1.0
+        "final_angle": 45,
+        "flight_time": 1.025
     },
     {
         "distance": 3.9,
@@ -5686,58 +5686,58 @@
     {
         "distance": 4.0,
         "robot_vel": -4.5,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.275
+        "final_vel": 10.8,
+        "final_angle": 45,
+        "flight_time": 1.385
     },
     {
         "distance": 4.0,
         "robot_vel": -4.3,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.255
+        "final_vel": 10.6,
+        "final_angle": 45,
+        "flight_time": 1.355
     },
     {
         "distance": 4.0,
         "robot_vel": -4.1,
         "final_vel": 10.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.33
     },
     {
         "distance": 4.0,
         "robot_vel": -3.9,
         "final_vel": 10.2,
-        "final_angle": 44.5,
-        "flight_time": 1.28
+        "final_angle": 45,
+        "flight_time": 1.305
     },
     {
         "distance": 4.0,
         "robot_vel": -3.7,
         "final_vel": 10.0,
-        "final_angle": 44.5,
-        "flight_time": 1.255
+        "final_angle": 45,
+        "flight_time": 1.28
     },
     {
         "distance": 4.0,
         "robot_vel": -3.5,
-        "final_vel": 9.8,
-        "final_angle": 44.0,
-        "flight_time": 1.21
+        "final_vel": 10.0,
+        "final_angle": 47.5,
+        "flight_time": 1.33
     },
     {
         "distance": 4.0,
         "robot_vel": -3.3,
-        "final_vel": 9.6,
-        "final_angle": 43.0,
-        "flight_time": 1.15
+        "final_vel": 9.8,
+        "final_angle": 47.5,
+        "flight_time": 1.3
     },
     {
         "distance": 4.0,
         "robot_vel": -3.1,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 47.5,
+        "flight_time": 1.275
     },
     {
         "distance": 4.0,
@@ -5764,15 +5764,15 @@
         "distance": 4.0,
         "robot_vel": -2.3,
         "final_vel": 8.8,
-        "final_angle": 42,
-        "flight_time": 1.005
+        "final_angle": 45,
+        "flight_time": 1.09
     },
     {
         "distance": 4.0,
         "robot_vel": -2.1,
-        "final_vel": 8.6,
-        "final_angle": 43.5,
-        "flight_time": 1.03
+        "final_vel": 8.8,
+        "final_angle": 49.5,
+        "flight_time": 1.185
     },
     {
         "distance": 4.0,
@@ -5952,44 +5952,44 @@
     {
         "distance": 4.1,
         "robot_vel": -4.5,
-        "final_vel": 10.8,
-        "final_angle": 44.0,
-        "flight_time": 1.36
+        "final_vel": 11.0,
+        "final_angle": 46.5,
+        "flight_time": 1.455
     },
     {
         "distance": 4.1,
         "robot_vel": -4.3,
-        "final_vel": 10.6,
-        "final_angle": 44.0,
-        "flight_time": 1.335
+        "final_vel": 10.8,
+        "final_angle": 46.5,
+        "flight_time": 1.425
     },
     {
         "distance": 4.1,
         "robot_vel": -4.1,
-        "final_vel": 10.4,
-        "final_angle": 43.5,
-        "flight_time": 1.285
+        "final_vel": 10.6,
+        "final_angle": 46.5,
+        "flight_time": 1.395
     },
     {
         "distance": 4.1,
         "robot_vel": -3.9,
-        "final_vel": 10.2,
-        "final_angle": 43.0,
-        "flight_time": 1.24
+        "final_vel": 10.4,
+        "final_angle": 46.5,
+        "flight_time": 1.365
     },
     {
         "distance": 4.1,
         "robot_vel": -3.7,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.18
+        "final_vel": 10.2,
+        "final_angle": 46.5,
+        "flight_time": 1.335
     },
     {
         "distance": 4.1,
         "robot_vel": -3.5,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.16
+        "final_vel": 10.0,
+        "final_angle": 46.5,
+        "flight_time": 1.31
     },
     {
         "distance": 4.1,
@@ -6009,22 +6009,22 @@
         "distance": 4.1,
         "robot_vel": -2.9,
         "final_vel": 9.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.175
     },
     {
         "distance": 4.1,
         "robot_vel": -2.7,
         "final_vel": 9.2,
-        "final_angle": 43.0,
-        "flight_time": 1.085
+        "final_angle": 45,
+        "flight_time": 1.155
     },
     {
         "distance": 4.1,
         "robot_vel": -2.5,
-        "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.045
+        "final_vel": 9.2,
+        "final_angle": 48.5,
+        "flight_time": 1.225
     },
     {
         "distance": 4.1,
@@ -6044,14 +6044,14 @@
         "distance": 4.1,
         "robot_vel": -1.9,
         "final_vel": 8.6,
-        "final_angle": 42.5,
-        "flight_time": 0.98
+        "final_angle": 45,
+        "flight_time": 1.045
     },
     {
         "distance": 4.1,
         "robot_vel": -1.7,
         "final_vel": 8.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.03
     },
     {
@@ -6211,23 +6211,23 @@
     {
         "distance": 4.2,
         "robot_vel": -4.5,
-        "final_vel": 10.8,
-        "final_angle": 42.5,
-        "flight_time": 1.315
+        "final_vel": 11.0,
+        "final_angle": 45.5,
+        "flight_time": 1.425
     },
     {
         "distance": 4.2,
         "robot_vel": -4.3,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.265
+        "final_vel": 10.8,
+        "final_angle": 45.5,
+        "flight_time": 1.4
     },
     {
         "distance": 4.2,
         "robot_vel": -4.1,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.25
+        "final_vel": 10.6,
+        "final_angle": 45.5,
+        "flight_time": 1.37
     },
     {
         "distance": 4.2,
@@ -6240,36 +6240,36 @@
         "distance": 4.2,
         "robot_vel": -3.7,
         "final_vel": 10.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.29
     },
     {
         "distance": 4.2,
         "robot_vel": -3.5,
         "final_vel": 10.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.27
     },
     {
         "distance": 4.2,
         "robot_vel": -3.3,
         "final_vel": 9.8,
-        "final_angle": 44.0,
-        "flight_time": 1.205
+        "final_angle": 45,
+        "flight_time": 1.245
     },
     {
         "distance": 4.2,
         "robot_vel": -3.1,
-        "final_vel": 9.6,
-        "final_angle": 43.0,
-        "flight_time": 1.15
+        "final_vel": 9.8,
+        "final_angle": 48.0,
+        "flight_time": 1.315
     },
     {
         "distance": 4.2,
         "robot_vel": -2.9,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 47.5,
+        "flight_time": 1.265
     },
     {
         "distance": 4.2,
@@ -6296,8 +6296,8 @@
         "distance": 4.2,
         "robot_vel": -2.1,
         "final_vel": 8.8,
-        "final_angle": 42.5,
-        "flight_time": 1.02
+        "final_angle": 45,
+        "flight_time": 1.09
     },
     {
         "distance": 4.2,
@@ -6317,8 +6317,8 @@
         "distance": 4.2,
         "robot_vel": -1.5,
         "final_vel": 8.4,
-        "final_angle": 44.0,
-        "flight_time": 0.985
+        "final_angle": 45.5,
+        "flight_time": 1.02
     },
     {
         "distance": 4.2,
@@ -6477,51 +6477,51 @@
     {
         "distance": 4.3,
         "robot_vel": -4.5,
-        "final_vel": 11.0,
-        "final_angle": 44.5,
-        "flight_time": 1.4
+        "final_vel": 11.2,
+        "final_angle": 47.0,
+        "flight_time": 1.505
     },
     {
         "distance": 4.3,
         "robot_vel": -4.3,
-        "final_vel": 10.8,
-        "final_angle": 44.5,
-        "flight_time": 1.375
+        "final_vel": 11.0,
+        "final_angle": 47.0,
+        "flight_time": 1.47
     },
     {
         "distance": 4.3,
         "robot_vel": -4.1,
-        "final_vel": 10.6,
-        "final_angle": 44.0,
-        "flight_time": 1.32
+        "final_vel": 10.8,
+        "final_angle": 47.0,
+        "flight_time": 1.44
     },
     {
         "distance": 4.3,
         "robot_vel": -3.9,
-        "final_vel": 10.4,
-        "final_angle": 44.0,
-        "flight_time": 1.3
+        "final_vel": 10.6,
+        "final_angle": 47.0,
+        "flight_time": 1.405
     },
     {
         "distance": 4.3,
         "robot_vel": -3.7,
-        "final_vel": 10.2,
-        "final_angle": 43.5,
-        "flight_time": 1.255
+        "final_vel": 10.4,
+        "final_angle": 47.0,
+        "flight_time": 1.38
     },
     {
         "distance": 4.3,
         "robot_vel": -3.5,
-        "final_vel": 10.0,
-        "final_angle": 42.5,
-        "flight_time": 1.195
+        "final_vel": 10.2,
+        "final_angle": 47.0,
+        "flight_time": 1.35
     },
     {
         "distance": 4.3,
         "robot_vel": -3.3,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.16
+        "final_vel": 10.0,
+        "final_angle": 47.0,
+        "flight_time": 1.325
     },
     {
         "distance": 4.3,
@@ -6541,22 +6541,22 @@
         "distance": 4.3,
         "robot_vel": -2.7,
         "final_vel": 9.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.17
     },
     {
         "distance": 4.3,
         "robot_vel": -2.5,
         "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.06
+        "final_angle": 45,
+        "flight_time": 1.15
     },
     {
         "distance": 4.3,
         "robot_vel": -2.3,
-        "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.045
+        "final_vel": 9.2,
+        "final_angle": 49.0,
+        "flight_time": 1.24
     },
     {
         "distance": 4.3,
@@ -6576,8 +6576,8 @@
         "distance": 4.3,
         "robot_vel": -1.7,
         "final_vel": 8.6,
-        "final_angle": 43.5,
-        "flight_time": 1.01
+        "final_angle": 45,
+        "flight_time": 1.05
     },
     {
         "distance": 4.3,
@@ -6743,37 +6743,37 @@
     {
         "distance": 4.4,
         "robot_vel": -4.5,
-        "final_vel": 11.0,
-        "final_angle": 43.5,
-        "flight_time": 1.375
+        "final_vel": 11.2,
+        "final_angle": 46.0,
+        "flight_time": 1.47
     },
     {
         "distance": 4.4,
         "robot_vel": -4.3,
-        "final_vel": 10.8,
-        "final_angle": 43.0,
-        "flight_time": 1.325
+        "final_vel": 11.0,
+        "final_angle": 46.0,
+        "flight_time": 1.44
     },
     {
         "distance": 4.4,
         "robot_vel": -4.1,
-        "final_vel": 10.6,
-        "final_angle": 42.5,
-        "flight_time": 1.28
+        "final_vel": 10.8,
+        "final_angle": 46.0,
+        "flight_time": 1.41
     },
     {
         "distance": 4.4,
         "robot_vel": -3.9,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.24
+        "final_vel": 10.6,
+        "final_angle": 46.0,
+        "flight_time": 1.385
     },
     {
         "distance": 4.4,
         "robot_vel": -3.7,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.22
+        "final_vel": 10.4,
+        "final_angle": 46.0,
+        "flight_time": 1.355
     },
     {
         "distance": 4.4,
@@ -6786,29 +6786,29 @@
         "distance": 4.4,
         "robot_vel": -3.3,
         "final_vel": 10.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.26
     },
     {
         "distance": 4.4,
         "robot_vel": -3.1,
         "final_vel": 9.8,
-        "final_angle": 44.5,
-        "flight_time": 1.22
+        "final_angle": 45,
+        "flight_time": 1.24
     },
     {
         "distance": 4.4,
         "robot_vel": -2.9,
-        "final_vel": 9.6,
-        "final_angle": 43.0,
-        "flight_time": 1.145
+        "final_vel": 9.8,
+        "final_angle": 48.5,
+        "flight_time": 1.325
     },
     {
         "distance": 4.4,
         "robot_vel": -2.7,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 48.0,
+        "flight_time": 1.28
     },
     {
         "distance": 4.4,
@@ -6828,15 +6828,15 @@
         "distance": 4.4,
         "robot_vel": -2.1,
         "final_vel": 9.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.105
     },
     {
         "distance": 4.4,
         "robot_vel": -1.9,
         "final_vel": 8.8,
-        "final_angle": 43.0,
-        "flight_time": 1.035
+        "final_angle": 45,
+        "flight_time": 1.09
     },
     {
         "distance": 4.4,
@@ -6856,7 +6856,7 @@
         "distance": 4.4,
         "robot_vel": -1.3,
         "final_vel": 8.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.015
     },
     {
@@ -7016,58 +7016,58 @@
     {
         "distance": 4.5,
         "robot_vel": -4.5,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.33
+        "final_vel": 11.2,
+        "final_angle": 45,
+        "flight_time": 1.44
     },
     {
         "distance": 4.5,
         "robot_vel": -4.3,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.31
+        "final_vel": 11.0,
+        "final_angle": 45,
+        "flight_time": 1.41
     },
     {
         "distance": 4.5,
         "robot_vel": -4.1,
         "final_vel": 10.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.385
     },
     {
         "distance": 4.5,
         "robot_vel": -3.9,
         "final_vel": 10.6,
-        "final_angle": 44.5,
-        "flight_time": 1.335
+        "final_angle": 45,
+        "flight_time": 1.36
     },
     {
         "distance": 4.5,
         "robot_vel": -3.7,
-        "final_vel": 10.4,
-        "final_angle": 44.5,
-        "flight_time": 1.31
+        "final_vel": 10.6,
+        "final_angle": 47.5,
+        "flight_time": 1.42
     },
     {
         "distance": 4.5,
         "robot_vel": -3.5,
-        "final_vel": 10.2,
-        "final_angle": 44.0,
-        "flight_time": 1.27
+        "final_vel": 10.4,
+        "final_angle": 47.5,
+        "flight_time": 1.39
     },
     {
         "distance": 4.5,
         "robot_vel": -3.3,
-        "final_vel": 10.0,
-        "final_angle": 43.0,
-        "flight_time": 1.21
+        "final_vel": 10.2,
+        "final_angle": 47.5,
+        "flight_time": 1.365
     },
     {
         "distance": 4.5,
         "robot_vel": -3.1,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.155
+        "final_vel": 10.0,
+        "final_angle": 47.0,
+        "flight_time": 1.31
     },
     {
         "distance": 4.5,
@@ -7094,15 +7094,15 @@
         "distance": 4.5,
         "robot_vel": -2.3,
         "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.06
+        "final_angle": 45,
+        "flight_time": 1.15
     },
     {
         "distance": 4.5,
         "robot_vel": -2.1,
-        "final_vel": 9.0,
-        "final_angle": 43.0,
-        "flight_time": 1.075
+        "final_vel": 9.2,
+        "final_angle": 49.0,
+        "flight_time": 1.235
     },
     {
         "distance": 4.5,
@@ -7122,8 +7122,8 @@
         "distance": 4.5,
         "robot_vel": -1.5,
         "final_vel": 8.6,
-        "final_angle": 44.5,
-        "flight_time": 1.04
+        "final_angle": 45,
+        "flight_time": 1.05
     },
     {
         "distance": 4.5,
@@ -7289,44 +7289,44 @@
     {
         "distance": 4.6,
         "robot_vel": -4.5,
-        "final_vel": 11.2,
-        "final_angle": 44.0,
-        "flight_time": 1.415
+        "final_vel": 11.4,
+        "final_angle": 46.5,
+        "flight_time": 1.51
     },
     {
         "distance": 4.6,
         "robot_vel": -4.3,
-        "final_vel": 11.0,
-        "final_angle": 44.0,
-        "flight_time": 1.39
+        "final_vel": 11.2,
+        "final_angle": 46.5,
+        "flight_time": 1.48
     },
     {
         "distance": 4.6,
         "robot_vel": -4.1,
-        "final_vel": 10.8,
-        "final_angle": 43.5,
-        "flight_time": 1.34
+        "final_vel": 11.0,
+        "final_angle": 46.5,
+        "flight_time": 1.45
     },
     {
         "distance": 4.6,
         "robot_vel": -3.9,
-        "final_vel": 10.6,
-        "final_angle": 43.0,
-        "flight_time": 1.295
+        "final_vel": 10.8,
+        "final_angle": 46.5,
+        "flight_time": 1.42
     },
     {
         "distance": 4.6,
         "robot_vel": -3.7,
-        "final_vel": 10.4,
-        "final_angle": 42.5,
-        "flight_time": 1.255
+        "final_vel": 10.6,
+        "final_angle": 46.5,
+        "flight_time": 1.395
     },
     {
         "distance": 4.6,
         "robot_vel": -3.5,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.215
+        "final_vel": 10.4,
+        "final_angle": 46.5,
+        "flight_time": 1.37
     },
     {
         "distance": 4.6,
@@ -7346,22 +7346,22 @@
         "distance": 4.6,
         "robot_vel": -2.9,
         "final_vel": 9.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.235
     },
     {
         "distance": 4.6,
         "robot_vel": -2.7,
         "final_vel": 9.6,
-        "final_angle": 43.5,
-        "flight_time": 1.16
+        "final_angle": 45,
+        "flight_time": 1.215
     },
     {
         "distance": 4.6,
         "robot_vel": -2.5,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 48.5,
+        "flight_time": 1.29
     },
     {
         "distance": 4.6,
@@ -7381,15 +7381,15 @@
         "distance": 4.6,
         "robot_vel": -1.9,
         "final_vel": 9.0,
-        "final_angle": 42,
-        "flight_time": 1.03
+        "final_angle": 45,
+        "flight_time": 1.105
     },
     {
         "distance": 4.6,
         "robot_vel": -1.7,
         "final_vel": 8.8,
-        "final_angle": 44.0,
-        "flight_time": 1.065
+        "final_angle": 45,
+        "flight_time": 1.09
     },
     {
         "distance": 4.6,
@@ -7569,65 +7569,65 @@
     {
         "distance": 4.7,
         "robot_vel": -4.5,
-        "final_vel": 11.2,
-        "final_angle": 42.5,
-        "flight_time": 1.365
+        "final_vel": 11.4,
+        "final_angle": 45.5,
+        "flight_time": 1.48
     },
     {
         "distance": 4.7,
         "robot_vel": -4.3,
-        "final_vel": 11.0,
-        "final_angle": 42.5,
-        "flight_time": 1.34
+        "final_vel": 11.2,
+        "final_angle": 45.5,
+        "flight_time": 1.45
     },
     {
         "distance": 4.7,
         "robot_vel": -4.1,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.3
+        "final_vel": 11.0,
+        "final_angle": 45.5,
+        "flight_time": 1.425
     },
     {
         "distance": 4.7,
         "robot_vel": -3.9,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.28
+        "final_vel": 10.8,
+        "final_angle": 45.5,
+        "flight_time": 1.4
     },
     {
         "distance": 4.7,
         "robot_vel": -3.7,
         "final_vel": 10.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.35
     },
     {
         "distance": 4.7,
         "robot_vel": -3.5,
         "final_vel": 10.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.325
     },
     {
         "distance": 4.7,
         "robot_vel": -3.3,
         "final_vel": 10.2,
-        "final_angle": 44.5,
-        "flight_time": 1.28
+        "final_angle": 45,
+        "flight_time": 1.305
     },
     {
         "distance": 4.7,
         "robot_vel": -3.1,
-        "final_vel": 10.0,
-        "final_angle": 43.5,
-        "flight_time": 1.225
+        "final_vel": 10.2,
+        "final_angle": 48.0,
+        "flight_time": 1.375
     },
     {
         "distance": 4.7,
         "robot_vel": -2.9,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.155
+        "final_vel": 10.0,
+        "final_angle": 47.5,
+        "flight_time": 1.325
     },
     {
         "distance": 4.7,
@@ -7654,8 +7654,8 @@
         "distance": 4.7,
         "robot_vel": -2.1,
         "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.065
+        "final_angle": 45,
+        "flight_time": 1.15
     },
     {
         "distance": 4.7,
@@ -7842,58 +7842,58 @@
     {
         "distance": 4.8,
         "robot_vel": -4.5,
-        "final_vel": 11.4,
-        "final_angle": 44.5,
-        "flight_time": 1.45
+        "final_vel": 11.6,
+        "final_angle": 47.0,
+        "flight_time": 1.555
     },
     {
         "distance": 4.8,
         "robot_vel": -4.3,
-        "final_vel": 11.2,
-        "final_angle": 44.5,
-        "flight_time": 1.425
+        "final_vel": 11.4,
+        "final_angle": 47.0,
+        "flight_time": 1.525
     },
     {
         "distance": 4.8,
         "robot_vel": -4.1,
-        "final_vel": 11.0,
-        "final_angle": 44.5,
-        "flight_time": 1.4
+        "final_vel": 11.2,
+        "final_angle": 47.0,
+        "flight_time": 1.49
     },
     {
         "distance": 4.8,
         "robot_vel": -3.9,
-        "final_vel": 10.8,
-        "final_angle": 44.0,
-        "flight_time": 1.35
+        "final_vel": 11.0,
+        "final_angle": 47.0,
+        "flight_time": 1.465
     },
     {
         "distance": 4.8,
         "robot_vel": -3.7,
-        "final_vel": 10.6,
-        "final_angle": 43.5,
-        "flight_time": 1.31
+        "final_vel": 10.8,
+        "final_angle": 47.0,
+        "flight_time": 1.435
     },
     {
         "distance": 4.8,
         "robot_vel": -3.5,
-        "final_vel": 10.4,
-        "final_angle": 43.0,
-        "flight_time": 1.265
+        "final_vel": 10.6,
+        "final_angle": 47.0,
+        "flight_time": 1.405
     },
     {
         "distance": 4.8,
         "robot_vel": -3.3,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.21
+        "final_vel": 10.4,
+        "final_angle": 47.0,
+        "flight_time": 1.38
     },
     {
         "distance": 4.8,
         "robot_vel": -3.1,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.195
+        "final_vel": 10.2,
+        "final_angle": 46.5,
+        "flight_time": 1.33
     },
     {
         "distance": 4.8,
@@ -7913,15 +7913,15 @@
         "distance": 4.8,
         "robot_vel": -2.5,
         "final_vel": 9.6,
-        "final_angle": 43.5,
-        "flight_time": 1.16
+        "final_angle": 45,
+        "flight_time": 1.21
     },
     {
         "distance": 4.8,
         "robot_vel": -2.3,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 49.0,
+        "flight_time": 1.305
     },
     {
         "distance": 4.8,
@@ -7941,14 +7941,14 @@
         "distance": 4.8,
         "robot_vel": -1.7,
         "final_vel": 9.0,
-        "final_angle": 42.5,
-        "flight_time": 1.045
+        "final_angle": 45,
+        "flight_time": 1.105
     },
     {
         "distance": 4.8,
         "robot_vel": -1.5,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.09
     },
     {
@@ -8122,37 +8122,37 @@
     {
         "distance": 4.9,
         "robot_vel": -4.5,
-        "final_vel": 11.4,
-        "final_angle": 43.5,
-        "flight_time": 1.425
+        "final_vel": 12.4,
+        "final_angle": 52.5,
+        "flight_time": 1.82
     },
     {
         "distance": 4.9,
         "robot_vel": -4.3,
-        "final_vel": 11.2,
-        "final_angle": 43.5,
-        "flight_time": 1.4
+        "final_vel": 11.8,
+        "final_angle": 50.0,
+        "flight_time": 1.665
     },
     {
         "distance": 4.9,
         "robot_vel": -4.1,
-        "final_vel": 11.0,
-        "final_angle": 43.0,
-        "flight_time": 1.355
+        "final_vel": 11.2,
+        "final_angle": 46.0,
+        "flight_time": 1.465
     },
     {
         "distance": 4.9,
         "robot_vel": -3.9,
-        "final_vel": 10.8,
-        "final_angle": 42.5,
-        "flight_time": 1.31
+        "final_vel": 11.0,
+        "final_angle": 46.0,
+        "flight_time": 1.435
     },
     {
         "distance": 4.9,
         "robot_vel": -3.7,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.275
+        "final_vel": 10.8,
+        "final_angle": 46.0,
+        "flight_time": 1.41
     },
     {
         "distance": 4.9,
@@ -8172,22 +8172,22 @@
         "distance": 4.9,
         "robot_vel": -3.1,
         "final_vel": 10.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.295
     },
     {
         "distance": 4.9,
         "robot_vel": -2.9,
         "final_vel": 10.0,
-        "final_angle": 43.5,
-        "flight_time": 1.22
+        "final_angle": 45,
+        "flight_time": 1.275
     },
     {
         "distance": 4.9,
         "robot_vel": -2.7,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.155
+        "final_vel": 10.0,
+        "final_angle": 48.0,
+        "flight_time": 1.335
     },
     {
         "distance": 4.9,
@@ -8214,8 +8214,8 @@
         "distance": 4.9,
         "robot_vel": -1.9,
         "final_vel": 9.2,
-        "final_angle": 42,
-        "flight_time": 1.065
+        "final_angle": 45,
+        "flight_time": 1.145
     },
     {
         "distance": 4.9,
@@ -8235,8 +8235,8 @@
         "distance": 4.9,
         "robot_vel": -1.3,
         "final_vel": 8.8,
-        "final_angle": 43.5,
-        "flight_time": 1.035
+        "final_angle": 46.0,
+        "flight_time": 1.095
     },
     {
         "distance": 4.9,
@@ -8402,65 +8402,65 @@
     {
         "distance": 5.0,
         "robot_vel": -4.5,
-        "final_vel": 11.4,
-        "final_angle": 42,
-        "flight_time": 1.375
+        "final_vel": 11.6,
+        "final_angle": 45.5,
+        "flight_time": 1.52
     },
     {
         "distance": 5.0,
         "robot_vel": -4.3,
-        "final_vel": 11.2,
-        "final_angle": 42,
-        "flight_time": 1.355
+        "final_vel": 11.4,
+        "final_angle": 45.5,
+        "flight_time": 1.49
     },
     {
         "distance": 5.0,
         "robot_vel": -4.1,
         "final_vel": 11.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.435
     },
     {
         "distance": 5.0,
         "robot_vel": -3.9,
         "final_vel": 11.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.41
     },
     {
         "distance": 5.0,
         "robot_vel": -3.7,
         "final_vel": 10.8,
-        "final_angle": 44.5,
-        "flight_time": 1.365
+        "final_angle": 45,
+        "flight_time": 1.39
     },
     {
         "distance": 5.0,
         "robot_vel": -3.5,
-        "final_vel": 10.6,
-        "final_angle": 44.0,
-        "flight_time": 1.32
+        "final_vel": 10.8,
+        "final_angle": 47.5,
+        "flight_time": 1.445
     },
     {
         "distance": 5.0,
         "robot_vel": -3.3,
-        "final_vel": 10.4,
-        "final_angle": 43.5,
-        "flight_time": 1.28
+        "final_vel": 10.6,
+        "final_angle": 47.5,
+        "flight_time": 1.42
     },
     {
         "distance": 5.0,
         "robot_vel": -3.1,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.21
+        "final_vel": 10.4,
+        "final_angle": 47.5,
+        "flight_time": 1.395
     },
     {
         "distance": 5.0,
         "robot_vel": -2.9,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.195
+        "final_vel": 10.2,
+        "final_angle": 47.0,
+        "flight_time": 1.345
     },
     {
         "distance": 5.0,
@@ -8480,15 +8480,15 @@
         "distance": 5.0,
         "robot_vel": -2.3,
         "final_vel": 9.6,
-        "final_angle": 43.5,
-        "flight_time": 1.16
+        "final_angle": 45,
+        "flight_time": 1.205
     },
     {
         "distance": 5.0,
         "robot_vel": -2.1,
-        "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.1
+        "final_vel": 9.6,
+        "final_angle": 49.0,
+        "flight_time": 1.295
     },
     {
         "distance": 5.0,
@@ -8508,8 +8508,8 @@
         "distance": 5.0,
         "robot_vel": -1.5,
         "final_vel": 9.0,
-        "final_angle": 43.0,
-        "flight_time": 1.06
+        "final_angle": 45,
+        "flight_time": 1.11
     },
     {
         "distance": 5.0,
@@ -8689,51 +8689,51 @@
     {
         "distance": 5.1,
         "robot_vel": -4.5,
-        "final_vel": 11.6,
-        "final_angle": 44.5,
-        "flight_time": 1.49
+        "final_vel": 12.0,
+        "final_angle": 48.5,
+        "flight_time": 1.65
     },
     {
         "distance": 5.1,
         "robot_vel": -4.3,
-        "final_vel": 11.4,
-        "final_angle": 44.0,
-        "flight_time": 1.435
+        "final_vel": 12.4,
+        "final_angle": 53.0,
+        "flight_time": 1.83
     },
     {
         "distance": 5.1,
         "robot_vel": -4.1,
-        "final_vel": 11.2,
-        "final_angle": 44.0,
-        "flight_time": 1.415
+        "final_vel": 11.8,
+        "final_angle": 50.5,
+        "flight_time": 1.675
     },
     {
         "distance": 5.1,
         "robot_vel": -3.9,
-        "final_vel": 11.0,
-        "final_angle": 43.5,
-        "flight_time": 1.365
+        "final_vel": 11.4,
+        "final_angle": 49.0,
+        "flight_time": 1.58
     },
     {
         "distance": 5.1,
         "robot_vel": -3.7,
-        "final_vel": 10.8,
-        "final_angle": 43.0,
-        "flight_time": 1.325
+        "final_vel": 11.0,
+        "final_angle": 46.5,
+        "flight_time": 1.445
     },
     {
         "distance": 5.1,
         "robot_vel": -3.5,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.265
+        "final_vel": 10.8,
+        "final_angle": 46.5,
+        "flight_time": 1.42
     },
     {
         "distance": 5.1,
         "robot_vel": -3.3,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.25
+        "final_vel": 10.6,
+        "final_angle": 46.5,
+        "flight_time": 1.395
     },
     {
         "distance": 5.1,
@@ -8753,15 +8753,15 @@
         "distance": 5.1,
         "robot_vel": -2.7,
         "final_vel": 10.0,
-        "final_angle": 44.0,
-        "flight_time": 1.23
+        "final_angle": 45,
+        "flight_time": 1.27
     },
     {
         "distance": 5.1,
         "robot_vel": -2.5,
-        "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.15
+        "final_vel": 10.0,
+        "final_angle": 48.5,
+        "flight_time": 1.35
     },
     {
         "distance": 5.1,
@@ -8788,8 +8788,8 @@
         "distance": 5.1,
         "robot_vel": -1.7,
         "final_vel": 9.2,
-        "final_angle": 43.0,
-        "flight_time": 1.095
+        "final_angle": 45,
+        "flight_time": 1.145
     },
     {
         "distance": 5.1,
@@ -8809,8 +8809,8 @@
         "distance": 5.1,
         "robot_vel": -1.1,
         "final_vel": 8.8,
-        "final_angle": 44.5,
-        "flight_time": 1.06
+        "final_angle": 45,
+        "flight_time": 1.07
     },
     {
         "distance": 5.1,
@@ -8976,30 +8976,30 @@
     {
         "distance": 5.2,
         "robot_vel": -4.5,
-        "final_vel": 11.6,
-        "final_angle": 43.0,
-        "flight_time": 1.435
+        "final_vel": 11.8,
+        "final_angle": 46.0,
+        "flight_time": 1.56
     },
     {
         "distance": 5.2,
         "robot_vel": -4.3,
-        "final_vel": 11.4,
-        "final_angle": 43.0,
-        "flight_time": 1.415
+        "final_vel": 11.6,
+        "final_angle": 46.0,
+        "flight_time": 1.53
     },
     {
         "distance": 5.2,
         "robot_vel": -4.1,
-        "final_vel": 11.2,
-        "final_angle": 42.5,
-        "flight_time": 1.37
+        "final_vel": 11.4,
+        "final_angle": 46.0,
+        "flight_time": 1.5
     },
     {
         "distance": 5.2,
         "robot_vel": -3.9,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.325
+        "final_vel": 11.2,
+        "final_angle": 45.5,
+        "flight_time": 1.45
     },
     {
         "distance": 5.2,
@@ -9012,36 +9012,36 @@
         "distance": 5.2,
         "robot_vel": -3.5,
         "final_vel": 10.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.375
     },
     {
         "distance": 5.2,
         "robot_vel": -3.3,
         "final_vel": 10.6,
-        "final_angle": 44.5,
-        "flight_time": 1.33
+        "final_angle": 45,
+        "flight_time": 1.355
     },
     {
         "distance": 5.2,
         "robot_vel": -3.1,
         "final_vel": 10.4,
-        "final_angle": 44.0,
-        "flight_time": 1.295
+        "final_angle": 45,
+        "flight_time": 1.335
     },
     {
         "distance": 5.2,
         "robot_vel": -2.9,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.205
+        "final_vel": 10.4,
+        "final_angle": 48.0,
+        "flight_time": 1.405
     },
     {
         "distance": 5.2,
         "robot_vel": -2.7,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.19
+        "final_vel": 10.2,
+        "final_angle": 47.5,
+        "flight_time": 1.355
     },
     {
         "distance": 5.2,
@@ -9061,15 +9061,15 @@
         "distance": 5.2,
         "robot_vel": -2.1,
         "final_vel": 9.6,
-        "final_angle": 42,
-        "flight_time": 1.115
+        "final_angle": 45,
+        "flight_time": 1.2
     },
     {
         "distance": 5.2,
         "robot_vel": -1.9,
-        "final_vel": 9.4,
-        "final_angle": 42.5,
-        "flight_time": 1.115
+        "final_vel": 9.6,
+        "final_angle": 49.5,
+        "flight_time": 1.305
     },
     {
         "distance": 5.2,
@@ -9089,8 +9089,8 @@
         "distance": 5.2,
         "robot_vel": -1.3,
         "final_vel": 9.0,
-        "final_angle": 44.0,
-        "flight_time": 1.085
+        "final_angle": 45,
+        "flight_time": 1.11
     },
     {
         "distance": 5.2,
@@ -9270,58 +9270,58 @@
     {
         "distance": 5.3,
         "robot_vel": -4.5,
-        "final_vel": 11.6,
-        "final_angle": 42,
-        "flight_time": 1.41
+        "final_vel": 11.8,
+        "final_angle": 45,
+        "flight_time": 1.525
     },
     {
         "distance": 5.3,
         "robot_vel": -4.3,
         "final_vel": 11.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.5
     },
     {
         "distance": 5.3,
         "robot_vel": -4.1,
         "final_vel": 11.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.475
     },
     {
         "distance": 5.3,
         "robot_vel": -3.9,
-        "final_vel": 11.2,
-        "final_angle": 44.5,
-        "flight_time": 1.425
+        "final_vel": 11.4,
+        "final_angle": 47.5,
+        "flight_time": 1.545
     },
     {
         "distance": 5.3,
         "robot_vel": -3.7,
-        "final_vel": 11.0,
-        "final_angle": 44.0,
-        "flight_time": 1.38
+        "final_vel": 11.2,
+        "final_angle": 47.5,
+        "flight_time": 1.515
     },
     {
         "distance": 5.3,
         "robot_vel": -3.5,
-        "final_vel": 10.8,
-        "final_angle": 43.5,
-        "flight_time": 1.335
+        "final_vel": 11.0,
+        "final_angle": 47.0,
+        "flight_time": 1.46
     },
     {
         "distance": 5.3,
         "robot_vel": -3.3,
-        "final_vel": 10.6,
-        "final_angle": 42.5,
-        "flight_time": 1.28
+        "final_vel": 10.8,
+        "final_angle": 47.0,
+        "flight_time": 1.435
     },
     {
         "distance": 5.3,
         "robot_vel": -3.1,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.245
+        "final_vel": 10.6,
+        "final_angle": 47.0,
+        "flight_time": 1.41
     },
     {
         "distance": 5.3,
@@ -9341,15 +9341,15 @@
         "distance": 5.3,
         "robot_vel": -2.5,
         "final_vel": 10.0,
-        "final_angle": 44.5,
-        "flight_time": 1.245
+        "final_angle": 45,
+        "flight_time": 1.26
     },
     {
         "distance": 5.3,
         "robot_vel": -2.3,
         "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.15
+        "final_angle": 45,
+        "flight_time": 1.245
     },
     {
         "distance": 5.3,
@@ -9376,8 +9376,8 @@
         "distance": 5.3,
         "robot_vel": -1.5,
         "final_vel": 9.2,
-        "final_angle": 43.5,
-        "flight_time": 1.105
+        "final_angle": 45,
+        "flight_time": 1.145
     },
     {
         "distance": 5.3,
@@ -9397,7 +9397,7 @@
         "distance": 5.3,
         "robot_vel": -0.9,
         "final_vel": 8.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.075
     },
     {
@@ -9564,44 +9564,44 @@
     {
         "distance": 5.4,
         "robot_vel": -4.5,
-        "final_vel": 11.8,
-        "final_angle": 44.0,
-        "flight_time": 1.495
+        "final_vel": 12.0,
+        "final_angle": 46.5,
+        "flight_time": 1.6
     },
     {
         "distance": 5.4,
         "robot_vel": -4.3,
-        "final_vel": 11.6,
-        "final_angle": 44.0,
-        "flight_time": 1.47
+        "final_vel": 11.8,
+        "final_angle": 46.5,
+        "flight_time": 1.57
     },
     {
         "distance": 5.4,
         "robot_vel": -4.1,
-        "final_vel": 11.4,
-        "final_angle": 43.5,
-        "flight_time": 1.425
+        "final_vel": 11.6,
+        "final_angle": 46.5,
+        "flight_time": 1.54
     },
     {
         "distance": 5.4,
         "robot_vel": -3.9,
-        "final_vel": 11.2,
-        "final_angle": 43.0,
-        "flight_time": 1.38
+        "final_vel": 11.4,
+        "final_angle": 46.5,
+        "flight_time": 1.515
     },
     {
         "distance": 5.4,
         "robot_vel": -3.7,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.32
+        "final_vel": 11.2,
+        "final_angle": 46.5,
+        "flight_time": 1.485
     },
     {
         "distance": 5.4,
         "robot_vel": -3.5,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.3
+        "final_vel": 11.0,
+        "final_angle": 46.0,
+        "flight_time": 1.435
     },
     {
         "distance": 5.4,
@@ -9621,22 +9621,22 @@
         "distance": 5.4,
         "robot_vel": -2.9,
         "final_vel": 10.4,
-        "final_angle": 44.5,
-        "flight_time": 1.305
+        "final_angle": 45,
+        "flight_time": 1.325
     },
     {
         "distance": 5.4,
         "robot_vel": -2.7,
-        "final_vel": 10.2,
-        "final_angle": 42.5,
-        "flight_time": 1.22
+        "final_vel": 10.4,
+        "final_angle": 48.5,
+        "flight_time": 1.415
     },
     {
         "distance": 5.4,
         "robot_vel": -2.5,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.19
+        "final_vel": 10.2,
+        "final_angle": 48.0,
+        "flight_time": 1.37
     },
     {
         "distance": 5.4,
@@ -9656,15 +9656,15 @@
         "distance": 5.4,
         "robot_vel": -1.9,
         "final_vel": 9.6,
-        "final_angle": 42,
-        "flight_time": 1.115
+        "final_angle": 45,
+        "flight_time": 1.2
     },
     {
         "distance": 5.4,
         "robot_vel": -1.7,
         "final_vel": 9.4,
-        "final_angle": 43.0,
-        "flight_time": 1.13
+        "final_angle": 45,
+        "flight_time": 1.185
     },
     {
         "distance": 5.4,
@@ -9684,8 +9684,8 @@
         "distance": 5.4,
         "robot_vel": -1.1,
         "final_vel": 9.0,
-        "final_angle": 44.5,
-        "flight_time": 1.095
+        "final_angle": 45,
+        "flight_time": 1.11
     },
     {
         "distance": 5.4,
@@ -9858,23 +9858,23 @@
     {
         "distance": 5.5,
         "robot_vel": -4.5,
-        "final_vel": 11.8,
-        "final_angle": 42.5,
-        "flight_time": 1.445
+        "final_vel": 12.0,
+        "final_angle": 45.5,
+        "flight_time": 1.565
     },
     {
         "distance": 5.5,
         "robot_vel": -4.3,
-        "final_vel": 11.6,
-        "final_angle": 42.5,
-        "flight_time": 1.425
+        "final_vel": 11.8,
+        "final_angle": 45.5,
+        "flight_time": 1.535
     },
     {
         "distance": 5.5,
         "robot_vel": -4.1,
-        "final_vel": 11.4,
-        "final_angle": 42,
-        "flight_time": 1.38
+        "final_vel": 11.6,
+        "final_angle": 45.5,
+        "flight_time": 1.51
     },
     {
         "distance": 5.5,
@@ -9887,36 +9887,36 @@
         "distance": 5.5,
         "robot_vel": -3.7,
         "final_vel": 11.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.435
     },
     {
         "distance": 5.5,
         "robot_vel": -3.5,
         "final_vel": 11.0,
-        "final_angle": 44.5,
-        "flight_time": 1.39
+        "final_angle": 45,
+        "flight_time": 1.415
     },
     {
         "distance": 5.5,
         "robot_vel": -3.3,
-        "final_vel": 10.8,
-        "final_angle": 44.0,
-        "flight_time": 1.35
+        "final_vel": 11.0,
+        "final_angle": 48.0,
+        "flight_time": 1.495
     },
     {
         "distance": 5.5,
         "robot_vel": -3.1,
-        "final_vel": 10.6,
-        "final_angle": 43.0,
-        "flight_time": 1.29
+        "final_vel": 10.8,
+        "final_angle": 47.5,
+        "flight_time": 1.445
     },
     {
         "distance": 5.5,
         "robot_vel": -2.9,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.24
+        "final_vel": 10.6,
+        "final_angle": 47.5,
+        "flight_time": 1.42
     },
     {
         "distance": 5.5,
@@ -9936,15 +9936,15 @@
         "distance": 5.5,
         "robot_vel": -2.3,
         "final_vel": 10.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.255
     },
     {
         "distance": 5.5,
         "robot_vel": -2.1,
         "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.15
+        "final_angle": 45,
+        "flight_time": 1.24
     },
     {
         "distance": 5.5,
@@ -9964,15 +9964,15 @@
         "distance": 5.5,
         "robot_vel": -1.5,
         "final_vel": 9.4,
-        "final_angle": 42,
-        "flight_time": 1.085
+        "final_angle": 46.5,
+        "flight_time": 1.205
     },
     {
         "distance": 5.5,
         "robot_vel": -1.3,
         "final_vel": 9.2,
-        "final_angle": 44.0,
-        "flight_time": 1.12
+        "final_angle": 45,
+        "flight_time": 1.145
     },
     {
         "distance": 5.5,
@@ -10152,51 +10152,51 @@
     {
         "distance": 5.6,
         "robot_vel": -4.5,
-        "final_vel": 12.0,
-        "final_angle": 44.5,
-        "flight_time": 1.53
+        "final_vel": 12.2,
+        "final_angle": 47.0,
+        "flight_time": 1.64
     },
     {
         "distance": 5.6,
         "robot_vel": -4.3,
-        "final_vel": 11.8,
-        "final_angle": 44.5,
-        "flight_time": 1.505
+        "final_vel": 12.0,
+        "final_angle": 47.0,
+        "flight_time": 1.61
     },
     {
         "distance": 5.6,
         "robot_vel": -4.1,
-        "final_vel": 11.6,
-        "final_angle": 44.5,
-        "flight_time": 1.485
+        "final_vel": 11.8,
+        "final_angle": 47.0,
+        "flight_time": 1.58
     },
     {
         "distance": 5.6,
         "robot_vel": -3.9,
-        "final_vel": 11.4,
-        "final_angle": 44.0,
-        "flight_time": 1.435
+        "final_vel": 11.6,
+        "final_angle": 47.0,
+        "flight_time": 1.55
     },
     {
         "distance": 5.6,
         "robot_vel": -3.7,
-        "final_vel": 11.2,
-        "final_angle": 43.5,
-        "flight_time": 1.39
+        "final_vel": 11.4,
+        "final_angle": 47.0,
+        "flight_time": 1.525
     },
     {
         "distance": 5.6,
         "robot_vel": -3.5,
-        "final_vel": 11.0,
-        "final_angle": 43.0,
-        "flight_time": 1.35
+        "final_vel": 11.2,
+        "final_angle": 47.0,
+        "flight_time": 1.495
     },
     {
         "distance": 5.6,
         "robot_vel": -3.3,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.295
+        "final_vel": 11.0,
+        "final_angle": 46.5,
+        "flight_time": 1.445
     },
     {
         "distance": 5.6,
@@ -10216,22 +10216,22 @@
         "distance": 5.6,
         "robot_vel": -2.7,
         "final_vel": 10.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.315
     },
     {
         "distance": 5.6,
         "robot_vel": -2.5,
         "final_vel": 10.2,
-        "final_angle": 43.5,
-        "flight_time": 1.245
+        "final_angle": 45,
+        "flight_time": 1.3
     },
     {
         "distance": 5.6,
         "robot_vel": -2.3,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.185
+        "final_vel": 10.2,
+        "final_angle": 48.5,
+        "flight_time": 1.38
     },
     {
         "distance": 5.6,
@@ -10251,15 +10251,15 @@
         "distance": 5.6,
         "robot_vel": -1.7,
         "final_vel": 9.6,
-        "final_angle": 42,
-        "flight_time": 1.115
+        "final_angle": 45,
+        "flight_time": 1.195
     },
     {
         "distance": 5.6,
         "robot_vel": -1.5,
         "final_vel": 9.4,
-        "final_angle": 43.5,
-        "flight_time": 1.14
+        "final_angle": 45,
+        "flight_time": 1.18
     },
     {
         "distance": 5.6,
@@ -10453,37 +10453,30 @@
     {
         "distance": 5.7,
         "robot_vel": -4.5,
-        "final_vel": 12.0,
-        "final_angle": 43.5,
-        "flight_time": 1.5
-    },
-    {
-        "distance": 5.7,
-        "robot_vel": -4.3,
-        "final_vel": 11.8,
-        "final_angle": 43.5,
-        "flight_time": 1.48
+        "final_vel": 12.4,
+        "final_angle": 48.0,
+        "flight_time": 1.685
     },
     {
         "distance": 5.7,
         "robot_vel": -4.1,
-        "final_vel": 11.6,
-        "final_angle": 43.0,
-        "flight_time": 1.435
+        "final_vel": 11.8,
+        "final_angle": 46.0,
+        "flight_time": 1.545
     },
     {
         "distance": 5.7,
         "robot_vel": -3.9,
-        "final_vel": 11.4,
-        "final_angle": 42.5,
-        "flight_time": 1.39
+        "final_vel": 11.6,
+        "final_angle": 46.0,
+        "flight_time": 1.52
     },
     {
         "distance": 5.7,
         "robot_vel": -3.7,
-        "final_vel": 11.2,
-        "final_angle": 42,
-        "flight_time": 1.355
+        "final_vel": 11.4,
+        "final_angle": 46.0,
+        "flight_time": 1.495
     },
     {
         "distance": 5.7,
@@ -10503,22 +10496,22 @@
         "distance": 5.7,
         "robot_vel": -3.1,
         "final_vel": 10.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.38
     },
     {
         "distance": 5.7,
         "robot_vel": -2.9,
         "final_vel": 10.6,
-        "final_angle": 43.5,
-        "flight_time": 1.305
+        "final_angle": 45,
+        "flight_time": 1.36
     },
     {
         "distance": 5.7,
         "robot_vel": -2.7,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.235
+        "final_vel": 10.6,
+        "final_angle": 48.0,
+        "flight_time": 1.43
     },
     {
         "distance": 5.7,
@@ -10545,8 +10538,8 @@
         "distance": 5.7,
         "robot_vel": -1.9,
         "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.15
+        "final_angle": 45,
+        "flight_time": 1.235
     },
     {
         "distance": 5.7,
@@ -10566,14 +10559,14 @@
         "distance": 5.7,
         "robot_vel": -1.3,
         "final_vel": 9.4,
-        "final_angle": 42.5,
-        "flight_time": 1.1
+        "final_angle": 46.5,
+        "flight_time": 1.2
     },
     {
         "distance": 5.7,
         "robot_vel": -1.1,
         "final_vel": 9.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.145
     },
     {
@@ -10754,65 +10747,65 @@
     {
         "distance": 5.8,
         "robot_vel": -4.5,
-        "final_vel": 12.0,
-        "final_angle": 42.5,
-        "flight_time": 1.475
+        "final_vel": 12.2,
+        "final_angle": 45.5,
+        "flight_time": 1.6
     },
     {
         "distance": 5.8,
         "robot_vel": -4.3,
-        "final_vel": 11.8,
-        "final_angle": 42,
-        "flight_time": 1.43
+        "final_vel": 12.0,
+        "final_angle": 45.5,
+        "flight_time": 1.57
     },
     {
         "distance": 5.8,
         "robot_vel": -4.1,
-        "final_vel": 11.6,
-        "final_angle": 42,
-        "flight_time": 1.415
+        "final_vel": 11.8,
+        "final_angle": 45,
+        "flight_time": 1.515
     },
     {
         "distance": 5.8,
         "robot_vel": -3.9,
         "final_vel": 11.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.495
     },
     {
         "distance": 5.8,
         "robot_vel": -3.7,
         "final_vel": 11.4,
-        "final_angle": 44.5,
-        "flight_time": 1.445
+        "final_angle": 45,
+        "flight_time": 1.47
     },
     {
         "distance": 5.8,
         "robot_vel": -3.5,
-        "final_vel": 11.2,
-        "final_angle": 44.5,
-        "flight_time": 1.425
+        "final_vel": 11.4,
+        "final_angle": 47.5,
+        "flight_time": 1.535
     },
     {
         "distance": 5.8,
         "robot_vel": -3.3,
-        "final_vel": 11.0,
-        "final_angle": 43.5,
-        "flight_time": 1.36
+        "final_vel": 11.2,
+        "final_angle": 47.5,
+        "flight_time": 1.505
     },
     {
         "distance": 5.8,
         "robot_vel": -3.1,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.29
+        "final_vel": 11.0,
+        "final_angle": 47.5,
+        "flight_time": 1.48
     },
     {
         "distance": 5.8,
         "robot_vel": -2.9,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.275
+        "final_vel": 10.8,
+        "final_angle": 47.0,
+        "flight_time": 1.435
     },
     {
         "distance": 5.8,
@@ -10832,15 +10825,15 @@
         "distance": 5.8,
         "robot_vel": -2.3,
         "final_vel": 10.2,
-        "final_angle": 44.0,
-        "flight_time": 1.26
+        "final_angle": 45,
+        "flight_time": 1.29
     },
     {
         "distance": 5.8,
         "robot_vel": -2.1,
-        "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.185
+        "final_vel": 10.2,
+        "final_angle": 49.0,
+        "flight_time": 1.39
     },
     {
         "distance": 5.8,
@@ -10860,15 +10853,15 @@
         "distance": 5.8,
         "robot_vel": -1.5,
         "final_vel": 9.6,
-        "final_angle": 42,
-        "flight_time": 1.12
+        "final_angle": 45,
+        "flight_time": 1.195
     },
     {
         "distance": 5.8,
         "robot_vel": -1.3,
         "final_vel": 9.4,
-        "final_angle": 44.5,
-        "flight_time": 1.165
+        "final_angle": 45,
+        "flight_time": 1.18
     },
     {
         "distance": 5.8,
@@ -11061,52 +11054,38 @@
     },
     {
         "distance": 5.9,
-        "robot_vel": -4.5,
-        "final_vel": 12.2,
-        "final_angle": 44.5,
-        "flight_time": 1.565
-    },
-    {
-        "distance": 5.9,
-        "robot_vel": -4.3,
-        "final_vel": 12.0,
-        "final_angle": 44.5,
-        "flight_time": 1.54
-    },
-    {
-        "distance": 5.9,
         "robot_vel": -4.1,
-        "final_vel": 11.8,
-        "final_angle": 44.0,
-        "flight_time": 1.49
+        "final_vel": 12.0,
+        "final_angle": 47.0,
+        "flight_time": 1.615
     },
     {
         "distance": 5.9,
         "robot_vel": -3.9,
-        "final_vel": 11.6,
-        "final_angle": 43.5,
-        "flight_time": 1.445
+        "final_vel": 11.8,
+        "final_angle": 47.0,
+        "flight_time": 1.585
     },
     {
         "distance": 5.9,
         "robot_vel": -3.7,
-        "final_vel": 11.4,
-        "final_angle": 43.0,
-        "flight_time": 1.405
+        "final_vel": 11.6,
+        "final_angle": 46.5,
+        "flight_time": 1.53
     },
     {
         "distance": 5.9,
         "robot_vel": -3.5,
-        "final_vel": 11.2,
-        "final_angle": 42,
-        "flight_time": 1.345
+        "final_vel": 11.4,
+        "final_angle": 46.5,
+        "flight_time": 1.505
     },
     {
         "distance": 5.9,
         "robot_vel": -3.3,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.33
+        "final_vel": 11.2,
+        "final_angle": 46.5,
+        "flight_time": 1.48
     },
     {
         "distance": 5.9,
@@ -11126,22 +11105,22 @@
         "distance": 5.9,
         "robot_vel": -2.7,
         "final_vel": 10.6,
-        "final_angle": 44.5,
-        "flight_time": 1.335
+        "final_angle": 45,
+        "flight_time": 1.35
     },
     {
         "distance": 5.9,
         "robot_vel": -2.5,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.235
+        "final_vel": 10.6,
+        "final_angle": 48.5,
+        "flight_time": 1.44
     },
     {
         "distance": 5.9,
         "robot_vel": -2.3,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.22
+        "final_vel": 10.4,
+        "final_angle": 48.0,
+        "flight_time": 1.395
     },
     {
         "distance": 5.9,
@@ -11161,8 +11140,8 @@
         "distance": 5.9,
         "robot_vel": -1.7,
         "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.15
+        "final_angle": 45,
+        "flight_time": 1.23
     },
     {
         "distance": 5.9,
@@ -11182,8 +11161,8 @@
         "distance": 5.9,
         "robot_vel": -1.1,
         "final_vel": 9.4,
-        "final_angle": 43.0,
-        "flight_time": 1.11
+        "final_angle": 47.0,
+        "flight_time": 1.21
     },
     {
         "distance": 5.9,
@@ -11363,37 +11342,37 @@
     {
         "distance": 6.0,
         "robot_vel": -4.5,
-        "final_vel": 12.2,
-        "final_angle": 43.5,
-        "flight_time": 1.535
+        "final_vel": 12.4,
+        "final_angle": 46.0,
+        "flight_time": 1.635
     },
     {
         "distance": 6.0,
         "robot_vel": -4.3,
-        "final_vel": 12.0,
-        "final_angle": 43.0,
-        "flight_time": 1.485
+        "final_vel": 12.2,
+        "final_angle": 46.0,
+        "flight_time": 1.61
     },
     {
         "distance": 6.0,
         "robot_vel": -4.1,
-        "final_vel": 11.8,
-        "final_angle": 42.5,
-        "flight_time": 1.445
+        "final_vel": 12.0,
+        "final_angle": 46.0,
+        "flight_time": 1.58
     },
     {
         "distance": 6.0,
         "robot_vel": -3.9,
-        "final_vel": 11.6,
-        "final_angle": 42,
-        "flight_time": 1.4
+        "final_vel": 11.8,
+        "final_angle": 46.0,
+        "flight_time": 1.555
     },
     {
         "distance": 6.0,
         "robot_vel": -3.7,
-        "final_vel": 11.4,
-        "final_angle": 42,
-        "flight_time": 1.385
+        "final_vel": 11.6,
+        "final_angle": 45.5,
+        "flight_time": 1.505
     },
     {
         "distance": 6.0,
@@ -11406,29 +11385,29 @@
         "distance": 6.0,
         "robot_vel": -3.3,
         "final_vel": 11.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.435
     },
     {
         "distance": 6.0,
         "robot_vel": -3.1,
         "final_vel": 11.0,
-        "final_angle": 44.5,
-        "flight_time": 1.395
+        "final_angle": 45,
+        "flight_time": 1.415
     },
     {
         "distance": 6.0,
         "robot_vel": -2.9,
-        "final_vel": 10.8,
-        "final_angle": 43.0,
-        "flight_time": 1.32
+        "final_vel": 11.0,
+        "final_angle": 48.0,
+        "flight_time": 1.49
     },
     {
         "distance": 6.0,
         "robot_vel": -2.7,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.27
+        "final_vel": 10.8,
+        "final_angle": 47.5,
+        "flight_time": 1.445
     },
     {
         "distance": 6.0,
@@ -11448,15 +11427,15 @@
         "distance": 6.0,
         "robot_vel": -2.1,
         "final_vel": 10.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.285
     },
     {
         "distance": 6.0,
         "robot_vel": -1.9,
         "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.185
+        "final_angle": 45,
+        "flight_time": 1.27
     },
     {
         "distance": 6.0,
@@ -11476,14 +11455,14 @@
         "distance": 6.0,
         "robot_vel": -1.3,
         "final_vel": 9.6,
-        "final_angle": 42.5,
-        "flight_time": 1.13
+        "final_angle": 45,
+        "flight_time": 1.195
     },
     {
         "distance": 6.0,
         "robot_vel": -1.1,
         "final_vel": 9.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.18
     },
     {
@@ -11678,58 +11657,58 @@
     {
         "distance": 6.1,
         "robot_vel": -4.5,
-        "final_vel": 12.2,
-        "final_angle": 42,
-        "flight_time": 1.485
+        "final_vel": 12.4,
+        "final_angle": 45,
+        "flight_time": 1.6
     },
     {
         "distance": 6.1,
         "robot_vel": -4.3,
-        "final_vel": 12.0,
-        "final_angle": 42,
-        "flight_time": 1.465
+        "final_vel": 12.2,
+        "final_angle": 45,
+        "flight_time": 1.575
     },
     {
         "distance": 6.1,
         "robot_vel": -4.1,
         "final_vel": 12.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.55
     },
     {
         "distance": 6.1,
         "robot_vel": -3.9,
         "final_vel": 11.8,
-        "final_angle": 44.5,
-        "flight_time": 1.5
+        "final_angle": 45,
+        "flight_time": 1.525
     },
     {
         "distance": 6.1,
         "robot_vel": -3.7,
-        "final_vel": 11.6,
-        "final_angle": 44.5,
-        "flight_time": 1.48
+        "final_vel": 11.8,
+        "final_angle": 47.5,
+        "flight_time": 1.595
     },
     {
         "distance": 6.1,
         "robot_vel": -3.5,
-        "final_vel": 11.4,
-        "final_angle": 44.0,
-        "flight_time": 1.435
+        "final_vel": 11.6,
+        "final_angle": 47.5,
+        "flight_time": 1.57
     },
     {
         "distance": 6.1,
         "robot_vel": -3.3,
-        "final_vel": 11.2,
-        "final_angle": 43.0,
-        "flight_time": 1.375
+        "final_vel": 11.4,
+        "final_angle": 47.0,
+        "flight_time": 1.515
     },
     {
         "distance": 6.1,
         "robot_vel": -3.1,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.32
+        "final_vel": 11.2,
+        "final_angle": 47.0,
+        "flight_time": 1.49
     },
     {
         "distance": 6.1,
@@ -11749,22 +11728,22 @@
         "distance": 6.1,
         "robot_vel": -2.5,
         "final_vel": 10.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.345
     },
     {
         "distance": 6.1,
         "robot_vel": -2.3,
         "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.23
+        "final_angle": 45,
+        "flight_time": 1.325
     },
     {
         "distance": 6.1,
         "robot_vel": -2.1,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.215
+        "final_vel": 10.4,
+        "final_angle": 48.5,
+        "flight_time": 1.405
     },
     {
         "distance": 6.1,
@@ -11784,8 +11763,8 @@
         "distance": 6.1,
         "robot_vel": -1.5,
         "final_vel": 9.8,
-        "final_angle": 42,
-        "flight_time": 1.15
+        "final_angle": 45,
+        "flight_time": 1.23
     },
     {
         "distance": 6.1,
@@ -11805,8 +11784,8 @@
         "distance": 6.1,
         "robot_vel": -0.9,
         "final_vel": 9.4,
-        "final_angle": 43.5,
-        "flight_time": 1.125
+        "final_angle": 47.0,
+        "flight_time": 1.21
     },
     {
         "distance": 6.1,
@@ -11985,45 +11964,38 @@
     },
     {
         "distance": 6.2,
-        "robot_vel": -4.5,
-        "final_vel": 12.4,
-        "final_angle": 44.5,
-        "flight_time": 1.595
-    },
-    {
-        "distance": 6.2,
         "robot_vel": -4.3,
-        "final_vel": 12.2,
-        "final_angle": 44.0,
-        "flight_time": 1.545
+        "final_vel": 12.4,
+        "final_angle": 46.5,
+        "flight_time": 1.645
     },
     {
         "distance": 6.2,
         "robot_vel": -4.1,
-        "final_vel": 12.0,
-        "final_angle": 44.0,
-        "flight_time": 1.525
+        "final_vel": 12.2,
+        "final_angle": 46.5,
+        "flight_time": 1.615
     },
     {
         "distance": 6.2,
         "robot_vel": -3.9,
-        "final_vel": 11.8,
-        "final_angle": 43.5,
-        "flight_time": 1.475
+        "final_vel": 12.0,
+        "final_angle": 46.5,
+        "flight_time": 1.59
     },
     {
         "distance": 6.2,
         "robot_vel": -3.7,
-        "final_vel": 11.6,
-        "final_angle": 42.5,
-        "flight_time": 1.415
+        "final_vel": 11.8,
+        "final_angle": 46.5,
+        "flight_time": 1.565
     },
     {
         "distance": 6.2,
         "robot_vel": -3.5,
-        "final_vel": 11.4,
-        "final_angle": 42,
-        "flight_time": 1.375
+        "final_vel": 11.6,
+        "final_angle": 46.5,
+        "flight_time": 1.54
     },
     {
         "distance": 6.2,
@@ -12043,22 +12015,22 @@
         "distance": 6.2,
         "robot_vel": -2.9,
         "final_vel": 11.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.405
     },
     {
         "distance": 6.2,
         "robot_vel": -2.7,
         "final_vel": 10.8,
-        "final_angle": 44.0,
-        "flight_time": 1.345
+        "final_angle": 45,
+        "flight_time": 1.385
     },
     {
         "distance": 6.2,
         "robot_vel": -2.5,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.265
+        "final_vel": 10.8,
+        "final_angle": 48.0,
+        "flight_time": 1.455
     },
     {
         "distance": 6.2,
@@ -12085,8 +12057,8 @@
         "distance": 6.2,
         "robot_vel": -1.7,
         "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.18
+        "final_angle": 45,
+        "flight_time": 1.265
     },
     {
         "distance": 6.2,
@@ -12106,8 +12078,8 @@
         "distance": 6.2,
         "robot_vel": -1.1,
         "final_vel": 9.6,
-        "final_angle": 43.0,
-        "flight_time": 1.145
+        "final_angle": 45,
+        "flight_time": 1.19
     },
     {
         "distance": 6.2,
@@ -12300,31 +12272,24 @@
     },
     {
         "distance": 6.3,
-        "robot_vel": -4.5,
-        "final_vel": 12.4,
-        "final_angle": 43.0,
-        "flight_time": 1.54
-    },
-    {
-        "distance": 6.3,
         "robot_vel": -4.3,
-        "final_vel": 12.2,
-        "final_angle": 43.0,
-        "flight_time": 1.52
+        "final_vel": 12.4,
+        "final_angle": 46.0,
+        "flight_time": 1.64
     },
     {
         "distance": 6.3,
         "robot_vel": -4.1,
-        "final_vel": 12.0,
-        "final_angle": 42.5,
-        "flight_time": 1.475
+        "final_vel": 12.4,
+        "final_angle": 48.0,
+        "flight_time": 1.695
     },
     {
         "distance": 6.3,
         "robot_vel": -3.9,
-        "final_vel": 11.8,
-        "final_angle": 42,
-        "flight_time": 1.435
+        "final_vel": 12.0,
+        "final_angle": 45.5,
+        "flight_time": 1.56
     },
     {
         "distance": 6.3,
@@ -12337,36 +12302,36 @@
         "distance": 6.3,
         "robot_vel": -3.5,
         "final_vel": 11.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.49
     },
     {
         "distance": 6.3,
         "robot_vel": -3.3,
         "final_vel": 11.4,
-        "final_angle": 44.5,
-        "flight_time": 1.445
+        "final_angle": 45,
+        "flight_time": 1.47
     },
     {
         "distance": 6.3,
         "robot_vel": -3.1,
-        "final_vel": 11.2,
-        "final_angle": 44.0,
-        "flight_time": 1.405
+        "final_vel": 11.4,
+        "final_angle": 48.0,
+        "flight_time": 1.555
     },
     {
         "distance": 6.3,
         "robot_vel": -2.9,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.315
+        "final_vel": 11.2,
+        "final_angle": 47.5,
+        "flight_time": 1.5
     },
     {
         "distance": 6.3,
         "robot_vel": -2.7,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.3
+        "final_vel": 11.0,
+        "final_angle": 47.0,
+        "flight_time": 1.455
     },
     {
         "distance": 6.3,
@@ -12386,15 +12351,15 @@
         "distance": 6.3,
         "robot_vel": -2.1,
         "final_vel": 10.4,
-        "final_angle": 43.5,
-        "flight_time": 1.27
+        "final_angle": 45,
+        "flight_time": 1.32
     },
     {
         "distance": 6.3,
         "robot_vel": -1.9,
-        "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.215
+        "final_vel": 10.4,
+        "final_angle": 49.0,
+        "flight_time": 1.415
     },
     {
         "distance": 6.3,
@@ -12414,8 +12379,8 @@
         "distance": 6.3,
         "robot_vel": -1.3,
         "final_vel": 9.8,
-        "final_angle": 42.5,
-        "flight_time": 1.16
+        "final_angle": 45,
+        "flight_time": 1.225
     },
     {
         "distance": 6.3,
@@ -12435,8 +12400,8 @@
         "distance": 6.3,
         "robot_vel": -0.7,
         "final_vel": 9.4,
-        "final_angle": 44.0,
-        "flight_time": 1.135
+        "final_angle": 47.5,
+        "flight_time": 1.22
     },
     {
         "distance": 6.3,
@@ -12615,59 +12580,45 @@
     },
     {
         "distance": 6.4,
-        "robot_vel": -4.5,
-        "final_vel": 12.4,
-        "final_angle": 42,
-        "flight_time": 1.515
-    },
-    {
-        "distance": 6.4,
         "robot_vel": -4.3,
         "final_vel": 12.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.605
     },
     {
         "distance": 6.4,
         "robot_vel": -4.1,
         "final_vel": 12.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.585
     },
     {
         "distance": 6.4,
-        "robot_vel": -3.9,
-        "final_vel": 12.0,
-        "final_angle": 44.5,
-        "flight_time": 1.535
-    },
-    {
-        "distance": 6.4,
         "robot_vel": -3.7,
-        "final_vel": 11.8,
-        "final_angle": 44.0,
-        "flight_time": 1.485
+        "final_vel": 12.0,
+        "final_angle": 47.0,
+        "flight_time": 1.6
     },
     {
         "distance": 6.4,
         "robot_vel": -3.5,
-        "final_vel": 11.6,
-        "final_angle": 43.5,
-        "flight_time": 1.445
+        "final_vel": 11.8,
+        "final_angle": 47.0,
+        "flight_time": 1.575
     },
     {
         "distance": 6.4,
         "robot_vel": -3.3,
-        "final_vel": 11.4,
-        "final_angle": 42.5,
-        "flight_time": 1.385
+        "final_vel": 11.6,
+        "final_angle": 47.0,
+        "flight_time": 1.55
     },
     {
         "distance": 6.4,
         "robot_vel": -3.1,
-        "final_vel": 11.2,
-        "final_angle": 42,
-        "flight_time": 1.35
+        "final_vel": 11.4,
+        "final_angle": 46.5,
+        "flight_time": 1.5
     },
     {
         "distance": 6.4,
@@ -12687,15 +12638,15 @@
         "distance": 6.4,
         "robot_vel": -2.5,
         "final_vel": 10.8,
-        "final_angle": 44.5,
-        "flight_time": 1.36
+        "final_angle": 45,
+        "flight_time": 1.375
     },
     {
         "distance": 6.4,
         "robot_vel": -2.3,
-        "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.26
+        "final_vel": 10.8,
+        "final_angle": 48.5,
+        "flight_time": 1.465
     },
     {
         "distance": 6.4,
@@ -12722,8 +12673,8 @@
         "distance": 6.4,
         "robot_vel": -1.5,
         "final_vel": 10.0,
-        "final_angle": 42,
-        "flight_time": 1.18
+        "final_angle": 45,
+        "flight_time": 1.26
     },
     {
         "distance": 6.4,
@@ -12743,8 +12694,8 @@
         "distance": 6.4,
         "robot_vel": -0.9,
         "final_vel": 9.6,
-        "final_angle": 43.5,
-        "flight_time": 1.155
+        "final_angle": 45,
+        "flight_time": 1.19
     },
     {
         "distance": 6.4,
@@ -12764,7 +12715,7 @@
         "distance": 6.4,
         "robot_vel": -0.3,
         "final_vel": 9.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.125
     },
     {
@@ -12930,38 +12881,31 @@
     },
     {
         "distance": 6.5,
-        "robot_vel": -4.3,
-        "final_vel": 12.4,
-        "final_angle": 44.0,
-        "flight_time": 1.575
-    },
-    {
-        "distance": 6.5,
         "robot_vel": -4.1,
-        "final_vel": 12.2,
-        "final_angle": 43.5,
-        "flight_time": 1.53
+        "final_vel": 12.4,
+        "final_angle": 46.5,
+        "flight_time": 1.65
     },
     {
         "distance": 6.5,
         "robot_vel": -3.9,
-        "final_vel": 12.0,
-        "final_angle": 43.0,
-        "flight_time": 1.485
+        "final_vel": 12.2,
+        "final_angle": 46.5,
+        "flight_time": 1.625
     },
     {
         "distance": 6.5,
         "robot_vel": -3.7,
-        "final_vel": 11.8,
-        "final_angle": 42.5,
-        "flight_time": 1.445
+        "final_vel": 12.0,
+        "final_angle": 46.5,
+        "flight_time": 1.6
     },
     {
         "distance": 6.5,
         "robot_vel": -3.5,
-        "final_vel": 11.6,
-        "final_angle": 42,
-        "flight_time": 1.405
+        "final_vel": 11.8,
+        "final_angle": 46.0,
+        "flight_time": 1.545
     },
     {
         "distance": 6.5,
@@ -12981,22 +12925,22 @@
         "distance": 6.5,
         "robot_vel": -2.9,
         "final_vel": 11.2,
-        "final_angle": 44.5,
-        "flight_time": 1.415
+        "final_angle": 45,
+        "flight_time": 1.435
     },
     {
         "distance": 6.5,
         "robot_vel": -2.7,
-        "final_vel": 11.0,
-        "final_angle": 43.0,
-        "flight_time": 1.345
+        "final_vel": 11.2,
+        "final_angle": 48.0,
+        "flight_time": 1.51
     },
     {
         "distance": 6.5,
         "robot_vel": -2.5,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.295
+        "final_vel": 11.0,
+        "final_angle": 48.0,
+        "flight_time": 1.49
     },
     {
         "distance": 6.5,
@@ -13016,15 +12960,15 @@
         "distance": 6.5,
         "robot_vel": -1.9,
         "final_vel": 10.4,
-        "final_angle": 44.5,
-        "flight_time": 1.3
+        "final_angle": 45,
+        "flight_time": 1.315
     },
     {
         "distance": 6.5,
         "robot_vel": -1.7,
         "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.215
+        "final_angle": 45,
+        "flight_time": 1.3
     },
     {
         "distance": 6.5,
@@ -13044,8 +12988,8 @@
         "distance": 6.5,
         "robot_vel": -1.1,
         "final_vel": 9.8,
-        "final_angle": 43.0,
-        "flight_time": 1.175
+        "final_angle": 45,
+        "flight_time": 1.225
     },
     {
         "distance": 6.5,
@@ -13065,8 +13009,8 @@
         "distance": 6.5,
         "robot_vel": -0.5,
         "final_vel": 9.4,
-        "final_angle": 44.5,
-        "flight_time": 1.145
+        "final_angle": 45,
+        "flight_time": 1.16
     },
     {
         "distance": 6.5,
@@ -13245,59 +13189,52 @@
     },
     {
         "distance": 6.6,
-        "robot_vel": -4.3,
-        "final_vel": 12.4,
-        "final_angle": 42.5,
-        "flight_time": 1.525
-    },
-    {
-        "distance": 6.6,
         "robot_vel": -4.1,
-        "final_vel": 12.2,
-        "final_angle": 42,
-        "flight_time": 1.48
+        "final_vel": 12.4,
+        "final_angle": 45.5,
+        "flight_time": 1.615
     },
     {
         "distance": 6.6,
         "robot_vel": -3.9,
-        "final_vel": 12.0,
-        "final_angle": 42,
-        "flight_time": 1.465
+        "final_vel": 12.2,
+        "final_angle": 45.5,
+        "flight_time": 1.59
     },
     {
         "distance": 6.6,
         "robot_vel": -3.7,
         "final_vel": 12.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.545
     },
     {
         "distance": 6.6,
         "robot_vel": -3.5,
         "final_vel": 11.8,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.52
     },
     {
         "distance": 6.6,
         "robot_vel": -3.3,
-        "final_vel": 11.6,
-        "final_angle": 44.5,
-        "flight_time": 1.48
+        "final_vel": 11.8,
+        "final_angle": 47.5,
+        "flight_time": 1.585
     },
     {
         "distance": 6.6,
         "robot_vel": -3.1,
-        "final_vel": 11.4,
-        "final_angle": 43.5,
-        "flight_time": 1.415
+        "final_vel": 11.6,
+        "final_angle": 47.5,
+        "flight_time": 1.56
     },
     {
         "distance": 6.6,
         "robot_vel": -2.9,
-        "final_vel": 11.2,
-        "final_angle": 42,
-        "flight_time": 1.345
+        "final_vel": 11.4,
+        "final_angle": 47.5,
+        "flight_time": 1.535
     },
     {
         "distance": 6.6,
@@ -13324,15 +13261,15 @@
         "distance": 6.6,
         "robot_vel": -2.1,
         "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.255
+        "final_angle": 45,
+        "flight_time": 1.35
     },
     {
         "distance": 6.6,
         "robot_vel": -1.9,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.245
+        "final_vel": 10.6,
+        "final_angle": 49.0,
+        "flight_time": 1.45
     },
     {
         "distance": 6.6,
@@ -13352,8 +13289,8 @@
         "distance": 6.6,
         "robot_vel": -1.3,
         "final_vel": 10.0,
-        "final_angle": 42.5,
-        "flight_time": 1.195
+        "final_angle": 45,
+        "flight_time": 1.26
     },
     {
         "distance": 6.6,
@@ -13373,8 +13310,8 @@
         "distance": 6.6,
         "robot_vel": -0.7,
         "final_vel": 9.6,
-        "final_angle": 44.0,
-        "flight_time": 1.165
+        "final_angle": 45,
+        "flight_time": 1.19
     },
     {
         "distance": 6.6,
@@ -13553,45 +13490,38 @@
     },
     {
         "distance": 6.7,
-        "robot_vel": -4.1,
-        "final_vel": 12.4,
-        "final_angle": 44.5,
-        "flight_time": 1.585
-    },
-    {
-        "distance": 6.7,
         "robot_vel": -3.9,
-        "final_vel": 12.2,
-        "final_angle": 44.5,
-        "flight_time": 1.565
+        "final_vel": 12.4,
+        "final_angle": 47.0,
+        "flight_time": 1.66
     },
     {
         "distance": 6.7,
         "robot_vel": -3.7,
-        "final_vel": 12.0,
-        "final_angle": 44.0,
-        "flight_time": 1.52
+        "final_vel": 12.2,
+        "final_angle": 47.0,
+        "flight_time": 1.635
     },
     {
         "distance": 6.7,
         "robot_vel": -3.5,
-        "final_vel": 11.8,
-        "final_angle": 43.0,
-        "flight_time": 1.455
+        "final_vel": 12.0,
+        "final_angle": 47.0,
+        "flight_time": 1.61
     },
     {
         "distance": 6.7,
         "robot_vel": -3.3,
-        "final_vel": 11.6,
-        "final_angle": 42,
-        "flight_time": 1.395
+        "final_vel": 11.8,
+        "final_angle": 46.5,
+        "flight_time": 1.555
     },
     {
         "distance": 6.7,
         "robot_vel": -3.1,
-        "final_vel": 11.4,
-        "final_angle": 42,
-        "flight_time": 1.38
+        "final_vel": 11.6,
+        "final_angle": 46.5,
+        "flight_time": 1.535
     },
     {
         "distance": 6.7,
@@ -13611,15 +13541,15 @@
         "distance": 6.7,
         "robot_vel": -2.5,
         "final_vel": 11.0,
-        "final_angle": 44.0,
-        "flight_time": 1.37
+        "final_angle": 45,
+        "flight_time": 1.41
     },
     {
         "distance": 6.7,
         "robot_vel": -2.3,
-        "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.29
+        "final_vel": 11.0,
+        "final_angle": 48.5,
+        "flight_time": 1.5
     },
     {
         "distance": 6.7,
@@ -13646,8 +13576,8 @@
         "distance": 6.7,
         "robot_vel": -1.5,
         "final_vel": 10.2,
-        "final_angle": 42,
-        "flight_time": 1.21
+        "final_angle": 45,
+        "flight_time": 1.295
     },
     {
         "distance": 6.7,
@@ -13667,8 +13597,8 @@
         "distance": 6.7,
         "robot_vel": -0.9,
         "final_vel": 9.8,
-        "final_angle": 43.5,
-        "flight_time": 1.185
+        "final_angle": 45,
+        "flight_time": 1.22
     },
     {
         "distance": 6.7,
@@ -13688,7 +13618,7 @@
         "distance": 6.7,
         "robot_vel": -0.3,
         "final_vel": 9.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.16
     },
     {
@@ -13861,31 +13791,24 @@
     },
     {
         "distance": 6.8,
-        "robot_vel": -4.1,
-        "final_vel": 12.4,
-        "final_angle": 43.5,
-        "flight_time": 1.56
-    },
-    {
-        "distance": 6.8,
         "robot_vel": -3.9,
-        "final_vel": 12.2,
-        "final_angle": 43.0,
-        "flight_time": 1.515
+        "final_vel": 12.4,
+        "final_angle": 46.0,
+        "flight_time": 1.625
     },
     {
         "distance": 6.8,
         "robot_vel": -3.7,
-        "final_vel": 12.0,
-        "final_angle": 42,
-        "flight_time": 1.45
+        "final_vel": 12.2,
+        "final_angle": 46.0,
+        "flight_time": 1.6
     },
     {
         "distance": 6.8,
         "robot_vel": -3.5,
-        "final_vel": 11.8,
-        "final_angle": 42,
-        "flight_time": 1.435
+        "final_vel": 12.0,
+        "final_angle": 46.0,
+        "flight_time": 1.58
     },
     {
         "distance": 6.8,
@@ -13898,29 +13821,29 @@
         "distance": 6.8,
         "robot_vel": -3.1,
         "final_vel": 11.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.49
     },
     {
         "distance": 6.8,
         "robot_vel": -2.9,
         "final_vel": 11.4,
-        "final_angle": 44.0,
-        "flight_time": 1.425
+        "final_angle": 45,
+        "flight_time": 1.47
     },
     {
         "distance": 6.8,
         "robot_vel": -2.7,
-        "final_vel": 11.2,
-        "final_angle": 42.5,
-        "flight_time": 1.355
+        "final_vel": 11.4,
+        "final_angle": 48.0,
+        "flight_time": 1.545
     },
     {
         "distance": 6.8,
         "robot_vel": -2.5,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.325
+        "final_vel": 11.2,
+        "final_angle": 47.5,
+        "flight_time": 1.5
     },
     {
         "distance": 6.8,
@@ -13940,15 +13863,15 @@
         "distance": 6.8,
         "robot_vel": -1.9,
         "final_vel": 10.6,
-        "final_angle": 42,
-        "flight_time": 1.255
+        "final_angle": 45,
+        "flight_time": 1.345
     },
     {
         "distance": 6.8,
         "robot_vel": -1.7,
-        "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.24
+        "final_vel": 10.6,
+        "final_angle": 49.5,
+        "flight_time": 1.46
     },
     {
         "distance": 6.8,
@@ -13968,8 +13891,8 @@
         "distance": 6.8,
         "robot_vel": -1.1,
         "final_vel": 10.0,
-        "final_angle": 43.0,
-        "flight_time": 1.205
+        "final_angle": 45,
+        "flight_time": 1.255
     },
     {
         "distance": 6.8,
@@ -13989,8 +13912,8 @@
         "distance": 6.8,
         "robot_vel": -0.5,
         "final_vel": 9.6,
-        "final_angle": 44.5,
-        "flight_time": 1.175
+        "final_angle": 45,
+        "flight_time": 1.19
     },
     {
         "distance": 6.8,
@@ -14166,13 +14089,6 @@
         "final_vel": 7.0,
         "final_angle": 75.0,
         "flight_time": 1.185
-    },
-    {
-        "distance": 6.9,
-        "robot_vel": -4.1,
-        "final_vel": 12.4,
-        "final_angle": 42,
-        "flight_time": 1.51
     },
     {
         "distance": 6.9,
@@ -14185,36 +14101,36 @@
         "distance": 6.9,
         "robot_vel": -3.7,
         "final_vel": 12.2,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.575
     },
     {
         "distance": 6.9,
         "robot_vel": -3.5,
         "final_vel": 12.0,
-        "final_angle": 44.5,
-        "flight_time": 1.53
+        "final_angle": 45,
+        "flight_time": 1.55
     },
     {
         "distance": 6.9,
         "robot_vel": -3.3,
-        "final_vel": 11.8,
-        "final_angle": 44.0,
-        "flight_time": 1.485
+        "final_vel": 12.0,
+        "final_angle": 47.5,
+        "flight_time": 1.615
     },
     {
         "distance": 6.9,
         "robot_vel": -3.1,
-        "final_vel": 11.6,
-        "final_angle": 43.0,
-        "flight_time": 1.425
+        "final_vel": 11.8,
+        "final_angle": 47.5,
+        "flight_time": 1.595
     },
     {
         "distance": 6.9,
         "robot_vel": -2.9,
-        "final_vel": 11.4,
-        "final_angle": 42,
-        "flight_time": 1.375
+        "final_vel": 11.6,
+        "final_angle": 47.0,
+        "flight_time": 1.545
     },
     {
         "distance": 6.9,
@@ -14234,15 +14150,15 @@
         "distance": 6.9,
         "robot_vel": -2.3,
         "final_vel": 11.0,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.4
     },
     {
         "distance": 6.9,
         "robot_vel": -2.1,
         "final_vel": 10.8,
-        "final_angle": 42,
-        "flight_time": 1.285
+        "final_angle": 45,
+        "flight_time": 1.385
     },
     {
         "distance": 6.9,
@@ -14269,8 +14185,8 @@
         "distance": 6.9,
         "robot_vel": -1.3,
         "final_vel": 10.2,
-        "final_angle": 42.5,
-        "flight_time": 1.22
+        "final_angle": 45,
+        "flight_time": 1.29
     },
     {
         "distance": 6.9,
@@ -14290,8 +14206,8 @@
         "distance": 6.9,
         "robot_vel": -0.7,
         "final_vel": 9.8,
-        "final_angle": 43.5,
-        "flight_time": 1.185
+        "final_angle": 45,
+        "flight_time": 1.22
     },
     {
         "distance": 6.9,
@@ -14477,31 +14393,24 @@
     },
     {
         "distance": 7.0,
-        "robot_vel": -3.9,
-        "final_vel": 12.4,
-        "final_angle": 44.0,
-        "flight_time": 1.57
-    },
-    {
-        "distance": 7.0,
         "robot_vel": -3.7,
-        "final_vel": 12.2,
-        "final_angle": 43.5,
-        "flight_time": 1.525
+        "final_vel": 12.4,
+        "final_angle": 47.0,
+        "flight_time": 1.665
     },
     {
         "distance": 7.0,
         "robot_vel": -3.5,
-        "final_vel": 12.0,
-        "final_angle": 43.0,
-        "flight_time": 1.485
+        "final_vel": 12.2,
+        "final_angle": 46.5,
+        "flight_time": 1.61
     },
     {
         "distance": 7.0,
         "robot_vel": -3.3,
-        "final_vel": 11.8,
-        "final_angle": 42,
-        "flight_time": 1.425
+        "final_vel": 12.0,
+        "final_angle": 46.5,
+        "flight_time": 1.59
     },
     {
         "distance": 7.0,
@@ -14521,22 +14430,22 @@
         "distance": 7.0,
         "robot_vel": -2.7,
         "final_vel": 11.4,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.455
     },
     {
         "distance": 7.0,
         "robot_vel": -2.5,
         "final_vel": 11.2,
-        "final_angle": 43.5,
-        "flight_time": 1.385
+        "final_angle": 45,
+        "flight_time": 1.44
     },
     {
         "distance": 7.0,
         "robot_vel": -2.3,
-        "final_vel": 11.0,
-        "final_angle": 42,
-        "flight_time": 1.32
+        "final_vel": 11.2,
+        "final_angle": 48.0,
+        "flight_time": 1.51
     },
     {
         "distance": 7.0,
@@ -14556,15 +14465,15 @@
         "distance": 7.0,
         "robot_vel": -1.7,
         "final_vel": 10.6,
-        "final_angle": 45.0,
+        "final_angle": 45,
         "flight_time": 1.34
     },
     {
         "distance": 7.0,
         "robot_vel": -1.5,
         "final_vel": 10.4,
-        "final_angle": 42,
-        "flight_time": 1.24
+        "final_angle": 45,
+        "flight_time": 1.325
     },
     {
         "distance": 7.0,
@@ -14584,8 +14493,8 @@
         "distance": 7.0,
         "robot_vel": -0.9,
         "final_vel": 10.0,
-        "final_angle": 43.0,
-        "flight_time": 1.205
+        "final_angle": 45,
+        "flight_time": 1.255
     },
     {
         "distance": 7.0,
@@ -14605,8 +14514,8 @@
         "distance": 7.0,
         "robot_vel": -0.3,
         "final_vel": 9.6,
-        "final_angle": 44.5,
-        "flight_time": 1.175
+        "final_angle": 45,
+        "flight_time": 1.19
     },
     {
         "distance": 7.0,

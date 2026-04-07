@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.auto.AutoActions;
 import frc.robot.auto.AutoFile;
 import frc.robot.auto.AutoRoutines;
@@ -290,9 +289,9 @@ public class RobotContainer {
         operator.rightBumper().whileTrue(intake.runExtendedReverse());
 
         driver.leftBumper().onTrue(intake.toggleIntake());
-        // driver.povUp().onTrue(intake.outZeroCommand());
-        // driver.povLeft().onTrue(intake.zeroCommand());
-        // driver.povDown().onTrue(intake.runRetract());
+        driver.povUp().onTrue(intake.outZeroCommand());
+        driver.povLeft().onTrue(intake.zeroCommand());
+        driver.povDown().onTrue(intake.runRetract());
         driver.leftTrigger().whileTrue(intake.runFeed());
         driver.rightTrigger().whileTrue(shootingSuperstructure.runSetFrame());
 
@@ -350,12 +349,12 @@ public class RobotContainer {
 
         SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
 
-        tester.povDown().whileTrue(spindexerSysId.quasistatic(Direction.kForward));
+        // tester.povDown().whileTrue(spindexerSysId.quasistatic(Direction.kForward));
 
-        tester.povRight().whileTrue(spindexerSysId.quasistatic(Direction.kReverse));
+        // tester.povRight().whileTrue(spindexerSysId.quasistatic(Direction.kReverse));
 
-        tester.povLeft().whileTrue(spindexerSysId.dynamic(Direction.kForward));
-        tester.povUp().whileTrue(spindexerSysId.dynamic(Direction.kReverse));
+        // tester.povLeft().whileTrue(spindexerSysId.dynamic(Direction.kForward));
+        // tester.povUp().whileTrue(spindexerSysId.dynamic(Direction.kReverse));
         // tester.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // tester.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
         // tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
