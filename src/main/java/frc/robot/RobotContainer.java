@@ -500,7 +500,11 @@ public class RobotContainer {
                         swerve,
                         new LimelightIOReal(
                                 LimeLightConfig.limelightAConfig,
-                                () -> swerve.imuIOInputs.yawPosition.getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()
@@ -515,7 +519,11 @@ public class RobotContainer {
                                 LimeLightConfig.asDeviationParams()),
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
-                                () -> swerve.imuIOInputs.yawPosition.getDegrees(),
+                                () ->
+                                        RobotStateRecorder.getPoseWorldRobotCurrent()
+                                                .toPose2d()
+                                                .getRotation()
+                                                .getDegrees(),
                                 () ->
                                         RobotStateRecorder.getVelocityWorldRobotCurrent()
                                                 .getRotation()

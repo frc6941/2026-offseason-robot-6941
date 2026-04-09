@@ -20,7 +20,7 @@ public final class ShotCalculatorConfig {
         public static final double trajectoryBiasDegFEED = -2;
         public static final double loookfwdDistanceScale = 0;
         public static final double lateralVelocityCompScale = is10541 ? 1.1 : 1.1;
-        public static final double lookfwdDelayCycles = is10541 ? 1 : 3;
+        public static final double lookfwdDelayCycles = is10541 ? 2 : 3;
 
         public static final double lookfwdFlightScale = 0;
 
@@ -29,10 +29,10 @@ public final class ShotCalculatorConfig {
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
-        public static final double rpmA = is10541 ? 256.4 : 237.1;
+        public static final double rpmA = is10541 ? 282.6 : 237.1;
         public static final double rpmB = is10541 ? 0 : 0;
-        public static final double rpmC = is10541 ? 64.32 : 146;
+        public static final double rpmC = is10541 ? -92.24 : 146;
 
-        public static final double distanceScaler = 1;
+        public static final double distanceScaler = 1.02;
     }
 }

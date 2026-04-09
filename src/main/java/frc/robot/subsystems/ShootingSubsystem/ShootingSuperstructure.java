@@ -80,7 +80,7 @@ public class ShootingSuperstructure {
                                                         .hoodAngle()
                                                         .in(Degrees),
                                                 0,
-                                                51))));
+                                                47))));
     }
 
     public Command shootWhenReady(boolean forceFeed) {
