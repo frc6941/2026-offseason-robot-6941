@@ -52,7 +52,7 @@ public class IntakerSubsystem extends SubsystemBase {
     public void setDefaultCommand() {
         roller.setDefaultCommand(
                 Commands.either(
-                                roller.runVelVolt(
+                                roller.runVelTC(
                                                 () ->
                                                         RotationsPerSecond.of(
                                                                 currentMode

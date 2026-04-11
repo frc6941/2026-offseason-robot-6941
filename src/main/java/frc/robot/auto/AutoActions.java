@@ -241,7 +241,7 @@ public class AutoActions {
                         driveToAllign(
                                 AllianceFlipUtil.apply(kDepotIntake),
                                 AutoActions::getShiftDirectionTowardBump,
-                                1.5,
+                                1.,
                                 0.2));
     }
 
@@ -474,15 +474,20 @@ public class AutoActions {
         // return Commands.defer(() -> shooter.shootWhenReady(false), Collections.emptySet());
     }
 
-    public static double shootBackLimitY = 3.7;
+    public static double shootBackLimitY = 3.6;
     public static double shootBackLimitYOther = FieldConstants.fieldWidth - shootBackLimitY;
+    public static double shootBackLimitX = 6;
 
     public static Command shootBackWhenSuitable() {
         Supplier<Boolean> conditional =
                 () -> {
+                    var robotX =
+                            RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().getX();
                     var robotY =
                             RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().getY();
-                    var isInBlindZone = robotY > shootBackLimitY && robotY < shootBackLimitYOther;
+                    var isInBlindZone =
+                            robotY > shootBackLimitY && robotY < shootBackLimitYOther
+                                    || robotX < shootBackLimitX;
                     var isAvailable = !isInBlindZone;
                     return isAvailable;
                 };

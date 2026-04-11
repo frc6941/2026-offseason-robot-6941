@@ -231,7 +231,11 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
         double chassisOmegaDegPerSec =
                 (chassisCmdOmegaDegPerSec + chassisActualOmegaDegPerSec) / 2.0;
-        // Logger.recordOutput(getName() + "/addedV", chassisOmegaDegPerSec);
+        double yawOmegaDegPerSec = RobotStateRecorder.getOmegaRobotCurrent().in(DegreesPerSecond);
+        Logger.recordOutput(getName() + "/addedV", chassisCmdOmegaDegPerSec);
+        Logger.recordOutput(getName() + "/actualV", chassisActualOmegaDegPerSec);
+        Logger.recordOutput(getName() + "/averageV", chassisOmegaDegPerSec);
+        Logger.recordOutput(getName() + "/pigeonV", yawOmegaDegPerSec);
         desiredVelocity -=
                 TurretPosParamsNT.kchassisVelCompensation.getValue() * chassisOmegaDegPerSec;
         desiredTurretVelocity = DegreesPerSecond.of(desiredVelocity);

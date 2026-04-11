@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
 
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Distance;
 import lib.ironpulse.subsystem.SubsystemConfig;
@@ -14,6 +15,7 @@ public class IntakeConfig {
     public static final String INTAKER_EXTENSION_NAME = "IntakerExtension";
     public static final Distance INTAKE_EXTENSION_METERS_PER_ROTATION = Meters.of(0.10511);
     private static final int INTAKER_ROLLER_MOTOR_MAIN_ID = 32;
+    private static final int INTAKER_ROLLER_MOTOR_FOLLOWER_ID = 35;
     private static final double INTAKER_ROLLER_GEAR_RATIO = 26.0 / 12.0;
     private static final int INTAKER_EXTENSION_MOTOR_MAIN_ID = 33;
     private static final double INTAKER_EXTENSION_GEAR_RATIO = 26.0 / 40.0 * 15 / 1;
@@ -30,6 +32,18 @@ public class IntakeConfig {
                     .defaultBrake(true)
                     .kSValue(StaticFeedforwardSignValue.UseVelocitySign)
                     .SensorToMechanismRatio(INTAKER_ROLLER_GEAR_RATIO)
+                    .followers(
+                            new SubsystemConfig.FollowerConfig[] {
+                                SubsystemConfig.FollowerConfig.builder()
+                                        .id(INTAKER_ROLLER_MOTOR_FOLLOWER_ID)
+                                        .bus(CANIVORE_CAN_BUS)
+                                        .opposeMain(MotorAlignmentValue.Opposed)
+                                        .statorCurrentLimitAmps(
+                                                INTAKER_ROLLER_STATOR_CURRENT_LIMIT_AMPS)
+                                        .supplyCurrentLimitAmps(
+                                                INTAKER_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS)
+                                        .build()
+                            })
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(INTAKER_ROLLER_GEAR_RATIO)

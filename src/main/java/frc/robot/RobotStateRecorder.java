@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static lib.ironpulse.math.MathTools.toPose2d;
 
@@ -13,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -35,6 +37,7 @@ public class RobotStateRecorder extends TransformRecorder {
     private static RobotStateRecorder instance;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotBuffer;
     private static TimeInterpolatableBuffer<Pose2d> velocityRobotCmdBuffer;
+    private static AngularVelocity omegaRobotCurrent = RadiansPerSecond.zero();
 
     @Getter @Setter
     private static ShotFrame currentFrame =
@@ -53,7 +56,6 @@ public class RobotStateRecorder extends TransformRecorder {
         setBufferDuration(2.0);
         velocityRobotBuffer = TimeInterpolatableBuffer.createBuffer(2.0);
         velocityRobotCmdBuffer = TimeInterpolatableBuffer.createBuffer(2.0);
-
         // add default transforms
         putTransform(
                 kTransformWorldDriverStationBlue,
@@ -114,6 +116,9 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/velocityWorldRobotCmd",
                 RobotStateRecorder.getVelocityWorldRobotCmdCurrent());
         Logger.recordOutput(
+                "RobotStateRecorder/omegaRobotCurrentRadPerSec",
+                RobotStateRecorder.getOmegaRobotCurrent().in(RadiansPerSecond));
+        Logger.recordOutput(
                 "RobotStateRecorder/TargetPoseWorld", getPoseWorldTargetCurrent(kFrameTarget));
         Logger.recordOutput(
                 "RobotStateRecorder/ShotFrame/poseShot",
@@ -152,8 +157,16 @@ public class RobotStateRecorder extends TransformRecorder {
         velocityRobotCmdBuffer.addSample(time.in(Seconds), toPose2d(speedCmd));
     }
 
+    public static void putOmegaRobotCurrent(AngularVelocity omega) {
+        omegaRobotCurrent = omega;
+    }
+
     public static Pose2d getVelocityRobotCurrent() {
         return velocityRobotBuffer.getSample(Timer.getTimestamp()).orElse(new Pose2d());
+    }
+
+    public static AngularVelocity getOmegaRobotCurrent() {
+        return omegaRobotCurrent;
     }
 
     public static Pose2d getVelocityRobotCmdCurrent() {

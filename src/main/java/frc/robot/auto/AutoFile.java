@@ -310,9 +310,9 @@ public class AutoFile {
                                         defer(intake::zeroCommand, Collections.emptySet()),
                                         intake()));
         return sequence(
-                        driveToNeutral, //
+                        // driveToNeutral, //
                         hunt, //
-                        driveBack, //
+                        // driveBack, //
                         parallel( //
                                 shoot(),
                                 sequence(driveToCorner, waitSeconds(1.5), sweepToClimb),

@@ -30,7 +30,7 @@ public class TurretConfig {
     public static final Angle ENCODER_DELTA_WRAP_THRESHOLD = Degrees.of(190);
     public static final Angle ANGLE_CORRECTION_THRESHOLD = Degrees.of(30);
     // Zero offset- the position at which the two encoders are set to zero.
-    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-130);
+    public static final Angle TURRET_ZERO_OFFSET = Degrees.of(-214);
     public static final Angle TURRET_DOF = Degrees.of(220);
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =

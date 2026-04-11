@@ -226,6 +226,8 @@ public class RobotContainer {
 
         RobotStateRecorder.putVelocityRobot(now, swerve.getChassisSpeeds());
         RobotStateRecorder.putVelocityRobotCmd(now, swerve.getChassisSpeedsCmd());
+        RobotStateRecorder.putOmegaRobotCurrent(
+                RadiansPerSecond.of(swerve.getYawVelocityRadPerSec()));
         RobotStateRecorder.setCmdFrame(shotCalculator.computeShotFrame());
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
@@ -363,7 +365,7 @@ public class RobotContainer {
         // tester.povUp().whileTrue(spindexerSysId.dynamic(Direction.kReverse));
         // tester.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // tester.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
-        // tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
+        tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
         // tester.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
         // tester.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180)));
         // tester.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270)));

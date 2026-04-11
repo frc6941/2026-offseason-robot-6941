@@ -131,7 +131,14 @@ public class ShootingSuperstructure {
                                 idx.runState(() -> IdxMode.REVERSE)
                                         .withTimeout(SpindexerParamsNT.unjammTimeoutSec.getValue()),
                                 Commands.runOnce(() -> isShooting = true),
-                                idx.runState(() -> conditional.get() ? IdxMode.FEED : IdxMode.OFF))
+                                idx.runState(
+                                        () ->
+                                                conditional.get()
+                                                                && turret.getCurrentMode()
+                                                                        == TurretMode.TRACKING
+                                                                && !isInTower()
+                                                        ? IdxMode.FEED
+                                                        : IdxMode.OFF))
                         .finallyDo(() -> isShooting = false));
     }
 
