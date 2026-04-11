@@ -248,6 +248,7 @@ public class Swerve extends SubsystemBase implements Localizable {
         return poseEstimator.sampleAt(time.in(Seconds));
     }
 
+    @Override
     public void addVisionMeasurement(
             Pose3d visionRobotPoseMeters,
             double timestampSeconds,
@@ -256,6 +257,7 @@ public class Swerve extends SubsystemBase implements Localizable {
                 visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
+    @Override
     public double getIMUYaw() {
         return poseEstimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees();
     }
@@ -293,6 +295,7 @@ public class Swerve extends SubsystemBase implements Localizable {
         setpointGenerator.setModuleLimit(config.defaultSwerveModuleLimit);
     }
 
+    @Override
     public void setIMUYaw(double yaw) {
         imuIO.setYawDeg(yaw);
     }
