@@ -3,6 +3,7 @@ package frc.robot.subsystems.ShootingSubsystem;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -92,6 +93,7 @@ public class ShootingSuperstructure {
                                 idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
+                                                                && !isInTower()
                                                         ? forceFeed
                                                                 ? IdxMode.FORCE_FEED
                                                                 : IdxMode.FEED
@@ -113,6 +115,7 @@ public class ShootingSuperstructure {
                                 idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
+                                                                && !isInTower()
                                                         ? forceFeed
                                                                 ? IdxMode.FORCE_FEED
                                                                 : IdxMode.FEED
@@ -198,6 +201,22 @@ public class ShootingSuperstructure {
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
     public boolean readyToShoot() {
         return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
+    }
+
+    @AutoLogOutput(key = "ShootingSuperstructure/isInTower")
+    public boolean isInTower() {
+        Translation2d pos =
+                RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
+        double x = pos.getX(), y = pos.getY();
+        boolean inBlue =
+                x <= FieldConstants.Tower.frontFaceX
+                        && Math.abs(y - FieldConstants.Tower.centerPoint.getY())
+                                <= FieldConstants.Tower.width / 2.0;
+        boolean inRed =
+                x >= FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX
+                        && Math.abs(y - FieldConstants.Tower.oppCenterPoint.getY())
+                                <= FieldConstants.Tower.width / 2.0;
+        return inBlue || inRed;
     }
 
     public Command runUnjamming() {

@@ -340,6 +340,12 @@ public class RobotContainer {
                                 SwerveCommands.xLock(swerve),
                                 shootingSuperstructure.shootWhenReady(false)));
 
+        operator.rightTrigger()
+                .or(driver.rightBumper())
+                .or(driver.leftStick())
+                .and(shootingSuperstructure::isInTower)
+                .whileTrue(indicatorSubsystem.indicate(Patterns.HOLD_SHOOTING));
+
         // SYSID/test
         // SysIdCommand shooterSysId = new SysIdCommand(shooter);
         // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));

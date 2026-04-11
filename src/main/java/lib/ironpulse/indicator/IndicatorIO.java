@@ -19,7 +19,8 @@ public interface IndicatorIO {
         NORMAL(new ScannerPattern(Color.kBlue, 8)),
 
         INTAKE(new BlinkingPattern(Color.kBlue, 0.04)),
-
+        
+        HOLD_SHOOTING(new BlinkingPattern(Color.kPurple, 0.04)),
         RESET_ODOM(new BlinkingPattern(Color.kWhite, 0.1)),
         SHOOTING(new BlinkingPattern(Color.kRed, 0.04)),
         AFTER_SHOOTING(new BlinkingPattern(Color.kGreen, 0.04)),
