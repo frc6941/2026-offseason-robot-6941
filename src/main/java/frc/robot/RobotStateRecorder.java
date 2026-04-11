@@ -80,12 +80,12 @@ public class RobotStateRecorder extends TransformRecorder {
                 kFrameGoal); // static TWorldGoal (blue reference)
 
         putTransform(
-                new Pose3d(1.5, 7, 0, new Rotation3d()),
+                new Pose3d(2.0, 7, 0, new Rotation3d()),
                 Seconds.of(0.0),
                 kFrameWorld,
                 kFrameFeedUp);
         putTransform(
-                new Pose3d(1.5, 1, 0, new Rotation3d()),
+                new Pose3d(2.0, 1, 0, new Rotation3d()),
                 Seconds.of(0.0),
                 kFrameWorld,
                 kFrameFeedDown);
