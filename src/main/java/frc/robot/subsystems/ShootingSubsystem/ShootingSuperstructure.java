@@ -35,7 +35,7 @@ public class ShootingSuperstructure {
     @Getter private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     @Getter private final SpindexerSubsystem idx;
     @Getter private final BallCounter ballCounter;
-    private TargetMode mode;
+    @Getter public TargetMode mode = TargetMode.GOAL;
     @Getter private boolean isShooting = false;
 
     public ShootingSuperstructure(
@@ -275,7 +275,7 @@ public class ShootingSuperstructure {
     }
 
     public Command runResetBallCounter() {
-        return Commands.runOnce(() -> ballCounter.resetAll());
+        return Commands.run(() -> ballCounter.resetAll());
     }
 
     public enum IdxMode {

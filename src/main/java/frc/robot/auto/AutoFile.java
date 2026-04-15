@@ -43,6 +43,9 @@ public class AutoFile {
             new LoggedDashboardChooser<Integer>("Sweep Cycles Chooser");
     private static final LoggedDashboardChooser<Boolean> waitingChooser =
             new LoggedDashboardChooser<Boolean>("Waiting Chooser");
+    private static final LoggedDashboardChooser<AntiSweepBehavior> antiSweepBehavioiurChooser =
+            new LoggedDashboardChooser<AntiSweepBehavior>("Anti Sweep Behaviour Chooser");
+    private static double antiSweepWaitTime = 0.0;
 
     private static final Alert competitionNotSelectedAlert =
             new Alert("Competition auto is not running", Alert.AlertType.kWarning);
@@ -67,6 +70,8 @@ public class AutoFile {
     public static void init() {
         initializeAutoPaths();
         initializeChooser(autoChooser, AutoType.values(), AutoType.COMPETITION);
+        initializeChooser(
+                antiSweepBehavioiurChooser, AntiSweepBehavior.values(), AntiSweepBehavior.SHOOT);
         initializeChooser(sideChooser, AutoSide.values(), AutoSide.RIGHT);
         initializeChooser(endBehaviourChooser, EndBehaviour.values(), EndBehaviour.FUEL);
         initializeChooser(sweepModeChooser, SweepMode.values(), SweepMode.LONG);
@@ -78,6 +83,9 @@ public class AutoFile {
 
         waitingChooser.addDefaultOption("Wait", true);
         waitingChooser.addOption("No Waiting", false);
+
+        // Initialize AntiSweep wait time as typable field
+        SmartDashboard.putNumber("Auto/AntiSweep Wait Time", antiSweepWaitTime);
     }
 
     private static void initializeAutoPaths() {
@@ -109,7 +117,7 @@ public class AutoFile {
 
         return switch (selected) {
             case TEST -> buildTest();
-            case COMPETITION -> buildCompetition();
+            case COMPETITION, ANTI_SWEEP_COMPETITION -> buildCompetition();
             case HUNT -> buildHunt();
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false),
@@ -150,10 +158,8 @@ public class AutoFile {
     private static Command buildSweepShootCycle(String sweepPathName, boolean isLeft) {
         return Commands.sequence(
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                drivePastSlope(isLeft, false),
-                Commands.deadline(driveToShoot(isLeft), shoot().withTimeout(20.0)),
+                Commands.deadline(new WaitCommand(4), shoot().withTimeout(20.0)),
                 new WaitCommand(3),
-                allignToStarting(isLeft),
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
                         .deadlineFor(
@@ -165,11 +171,14 @@ public class AutoFile {
         if (invalidConfigAlert.get()) return Commands.none();
         boolean isLeft = sideChooser.get() == AutoSide.LEFT;
         SweepMode sweepMode = sweepModeChooser.get();
+        boolean isAntiSweep = autoChooser.get() == AutoType.ANTI_SWEEP_COMPETITION;
+        AntiSweepBehavior antiSweepBehavior = antiSweepBehavioiurChooser.get();
+        boolean isAntiSweepPass = isAntiSweep && antiSweepBehavior == AntiSweepBehavior.PASS;
 
         String sweepPathName =
                 switch (sweepMode) {
-                    case FAST -> "quickSweepRight";
-                    case LONG -> "longSweepRight";
+                    case FAST -> "DoubleSweep";
+                    case LONG -> "longSweepRightNew";
                     case NORMAL -> "sweepRight";
                 };
 
@@ -177,43 +186,70 @@ public class AutoFile {
         Command sweepSequence;
         if (sweepMode == SweepMode.FAST) {
             int cycles = sweepCyclesChooser.get() != null ? sweepCyclesChooser.get() : 1;
-            Command[] cycleCommands = new Command[cycles];
-            for (int i = 0; i < cycles; i++) {
-                if (i == cycles - 1) {
-                    // Last cycle: only sweep and drive, no shoot
+
+            // If AntiSweep PASS mode, only do first cycle (no second cycle)
+            int effectiveCycles = isAntiSweepPass ? 1 : cycles;
+            Command[] cycleCommands = new Command[effectiveCycles];
+
+            for (int i = 0; i < effectiveCycles; i++) {
+                // Use AntiSweep path for first cycle if in ANTI_SWEEP_COMPETITION mode
+                String pathToUse = (isAntiSweep && i == 0) ? "AntiSweep" : sweepPathName;
+
+                // If AntiSweep PASS mode on first cycle, just drive path without shooting
+                if (isAntiSweepPass && i == 0) {
                     cycleCommands[i] =
                             Commands.sequence(
                                     Commands.deadline(
-                                            followPathFile(sweepPathName, isLeft), intake()),
-                                    drivePastSlope(isLeft, false));
+                                            followPathFile(pathToUse, isLeft), intake(), shoot()));
+                } else if (i == effectiveCycles - 1) {
+                    // Last cycle: only sweep and drive, no shoot
+                    cycleCommands[i] =
+                            Commands.sequence(
+                                    Commands.deadline(followPathFile(pathToUse, isLeft), intake()));
                 } else {
                     // All other cycles: full sweep/shoot cycle
-                    cycleCommands[i] = buildSweepShootCycle(sweepPathName, isLeft);
+                    cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft);
                 }
             }
             sweepSequence = Commands.sequence(cycleCommands);
         } else {
             // For LONG and NORMAL modes, use original single sweep logic
+            String pathToUse = isAntiSweep ? "AntiSweep" : sweepPathName;
             sweepSequence =
                     Commands.sequence(
-                                    new WaitCommand(waitingChooser.get() ? 2 : 0),
-                                    Commands.deadline(
-                                            followPathFile(sweepPathName, isLeft), intake()),
-                                    drivePastSlope(isLeft, false))
-                            .alongWith();
+                            new WaitCommand(waitingChooser.get() ? 2 : 0),
+                            Commands.deadline(followPathFile(pathToUse, isLeft), intake()),
+                            drivePastSlope(isLeft, false),
+                            Commands.deadline(
+                                    driveToShoot(isLeft),
+                                    shoot().withTimeout(20.0),
+                                    oscillateIntakeFeed()),
+                            new WaitCommand(3),
+                            Commands.runOnce(() -> {})
+                                    .withTimeout(0.1)
+                                    .deadlineFor(
+                                            shooterDefault(),
+                                            shootingSuperstructure
+                                                    .getIdx()
+                                                    .runState(() -> IdxMode.OFF)));
         }
 
         return Commands.parallel(
                         // shooterDefault(),
-                        // Start and run timer in parallel
-                        Commands.runOnce(
-                                () -> {
-                                    autoTimer.reset();
-                                    autoTimer.start();
-                                }),
                         Commands.sequence(
-                                // Initial drive past slope with zeroing
-                                drivePastSlope(isLeft, true),
+                                // Wait before starting (only for AntiSweep)
+                                new WaitCommand(
+                                        isAntiSweep
+                                                ? SmartDashboard.getNumber(
+                                                        "Auto/AntiSweep Wait Time", 0.0)
+                                                : 0.0),
+
+                                // Start timer after wait command
+                                Commands.runOnce(
+                                        () -> {
+                                            autoTimer.reset();
+                                            autoTimer.start();
+                                        }),
 
                                 // Sweep sequence (single or multiple cycles)
                                 sweepSequence,
@@ -223,19 +259,30 @@ public class AutoFile {
                                                 shoot(),
                                                 Commands.sequence(
                                                         Commands.deadline(
-                                                                new WaitUntilCommand(
-                                                                        () ->
-                                                                                autoTimer.get()
-                                                                                        >= 17),
+                                                                new ConditionalCommand(
+                                                                        new WaitUntilCommand(
+                                                                                () ->
+                                                                                        autoTimer
+                                                                                                        .get()
+                                                                                                >= 20),
+                                                                        new WaitUntilCommand(
+                                                                                () ->
+                                                                                        autoTimer
+                                                                                                        .get()
+                                                                                                >= 17),
+                                                                        () -> isLeft),
                                                                 new ConditionalCommand(
                                                                         Commands.deadline(
-                                                                                allignToDepot(),
-                                                                                oscillateIntakeFeed()),
+                                                                                followPathFile(
+                                                                                        "depot",
+                                                                                        false),
+                                                                                intake()),
                                                                         Commands.deadline(
                                                                                 allignToStation(),
                                                                                 oscillateIntakeFeed()),
                                                                         () -> isLeft)),
-                                                        driveToShoot(isLeft)),
+                                                        driveToShoot(isLeft)
+                                                                .onlyIf(() -> isLeft == false)),
                                                 new WaitUntilCommand(
                                                                 () ->
                                                                         isLeft
@@ -295,7 +342,7 @@ public class AutoFile {
         Command driveBack = drivePastSlope(isLeft, false);
         Command driveToCorner =
                 either(
-                        deadline(allignToDepot(), oscillateIntakeFeed()),
+                        deadline(followPathFile("depot", false), intake()),
                         deadline(allignToStation(), oscillateIntakeFeed()),
                         () -> isLeft);
         Command sweepToClimb =
@@ -324,7 +371,13 @@ public class AutoFile {
         COMPETITION,
         TEST,
         SHOOT,
-        HUNT
+        HUNT,
+        ANTI_SWEEP_COMPETITION
+    }
+
+    private enum AntiSweepBehavior {
+        SHOOT,
+        PASS
     }
 
     private enum AutoSide {

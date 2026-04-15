@@ -150,7 +150,7 @@ public class ShotCalculator {
                 velocityWorldRobotActualCurrent.plus(
                         velocityWorldRobotCmdCurrent
                                 .minus(velocityWorldRobotActualCurrent)
-                                .times(velocityCmdBlend));
+                                .times(ShotCalculatorParamsNT.velocityBlend.getValue()));
         // Translation2d velocityWorldRobotCurrent =
         //         RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getTranslation();
 

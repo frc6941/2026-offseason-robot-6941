@@ -82,12 +82,9 @@ public class RobotStateRecorder extends TransformRecorder {
                 kFrameGoal); // static TWorldGoal (blue reference)
 
         putTransform(
-                new Pose3d(2.0, 7, 0, new Rotation3d()),
-                Seconds.of(0.0),
-                kFrameWorld,
-                kFrameFeedUp);
+                new Pose3d(0, 7, 0, new Rotation3d()), Seconds.of(0.0), kFrameWorld, kFrameFeedUp);
         putTransform(
-                new Pose3d(2.0, 1, 0, new Rotation3d()),
+                new Pose3d(0, 1, 0, new Rotation3d()),
                 Seconds.of(0.0),
                 kFrameWorld,
                 kFrameFeedDown);
@@ -106,6 +103,9 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/poseWorldRobot", RobotStateRecorder.getPoseWorldRobotCurrent());
         Logger.recordOutput(
                 "RobotStateRecorder/velocityRobot", RobotStateRecorder.getVelocityRobotCurrent());
+        Logger.recordOutput(
+                "RobotStateRecorder/RobotRotation2d",
+                RobotStateRecorder.getPoseWorldRobotCurrent().getRotation().toRotation2d());
         Logger.recordOutput(
                 "RobotStateRecorder/velocityWorldRobot",
                 RobotStateRecorder.getVelocityWorldRobotCurrent());

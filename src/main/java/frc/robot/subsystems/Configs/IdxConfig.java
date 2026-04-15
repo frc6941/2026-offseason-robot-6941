@@ -11,8 +11,8 @@ import lib.ntext.NTParameter;
 
 public class IdxConfig {
     public static final String SPINDEXER = "Spindexer";
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 95;
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 95;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 70;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 65;
     public static final double SPINDEXER_GEAR_RATIO =
             is10541
                     ? 12.0 / 1.0 * 30 / 22 * 42 / 20
@@ -65,16 +65,16 @@ public class IdxConfig {
         // public static final double kV = 0;
         // public static final double kA = 0;
         // public static final double kS = 0.;
-        public static final double kP = 5;
+        public static final double kP = 3;
         public static final double kI = 0.05;
         public static final double kD = 0.0;
         public static final double kV = 5.12;
         public static final double kA = 1.2866;
         public static final double kS = 0.24452;
 
-        public static final double unjammTimeoutSec = 0.08;
-        public static final double unjammTriggerAmps = 85;
-        public static final double unjammTriggerBelowRps = 1.65; // 1.5 for 10541
+        public static final double unjammTimeoutSec = 0.16;
+        public static final double unjammTriggerAmps = 60;
+        public static final double unjammTriggerBelowRps = 1.4; // 1.5 for 10541
         public static final double unjammTriggerSec = 0.08;
         public static final double unjammLockoutSec = 0.2;
         public static final boolean periodicUnjamEnabled = false;

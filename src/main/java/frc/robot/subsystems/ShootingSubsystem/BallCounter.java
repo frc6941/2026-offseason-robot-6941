@@ -30,7 +30,7 @@ public class BallCounter {
     private static final double BPS_TIMEOUT = 1.0; // Reset BPS to 0 after 1 second of no shots
     private double lastShotTime = 0.0;
     private double currentBPS = 0.0;
-    private final MovingAverageFilter bpsFilter = new MovingAverageFilter(3, 0.0);
+    private final MovingAverageFilter bpsFilter = new MovingAverageFilter(2, 0.0);
 
     // Overall counters
     private int ballCountAll = 0;
@@ -53,9 +53,6 @@ public class BallCounter {
         // Detect shot - EXACT same logic as old code
         boolean shot =
                 edgeFilter.compute() == 1.0
-                        && shootingSuperstructure
-                                .getShooter()
-                                .velocityAtGoal(RotationsPerSecond.of(5.0))
                         && shootingSuperstructure.getIdx().getCurrentState()
                                 == SpindexerSubsystem.State.FEED;
 
@@ -92,15 +89,6 @@ public class BallCounter {
             bpsFilter.input(0.0, RobotConstants.LOOPER_DT);
         }
 
-        // Log outputs
-        logOutputs(shooterRpsCurr, shooterRpsDes, shooterCurrent.in(Amp), shot);
-    }
-
-    private void logOutputs(double rpsCurr, double rpsDes, double current, boolean shot) {
-        Logger.recordOutput("ShotCounter/RpsCurr", rpsCurr);
-        Logger.recordOutput("ShotCounter/RpsDes", rpsDes);
-        Logger.recordOutput("ShotCounter/Current", current);
-        Logger.recordOutput("ShotCounter/BallDetected", shot);
         Logger.recordOutput("ShotCounter/BallCountAll", ballCountAll);
         Logger.recordOutput("ShotCounter/BallCountGoal", ballCountGoal);
         Logger.recordOutput("ShotCounter/AvgBPS", bpsFilter.compute());

@@ -305,10 +305,14 @@ public class RobotContainer {
                                 .shootWhenReady(false, driver.getHID(), operator.getHID())
                                 .alongWith(
                                         Commands.runOnce(
-                                                () ->
+                                                () -> {
+                                                    if (shotCalculator.decideShotMode()
+                                                            == ShotCalculator.TargetMode.GOAL) {
                                                         swerve.setSwerveModuleLimit(
                                                                 SwerveMK5Config
-                                                                        .kShootingSwerveLimit)))
+                                                                        .kShootingSwerveLimit);
+                                                    }
+                                                }))
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();
@@ -324,10 +328,14 @@ public class RobotContainer {
                                 .shootWhenReady(false, driver.getHID(), operator.getHID())
                                 .alongWith(
                                         Commands.runOnce(
-                                                () ->
+                                                () -> {
+                                                    if (shotCalculator.decideShotMode()
+                                                            == ShotCalculator.TargetMode.GOAL) {
                                                         swerve.setSwerveModuleLimit(
                                                                 SwerveMK5Config
-                                                                        .kShootingSwerveLimit)))
+                                                                        .kShootingSwerveLimit);
+                                                    }
+                                                }))
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();

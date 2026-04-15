@@ -26,7 +26,7 @@ public final class SwerveMK5Config {
                     // MK5n R1 defaults (drive ~= 7.03, steer = 287/11 ~= 26.09, wheel = 4.0in)
                     // v (mps) = 5800rpm (X60 with FOC) / 60 / 7.03 * pi * 4.0in
                     .maxDriveVelocity(InchesPerSecond.of(5800 / 60.0 / 7.03 * Math.PI * 4.0))
-                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(15))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(200))
                     // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
                     .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
                     // accelerate in 0.2s
@@ -37,12 +37,12 @@ public final class SwerveMK5Config {
             SwerveLimit.builder()
                     .maxLinearVelocity(MetersPerSecond.of(4)) // theoretically 4.39
                     // prevents skidding, see orbit archive ytb channel open class for theory
-                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(20)) // <maxDriveAcceleration
+                    .maxSkidAcceleration(MetersPerSecondPerSecond.of(200)) // <maxDriveAcceleration
                     // omega_max ≈ vMax / r.
                     .maxAngularVelocity(DegreesPerSecond.of(1000))
                     // accelerate in 0.32s, also must be smaller than the defined module limit to be
                     // actually effective
-                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(2500)) // 1000-1472
+                    .maxAngularAcceleration(DegreesPerSecondPerSecond.of(5000)) // 1000-1472
                     .build();
 
     public static SwerveLimit kShootingChassis =
@@ -178,7 +178,7 @@ public final class SwerveMK5Config {
                                 kModuleCompFL, kModuleCompFR, kModuleCompBL, kModuleCompBR
                             })
                     .odometryFrequency(Hertz.of(100))
-                    .driveStatorCurrentLimit(Amps.of(80))
+                    .driveStatorCurrentLimit(Amps.of(100))
                     .driveSupplyCurrentLimit(Amps.of(65))
                     .steerStatorCurrentLimit(Amps.of(55))
                     .steerSupplyCurrentLimit(Amps.of(40))
@@ -190,7 +190,7 @@ public final class SwerveMK5Config {
     @SuppressWarnings("unused")
     private static final class SwerveModuleParams {
         private static final class Drive {
-            static final double kP = 6;
+            static final double kP = 15;
             static final double kI = 0;
             static final double kD = 0;
             static final double kS = 0;
