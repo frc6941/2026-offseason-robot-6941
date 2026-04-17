@@ -137,6 +137,11 @@ public class Swerve extends SubsystemBase implements Localizable {
         Logger.recordOutput(
                 config.name + "/Limit/MaxAngAccDegps2",
                 limit.maxAngularAcceleration().in(DegreesPerSecondPerSecond));
+
+        var wrench = getWrench();
+        Logger.recordOutput(config.name + "/Wrench/FxN", wrench[0]);
+        Logger.recordOutput(config.name + "/Wrench/FyN", wrench[1]);
+        Logger.recordOutput(config.name + "/Wrench/TauNm", wrench[2]);
     }
 
     // -------- Run -------
@@ -226,6 +231,30 @@ public class Swerve extends SubsystemBase implements Localizable {
     public ChassisSpeeds getChassisSpeedsCmd() {
         if (mode != MODE.VELOCITY) return new ChassisSpeeds();
         return setpointCurr.chassisSpeeds();
+    }
+
+    /**
+     * Returns the chassis wrench as {@code [Fx (N), Fy (N), τ (N·m)]} in robot frame.
+     *
+     * <p>Computed by abusing {@link SwerveDriveKinematics#toChassisSpeeds}: each module's wheel
+     * force (torque-current × Kt × gear-ratio / wheel-radius) is fed in as a speed, so the
+     * kinematics least-squares projection maps wheel forces onto the chassis wrench space.
+     */
+    public double[] getWrench() {
+        double wheelRadius = config.wheelDiameter.in(Meter) * 0.5;
+        SwerveModuleState[] forceStates = new SwerveModuleState[modules.size()];
+        for (int i = 0; i < modules.size(); i++) {
+            double force =
+                    modules.get(i).getDriveTorqueCurrentAmpere()
+                            * config.driveMotorKt
+                            * config.driveGearRatio
+                            / wheelRadius;
+            forceStates[i] =
+                    new SwerveModuleState(
+                            force, new Rotation2d(modules.get(i).getSteerAngle().in(Radian)));
+        }
+        ChassisSpeeds w = kinematics.toChassisSpeeds(forceStates);
+        return new double[] {w.vxMetersPerSecond, w.vyMetersPerSecond, w.omegaRadiansPerSecond};
     }
 
     public Pose3d getEstimatedPose() {

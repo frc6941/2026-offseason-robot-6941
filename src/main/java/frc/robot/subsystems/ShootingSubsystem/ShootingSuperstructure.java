@@ -37,6 +37,7 @@ public class ShootingSuperstructure {
     @Getter private final BallCounter ballCounter;
     @Getter public TargetMode mode = TargetMode.GOAL;
     @Getter private boolean isShooting = false;
+    private final ShotCalculator calculator = new ShotCalculator();
 
     public ShootingSuperstructure(
             TurretSubsystem turret,
@@ -158,6 +159,18 @@ public class ShootingSuperstructure {
                 shooter.runVelVolt(
                         () -> {
                             ShotFrame frame = RobotStateRecorder.getCmdFrame();
+                            Angle bba = frame.hoodAngle();
+                            double rpm = computeRpm(frame.muzzleSpeed(), bba);
+                            return RotationsPerSecond.of(rpm / 60.0);
+                        }));
+    }
+
+    public Command runInitialFrame() {
+        return Commands.parallel(
+                turret.setTurretPoseWorld(() -> calculator.computeGoalFrame().turretAngleWorld()),
+                shooter.runVelVolt(
+                        () -> {
+                            ShotFrame frame = calculator.computeGoalFrame();
                             Angle bba = frame.hoodAngle();
                             double rpm = computeRpm(frame.muzzleSpeed(), bba);
                             return RotationsPerSecond.of(rpm / 60.0);

@@ -5,18 +5,15 @@
       "args": [
         "-Xmx4g",
         "-jar",
-        "c:\\Users\\caixinze\\.windsurf\\extensions\\triplehelixprogramming.wpilog-analyzer-0.8.2\\server\\wpilog-mcp-all.jar",
+        "C:\\Users\\Public\\wpilib\\2026\\vscode\\data\\extensions\\triplehelixprogramming.wpilog-analyzer-0.8.2\\server\\wpilog-mcp-all.jar",
         "-logdir",
         "C:\\Users\\caixinze\\riologs",
         "-team",
-        "6941",
-        "-tba-key",
-        "bpHQshV0WspvmIFBRD6BmQiexbHv2s1AnhtvKU72R1ldQz5T4KWvkmxmk1MlZOPJ"
+        "2363"
       ],
       "env": {
         "WPILOG_DIR": "C:\\Users\\caixinze\\riologs",
-        "WPILOG_TEAM": "6941",
-        "TBA_API_KEY": "bpHQshV0WspvmIFBRD6BmQiexbHv2s1AnhtvKU72R1ldQz5T4KWvkmxmk1MlZOPJ"
+        "WPILOG_TEAM": "2363"
       }
     }
   }

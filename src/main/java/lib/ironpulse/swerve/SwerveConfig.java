@@ -3,6 +3,7 @@ package lib.ironpulse.swerve;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 
@@ -16,6 +17,11 @@ public class SwerveConfig {
     public final Distance wheelDiameter;
     public final double driveGearRatio;
     public final double steerGearRatio;
+    public final double driveMotorKt;
+    public final Mass driveMass;
+
+    // pigeon
+    public final ImuPigeonConfig pigeonConfig;
 
     // limits
     public final SwerveLimit defaultSwerveLimit;

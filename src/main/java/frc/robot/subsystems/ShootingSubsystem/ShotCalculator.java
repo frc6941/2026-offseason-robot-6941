@@ -51,6 +51,7 @@ import org.littletonrobotics.junction.Logger;
  * subsystem using {@code ShotCalculatorParams}.
  */
 public class ShotCalculator {
+    public TargetMode mode = TargetMode.GOAL;
     private final Map<TargetMode, Path> modelJsonByTarget = new EnumMap<>(TargetMode.class);
     private final Map<TargetMode, NavigableMap<Double, NavigableMap<Double, ShotModel>>>
             tableByTarget = new EnumMap<>(TargetMode.class);
@@ -114,7 +115,7 @@ public class ShotCalculator {
 
     /** Computes the shot frame using automatic zone-based shot decision. */
     public ShotFrame computeShotFrame() {
-        TargetMode mode = decideShotMode();
+        mode = decideShotMode();
         String targetFrame;
         if (mode == TargetMode.GOAL) {
             targetFrame = RobotStateRecorder.kFrameGoal;
@@ -125,6 +126,14 @@ public class ShotCalculator {
                             ? RobotStateRecorder.kFrameFeedUp
                             : RobotStateRecorder.kFrameFeedDown;
         }
+        return computeShotFrame(mode, targetFrame);
+    }
+
+    public ShotFrame computeGoalFrame() {
+        mode = TargetMode.GOAL;
+        String targetFrame;
+        targetFrame = RobotStateRecorder.kFrameGoal;
+
         return computeShotFrame(mode, targetFrame);
     }
 

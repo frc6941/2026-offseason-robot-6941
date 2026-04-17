@@ -2,6 +2,7 @@ package lib.ironpulse.swerve.mk5n;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -11,6 +12,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import lib.ironpulse.swerve.ImuIO;
+import lib.ironpulse.swerve.ImuPigeonConfig;
 import lib.ironpulse.utils.PhoenixSynchronizationThread;
 import lib.ironpulse.utils.PhoenixUtils;
 
@@ -32,7 +34,9 @@ public class ImuIOPigeon implements ImuIO {
     private Queue<Double> yawPositionQueue;
     private Queue<Double> timestampQueue;
 
-    public ImuIOPigeon(SwerveMK5NConfig config) {
+    private Pigeon2Configuration configuration;
+
+    public ImuIOPigeon(SwerveMK5NConfig config, ImuPigeonConfig pigeonConfig) {
         this.config = config;
 
         System.out.println("ImuIOPigeon: Initializing Pigeon2 with ID " + config.pigeonId);
@@ -50,6 +54,26 @@ public class ImuIOPigeon implements ImuIO {
         pitchVelocity = pigeon.getAngularVelocityYWorld();
         roll = pigeon.getRoll();
         rollVelocity = pigeon.getAngularVelocityXWorld();
+
+        Pigeon2Configuration configs = new Pigeon2Configuration();
+        // This Pigeon is mounted X-up, so we should mount-pose with Pitch at 90 degrees
+        configs.MountPose.MountPoseYaw = pigeonConfig.mountPoseYaw;
+        configs.MountPose.MountPosePitch = pigeonConfig.mountPosePitch;
+        configs.MountPose.MountPoseRoll = pigeonConfig.mountPoseRoll;
+        // This Pigeon has no need to trim the gyro
+        configs.GyroTrim.GyroScalarX = pigeonConfig.gyroScalarX;
+        configs.GyroTrim.GyroScalarY = pigeonConfig.gyroScalarY;
+        configs.GyroTrim.GyroScalarZ = pigeonConfig.gyroScalarZ;
+        // We want the thermal comp and no-motion cal enabled, with the compass disabled for best
+        // behavior
+        configs.Pigeon2Features.DisableNoMotionCalibration =
+                pigeonConfig.disableNoMotionCalibration;
+        configs.Pigeon2Features.DisableTemperatureCompensation =
+                pigeonConfig.disableTemperatureCompensation;
+        configs.Pigeon2Features.EnableCompass = pigeonConfig.enableCompass;
+
+        // Write these configs to the Pigeon2
+        pigeon.getConfigurator().apply(configs);
 
         // Configure signal update frequencies
         configureSignalFrequencies();

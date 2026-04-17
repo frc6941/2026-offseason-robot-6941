@@ -234,8 +234,8 @@ public class RobotContainer {
         FieldView.updateRobotPose(RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d());
         // TODO: test & fix in sim
         if (Robot.isReal()) {
-            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_3g");
-            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_B), "LL_4");
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_4a");
+            FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_B), "LL_4b");
         }
 
         Logger.recordOutput("Competition/isHubActive", HubShiftUtil.getShiftedShiftInfo().active());
@@ -485,7 +485,9 @@ public class RobotContainer {
 
         return new Swerve(
                 isReal ? SwerveMK5Config.kRealConfig : SwerveMK5Config.kSimConfig,
-                isReal ? new ImuIOPigeon(SwerveMK5Config.kRealConfig) : new ImuIOSim(),
+                isReal
+                        ? new ImuIOPigeon(SwerveMK5Config.kRealConfig, SwerveMK5Config.pigeonConfig)
+                        : new ImuIOSim(),
                 isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 0)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 0),
@@ -545,10 +547,12 @@ public class RobotContainer {
                                                 .getRotation()
                                                 .getDegrees(),
                                 () ->
-                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
-                                                        .getRotation()
-                                                        .getDegrees()
-                                                > 360,
+                                        Math.abs(
+                                                        RobotStateRecorder
+                                                                .getVelocityWorldRobotCurrent()
+                                                                .getRotation()
+                                                                .getRadians())
+                                                > 1.2,
                                 LimeLightConfig.asDeviationParams()))
                 : new LimelightSubsystem(swerve); // TODO: sim
     }

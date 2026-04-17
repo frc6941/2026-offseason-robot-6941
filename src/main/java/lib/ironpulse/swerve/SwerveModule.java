@@ -110,6 +110,10 @@ public class SwerveModule {
                 data.driveMotorVelocityRadPerSec * 0.5 * swerveConfig.wheelDiameter.in(Meter));
     }
 
+    public double getDriveTorqueCurrentAmpere() {
+        return data.driveMotorTorqueCurrentAmpere;
+    }
+
     public Angle getSteerAngle() {
         return Radian.of(data.steerMotorPositionRad);
     }

@@ -158,8 +158,14 @@ public class AutoFile {
     private static Command buildSweepShootCycle(String sweepPathName, boolean isLeft) {
         return Commands.sequence(
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                Commands.deadline(new WaitCommand(4), shoot().withTimeout(20.0)),
-                new WaitCommand(3),
+                Commands.parallel(
+                        driveToShoot(isLeft),
+                        new WaitCommand(3)
+                                .withTimeout(3)
+                                .deadlineFor(
+                                        shootingSuperstructure
+                                                .shootWhenReady(false)
+                                                .alongWith(oscillateIntakeFeed()))),
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
                         .deadlineFor(
@@ -218,25 +224,16 @@ public class AutoFile {
             sweepSequence =
                     Commands.sequence(
                             new WaitCommand(waitingChooser.get() ? 2 : 0),
-                            Commands.deadline(followPathFile(pathToUse, isLeft), intake()),
-                            drivePastSlope(isLeft, false),
-                            Commands.deadline(
-                                    driveToShoot(isLeft),
-                                    shoot().withTimeout(20.0),
-                                    oscillateIntakeFeed()),
-                            new WaitCommand(3),
-                            Commands.runOnce(() -> {})
-                                    .withTimeout(0.1)
-                                    .deadlineFor(
-                                            shooterDefault(),
-                                            shootingSuperstructure
-                                                    .getIdx()
-                                                    .runState(() -> IdxMode.OFF)));
+                            Commands.deadline(followPathFile(pathToUse, isLeft), intake()));
         }
 
         return Commands.parallel(
                         // shooterDefault(),
                         Commands.sequence(
+                                Commands.runOnce(() -> {})
+                                        .withTimeout(0.1)
+                                        .deadlineFor(shootingSuperstructure.runFrame()),
+
                                 // Wait before starting (only for AntiSweep)
                                 new WaitCommand(
                                         isAntiSweep

@@ -7,6 +7,7 @@ import static frc.robot.RobotConstants.is10541;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import frc.robot.RobotConstants;
+import lib.ironpulse.swerve.ImuPigeonConfig;
 import lib.ironpulse.swerve.SwerveConfig;
 import lib.ironpulse.swerve.SwerveLimit;
 import lib.ironpulse.swerve.SwerveModuleLimit;
@@ -20,6 +21,14 @@ public final class SwerveMK5Config {
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
     public static final double kSwerveHalfLength = 0.30468; // m
     public static final double kSwerveHalfWidth = 0.24218; // m
+
+    public static ImuPigeonConfig pigeonConfig =
+            ImuPigeonConfig.builder()
+                    .mountPoseYaw(88.95365142822266)
+                    .mountPosePitch(0.85715872049331667)
+                    .mountPoseRoll(-0.731235146522522)
+                    .gyroScalarZ(-3.5)
+                    .build();
 
     public static SwerveModuleLimit kDefaultSwerveModuleLimit =
             SwerveModuleLimit.builder()
@@ -148,6 +157,8 @@ public final class SwerveMK5Config {
                     .wheelDiameter(Inch.of(4.0))
                     .driveGearRatio(7.03)
                     .steerGearRatio(26.09)
+                    .driveMotorKt(0.0182)
+                    .driveMass(Kilograms.of(52))
                     .driveMotor(DCMotor.getKrakenX60Foc(1))
                     .driveMomentOfInertia(KilogramSquareMeters.of(0.04))
                     .driveStdDevPos(0.0000001)
@@ -171,6 +182,8 @@ public final class SwerveMK5Config {
                     .wheelDiameter(Inch.of(4.0))
                     .driveGearRatio(7.03) // R1
                     .steerGearRatio(287.0 / 11.0)
+                    .driveMotorKt(0.0182)
+                    .driveMass(Kilograms.of(52))
                     .defaultSwerveLimit(kDefaultSwerveLimit)
                     .defaultSwerveModuleLimit(kDefaultSwerveModuleLimit)
                     .moduleConfigs(
