@@ -27,7 +27,9 @@ public interface IndicatorIO {
         AUTO(new RainbowingPattern()),
 
         CLIMB_DEPLOYED(new BlinkingPattern(Color.kWhite, 0.2)),
-        CLIMB_FINISHED(new RainbowingPattern());
+        CLIMB_FINISHED(new RainbowingPattern()),
+
+        OPPONENT_SHIFT_WARNING(new BlinkingPattern(Color.kYellow, 0.2));
 
         public final AddressableLEDPattern pattern;
 

@@ -125,6 +125,17 @@ public class AutoFile {
         };
     }
 
+    /** Returns true if current auto mode is AntiSweep with PASS behavior */
+    public static boolean isAntiSweepPass() {
+        return autoChooser.get() == AutoType.ANTI_SWEEP_COMPETITION
+                && antiSweepBehavioiurChooser.get() == AntiSweepBehavior.PASS;
+    }
+
+    /** Returns true if current auto mode is Hunt */
+    public static boolean isHunt() {
+        return autoChooser.get() == AutoType.HUNT;
+    }
+
     private static void verifyOption() {
         if (autoChooser.get() == null
                 || sweepModeChooser.get() == null
@@ -159,7 +170,7 @@ public class AutoFile {
         return Commands.sequence(
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                 Commands.parallel(
-                        driveToShoot(isLeft),
+                        rotateToShoot(isLeft),
                         new WaitCommand(3)
                                 .withTimeout(3)
                                 .deadlineFor(
@@ -304,9 +315,27 @@ public class AutoFile {
 
                                 // INTAKE
                                 Commands.sequence(
-                                                driveToShoot(isLeft),
-                                                shoot().withTimeout(5.0),
-                                                allignToStarting(isLeft),
+                                                Commands.deadline(
+                                                        new ConditionalCommand(
+                                                                new WaitUntilCommand(
+                                                                        () ->
+                                                                                autoTimer.get()
+                                                                                        >= 18),
+                                                                new WaitUntilCommand(
+                                                                        () ->
+                                                                                autoTimer.get()
+                                                                                        >= 18),
+                                                                () -> isLeft),
+                                                        shoot(),
+                                                        new ConditionalCommand(
+                                                                Commands.deadline(
+                                                                        followPathFile(
+                                                                                "depot", false),
+                                                                        intake()),
+                                                                Commands.deadline(
+                                                                        allignToStation(),
+                                                                        oscillateIntakeFeed()),
+                                                                () -> isLeft)),
                                                 Commands.runOnce(() -> {})
                                                         .withTimeout(0.1)
                                                         .deadlineFor(
@@ -315,7 +344,6 @@ public class AutoFile {
                                                                         .getIdx()
                                                                         .runState(
                                                                                 () -> IdxMode.OFF)),
-                                                drivePastSlope(isLeft, false),
                                                 Commands.deadline(
                                                         followPathFile("rightIntake", isLeft),
                                                         intake()))

@@ -11,9 +11,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
+import frc.robot.auto.AutoFile;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -139,6 +141,24 @@ public class ShotCalculator {
 
     public TargetMode decideShotMode() {
         double xAlliance = RobotStateRecorder.getPoseDriverRobotCurrent().getX();
+        boolean inMidfield = xAlliance > FieldConstants.LinesVertical.neutralZoneNear;
+
+        // In auto mode, force GOAL except for specific cases
+        if (DriverStation.isAutonomousEnabled()) {
+            // Check if we should allow FEED mode in auto
+            boolean isAntiSweepPass = AutoFile.isAntiSweepPass();
+            boolean isHunt = AutoFile.isHunt();
+
+            // Only allow FEED in midfield for AntiSweep PASS or Hunt
+            if (inMidfield && (isAntiSweepPass || isHunt)) {
+                return TargetMode.FEED;
+            }
+
+            // All other auto cases: force GOAL
+            return TargetMode.GOAL;
+        }
+
+        // Teleop: use normal zone-based logic
         if (xAlliance <= FieldConstants.LinesVertical.neutralZoneNear) {
             return TargetMode.GOAL;
         }

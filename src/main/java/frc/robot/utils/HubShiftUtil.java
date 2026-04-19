@@ -22,14 +22,17 @@ public class HubShiftUtil {
     private static final ShiftEnum[] shiftsEnums = ShiftEnum.values();
     private static final double[] shiftStartTimes = {0.0, 10.0, 35.0, 60.0, 85.0, 110.0};
     private static final double[] shiftEndTimes = {10.0, 35.0, 60.0, 85.0, 110.0, 140.0};
+    private static final double spindexerStartupTime = 0.1;
     private static final double minFuelCountDelay = 1.0;
     private static final double maxFuelCountDelay = 2.0;
     private static final double shiftEndFuelCountExtension = 3.0;
     private static final double minTimeOfFlight = 0.835;
     private static final double maxTimeOfFlight = 0.835;
-    private static final double approachingActiveFudge = -1 * (minTimeOfFlight + minFuelCountDelay);
+    private static final double approachingActiveFudge =
+            -1 * (spindexerStartupTime + minTimeOfFlight + minFuelCountDelay);
     private static final double endingActiveFudge =
-            shiftEndFuelCountExtension + -1 * (maxTimeOfFlight + maxFuelCountDelay);
+            shiftEndFuelCountExtension
+                    + -1 * (spindexerStartupTime + maxTimeOfFlight + maxFuelCountDelay);
     private static final boolean[] activeSchedule = {true, true, false, true, false, true};
     private static final boolean[] inactiveSchedule = {true, false, true, false, true, true};
     private static final double timeResetThreshold = 3.0;

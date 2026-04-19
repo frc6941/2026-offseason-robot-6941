@@ -36,6 +36,7 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
 import lib.ironpulse.swerve.SwerveLimit;
+import lib.ironpulse.swerve.commands.SwerveAimToHeading;
 import lib.ironpulse.swerve.commands.SwerveDriveToAllign;
 import lib.ironpulse.swerve.commands.SwerveDriveToPose;
 import lib.ironpulse.utils.AllianceFlipUtil;
@@ -225,6 +226,15 @@ public class AutoActions {
                 });
     }
 
+    public static Command rotateToShoot(boolean isLeft) {
+        return swerve.defer(
+                () -> {
+                    Rotation2d shootPose =
+                            AllianceFlipUtil.apply(isLeft ? kShootL : kShootR).getRotation();
+                    return driveToHeading(() -> shootPose);
+                });
+    }
+
     static Command allignToStation() {
         return swerve.defer(
                 () ->
@@ -325,6 +335,23 @@ public class AutoActions {
                                             () ->
                                                     Logger.recordOutput(
                                                             "Temp/targetPose", targetPose)));
+                });
+    }
+
+    static Command driveToHeading(Supplier<Rotation2d> targetRotationSupplier) {
+        return swerve.defer(
+                () -> {
+                    Rotation2d targetRotation = targetRotationSupplier.get();
+                    return new SwerveAimToHeading(
+                            swerve,
+                            RobotStateRecorder::getPoseWorldRobotCurrent,
+                            () -> targetRotation,
+                            new PIDController(
+                                    AutoParamsNT.AutoPoseParams.kpSpin.getValue(),
+                                    AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
+                                    AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
+                            Degrees.of(AutoParamsNT.AutoPoseParams.toleranceHeadingDeg.getValue()),
+                            () -> DegreesPerSecond.of(70));
                 });
     }
 
