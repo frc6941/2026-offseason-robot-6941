@@ -38,7 +38,6 @@ import frc.robot.utils.HubShiftUtil;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
-import lib.ironpulse.command.RumbleWhenCommand;
 import lib.ironpulse.command.SysIdCommand;
 import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
@@ -97,9 +96,7 @@ public class RobotContainer {
     private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
-    private final TargetMode activeTargetMode = TargetMode.GOAL;
-    private static final double OPPONENT_SHIFT_WARNING_TIME = 5.0;
-    private boolean wasOpponentShiftActive = false;
+    private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
     public RobotContainer() {
@@ -254,71 +251,6 @@ public class RobotContainer {
                 HubShiftUtil.getOfficialShiftInfo().currentShift().toString());
         SmartDashboard.putNumber(
                 "Competition/Hub Remaining", HubShiftUtil.getShiftedShiftInfo().remainingTime());
-
-        handleShiftWarnings();
-    }
-
-    private boolean isShootingAllowed() {
-        return HubShiftUtil.getShiftedShiftInfo().active() && DriverStation.isEnabled();
-    }
-
-    private boolean isPassingAllowed() {
-        return DriverStation.isEnabled();
-    }
-
-    private boolean isPassMode() {
-        return shotCalculator.decideShotMode() == TargetMode.FEED;
-    }
-
-    private void handleShiftWarnings() {
-        var shiftInfo = HubShiftUtil.getShiftedShiftInfo();
-        boolean isOpponentShiftActive = !shiftInfo.active() && DriverStation.isEnabled();
-        RumbleWhenCommand rumble =
-                new RumbleWhenCommand(
-                        () ->
-                                shiftInfo.remainingTime() <= OPPONENT_SHIFT_WARNING_TIME
-                                        && shiftInfo.remainingTime() > 0,
-                        driver.getHID(),
-                        operator.getHID());
-
-        if (isOpponentShiftActive
-                && shiftInfo.remainingTime() <= OPPONENT_SHIFT_WARNING_TIME
-                && shiftInfo.remainingTime() > 0) {
-            if (!indicatorSubsystem.isOutsideDefault()) {
-                indicatorSubsystem.setPattern(Patterns.OPPONENT_SHIFT_WARNING);
-            }
-        //     CommandScheduler.getInstance().schedule(rumble);
-        } else {
-        //     CommandScheduler.getInstance().cancel(rumble);
-        }
-
-        wasOpponentShiftActive = isOpponentShiftActive;
-    }
-
-    private Command createShootingCommand() {
-        return Commands.either(
-                        // Pass mode - always allowed with purple LED and rumble
-                        Commands.parallel(
-                                shootingSuperstructure.shootWhenReady(
-                                        false, driver.getHID(), operator.getHID())),
-                        // Goal mode - only allowed during our shift with normal shooting
-                        Commands.parallel(
-                                Commands.runOnce(
-                                        () -> {
-                                            swerve.setSwerveModuleLimit(
-                                                    SwerveMK5Config.kShootingSwerveLimit);
-                                        }),
-                                shootingSuperstructure.shootWhenReady(
-                                        false, driver.getHID(), operator.getHID())),
-                        this::isPassMode)
-                .finallyDo(
-                        () -> {
-                            swerve.setSwerveModuleLimitDefault();
-                            CommandScheduler.getInstance()
-                                    .schedule(
-                                            indicatorSubsystem.indicateWithTimeout(
-                                                    Patterns.AFTER_SHOOTING, 0.5));
-                        });
     }
 
     private void configureBindings() {
@@ -367,34 +299,56 @@ public class RobotContainer {
 
         // driver.rightTrigger().whileTrue(drivePastNearestSlope());
 
-        // Shooting commands with unified logic
         operator.rightTrigger()
                 .whileTrue(
-                        Commands.either(
-                                createShootingCommand(),
-                                indicatorSubsystem.indicate(
-                                        Patterns.HOLD_SHOOTING), // Show HOLD_SHOOTING when not
-                                // allowed
-                                () -> isPassMode() ? true : isShootingAllowed()));
+                        shootingSuperstructure
+                                .shootWhenReady(false, driver.getHID(), operator.getHID())
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    if (shotCalculator.decideShotMode()
+                                                            == ShotCalculator.TargetMode.GOAL) {
+                                                        swerve.setSwerveModuleLimit(
+                                                                SwerveMK5Config
+                                                                        .kShootingSwerveLimit);
+                                                    }
+                                                }))
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
 
         driver.rightBumper()
                 .whileTrue(
-                        Commands.either(
-                                createShootingCommand(),
-                                indicatorSubsystem.indicate(
-                                        Patterns.HOLD_SHOOTING), // Show HOLD_SHOOTING when not
-                                // allowed
-                                () -> isPassMode() ? true : isShootingAllowed()));
-
+                        shootingSuperstructure
+                                .shootWhenReady(false, driver.getHID(), operator.getHID())
+                                .alongWith(
+                                        Commands.runOnce(
+                                                () -> {
+                                                    if (shotCalculator.decideShotMode()
+                                                            == ShotCalculator.TargetMode.GOAL) {
+                                                        swerve.setSwerveModuleLimit(
+                                                                SwerveMK5Config
+                                                                        .kShootingSwerveLimit);
+                                                    }
+                                                }))
+                                .finallyDo(
+                                        () -> {
+                                            swerve.setSwerveModuleLimitDefault();
+                                            CommandScheduler.getInstance()
+                                                    .schedule(
+                                                            indicatorSubsystem.indicateWithTimeout(
+                                                                    Patterns.AFTER_SHOOTING, 0.5));
+                                        }));
         driver.leftStick()
                 .whileTrue(
-                        Commands.either(
-                                Commands.parallel(
-                                        SwerveCommands.xLock(swerve), createShootingCommand()),
-                                indicatorSubsystem.indicate(
-                                        Patterns.HOLD_SHOOTING), // Show HOLD_SHOOTING when not
-                                // allowed
-                                () -> isPassMode() ? true : isShootingAllowed()));
+                        Commands.parallel(
+                                SwerveCommands.xLock(swerve),
+                                shootingSuperstructure.shootWhenReady(false)));
 
         operator.rightTrigger()
                 .or(driver.rightBumper())
