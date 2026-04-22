@@ -38,7 +38,6 @@ import frc.robot.utils.HubShiftUtil;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
-import lib.ironpulse.command.SysIdCommand;
 import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -68,7 +67,6 @@ import lib.ntext.NTParameterRegistry;
 import lombok.SneakyThrows;
 import org.littletonrobotics.junction.Logger;
 
-@SuppressWarnings("rawtypes")
 public class RobotContainer {
     private static final boolean HAS_TURRET_IO = true;
     private static final boolean HAS_SHOOTER_IO = true;
@@ -92,12 +90,11 @@ public class RobotContainer {
     private final SpindexerSubsystem spindexer;
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final ShootingSuperstructure shootingSuperstructure;
-    private final VelocityMotorSubsystem intakerRoller;
-    private final PositionMotorSubsystem intakerExtension;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> intakerRoller;
+    private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> intakerExtension;
     private final IndicatorSubsystem indicatorSubsystem;
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
-    private TargetMode activeTargetMode = TargetMode.GOAL;
 
     @SneakyThrows
     public RobotContainer() {
@@ -197,6 +194,14 @@ public class RobotContainer {
     }
 
     public void robotPeriodic() {
+        Logger.recordOutput("Simulation/StationaryPose", new Pose3d());
+
+        // Visualize robot components (turret, intake, spindexer)
+        shootingSuperstructure.visualizeComponents(
+                intakerExtension.getCurrPos().in(Meters), spindexer.getPosition().in(Radians));
+
+        // Visualize projectile balls shot at 0.1s intervals
+        shootingSuperstructure.visualizeProjectileBalls(Timer.getTimestamp());
 
         // update IO inputs
         PhoenixUtils.refreshAll();
@@ -233,6 +238,10 @@ public class RobotContainer {
         RobotStateRecorder.setCurrentFrame(shootingSuperstructure.getCurrentFrame());
         RobotStateRecorder.periodic();
         FieldView.updateRobotPose(RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d());
+
+        // Visualize robot components (turret, intake, spindexer)
+        shootingSuperstructure.visualizeComponents(
+                intakerExtension.getCurrPos().in(Meters), spindexer.getPosition().in(Radians));
         // TODO: test & fix in sim
         if (Robot.isReal()) {
             FieldView.updateObjectPose(limelightSubsystem.getPose(LimeLightConfig.NAME_A), "LL_4a");
@@ -362,7 +371,7 @@ public class RobotContainer {
         // driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
         // driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
 
-        SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
+        // SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
 
         // tester.povDown().whileTrue(spindexerSysId.quasistatic(Direction.kForward));
 

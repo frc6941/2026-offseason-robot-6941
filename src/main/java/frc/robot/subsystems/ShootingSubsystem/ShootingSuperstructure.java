@@ -3,12 +3,16 @@ package frc.robot.subsystems.ShootingSubsystem;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,6 +24,8 @@ import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
 import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.utils.HubShiftUtil;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 import lib.ironpulse.command.RumbleWhenCommand;
 import lib.ironpulse.command.VisualizeProjectileShot;
@@ -40,6 +46,35 @@ public class ShootingSuperstructure {
     @Getter public TargetMode mode = TargetMode.GOAL;
     @Getter private boolean isShooting = false;
     @Getter public boolean isGoalShooting = false;
+
+    // Ball tracking for visualization
+    private static class ProjectileBall {
+        final Pose3d launchPose;
+        final Rotation2d launchYaw;
+        final Rotation2d launchPitch;
+        final double launchSpeed;
+        final Translation2d launchVelocity;
+        final double launchTime;
+
+        ProjectileBall(
+                Pose3d pose,
+                Rotation2d yaw,
+                Rotation2d pitch,
+                double speed,
+                Translation2d vel,
+                double time) {
+            this.launchPose = pose;
+            this.launchYaw = yaw;
+            this.launchPitch = pitch;
+            this.launchSpeed = speed;
+            this.launchVelocity = vel;
+            this.launchTime = time;
+        }
+    }
+
+    private final List<ProjectileBall> activeBalls = new ArrayList<>();
+    private double lastBallLaunchTime = 0.0;
+    private static final double BALL_LAUNCH_INTERVAL = 0.1; // 0.1 seconds between balls
     private final ShotCalculator calculator = new ShotCalculator();
 
     public ShootingSuperstructure(
@@ -336,6 +371,149 @@ public class ShootingSuperstructure {
                             double rpm = computeRpm(MetersPerSecond.of(6), bba);
                             return RotationsPerSecond.of(rpm / 60);
                         }));
+    }
+
+    /**
+     * Visualizes projectile balls shot at 0.1s intervals with their current positions based on
+     * ballistic trajectory simulation.
+     */
+    public void visualizeProjectileBalls(double currentTimeSec) {
+        // Add new ball if shooting and enough time has passed since last ball
+        if (isShooting && (currentTimeSec - lastBallLaunchTime) >= BALL_LAUNCH_INTERVAL && RobotBase.isSimulation()) {
+            // Get current shot parameters at launch
+            Pose3d releasePose = RobotStateRecorder.getPoseWorldShotCurrent();
+            Rotation2d yawWorld =
+                    Rotation2d.fromRadians(
+                            RobotStateRecorder.getCmdFrame().turretAngleWorld().in(Radians));
+            Rotation2d pitch =
+                    Rotation2d.fromRadians(
+                            RobotStateRecorder.getCmdFrame().hoodAngle().in(Radians));
+            double muzzleSpeed = RobotStateRecorder.getCmdFrame().muzzleSpeed().in(MetersPerSecond);
+            Translation2d addedVelocity =
+                    RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation();
+
+            activeBalls.add(
+                    new ProjectileBall(
+                            releasePose,
+                            yawWorld,
+                            pitch,
+                            muzzleSpeed,
+                            addedVelocity,
+                            currentTimeSec));
+            lastBallLaunchTime = currentTimeSec;
+        }
+
+        // Update all active balls and calculate their current positions
+        List<Pose3d> ballPoses = new ArrayList<>();
+        activeBalls.removeIf(
+                ball -> {
+                    double timeSinceLaunch = currentTimeSec - ball.launchTime;
+
+                    // Calculate current position of this ball
+                    Pose3d ballPose =
+                            calculateProjectilePosition(
+                                    ball.launchPose,
+                                    ball.launchYaw,
+                                    ball.launchPitch,
+                                    ball.launchSpeed,
+                                    ball.launchVelocity,
+                                    timeSinceLaunch);
+
+                    // Remove ball if it hit the ground or is too old
+                    if (ballPose == null || ballPose.getZ() <= 0.0 || timeSinceLaunch > 3.0) {
+                        return true; // Remove this ball
+                    }
+
+                    ballPoses.add(ballPose);
+                    return false; // Keep this ball
+                });
+
+        // Log all ball poses
+        Logger.recordOutput("RobotComponents/ProjectileBalls", ballPoses.toArray(new Pose3d[0]));
+    }
+
+    /**
+     * Calculate the position of a projectile at a given time after release using gravity-only
+     * ballistic simulation.
+     */
+    private Pose3d calculateProjectilePosition(
+            Pose3d releasePose,
+            Rotation2d yawWorld,
+            Rotation2d pitch,
+            double muzzleSpeedMps,
+            Translation2d addedVelocityMps,
+            double timeSec) {
+        if (timeSec < 0) return null;
+
+        // Calculate initial velocity
+        double yawRad = yawWorld.getRadians();
+        double pitchRad = pitch.getRadians();
+        double cosPitch = Math.cos(pitchRad);
+
+        Translation3d vProjectile =
+                new Translation3d(
+                        muzzleSpeedMps * cosPitch * Math.cos(yawRad),
+                        muzzleSpeedMps * cosPitch * Math.sin(yawRad),
+                        muzzleSpeedMps * Math.sin(pitchRad));
+
+        Translation3d vAdd3 =
+                new Translation3d(addedVelocityMps.getX(), addedVelocityMps.getY(), 0.0);
+        Translation3d initialVel = vProjectile.plus(vAdd3);
+
+        // Apply gravity (9.81 m/s^2 downward)
+        double gravity = 9.81;
+        Translation3d pos = releasePose.getTranslation();
+
+        // Position after time t: p = p0 + v0*t + 0.5*a*t^2
+        double x = pos.getX() + initialVel.getX() * timeSec;
+        double y = pos.getY() + initialVel.getY() * timeSec;
+        double z = pos.getZ() + initialVel.getZ() * timeSec - 0.5 * gravity * timeSec * timeSec;
+
+        if (z < 0.0) return null; // Ball hit ground
+
+        return new Pose3d(new Translation3d(x, y, z), new Rotation3d());
+    }
+
+    /**
+     * Visualizes robot components (turret, intake, spindexer) as Pose3d for AdvantageScope. Call
+     * this method periodically to update the visualization.
+     */
+    public void visualizeComponents(double intakeExtensionMeters, double spindexerRotationRadians) {
+        // Turret visualization: only yaw rotation from robot-relative angle, all else zero
+        Angle turretRobotAngle = turret.getPosition();
+        Pose3d turretPose =
+                new Pose3d(
+                        new Translation3d(0, 0, 0),
+                        new Rotation3d(0, 0, turretRobotAngle.in(Radians)));
+        Logger.recordOutput("RobotComponents/Turret", turretPose);
+
+        // Intake visualization: linear interpolation from retracted to extended
+        // Retracted: (-0.23732, 0, 0.03), Extended: (0, 0, 0) - swapped x and y
+        // Assuming intakeExtensionMeters ranges from 0 (retracted) to max (extended)
+        // We need to know the max extension value to interpolate correctly
+        // For now, let's assume the extension value is normalized or we interpolate based on
+        // position
+        double maxExtension = 0.305; // Adjust based on your robot's max extension
+        double t = MathUtil.clamp(intakeExtensionMeters / maxExtension, 0.0, 1.0);
+
+        double retractedX = -0.23732;
+        double retractedZ = 0.03;
+        double extendedX = 0.0;
+        double extendedZ = 0.0;
+
+        double currentX = retractedX + (extendedX - retractedX) * t;
+        double currentZ = retractedZ + (extendedZ - retractedZ) * t;
+
+        Pose3d intakePose =
+                new Pose3d(new Translation3d(currentX, 0, currentZ), new Rotation3d(0, 0, 0));
+        Logger.recordOutput("RobotComponents/Intake", intakePose);
+
+        // Spindexer visualization: rotating yaw based on spindexer rotation (negated)
+        Pose3d spindexerPose =
+                new Pose3d(
+                        new Translation3d(0, 0, 0),
+                        new Rotation3d(0, 0, -spindexerRotationRadians));
+        Logger.recordOutput("RobotComponents/Spindexer", spindexerPose);
     }
 
     public Command runResetBallCounter() {
