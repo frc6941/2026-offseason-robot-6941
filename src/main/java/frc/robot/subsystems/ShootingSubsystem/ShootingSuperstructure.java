@@ -3,6 +3,7 @@ package frc.robot.subsystems.ShootingSubsystem;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -21,6 +22,7 @@ import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.utils.HubShiftUtil;
 import java.util.function.Supplier;
 import lib.ironpulse.command.RumbleWhenCommand;
+import lib.ironpulse.command.VisualizeProjectileShot;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
@@ -37,6 +39,7 @@ public class ShootingSuperstructure {
     @Getter private final BallCounter ballCounter;
     @Getter public TargetMode mode = TargetMode.GOAL;
     @Getter private boolean isShooting = false;
+    @Getter public boolean isGoalShooting = false;
     private final ShotCalculator calculator = new ShotCalculator();
 
     public ShootingSuperstructure(
@@ -88,9 +91,27 @@ public class ShootingSuperstructure {
     public Command shootWhenReady(boolean forceFeed) {
         return Commands.parallel(
                 runFrame(),
+                new VisualizeProjectileShot(
+                        () -> RobotStateRecorder.getPoseWorldShotCurrent(),
+                        () ->
+                                Rotation2d.fromRadians(
+                                        RobotStateRecorder.getCmdFrame()
+                                                .turretAngleWorld()
+                                                .in(Radians)),
+                        () ->
+                                Rotation2d.fromRadians(
+                                        RobotStateRecorder.getCmdFrame().hoodAngle().in(Radians)),
+                        () -> RobotStateRecorder.getCmdFrame().muzzleSpeed().in(MetersPerSecond),
+                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
+                        true),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
+                                Commands.runOnce(() -> isGoalShooting = true)
+                                        .onlyIf(
+                                                () ->
+                                                        calculator.decideShotMode()
+                                                                == TargetMode.GOAL),
                                 idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
@@ -99,12 +120,29 @@ public class ShootingSuperstructure {
                                                                 ? IdxMode.FORCE_FEED
                                                                 : IdxMode.FEED
                                                         : IdxMode.OFF))
-                        .finallyDo(() -> isShooting = false));
+                        .finallyDo(
+                                () -> {
+                                    isShooting = false;
+                                    isGoalShooting = false;
+                                }));
     }
 
     public Command shootWhenReady(boolean forceFeed, GenericHID... hids) {
         return Commands.parallel(
                 runFrame(),
+                new VisualizeProjectileShot(
+                        () -> RobotStateRecorder.getPoseWorldShotCurrent(),
+                        () ->
+                                Rotation2d.fromRadians(
+                                        RobotStateRecorder.getCmdFrame()
+                                                .turretAngleWorld()
+                                                .in(Radians)),
+                        () ->
+                                Rotation2d.fromRadians(
+                                        RobotStateRecorder.getCmdFrame().hoodAngle().in(Radians)),
+                        () -> RobotStateRecorder.getCmdFrame().muzzleSpeed().in(MetersPerSecond),
+                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
+                        true),
                 new RumbleWhenCommand(
                         () ->
                                 (mode == TargetMode.GOAL
@@ -113,6 +151,11 @@ public class ShootingSuperstructure {
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
+                                Commands.runOnce(() -> isGoalShooting = true)
+                                        .onlyIf(
+                                                () ->
+                                                        calculator.decideShotMode()
+                                                                == TargetMode.GOAL),
                                 idx.runState(
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
@@ -121,7 +164,11 @@ public class ShootingSuperstructure {
                                                                 ? IdxMode.FORCE_FEED
                                                                 : IdxMode.FEED
                                                         : IdxMode.OFF))
-                        .finallyDo(() -> isShooting = false));
+                        .finallyDo(
+                                () -> {
+                                    isShooting = false;
+                                    isGoalShooting = false;
+                                }));
     }
 
     public Command shootOnCondition(Supplier<Boolean> conditional) {
@@ -140,7 +187,11 @@ public class ShootingSuperstructure {
                                                                 && !isInTower()
                                                         ? IdxMode.FEED
                                                         : IdxMode.OFF))
-                        .finallyDo(() -> isShooting = false));
+                        .finallyDo(
+                                () -> {
+                                    isShooting = false;
+                                    isGoalShooting = false;
+                                }));
     }
 
     public Command runFrame() {

@@ -77,6 +77,20 @@ public final class SwerveMK5Config {
                             RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
                     .build();
 
+    // Long-range shooting limit (distance > 4m) - reduced velocity and rotation for stability
+    public static SwerveModuleLimit kLongRangeShootingSwerveLimit =
+            SwerveModuleLimit.builder()
+                    .maxDriveVelocity(InchesPerSecond.of(1200.0 / 60.0 / 7.03 * Math.PI * 4.0))
+                    .maxDriveAcceleration(MetersPerSecondPerSecond.of(5))
+                    // Reduced rotation speed for better stability at long range
+                    .maxSteerAngularVelocity(
+                            RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) * 0.6))
+                    // accelerate in 0.3s (slower for stability)
+                    .maxSteerAngularAcceleration(
+                            RotationsPerSecondPerSecond.of(
+                                    7368.0 / 60.0 / (287.0 / 11.0) * 0.6 / 0.3))
+                    .build();
+
     public static SwerveModuleLimit kAutoLimit =
             SwerveModuleLimit.builder()
                     .maxDriveVelocity(InchesPerSecond.of(2500.0 / 60.0 / 7.03 * Math.PI * 4.0))

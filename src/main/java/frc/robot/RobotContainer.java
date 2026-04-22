@@ -57,6 +57,7 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.Swerve;
 import lib.ironpulse.swerve.SwerveCommands;
+import lib.ironpulse.swerve.SwerveModuleLimit;
 import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
 import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
 import lib.ironpulse.swerve.sim.ImuIOSim;
@@ -251,6 +252,24 @@ public class RobotContainer {
                 HubShiftUtil.getOfficialShiftInfo().currentShift().toString());
         SmartDashboard.putNumber(
                 "Competition/Hub Remaining", HubShiftUtil.getShiftedShiftInfo().remainingTime());
+
+        swerve.setSwerveModuleLimit(getShootingLimit());
+    }
+
+    private SwerveModuleLimit getShootingLimit() {
+        if (shootingSuperstructure.isGoalShooting
+                && shotCalculator.decideShotMode() == TargetMode.GOAL
+                && !DriverStation.isAutonomous()) {
+            // Get current shot parameters to determine distance
+            double distance = shootingSuperstructure.getDistance();
+
+            if (distance > 4.8) {
+                return SwerveMK5Config.kLongRangeShootingSwerveLimit;
+            }
+
+            return SwerveMK5Config.kShootingSwerveLimit;
+        }
+        return SwerveMK5Config.kDefaultSwerveModuleLimit;
     }
 
     private void configureBindings() {
@@ -287,7 +306,7 @@ public class RobotContainer {
         operator.leftBumper().whileTrue(intake.runExtendedReverse());
         operator.y().onTrue(shootingSuperstructure.runZero());
         operator.a().whileTrue(shootingSuperstructure.runSetFrame());
-        operator.leftTrigger().onTrue(intake.runFeed());
+        operator.leftTrigger().whileTrue(intake.runFeed());
         operator.rightBumper().whileTrue(shootingSuperstructure.runUnjamming());
 
         driver.leftBumper().onTrue(intake.toggleIntake());
@@ -303,16 +322,6 @@ public class RobotContainer {
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady(false, driver.getHID(), operator.getHID())
-                                .alongWith(
-                                        Commands.runOnce(
-                                                () -> {
-                                                    if (shotCalculator.decideShotMode()
-                                                            == ShotCalculator.TargetMode.GOAL) {
-                                                        swerve.setSwerveModuleLimit(
-                                                                SwerveMK5Config
-                                                                        .kShootingSwerveLimit);
-                                                    }
-                                                }))
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();
@@ -326,16 +335,6 @@ public class RobotContainer {
                 .whileTrue(
                         shootingSuperstructure
                                 .shootWhenReady(false, driver.getHID(), operator.getHID())
-                                .alongWith(
-                                        Commands.runOnce(
-                                                () -> {
-                                                    if (shotCalculator.decideShotMode()
-                                                            == ShotCalculator.TargetMode.GOAL) {
-                                                        swerve.setSwerveModuleLimit(
-                                                                SwerveMK5Config
-                                                                        .kShootingSwerveLimit);
-                                                    }
-                                                }))
                                 .finallyDo(
                                         () -> {
                                             swerve.setSwerveModuleLimitDefault();

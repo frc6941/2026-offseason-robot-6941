@@ -43,6 +43,8 @@ public class AutoFile {
             new LoggedDashboardChooser<Integer>("Sweep Cycles Chooser");
     private static final LoggedDashboardChooser<Boolean> waitingChooser =
             new LoggedDashboardChooser<Boolean>("Waiting Chooser");
+    private static final LoggedDashboardChooser<Boolean> revertChooser =
+            new LoggedDashboardChooser<Boolean>("Revert Path Chooser");
     private static final LoggedDashboardChooser<AntiSweepBehavior> antiSweepBehavioiurChooser =
             new LoggedDashboardChooser<AntiSweepBehavior>("Anti Sweep Behaviour Chooser");
     private static double antiSweepWaitTime = 0.0;
@@ -83,6 +85,9 @@ public class AutoFile {
 
         waitingChooser.addDefaultOption("Wait", true);
         waitingChooser.addOption("No Waiting", false);
+
+        revertChooser.addDefaultOption("No Revert", false);
+        revertChooser.addOption("Revert", true);
 
         // Initialize AntiSweep wait time as typable field
         SmartDashboard.putNumber("Auto/AntiSweep Wait Time", antiSweepWaitTime);
@@ -192,25 +197,45 @@ public class AutoFile {
         AntiSweepBehavior antiSweepBehavior = antiSweepBehavioiurChooser.get();
         boolean isAntiSweepPass = isAntiSweep && antiSweepBehavior == AntiSweepBehavior.PASS;
 
-        String sweepPathName =
-                switch (sweepMode) {
-                    case FAST -> "DoubleSweep";
-                    case LONG -> "longSweepRightNew";
-                    case NORMAL -> "sweepRight";
-                };
+        String sweepPathName;
+        switch (sweepMode) {
+            case FAST:
+                sweepPathName = "DoubleSweep-1";
+                break;
+            case LONG:
+                sweepPathName = "longSweepRightNew";
+                break;
+            case NORMAL:
+                sweepPathName = "sweepRight";
+                break;
+            default:
+                sweepPathName = "sweepRight";
+                break;
+        }
 
         // Build sweep/shoot cycles for FAST mode
         Command sweepSequence;
         if (sweepMode == SweepMode.FAST) {
             int cycles = sweepCyclesChooser.get() != null ? sweepCyclesChooser.get() : 1;
+            boolean useRevert = revertChooser.get() != null ? revertChooser.get() : false;
 
             // If AntiSweep PASS mode, only do first cycle (no second cycle)
             int effectiveCycles = isAntiSweepPass ? 1 : cycles;
             Command[] cycleCommands = new Command[effectiveCycles];
 
             for (int i = 0; i < effectiveCycles; i++) {
-                // Use AntiSweep path for first cycle if in ANTI_SWEEP_COMPETITION mode
-                String pathToUse = (isAntiSweep && i == 0) ? "AntiSweep" : sweepPathName;
+                // Determine path to use
+                String pathToUse;
+                if (isAntiSweep && i == 0) {
+                    // Use AntiSweep path for first cycle if in ANTI_SWEEP_COMPETITION mode
+                    pathToUse = "AntiSweep";
+                } else if (cycles == 2 && i == 1 && useRevert) {
+                    // Use DoubleSweep-2 for second cycle when revert=true and cycles=2
+                    pathToUse = "DoubleSweep-2";
+                } else {
+                    // Use default sweep path
+                    pathToUse = sweepPathName;
+                }
 
                 // If AntiSweep PASS mode on first cycle, just drive path without shooting
                 if (isAntiSweepPass && i == 0) {
@@ -218,13 +243,8 @@ public class AutoFile {
                             Commands.sequence(
                                     Commands.deadline(
                                             followPathFile(pathToUse, isLeft), intake(), shoot()));
-                } else if (i == effectiveCycles - 1) {
-                    // Last cycle: only sweep and drive, no shoot
-                    cycleCommands[i] =
-                            Commands.sequence(
-                                    Commands.deadline(followPathFile(pathToUse, isLeft), intake()));
                 } else {
-                    // All other cycles: full sweep/shoot cycle
+                    // All cycles: full sweep/shoot cycle
                     cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft);
                 }
             }
@@ -239,8 +259,8 @@ public class AutoFile {
         }
 
         return Commands.parallel(
-                        // shooterDefault(),
-                        Commands.sequence(
+                // shooterDefault(),
+                Commands.sequence(
                                 Commands.runOnce(() -> {})
                                         .withTimeout(0.1)
                                         .deadlineFor(shootingSuperstructure.runFrame()),
@@ -262,60 +282,65 @@ public class AutoFile {
                                 // Sweep sequence (single or multiple cycles)
                                 sweepSequence,
 
-                                // FUEL
-                                Commands.parallel(
-                                                shoot(),
+                                // FUEL or INTAKE based on end behaviour
+                                Commands.either(
+                                        // FUEL path
+                                        Commands.parallel(
                                                 Commands.sequence(
-                                                        Commands.deadline(
-                                                                new ConditionalCommand(
-                                                                        new WaitUntilCommand(
-                                                                                () ->
-                                                                                        autoTimer
-                                                                                                        .get()
-                                                                                                >= 20),
-                                                                        new WaitUntilCommand(
-                                                                                () ->
-                                                                                        autoTimer
-                                                                                                        .get()
-                                                                                                >= 17),
-                                                                        () -> isLeft),
-                                                                new ConditionalCommand(
-                                                                        Commands.deadline(
+                                                        new ConditionalCommand(
+                                                                Commands.deadline(
+                                                                        followPathFile(
+                                                                                "depot", false),
+                                                                        intake(),
+                                                                        shoot()),
+                                                                // Skip station if FAST mode
+                                                                // (DoubleSweep)
+                                                                (sweepMode == SweepMode.FAST
+                                                                                && sweepCyclesChooser
+                                                                                                .get()
+                                                                                        == 2
+                                                                        ? Commands.none()
+                                                                        : Commands.deadline(
                                                                                 followPathFile(
-                                                                                        "depot",
+                                                                                        "station",
                                                                                         false),
-                                                                                intake()),
-                                                                        Commands.deadline(
-                                                                                allignToStation(),
-                                                                                oscillateIntakeFeed()),
-                                                                        () -> isLeft)),
+                                                                                oscillateIntakeFeed(),
+                                                                                shoot())),
+                                                                () -> isLeft),
+                                                        new ConditionalCommand(
+                                                                new WaitUntilCommand(
+                                                                        () ->
+                                                                                autoTimer.get()
+                                                                                        >= 20),
+                                                                new WaitUntilCommand(
+                                                                        () ->
+                                                                                autoTimer.get()
+                                                                                        >= 19),
+                                                                () -> isLeft),
                                                         driveToShoot(isLeft)
-                                                                .onlyIf(() -> isLeft == false)),
-                                                new WaitUntilCommand(
-                                                                () ->
-                                                                        isLeft
-                                                                                && autoChooser.get()
-                                                                                        == AutoType
-                                                                                                .COMPETITION
-                                                                                && sweepModeChooser
-                                                                                                .get()
-                                                                                        == SweepMode
-                                                                                                .LONG
-                                                                                && endBehaviourChooser
-                                                                                                .get()
-                                                                                        == EndBehaviour
-                                                                                                .FUEL
-                                                                                && autoTimer.get()
-                                                                                        >= 18)
-                                                        .andThen(intake()))
-                                        .onlyIf(
-                                                () ->
-                                                        endBehaviourChooser.get()
-                                                                == EndBehaviour.FUEL),
-
-                                // INTAKE
-                                Commands.sequence(
-                                                Commands.deadline(
+                                                                .onlyIf(() -> isLeft == false),
+                                                        new WaitUntilCommand(
+                                                                        () ->
+                                                                                isLeft
+                                                                                        && autoChooser
+                                                                                                        .get()
+                                                                                                == AutoType
+                                                                                                        .COMPETITION
+                                                                                        && sweepModeChooser
+                                                                                                        .get()
+                                                                                                == SweepMode
+                                                                                                        .LONG
+                                                                                        && endBehaviourChooser
+                                                                                                        .get()
+                                                                                                == EndBehaviour
+                                                                                                        .FUEL
+                                                                                        && autoTimer
+                                                                                                        .get()
+                                                                                                >= 18)
+                                                                .andThen(intake()))),
+                                        // INTAKE path
+                                        Commands.parallel(
+                                                Commands.sequence(
                                                         new ConditionalCommand(
                                                                 new WaitUntilCommand(
                                                                         () ->
@@ -326,32 +351,23 @@ public class AutoFile {
                                                                                 autoTimer.get()
                                                                                         >= 18),
                                                                 () -> isLeft),
-                                                        shoot(),
+                                                        Commands.runOnce(() -> {})
+                                                                .withTimeout(0.1)
+                                                                .deadlineFor(
+                                                                        shooterDefault(),
+                                                                        shootingSuperstructure
+                                                                                .getIdx()
+                                                                                .runState(
+                                                                                        () ->
+                                                                                                IdxMode
+                                                                                                        .OFF)),
                                                         new ConditionalCommand(
-                                                                Commands.deadline(
-                                                                        followPathFile(
-                                                                                "depot", false),
-                                                                        intake()),
-                                                                Commands.deadline(
-                                                                        allignToStation(),
-                                                                        oscillateIntakeFeed()),
-                                                                () -> isLeft)),
-                                                Commands.runOnce(() -> {})
-                                                        .withTimeout(0.1)
-                                                        .deadlineFor(
-                                                                shooterDefault(),
-                                                                shootingSuperstructure
-                                                                        .getIdx()
-                                                                        .runState(
-                                                                                () -> IdxMode.OFF)),
-                                                Commands.deadline(
-                                                        followPathFile("rightIntake", isLeft),
-                                                        intake()))
-                                        .onlyIf(
-                                                () ->
-                                                        endBehaviourChooser.get()
-                                                                == EndBehaviour.INTAKE)))
-                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
+                                                                followPathFile("leftIntake", false),
+                                                                followPathFile(
+                                                                        "rightIntake", false),
+                                                                () -> isLeft))),
+                                        () -> endBehaviourChooser.get() == EndBehaviour.FUEL))
+                        .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
         // .beforeStarting(() -> swerve.removeDefaultCommand());
     }
 
@@ -368,7 +384,7 @@ public class AutoFile {
         Command driveToCorner =
                 either(
                         deadline(followPathFile("depot", false), intake()),
-                        deadline(allignToStation(), oscillateIntakeFeed()),
+                        deadline(followPathFile("station", false), oscillateIntakeFeed()),
                         () -> isLeft);
         Command sweepToClimb =
                 either(

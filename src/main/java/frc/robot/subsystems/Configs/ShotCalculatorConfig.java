@@ -27,7 +27,7 @@ public final class ShotCalculatorConfig {
         public static final double lookfwdMinCycles = 0.0;
         public static final double lookfwdMaxCycles = 20.0;
 
-        public static final double velocityBlend = 0.25;
+        public static final double velocityBlend = 1;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
