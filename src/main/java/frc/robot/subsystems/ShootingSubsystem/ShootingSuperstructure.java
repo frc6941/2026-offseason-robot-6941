@@ -221,6 +221,7 @@ public class ShootingSuperstructure {
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
                                                                 && !isInTower()
+                                                                && !isInHubZone()
                                                         ? forceFeed
                                                                 ? IdxMode.FORCE_FEED
                                                                 : IdxMode.FEED
@@ -246,6 +247,7 @@ public class ShootingSuperstructure {
                                                                 && turret.getCurrentMode()
                                                                         == TurretMode.TRACKING
                                                                 && !isInTower()
+                                                                && !isInHubZone()
                                                         ? IdxMode.FEED
                                                         : IdxMode.OFF))
                         .finallyDo(

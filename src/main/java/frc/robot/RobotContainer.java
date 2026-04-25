@@ -365,7 +365,7 @@ public class RobotContainer {
                 .and(shootingSuperstructure::isInTower)
                 .whileTrue(indicatorSubsystem.indicate(Patterns.HOLD_SHOOTING));
 
-         operator.rightTrigger()
+        operator.rightTrigger()
                 .or(driver.rightBumper())
                 .or(driver.leftStick())
                 .and(shootingSuperstructure::isInHubZone)
