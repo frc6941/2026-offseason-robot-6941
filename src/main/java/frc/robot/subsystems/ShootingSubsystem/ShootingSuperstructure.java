@@ -354,11 +354,11 @@ public class ShootingSuperstructure {
                 RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
         double x = pos.getX(), y = pos.getY();
         boolean inBlue =
-                x >= FieldConstants.Tower.frontFaceX
+                x <= FieldConstants.Tower.frontFaceX
                         && Math.abs(y - FieldConstants.Tower.centerPoint.getY())
                                 <= FieldConstants.Tower.width / 2.0;
         boolean inRed =
-                x <= FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX
+                x >= FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX
                         && Math.abs(y - FieldConstants.Tower.oppCenterPoint.getY())
                                 <= FieldConstants.Tower.width / 2.0;
         return inBlue || inRed;
