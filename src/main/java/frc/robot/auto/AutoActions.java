@@ -351,7 +351,7 @@ public class AutoActions {
                                     AutoParamsNT.AutoPoseParams.kiSpin.getValue(),
                                     AutoParamsNT.AutoPoseParams.kdSpin.getValue()),
                             Degrees.of(AutoParamsNT.AutoPoseParams.toleranceHeadingDeg.getValue()),
-                            () -> DegreesPerSecond.of(70));
+                            () -> DegreesPerSecond.of(80));
                 });
     }
 
@@ -504,6 +504,7 @@ public class AutoActions {
     public static double shootBackLimitY = 3.6;
     public static double shootBackLimitYOther = FieldConstants.fieldWidth - shootBackLimitY;
     public static double shootBackLimitX = 6;
+    public static double shootBackLimitXMax = 6.4;
 
     public static Command shootBackWhenSuitable() {
         Supplier<Boolean> conditional =
@@ -512,9 +513,13 @@ public class AutoActions {
                             RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().getX();
                     var robotY =
                             RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().getY();
+                    // Define a box: shootBackLimitX <= x <= shootBackLimitXMax
+                    //                shootBackLimitY <= y <= shootBackLimitYOther
                     var isInBlindZone =
-                            robotY > shootBackLimitY && robotY < shootBackLimitYOther
-                                    || robotX < shootBackLimitX;
+                            robotX >= shootBackLimitX
+                                    && robotX <= shootBackLimitXMax
+                                    && robotY >= shootBackLimitY
+                                    && robotY <= shootBackLimitYOther;
                     var isAvailable = !isInBlindZone;
                     return isAvailable;
                 };

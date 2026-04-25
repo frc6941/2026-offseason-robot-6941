@@ -99,6 +99,6 @@ public class TurretConfig {
         // Hysteresis thresholds for automatic mode switching.
         // Must satisfy seekEnterErrorDegrees > trackEnterErrorDegrees.
         public static final double seekEnterErrorDegrees = 25;
-        public static final double trackEnterErrorDegrees = 8;
+        public static final double trackEnterErrorDegrees = 4;
     }
 }

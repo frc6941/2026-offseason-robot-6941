@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.FieldConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsFEEDNT;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsGOALNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import frc.robot.subsystems.ShootingSubsystem.ShotCalculator.TargetMode;
@@ -93,15 +95,22 @@ public class ShootingSuperstructure {
         Angle turretWorldRotation =
                 RobotStateRecorder.getPoseWorldShotCurrent().toPose2d().getRotation().getMeasure();
         Angle bba = hood.getCurrPos();
-        double rpmA = ShotCalculatorParamsNT.rpmA.getValue();
-        AngularVelocity shooterVel = shooter.getVelocity();
+        double rpmA =
+                calculator.decideShotMode() == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.rpmA.getValue()
+                        : ShotCalculatorParamsFEEDNT.rpmA.getValue();
+        double rpmB =
+                calculator.decideShotMode() == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.rpmB.getValue()
+                        : ShotCalculatorParamsFEEDNT.rpmB.getValue();
+        double rpmC =
+                calculator.decideShotMode() == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.rpmC.getValue()
+                        : ShotCalculatorParamsFEEDNT.rpmC.getValue();
 
+        AngularVelocity shooterVel = shooter.getVelocity();
         double rpm = shooterVel.in(RotationsPerSecond) * 60.0;
-        double muzzleSpeedMps =
-                (rpm
-                                - ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
-                                - ShotCalculatorParamsNT.rpmC.getValue())
-                        / rpmA;
+        double muzzleSpeedMps = (rpm - rpmB * bba.in(Degrees) - rpmC) / rpmA;
         return new ShotFrame(turretWorldRotation, bba, MetersPerSecond.of(muzzleSpeedMps));
     }
 
@@ -127,18 +136,26 @@ public class ShootingSuperstructure {
         return Commands.parallel(
                 runFrame(),
                 new VisualizeProjectileShot(
-                        () -> RobotStateRecorder.getPoseWorldShotCurrent(),
-                        () ->
-                                Rotation2d.fromRadians(
+                                () -> RobotStateRecorder.getPoseWorldShotCurrent(),
+                                () ->
+                                        Rotation2d.fromRadians(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .turretAngleWorld()
+                                                        .in(Radians)),
+                                () ->
+                                        Rotation2d.fromRadians(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .hoodAngle()
+                                                        .in(Radians)),
+                                () ->
                                         RobotStateRecorder.getCmdFrame()
-                                                .turretAngleWorld()
-                                                .in(Radians)),
-                        () ->
-                                Rotation2d.fromRadians(
-                                        RobotStateRecorder.getCmdFrame().hoodAngle().in(Radians)),
-                        () -> RobotStateRecorder.getCmdFrame().muzzleSpeed().in(MetersPerSecond),
-                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
-                        true),
+                                                .muzzleSpeed()
+                                                .in(MetersPerSecond),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                .getTranslation(),
+                                true)
+                        .onlyIf(() -> RobotBase.isSimulation()),
                 Commands.waitUntil(shooter::velocityAtGoal)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
@@ -151,6 +168,7 @@ public class ShootingSuperstructure {
                                         () ->
                                                 turret.getCurrentMode() == TurretMode.TRACKING
                                                                 && !isInTower()
+                                                                && !isInHubZone()
                                                         ? forceFeed
                                                                 ? IdxMode.FORCE_FEED
                                                                 : IdxMode.FEED
@@ -166,18 +184,26 @@ public class ShootingSuperstructure {
         return Commands.parallel(
                 runFrame(),
                 new VisualizeProjectileShot(
-                        () -> RobotStateRecorder.getPoseWorldShotCurrent(),
-                        () ->
-                                Rotation2d.fromRadians(
+                                () -> RobotStateRecorder.getPoseWorldShotCurrent(),
+                                () ->
+                                        Rotation2d.fromRadians(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .turretAngleWorld()
+                                                        .in(Radians)),
+                                () ->
+                                        Rotation2d.fromRadians(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .hoodAngle()
+                                                        .in(Radians)),
+                                () ->
                                         RobotStateRecorder.getCmdFrame()
-                                                .turretAngleWorld()
-                                                .in(Radians)),
-                        () ->
-                                Rotation2d.fromRadians(
-                                        RobotStateRecorder.getCmdFrame().hoodAngle().in(Radians)),
-                        () -> RobotStateRecorder.getCmdFrame().muzzleSpeed().in(MetersPerSecond),
-                        () -> RobotStateRecorder.getVelocityWorldRobotCurrent().getTranslation(),
-                        true),
+                                                .muzzleSpeed()
+                                                .in(MetersPerSecond),
+                                () ->
+                                        RobotStateRecorder.getVelocityWorldRobotCurrent()
+                                                .getTranslation(),
+                                true)
+                        .onlyIf(() -> RobotBase.isSimulation()),
                 new RumbleWhenCommand(
                         () ->
                                 (mode == TargetMode.GOAL
@@ -282,10 +308,21 @@ public class ShootingSuperstructure {
             }
         }
 
-        double baseRpm =
-                ShotCalculatorParamsNT.rpmA.getValue() * muzzleSpeed.in(MetersPerSecond)
-                        + ShotCalculatorParamsNT.rpmB.getValue() * bba.in(Degrees)
-                        + ShotCalculatorParamsNT.rpmC.getValue();
+        // Use mode-specific parameters - use the mode already decided by calculator
+        double rpmA =
+                calculator.decideShotMode() == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.rpmA.getValue()
+                        : ShotCalculatorParamsFEEDNT.rpmA.getValue();
+        double rpmB =
+                calculator.decideShotMode() == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.rpmB.getValue()
+                        : ShotCalculatorParamsFEEDNT.rpmB.getValue();
+        double rpmC =
+                calculator.decideShotMode() == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.rpmC.getValue()
+                        : ShotCalculatorParamsFEEDNT.rpmC.getValue();
+
+        double baseRpm = rpmA * muzzleSpeed.in(MetersPerSecond) + rpmB * bba.in(Degrees) + rpmC;
         double scaledRpm = baseRpm * scalingFactor;
 
         Logger.recordOutput("ShootingSuperstructure/Distance/currentMeters", currentDistance);
@@ -315,13 +352,31 @@ public class ShootingSuperstructure {
                 RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
         double x = pos.getX(), y = pos.getY();
         boolean inBlue =
-                x <= FieldConstants.Tower.frontFaceX
+                x >= FieldConstants.Tower.frontFaceX
                         && Math.abs(y - FieldConstants.Tower.centerPoint.getY())
                                 <= FieldConstants.Tower.width / 2.0;
         boolean inRed =
-                x >= FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX
+                x <= FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX
                         && Math.abs(y - FieldConstants.Tower.oppCenterPoint.getY())
                                 <= FieldConstants.Tower.width / 2.0;
+        return inBlue || inRed;
+    }
+
+    @AutoLogOutput(key = "ShootingSuperstructure/isInHubZone")
+    public boolean isInHubZone() {
+        Translation2d pos =
+                RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
+        double x = pos.getX(), y = pos.getY();
+        boolean inBlue =
+                x >= 5
+                        && x <= 7.3
+                        && Math.abs(y - FieldConstants.Hub.topCenterPoint.getX())
+                                <= FieldConstants.Hub.width / 2.0;
+        boolean inRed =
+                x <= FieldConstants.fieldLength - 5
+                        && x >= FieldConstants.fieldLength - 7.3
+                        && Math.abs(y - FieldConstants.Hub.oppTopCenterPoint.getX())
+                                <= FieldConstants.Hub.width / 2.0;
         return inBlue || inRed;
     }
 
@@ -379,7 +434,9 @@ public class ShootingSuperstructure {
      */
     public void visualizeProjectileBalls(double currentTimeSec) {
         // Add new ball if shooting and enough time has passed since last ball
-        if (isShooting && (currentTimeSec - lastBallLaunchTime) >= BALL_LAUNCH_INTERVAL && RobotBase.isSimulation()) {
+        if (isShooting
+                && (currentTimeSec - lastBallLaunchTime) >= BALL_LAUNCH_INTERVAL
+                && RobotBase.isSimulation()) {
             // Get current shot parameters at launch
             Pose3d releasePose = RobotStateRecorder.getPoseWorldShotCurrent();
             Rotation2d yawWorld =

@@ -209,6 +209,7 @@ public class RobotContainer {
         // if (!Robot.isReal()) {
         NTParameterRegistry.refresh();
         // }
+
         // update RobotStateRecorder
         var now = Seconds.of(Timer.getTimestamp());
         RobotStateRecorder.getInstance()
@@ -362,6 +363,12 @@ public class RobotContainer {
                 .or(driver.rightBumper())
                 .or(driver.leftStick())
                 .and(shootingSuperstructure::isInTower)
+                .whileTrue(indicatorSubsystem.indicate(Patterns.HOLD_SHOOTING));
+
+         operator.rightTrigger()
+                .or(driver.rightBumper())
+                .or(driver.leftStick())
+                .and(shootingSuperstructure::isInHubZone)
                 .whileTrue(indicatorSubsystem.indicate(Patterns.HOLD_SHOOTING));
 
         // SYSID/test

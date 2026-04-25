@@ -35,7 +35,7 @@ TurretSubsystem
 Flow:
 systemConstructor
     -> claculate absolute position using differential encoder
-    -> sets the position of the embedded encoder ONLY when the syste is constructed
+    -> sets the position of the embedded encoder ONLY when the system is constructed
     @see updateUnwrappedTurretAngle
 Exposed Commands:
     runTurretPoseWorld : convert the world angle to a robot relative angle and set the position in the system
@@ -229,8 +229,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
                 RobotStateRecorder.getVelocityWorldRobotCmdCurrent().getRotation().getDegrees();
         double chassisActualOmegaDegPerSec =
                 RobotStateRecorder.getVelocityWorldRobotCurrent().getRotation().getDegrees();
-        double chassisOmegaDegPerSec =
-                (chassisCmdOmegaDegPerSec + chassisActualOmegaDegPerSec) / 2.0;
+        double chassisOmegaDegPerSec = (chassisCmdOmegaDegPerSec + chassisActualOmegaDegPerSec) / 2;
         double yawOmegaDegPerSec = RobotStateRecorder.getOmegaRobotCurrent().in(DegreesPerSecond);
         Logger.recordOutput(getName() + "/addedV", chassisCmdOmegaDegPerSec);
         Logger.recordOutput(getName() + "/actualV", chassisActualOmegaDegPerSec);

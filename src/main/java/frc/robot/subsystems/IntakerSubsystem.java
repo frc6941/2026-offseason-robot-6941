@@ -267,7 +267,7 @@ public class IntakerSubsystem extends SubsystemBase {
         } else if (!zeroTimer.isRunning()) {
             zeroTimer.start();
         }
-        if (!autoOutZeroRunning && zeroTimer.hasElapsed(2.0)) {
+        if (!autoOutZeroRunning && zeroTimer.hasElapsed(0.5)) {
             autoOutZeroRunning = true;
             CommandScheduler.getInstance()
                     .schedule(

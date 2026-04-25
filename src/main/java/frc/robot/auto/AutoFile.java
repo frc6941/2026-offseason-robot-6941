@@ -232,6 +232,9 @@ public class AutoFile {
                 } else if (cycles == 2 && i == 1 && useRevert) {
                     // Use DoubleSweep-2 for second cycle when revert=true and cycles=2
                     pathToUse = "DoubleSweep-2";
+                } else if (cycles == 2 && i == 1 && !useRevert) {
+                    // Use DoubleSweep-2 for second cycle when revert=true and cycles=2
+                    pathToUse = "DoubleSweep-2-NoRevert";
                 } else {
                     // Use default sweep path
                     pathToUse = sweepPathName;
@@ -379,7 +382,10 @@ public class AutoFile {
                         drivePastSlope(isLeft, true),
                         defer(AutoActions::zeroEverything, Collections.emptySet()));
         Command hunt =
-                deadline(followPathFile("huntRight", isLeft), intake(), shootBackWhenSuitable());
+                deadline(
+                        followPathFile("newhuntRight", isLeft),
+                        intake(),
+                        new WaitCommand(10).withTimeout(10).deadlineFor(shootBackWhenSuitable()));
         Command driveBack = drivePastSlope(isLeft, false);
         Command driveToCorner =
                 either(
@@ -388,8 +394,8 @@ public class AutoFile {
                         () -> isLeft);
         Command sweepToClimb =
                 either(
-                        deadline(driveToClimbSweepLeft(), oscillateIntakeFeed()),
-                        deadline(driveToClimbSweepRight(), oscillateIntakeFeed()),
+                        deadline(followPathFile("huntDepot", false), oscillateIntakeFeed()),
+                        deadline(followPathFile("huntStation", false), oscillateIntakeFeed()),
                         () -> isLeft);
         var resetWhenNeeded =
                 waitUntil(() -> isLeft && DriverStation.isAutonomous() && autoTimer.get() >= 18)

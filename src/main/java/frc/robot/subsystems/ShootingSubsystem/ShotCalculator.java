@@ -16,6 +16,8 @@ import frc.robot.FieldConstants;
 import frc.robot.RobotConstants;
 import frc.robot.RobotStateRecorder;
 import frc.robot.auto.AutoFile;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsFEEDNT;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsGOALNT;
 import frc.robot.subsystems.Configs.ShotCalculatorParamsNT;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -189,18 +191,36 @@ public class ShotCalculator {
         double currentVParallel = currentTargetVelocity.getX();
 
         ShotModel initialModel = lookupModel(currentDistanceMeters, currentVParallel, mode);
+
+        // Use mode-specific parameters
+        double lookfwdDelayCycles =
+                mode == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.lookfwdDelayCycles.getValue()
+                        : ShotCalculatorParamsFEEDNT.lookfwdDelayCycles.getValue();
+        double loookfwdDistanceScale =
+                mode == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.loookfwdDistanceScale.getValue()
+                        : ShotCalculatorParamsFEEDNT.loookfwdDistanceScale.getValue();
+        double lookfwdFlightScale =
+                mode == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.lookfwdFlightScale.getValue()
+                        : ShotCalculatorParamsFEEDNT.lookfwdFlightScale.getValue();
+        double lookfwdMinCycles =
+                mode == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.lookfwdMinCycles.getValue()
+                        : ShotCalculatorParamsFEEDNT.lookfwdMinCycles.getValue();
+        double lookfwdMaxCycles =
+                mode == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.lookfwdMaxCycles.getValue()
+                        : ShotCalculatorParamsFEEDNT.lookfwdMaxCycles.getValue();
+
         double totalCyclesRaw =
-                ShotCalculatorParamsNT.lookfwdDelayCycles.getValue()
-                        + ShotCalculatorParamsNT.loookfwdDistanceScale.getValue()
-                                * currentDistanceMeters
-                        + ShotCalculatorParamsNT.lookfwdFlightScale.getValue()
+                lookfwdDelayCycles
+                        + loookfwdDistanceScale * currentDistanceMeters
+                        + lookfwdFlightScale
                                 * (initialModel.flightTimeSec / RobotConstants.LOOPER_DT);
 
-        double totalCycles =
-                MathUtil.clamp(
-                        totalCyclesRaw,
-                        ShotCalculatorParamsNT.lookfwdMinCycles.getValue(),
-                        ShotCalculatorParamsNT.lookfwdMaxCycles.getValue());
+        double totalCycles = MathUtil.clamp(totalCyclesRaw, lookfwdMinCycles, lookfwdMaxCycles);
 
         Translation2d shotToTargetPredicted =
                 calculateLookfwdPose(shotToTargetCurrent, velocityWorldRobotCurrent, totalCycles);
@@ -225,7 +245,7 @@ public class ShotCalculator {
         ShotModel model = lookupModel(distanceMeters, vParallel, mode);
         model = applyModelTuning(model, mode);
 
-        Angle turretYawRad = solveTurretYaw(shotToTargetPredicted, vPerp, model);
+        Angle turretYawRad = solveTurretYaw(shotToTargetPredicted, vPerp, model, mode);
         return new ShotFrame(
                 turretYawRad,
                 Degrees.of(90).minus(Degrees.of(model.launchAngleDeg)),
@@ -285,12 +305,11 @@ public class ShotCalculator {
     /** Applies tuning offsets in model space. */
     public ShotModel applyModelTuning(ShotModel model, TargetMode mode) {
         double speed = model.exitSpeedMps;
-        double angle =
+        double trajectoryBiasDeg =
                 mode == TargetMode.GOAL
-                        ? model.launchAngleDeg
-                                + ShotCalculatorParamsNT.trajectoryBiasDegGOAL.getValue()
-                        : model.launchAngleDeg
-                                + ShotCalculatorParamsNT.trajectoryBiasDegFEED.getValue();
+                        ? ShotCalculatorParamsGOALNT.trajectoryBiasDeg.getValue()
+                        : ShotCalculatorParamsFEEDNT.trajectoryBiasDeg.getValue();
+        double angle = model.launchAngleDeg + trajectoryBiasDeg;
         return new ShotModel(speed, angle, model.flightTimeSec);
     }
 
@@ -300,14 +319,19 @@ public class ShotCalculator {
      * <p>Compensates lateral velocity by yawing into the motion so the net lateral component is
      * near zero in the goal-aligned frame.
      */
-    public Angle solveTurretYaw(Translation2d turretToTarget, double vPerp, ShotModel model) {
+    public Angle solveTurretYaw(
+            Translation2d turretToTarget, double vPerp, ShotModel model, TargetMode mode) {
         Rotation2d baseYaw = turretToTarget.getAngle();
         double launchRad = Math.toRadians(model.launchAngleDeg);
         double vHoriz = model.exitSpeedMps * Math.cos(launchRad);
         if (Math.abs(vHoriz) < 1e-6) {
             return baseYaw.getMeasure();
         }
-        double scaledVPerp = vPerp * ShotCalculatorParamsNT.lateralVelocityCompScale.getValue();
+        double lateralVelocityCompScale =
+                mode == TargetMode.GOAL
+                        ? ShotCalculatorParamsGOALNT.lateralVelocityCompScale.getValue()
+                        : ShotCalculatorParamsFEEDNT.lateralVelocityCompScale.getValue();
+        double scaledVPerp = vPerp * lateralVelocityCompScale;
         double ratio = MathUtil.clamp(-scaledVPerp / vHoriz, -1.0, 1.0);
         Rotation2d yawComp = Rotation2d.fromRadians(Math.asin(ratio));
         return baseYaw.plus(yawComp).getMeasure();

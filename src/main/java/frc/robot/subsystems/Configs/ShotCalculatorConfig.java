@@ -15,26 +15,44 @@ public final class ShotCalculatorConfig {
 
     @NTParameter(tableName = "Params/ShotCalculator")
     public static final class ShotCalculatorParams {
-        // Model tuning (model-space adjustments)
-        public static final double trajectoryBiasDegGOAL = is10541 ? -6 : -6;
-        public static final double trajectoryBiasDegFEED = -2;
+        // Common parameters
+        public static final double velocityBlend = 0.85;
+        public static final double distanceScaler = 1;
+    }
+
+    @NTParameter(tableName = "Params/ShotCalculator/GOAL")
+    public static final class ShotCalculatorParamsGOAL {
+        // Model tuning (model-space adjustments) for GOAL mode
+        public static final double trajectoryBiasDeg = is10541 ? -6 : -6;
         public static final double loookfwdDistanceScale = 0;
         public static final double lateralVelocityCompScale = is10541 ? 1.16 : 1.1;
         public static final double lookfwdDelayCycles = is10541 ? 0.5 : 3;
-
         public static final double lookfwdFlightScale = 0;
-
         public static final double lookfwdMinCycles = 0.0;
         public static final double lookfwdMaxCycles = 20.0;
-
-        public static final double velocityBlend = 1;
 
         // Linear mapping (actuator-space)
         // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
         public static final double rpmA = is10541 ? 300.6 : 237.1;
         public static final double rpmB = is10541 ? 0 : 0;
         public static final double rpmC = is10541 ? -238.9 : 146;
+    }
 
-        public static final double distanceScaler = 1;
+    @NTParameter(tableName = "Params/ShotCalculator/FEED")
+    public static final class ShotCalculatorParamsFEED {
+        // Model tuning (model-space adjustments) for FEED mode
+        public static final double trajectoryBiasDeg = -2;
+        public static final double loookfwdDistanceScale = 0;
+        public static final double lateralVelocityCompScale = is10541 ? 1.15 : 1.1;
+        public static final double lookfwdDelayCycles = is10541 ? 3 : 3;
+        public static final double lookfwdFlightScale = 0;
+        public static final double lookfwdMinCycles = 0.0;
+        public static final double lookfwdMaxCycles = 20.0;
+
+        // Linear mapping (actuator-space)
+        // rpm = rpmA * exitSpeed + rpmB * bbaDeg + rpmC
+        public static final double rpmA = is10541 ? 484.1 : 237.1;
+        public static final double rpmB = is10541 ? 0 : 0;
+        public static final double rpmC = is10541 ? -1498 : 146;
     }
 }

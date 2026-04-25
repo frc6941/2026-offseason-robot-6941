@@ -43,6 +43,9 @@ public class NTParameterWrapper<T> {
     @SuppressWarnings("unchecked")
     public void refresh() {
         prevValue = value;
-        value = (T) entry.getValue().getValue();
+        T newValue = (T) entry.getValue().getValue();
+        if (newValue != null) {
+            value = newValue;
+        }
     }
 }
