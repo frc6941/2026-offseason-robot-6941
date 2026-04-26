@@ -11,8 +11,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,6 +30,7 @@ import frc.robot.subsystems.ShootingSubsystem.TurretSubsystem.TurretMode;
 import frc.robot.utils.HubShiftUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import lib.ironpulse.command.RumbleWhenCommand;
 import lib.ironpulse.command.VisualizeProjectileShot;
@@ -35,6 +38,7 @@ import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
+import lib.ironpulse.utils.AllianceFlipUtil;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -366,6 +370,9 @@ public class ShootingSuperstructure {
 
     @AutoLogOutput(key = "ShootingSuperstructure/isInHubZone")
     public boolean isInHubZone() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        boolean isBlue = alliance.get() == Alliance.Blue; 
+
         Translation2d pos =
                 RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
         double x = pos.getX(), y = pos.getY();
@@ -379,7 +386,7 @@ public class ShootingSuperstructure {
                         && x >= FieldConstants.fieldLength - 7.3
                         && Math.abs(y - FieldConstants.Hub.oppTopCenterPoint.getX())
                                 <= FieldConstants.Hub.width / 2.0;
-        return inBlue || inRed;
+        return isBlue ? inBlue : inRed;
     }
 
     public Command runUnjamming() {
