@@ -48,7 +48,6 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().setPeriod(0.2);
 
         robotContainer = new RobotContainer();
-        robotContainer = new RobotContainer();
         robotContainer.setThrottle(false);
 
         // elastic
