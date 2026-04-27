@@ -355,37 +355,21 @@ public class ShootingSuperstructure {
     public boolean isInTower() {
         Translation2d pos =
                 RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
-        double x = pos.getX(), y = pos.getY();
-        boolean inBlue =
-                x <= FieldConstants.Tower.frontFaceX
-                        && Math.abs(y - FieldConstants.Tower.centerPoint.getY())
-                                <= FieldConstants.Tower.width / 2.0;
-        boolean inRed =
-                x >= FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX
-                        && Math.abs(y - FieldConstants.Tower.oppCenterPoint.getY())
-                                <= FieldConstants.Tower.width / 2.0;
-        return inBlue || inRed;
+        return RobotStateRecorder.towerZoneBlue.isInside(pos)
+                || RobotStateRecorder.towerZoneRed.isInside(pos);
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/isInHubZone")
     public boolean isInHubZone() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
-        boolean isBlue = alliance.get() == Alliance.Blue;
+        boolean isBlue = alliance.isPresent() && alliance.get() == Alliance.Blue;
 
         Translation2d pos =
                 RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
-        double x = pos.getX(), y = pos.getY();
-        boolean inBlue =
-                x >= 5
-                        && x <= 7.3
-                        && Math.abs(y - FieldConstants.Hub.topCenterPoint.getX())
-                                <= FieldConstants.Hub.width / 2.0;
-        boolean inRed =
-                x <= FieldConstants.fieldLength - 5
-                        && x >= FieldConstants.fieldLength - 7.3
-                        && Math.abs(y - FieldConstants.Hub.oppTopCenterPoint.getX())
-                                <= FieldConstants.Hub.width / 2.0;
-        return isBlue ? inBlue : inRed;
+
+        return isBlue
+                ? RobotStateRecorder.hubZoneBlue.isInside(pos)
+                : RobotStateRecorder.hubZoneRed.isInside(pos);
     }
 
     public Command runUnjamming() {

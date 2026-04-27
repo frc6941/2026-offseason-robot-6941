@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.ShootingSubsystem.ShotFrame;
+import lib.ironpulse.math.obstacle.Obstacle2d;
+import lib.ironpulse.math.obstacle.PolygonObstacle2d;
 import lib.ironpulse.math.rbd.TransformRecorder;
 import lib.ironpulse.utils.AllianceFlipUtil;
 import lombok.Getter;
@@ -151,6 +153,81 @@ public class RobotStateRecorder extends TransformRecorder {
                 "RobotStateRecorder/ShotFrame/cmdFrame/muzzleSpeedMps",
                 cmdFrame.muzzleSpeed().in(MetersPerSecond));
     }
+
+    public static final Obstacle2d towerZoneBlue =
+            new PolygonObstacle2d(
+                    new Translation2d(
+                            0,
+                            FieldConstants.Tower.centerPoint.getY()
+                                    - FieldConstants.Tower.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.Tower.frontFaceX,
+                            FieldConstants.Tower.centerPoint.getY()
+                                    - FieldConstants.Tower.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.Tower.frontFaceX,
+                            FieldConstants.Tower.centerPoint.getY()
+                                    + FieldConstants.Tower.width / 2.0),
+                    new Translation2d(
+                            0,
+                            FieldConstants.Tower.centerPoint.getY()
+                                    + FieldConstants.Tower.width / 2.0));
+    public static final Obstacle2d towerZoneRed =
+            new PolygonObstacle2d(
+                    new Translation2d(
+                            FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX,
+                            FieldConstants.Tower.oppCenterPoint.getY()
+                                    - FieldConstants.Tower.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.fieldLength,
+                            FieldConstants.Tower.oppCenterPoint.getY()
+                                    - FieldConstants.Tower.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.fieldLength,
+                            FieldConstants.Tower.oppCenterPoint.getY()
+                                    + FieldConstants.Tower.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.fieldLength - FieldConstants.Tower.frontFaceX,
+                            FieldConstants.Tower.oppCenterPoint.getY()
+                                    + FieldConstants.Tower.width / 2.0));
+
+    // Hub shooting zones
+    public static final Obstacle2d hubZoneBlue =
+            new PolygonObstacle2d(
+                    new Translation2d(
+                            5.0,
+                            FieldConstants.Hub.topCenterPoint.getY()
+                                    - FieldConstants.Hub.width / 2.0),
+                    new Translation2d(
+                            7.3,
+                            FieldConstants.Hub.topCenterPoint.getY()
+                                    - FieldConstants.Hub.width / 2.0),
+                    new Translation2d(
+                            7.3,
+                            FieldConstants.Hub.topCenterPoint.getY()
+                                    + FieldConstants.Hub.width / 2.0),
+                    new Translation2d(
+                            5.0,
+                            FieldConstants.Hub.topCenterPoint.getY()
+                                    + FieldConstants.Hub.width / 2.0));
+    public static final Obstacle2d hubZoneRed =
+            new PolygonObstacle2d(
+                    new Translation2d(
+                            FieldConstants.fieldLength - 7.3,
+                            FieldConstants.Hub.oppTopCenterPoint.getY()
+                                    - FieldConstants.Hub.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.fieldLength - 5.0,
+                            FieldConstants.Hub.oppTopCenterPoint.getY()
+                                    - FieldConstants.Hub.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.fieldLength - 5.0,
+                            FieldConstants.Hub.oppTopCenterPoint.getY()
+                                    + FieldConstants.Hub.width / 2.0),
+                    new Translation2d(
+                            FieldConstants.fieldLength - 7.3,
+                            FieldConstants.Hub.oppTopCenterPoint.getY()
+                                    + FieldConstants.Hub.width / 2.0));
 
     public static void putVelocityRobot(Time time, ChassisSpeeds speed) {
         velocityRobotBuffer.addSample(time.in(Seconds), toPose2d(speed));
