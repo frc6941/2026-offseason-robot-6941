@@ -20,9 +20,9 @@ public class TurretConfig {
     public static final int TURRET_ENCODER_G1_ID = 59;
     public static final int TURRET_ENCODER_G2_ID = 58;
     public static final Angle TURRET_ENCODER_G1_OFFSET =
-            Rotations.of(is10541 ? -0.92578125 : -0.370361328125);
+            Rotations.of(is10541 ? -0.420654296875 : -0.370361328125);
     public static final Angle TURRET_ENCODER_G2_OFFSET =
-            Rotations.of(is10541 ? -0.983642578125 : -0.990478515625); // -0.837890625
+            Rotations.of(is10541 ? -0.841064453125 : -0.990478515625); // -0.837890625
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 88;
     public static final int G1_TOOTH_COUNT = 16;
@@ -84,7 +84,7 @@ public class TurretConfig {
     @NTParameter(tableName = "Params/" + NAME + "Pos")
     public static final class TurretPosParams {
         // shold be small
-        public static final double kpSeek = 8;
+        public static final double kpSeek = 4;
         public static final double kiSeek = 0.0;
         public static final double kdSeek = 0.0;
 
@@ -99,6 +99,6 @@ public class TurretConfig {
         // Hysteresis thresholds for automatic mode switching.
         // Must satisfy seekEnterErrorDegrees > trackEnterErrorDegrees.
         public static final double seekEnterErrorDegrees = 25;
-        public static final double trackEnterErrorDegrees = 4;
+        public static final double trackEnterErrorDegrees = 8;
     }
 }
