@@ -363,10 +363,8 @@ public class ShootingSuperstructure {
     public boolean isInHubZone() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
         boolean isBlue = alliance.isPresent() && alliance.get() == Alliance.Blue;
-
         Translation2d pos =
                 RobotStateRecorder.getPoseWorldRobotCurrent().getTranslation().toTranslation2d();
-
         return isBlue
                 ? RobotStateRecorder.hubZoneBlue.isInside(pos)
                 : RobotStateRecorder.hubZoneRed.isInside(pos);

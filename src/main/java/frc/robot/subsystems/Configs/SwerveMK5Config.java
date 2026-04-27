@@ -71,7 +71,8 @@ public final class SwerveMK5Config {
                     .maxDriveVelocity(InchesPerSecond.of(2000.0 / 60.0 / 7.03 * Math.PI * 4.0))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(7))
                     // omega (rps) = 7368rpm (X44 with FOC) / 60 / (287/11) ~= 4.707 rps
-                    .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
+                    .maxSteerAngularVelocity(
+                            RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) * 1.2))
                     // accelerate in 0.2s
                     .maxSteerAngularAcceleration(
                             RotationsPerSecondPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) / 0.2))
@@ -83,8 +84,7 @@ public final class SwerveMK5Config {
                     .maxDriveVelocity(InchesPerSecond.of(1200.0 / 60.0 / 7.03 * Math.PI * 4.0))
                     .maxDriveAcceleration(MetersPerSecondPerSecond.of(5))
                     // Reduced rotation speed for better stability at long range
-                    .maxSteerAngularVelocity(
-                            RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0) * 0.6))
+                    .maxSteerAngularVelocity(RotationsPerSecond.of(7368.0 / 60.0 / (287.0 / 11.0)))
                     // accelerate in 0.3s (slower for stability)
                     .maxSteerAngularAcceleration(
                             RotationsPerSecondPerSecond.of(
