@@ -375,11 +375,11 @@ public class RobotContainer {
                 .whileTrue(indicatorSubsystem.indicate(Patterns.HOLD_SHOOTING));
 
         // SYSID/test
-        SysIdCommand shooterSysId = new SysIdCommand(shooter);
-        driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
-        driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
-        driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
-        driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
+        // SysIdCommand shooterSysId = new SysIdCommand(shooter);
+        // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
+        // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
+        // driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
+        // driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
 
         // SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
 
