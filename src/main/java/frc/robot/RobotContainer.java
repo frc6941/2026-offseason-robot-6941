@@ -9,7 +9,6 @@ import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -39,8 +38,6 @@ import frc.robot.utils.HubShiftUtil;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
-
-import lib.ironpulse.command.SysIdCommand;
 import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
