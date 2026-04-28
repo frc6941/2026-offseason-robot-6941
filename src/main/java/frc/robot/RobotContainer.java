@@ -9,6 +9,7 @@ import static frc.robot.RobotConstants.LED_LENGTH;
 import static frc.robot.RobotConstants.LED_PORT;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,6 +39,8 @@ import frc.robot.utils.HubShiftUtil;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+
+import lib.ironpulse.command.SysIdCommand;
 import lib.ironpulse.display.FieldView;
 import lib.ironpulse.indicator.IndicatorIO.Patterns;
 import lib.ironpulse.indicator.IndicatorIOARGB;
@@ -372,11 +375,11 @@ public class RobotContainer {
                 .whileTrue(indicatorSubsystem.indicate(Patterns.HOLD_SHOOTING));
 
         // SYSID/test
-        // SysIdCommand shooterSysId = new SysIdCommand(shooter);
-        // driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
-        // driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
-        // driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
-        // driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
+        SysIdCommand shooterSysId = new SysIdCommand(shooter);
+        driver.a().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kForward));
+        driver.b().whileTrue(shooterSysId.quasistatic(SysIdRoutine.Direction.kReverse));
+        driver.x().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kForward));
+        driver.y().whileTrue(shooterSysId.dynamic(SysIdRoutine.Direction.kReverse));
 
         // SysIdCommand spindexerSysId = new SysIdCommand(spindexer);
 
@@ -388,7 +391,7 @@ public class RobotContainer {
         // tester.povUp().whileTrue(spindexerSysId.dynamic(Direction.kReverse));
         // tester.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // tester.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
-        tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
+        // tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
         // tester.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
         // tester.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180)));
         // tester.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270)));
