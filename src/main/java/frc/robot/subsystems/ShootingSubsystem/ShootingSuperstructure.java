@@ -343,7 +343,7 @@ public class ShootingSuperstructure {
         // Update ball counter with current shooter state
         ballCounter.update(shooterRpsCurr, shooterRpsDes, shooter.getSupplyCurrent(), mode);
 
-        return scaledRpm;
+        return Math.min(scaledRpm, 65.0 * 60.0);
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
