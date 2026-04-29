@@ -32,7 +32,7 @@ public class TurretConfig {
     // Zero offset- the position at which the two encoders are set to zero.
     public static final Angle TURRET_ZERO_OFFSET = Degrees.of(0);
     // Degree of freedom for each direction from zero offset
-    public static final Angle TURRET_DOF_CCW = Degrees.of(90); // Counter-clockwise (left) range
+    public static final Angle TURRET_DOF_CCW = Degrees.of(100); // Counter-clockwise (left) range
     public static final Angle TURRET_DOF_CW = Degrees.of(380); // Clockwise (right) range
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF_CCW.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =
