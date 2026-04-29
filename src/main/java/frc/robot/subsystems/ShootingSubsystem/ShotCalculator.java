@@ -115,6 +115,11 @@ public class ShotCalculator {
                 throw new RuntimeException("Failed to load model table: " + path, e);
             }
         }
+
+        // Force initialization of NT parameter classes to create NetworkTables entries at startup
+        // This ensures both GOAL and FEED parameters are visible in AdvantageKit immediately
+        ShotCalculatorParamsGOALNT.trajectoryBiasDeg.getValue();
+        ShotCalculatorParamsFEEDNT.trajectoryBiasDeg.getValue();
     }
 
     /** Computes the shot frame using automatic zone-based shot decision. */
