@@ -154,6 +154,11 @@ public class IntakerSubsystem extends SubsystemBase {
                 runExtendedIdle(), runIntake(), () -> fallbackMode == IntakeMode.INTAKING);
     }
 
+    public Command toggleFeeding() {
+        return Commands.either(
+                runExtendedIdle(), runRetractedFeeding(), () -> fallbackMode == IntakeMode.RETRACTED_FEEDING);
+    }
+
     //     public Command runFeed() {
     //         return Commands.runOnce(
     //                         () -> feedOscillationStartTime = Timer.getFPGATimestamp(), extension)
