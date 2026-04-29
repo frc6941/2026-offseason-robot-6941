@@ -22,7 +22,7 @@ public class TurretConfig {
     public static final Angle TURRET_ENCODER_G1_OFFSET =
             Rotations.of(is10541 ? -0.420654296875 : -0.370361328125);
     public static final Angle TURRET_ENCODER_G2_OFFSET =
-            Rotations.of(is10541 ? -0.983642578125 : -0.990478515625); // -0.837890625
+            Rotations.of(is10541 ? -0.841064453125 : -0.990478515625); // -0.837890625
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 88;
     public static final int G1_TOOTH_COUNT = 16;
@@ -92,8 +92,8 @@ public class TurretConfig {
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.01;
 
-        public static final double maxVelocityRPS = 5;
-        public static final double maxAccelerationRPS2 = 25;
+        public static final double maxVelocityRPS = 3.5;
+        public static final double maxAccelerationRPS2 = 9;
         public static final double kchassisVelCompensation = 1.15;
         public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.
