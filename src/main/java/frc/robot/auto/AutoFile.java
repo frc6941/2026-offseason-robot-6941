@@ -176,7 +176,7 @@ public class AutoFile {
         Command shootPhase =
                 skipRotateToShoot
                         ? new WaitCommand(3)
-                                .withTimeout(0.1)
+                                .withTimeout(0.02)
                                 .deadlineFor(
                                         shootingSuperstructure
                                                 .shootWhenReady(false)
@@ -193,7 +193,7 @@ public class AutoFile {
                 Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
                 shootPhase,
                 Commands.runOnce(() -> {})
-                        .withTimeout(0.1)
+                        .withTimeout(0.02)
                         .deadlineFor(
                                 shooterDefault(),
                                 shootingSuperstructure.getIdx().runState(() -> IdxMode.OFF)));
@@ -258,7 +258,8 @@ public class AutoFile {
                                             followPathFile(pathToUse, isLeft), intake(), shoot()));
                 } else {
                     // All cycles: full sweep/shoot cycle
-                    boolean skipRotate = i == 1 && endBehaviourChooser.get() == EndBehaviour.FUEL;
+                    boolean skipRotate =
+                            i == 1 && endBehaviourChooser.get() == EndBehaviour.FUEL && isLeft;
                     cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft, skipRotate);
                 }
             }
