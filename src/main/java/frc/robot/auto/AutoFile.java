@@ -124,6 +124,18 @@ public class AutoFile {
             case TEST -> buildTest();
             case COMPETITION, ANTI_SWEEP_COMPETITION -> buildCompetition();
             case HUNT -> buildHunt();
+            case MIDDLE_DEPOT -> Commands.parallel(
+                    Commands.defer(
+                            () -> shootingSuperstructure.shootWhenReady(false),
+                            Collections.singleton(shooter)),
+                    buildMiddleDepot());
+
+            case MIDDLE_OUTPOST -> Commands.parallel(
+                    Commands.defer(
+                            () -> shootingSuperstructure.shootWhenReady(false),
+                            Collections.singleton(shooter)),
+                    buildMiddleOutpost());
+
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false),
                     Collections.singleton(shooter));
@@ -276,10 +288,6 @@ public class AutoFile {
         return Commands.parallel(
                 // shooterDefault(),
                 Commands.sequence(
-                                Commands.runOnce(() -> {})
-                                        .withTimeout(0.1)
-                                        .deadlineFor(shootingSuperstructure.runFrame()),
-
                                 // Wait before starting (only for AntiSweep)
                                 new WaitCommand(
                                         isAntiSweep
@@ -426,9 +434,25 @@ public class AutoFile {
                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
     }
 
+    private static Command buildMiddleDepot() {
+        return sequence(
+                followPathFile("middle-depot", false),
+                intake(),
+                followPathFile("middle-depot-intake", false));
+    }
+
+    private static Command buildMiddleOutpost() {
+        return sequence(
+                followPathFile("middle-outpost", false),
+                intake(),
+                followPathFile("middle-outpost-intake", false));
+    }
+
     private enum AutoType {
         COMPETITION,
         TEST,
+        MIDDLE_DEPOT,
+        MIDDLE_OUTPOST,
         SHOOT,
         HUNT,
         ANTI_SWEEP_COMPETITION

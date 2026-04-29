@@ -75,7 +75,10 @@ public class IntakerSubsystem extends SubsystemBase {
                                                                 && currentMode != IntakeMode.FEEDING
                                                                 && currentMode
                                                                         != IntakeMode
-                                                                                .EXTENDED_REVERSE),
+                                                                                .EXTENDED_REVERSE
+                                                                && currentMode
+                                                                        != IntakeMode
+                                                                                .RETRACTED_FEEDING),
                                 roller.runStop()
                                         .until(
                                                 () ->
@@ -83,11 +86,15 @@ public class IntakerSubsystem extends SubsystemBase {
                                                                 || currentMode == IntakeMode.FEEDING
                                                                 || currentMode
                                                                         == IntakeMode
-                                                                                .EXTENDED_REVERSE),
+                                                                                .EXTENDED_REVERSE
+                                                                || currentMode
+                                                                        == IntakeMode
+                                                                                .RETRACTED_FEEDING),
                                 () ->
                                         currentMode == IntakeMode.INTAKING
                                                 || currentMode == IntakeMode.FEEDING
-                                                || currentMode == IntakeMode.EXTENDED_REVERSE)
+                                                || currentMode == IntakeMode.EXTENDED_REVERSE
+                                                || currentMode == IntakeMode.RETRACTED_FEEDING)
                         .repeatedly());
         extension.setDefaultCommand(
                 extension.runMotionMagic(
@@ -101,6 +108,9 @@ public class IntakerSubsystem extends SubsystemBase {
                                             IntakerExtensionParamsNT.retractPosMeters.getValue());
                                     case FEEDING -> Meters.of(
                                             IntakerExtensionParamsNT.feedPosMeters.getValue());
+                                    case RETRACTED_FEEDING -> Meters.of(
+                                            IntakerExtensionParamsNT.retractedFeedPosMeters
+                                                    .getValue());
                                     default -> Meters.of(
                                             IntakerExtensionParamsNT.retractPosMeters.getValue());
                                 }));
@@ -183,6 +193,17 @@ public class IntakerSubsystem extends SubsystemBase {
     public Command runFeed() {
         return Commands.startEnd(
                 () -> currentMode = IntakeMode.FEEDING, () -> currentMode = fallbackMode);
+    }
+
+    public Command runRetractedFeeding() {
+        return Commands.runOnce(
+                () -> {
+                    fallbackMode = IntakeMode.RETRACTED_FEEDING;
+                    if (currentMode != IntakeMode.FEEDING
+                            && currentMode != IntakeMode.EXTENDED_REVERSE) {
+                        currentMode = IntakeMode.RETRACTED_FEEDING;
+                    }
+                });
     }
 
     public Command runExtendedReverse() {
@@ -292,6 +313,7 @@ public class IntakerSubsystem extends SubsystemBase {
         EXTENDED_IDLE,
         RETRACTED,
         FEEDING,
-        EXTENDED_REVERSE
+        EXTENDED_REVERSE,
+        RETRACTED_FEEDING
     }
 }
