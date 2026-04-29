@@ -156,7 +156,9 @@ public class IntakerSubsystem extends SubsystemBase {
 
     public Command toggleFeeding() {
         return Commands.either(
-                runExtendedIdle(), runRetractedFeeding(), () -> fallbackMode == IntakeMode.RETRACTED_FEEDING);
+                runIntake(),
+                runRetractedFeeding(),
+                () -> fallbackMode == IntakeMode.RETRACTED_FEEDING);
     }
 
     //     public Command runFeed() {
