@@ -171,17 +171,27 @@ public class AutoFile {
      * @param isLeft Whether this is the left side
      * @return Command for one sweep/shoot cycle
      */
-    private static Command buildSweepShootCycle(String sweepPathName, boolean isLeft) {
-        return Commands.sequence(
-                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                Commands.parallel(
-                        rotateToShoot(isLeft),
-                        new WaitCommand(3)
-                                .withTimeout(3)
+    private static Command buildSweepShootCycle(
+            String sweepPathName, boolean isLeft, boolean skipRotateToShoot) {
+        Command shootPhase =
+                skipRotateToShoot
+                        ? new WaitCommand(3)
+                                .withTimeout(0.1)
                                 .deadlineFor(
                                         shootingSuperstructure
                                                 .shootWhenReady(false)
-                                                .alongWith(oscillateIntakeFeed()))),
+                                                .alongWith(oscillateIntakeFeed()))
+                        : Commands.parallel(
+                                rotateToShoot(isLeft),
+                                new WaitCommand(3)
+                                        .withTimeout(3)
+                                        .deadlineFor(
+                                                shootingSuperstructure
+                                                        .shootWhenReady(false)
+                                                        .alongWith(oscillateIntakeFeed())));
+        return Commands.sequence(
+                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+                shootPhase,
                 Commands.runOnce(() -> {})
                         .withTimeout(0.1)
                         .deadlineFor(
@@ -248,7 +258,8 @@ public class AutoFile {
                                             followPathFile(pathToUse, isLeft), intake(), shoot()));
                 } else {
                     // All cycles: full sweep/shoot cycle
-                    cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft);
+                    boolean skipRotate = i == 1 && endBehaviourChooser.get() == EndBehaviour.FUEL;
+                    cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft, skipRotate);
                 }
             }
             sweepSequence = Commands.sequence(cycleCommands);

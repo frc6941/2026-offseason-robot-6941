@@ -16,12 +16,44 @@
     },
     {
       "anchor": {
+        "x": 1.0,
+        "y": 5.946379769299024
+      },
+      "prevControl": {
+        "x": 1.5955456965394854,
+        "y": 5.978571428571428
+      },
+      "nextControl": {
+        "x": 0.4044543034605146,
+        "y": 5.91418811002662
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.1475953859804786,
+        "y": 5.946379769299024
+      },
+      "prevControl": {
+        "x": 0.4310936113575863,
+        "y": 5.934307897071872
+      },
+      "nextControl": {
+        "x": 1.864097160603371,
+        "y": 5.9584516415261755
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
         "x": 0.455,
         "y": 5.946379769299024
       },
       "prevControl": {
-        "x": 1.0505456965394855,
-        "y": 5.978571428571428
+        "x": 1.2880778615794142,
+        "y": 6.0087511091393075
       },
       "nextControl": null,
       "isLocked": false,
@@ -37,13 +69,39 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.6208053691275168,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0.5889261744966444,
+      "maxWaypointRelativePos": 0.9,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 5.0,
         "maxAngularVelocity": 500.0,
         "maxAngularAcceleration": 300.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.9,
+      "maxWaypointRelativePos": 1.917785234899343,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 500.0,
+        "maxAngularAcceleration": 2000.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 2.6325503355704694,
+      "maxWaypointRelativePos": 3.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 500.0,
+        "maxAngularAcceleration": 2000.0,
         "nominalVoltage": 12.0,
         "unlimited": false
       }

@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Robot;
 import frc.robot.subsystems.Configs.IntakeConfig;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
@@ -20,6 +21,7 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakerSubsystem extends SubsystemBase {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
@@ -27,6 +29,8 @@ public class IntakerSubsystem extends SubsystemBase {
     private Timer zeroTimer = new Timer();
     private double currentFilterValue = 0.0;
     private LinearFilter currentFilter;
+
+    @AutoLogOutput(key = "IntakerRoller/autoZeroRunning")
     private boolean autoOutZeroRunning = false;
 
     @Getter
@@ -41,6 +45,7 @@ public class IntakerSubsystem extends SubsystemBase {
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension) {
         this.roller = roller;
         this.extension = extension;
+        RobotModeTriggers.teleop().onTrue(Commands.runOnce(() -> autoOutZeroRunning = false));
     }
 
     private boolean isDeployMode() {
@@ -233,7 +238,7 @@ public class IntakerSubsystem extends SubsystemBase {
                                                         extension.setCurrPos(
                                                                 Meters.of(
                                                                         is10541
-                                                                                ? 0.315766
+                                                                                ? 0.318358
                                                                                 : 0.319718));
                                                     }
                                                 })
@@ -241,7 +246,10 @@ public class IntakerSubsystem extends SubsystemBase {
 
         Command simZero =
                 Commands.sequence(
-                        Commands.runOnce(() -> extension.setCurrPos(Meters.of(0))),
+                        Commands.runOnce(
+                                () ->
+                                        extension.setCurrPos(
+                                                Meters.of(is10541 ? 0.315766 : 0.307895))),
                         new WaitCommand(0.2),
                         Commands.runOnce(
                                 () ->
@@ -261,6 +269,7 @@ public class IntakerSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Logger.recordOutput("intakeZeroTimer", zeroTimer.hasElapsed(0.5));
         if (!isDeployMode()) {
             zeroTimer.stop();
             zeroTimer.reset();
