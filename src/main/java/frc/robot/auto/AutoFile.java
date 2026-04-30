@@ -202,7 +202,12 @@ public class AutoFile {
                                                         .shootWhenReady(false)
                                                         .alongWith(oscillateIntakeFeed())));
         return Commands.sequence(
-                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
+                Commands.deadline(
+                        Commands.sequence(
+                                drivePastSlope(isLeft, true),
+                                followPathFile(sweepPathName, isLeft),
+                                drivePastSlope(isLeft, false)),
+                        intake()),
                 shootPhase,
                 Commands.runOnce(() -> {})
                         .withTimeout(0.02)

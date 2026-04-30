@@ -59,9 +59,9 @@ public class AutoActions {
     public static final Pose2d kSlopeFrontR =
             new Pose2d(5.84, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeEndL =
-            new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(-45)));
+            new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(135)));
     public static final Pose2d kSlopeEndR =
-            new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
+            new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(-135)));
 
     public static final Pose2d kSlopeEndLNormal =
             new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(45)));
