@@ -549,7 +549,7 @@ public class RobotContainer {
                                                                 .getVelocityWorldRobotCurrent()
                                                                 .getRotation()
                                                                 .getRadians())
-                                                >(DriverStation.isAutonomous()? 7:1.2),
+                                                > (DriverStation.isAutonomous() ? 7 : 1.2),
                                 LimeLightConfig.asDeviationParams()),
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
@@ -568,7 +568,7 @@ public class RobotContainer {
                                                                 .getVelocityWorldRobotCurrent()
                                                                 .getRotation()
                                                                 .getRadians())
-                                                >(DriverStation.isAutonomous()? 7:1.2),
+                                                > (DriverStation.isAutonomous() ? 7 : 1.2),
                                 LimeLightConfig.asDeviationParams()))
                 : new LimelightSubsystem(swerve); // TODO: sim
     }
