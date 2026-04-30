@@ -16,7 +16,7 @@ public final class ShotCalculatorConfig {
     @NTParameter(tableName = "Params/ShotCalculator")
     public static final class ShotCalculatorParams {
         // Common parameters
-        public static final double velocityBlend = 0.85;
+        public static final double velocityBlend = 0.25;
         public static final double distanceScaler = 1;
     }
 

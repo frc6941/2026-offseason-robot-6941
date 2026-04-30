@@ -79,17 +79,17 @@ public class IntakeConfig {
     @NTParameter(tableName = "Params/" + INTAKER_ROLLER_NAME)
     public static final class IntakerRollerParams {
         // velocity gains
-        public static final double kP = 20;
+        public static final double kP = 30;
         public static final double kI = 0.005;
         public static final double kD = 0.0;
-        public static final double kV = 0.133;
+        public static final double kV = 0.3;
         public static final double kA = 0.0068;
         public static final double kS = 0.13;
 
         public static final double velocityAtGoalToleranceRPS = 30;
 
         public static final double testVelRPS = 110;
-        public static final double intakeVelRPS = 55;
+        public static final double intakeVelRPS = 52;
         public static final double outtakeVelRPS = -50;
         public static final double idleVelRPS = 0;
     }
