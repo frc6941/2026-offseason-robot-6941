@@ -21,7 +21,6 @@ import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class IntakerSubsystem extends SubsystemBase {
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
@@ -203,14 +202,8 @@ public class IntakerSubsystem extends SubsystemBase {
     }
 
     public Command runRetractedFeeding() {
-        return Commands.runOnce(
-                () -> {
-                    fallbackMode = IntakeMode.RETRACTED_FEEDING;
-                    if (currentMode != IntakeMode.FEEDING
-                            && currentMode != IntakeMode.EXTENDED_REVERSE) {
-                        currentMode = IntakeMode.RETRACTED_FEEDING;
-                    }
-                });
+        return Commands.startEnd(
+                () -> currentMode = IntakeMode.RETRACTED_FEEDING, () -> currentMode = fallbackMode);
     }
 
     public Command runExtendedReverse() {
@@ -297,14 +290,13 @@ public class IntakerSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("intakeZeroTimer", zeroTimer.hasElapsed(0.5));
         if (!isDeployMode()) {
             zeroTimer.stop();
             zeroTimer.reset();
         } else if (!zeroTimer.isRunning()) {
             zeroTimer.start();
         }
-        if (!autoOutZeroRunning && zeroTimer.hasElapsed(0.5)) {
+        if (!autoOutZeroRunning && zeroTimer.hasElapsed(0.3)) {
             autoOutZeroRunning = true;
             CommandScheduler.getInstance()
                     .schedule(

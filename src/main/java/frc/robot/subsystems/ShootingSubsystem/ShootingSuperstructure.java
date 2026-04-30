@@ -159,7 +159,7 @@ public class ShootingSuperstructure {
                                                 .getTranslation(),
                                 true)
                         .onlyIf(() -> RobotBase.isSimulation()),
-                Commands.waitUntil(shooter::velocityAtGoal)
+                Commands.waitUntil(this::shooterVelocityAtGoalWithDistanceTolerance)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
                                 Commands.runOnce(() -> isGoalShooting = true)
@@ -212,7 +212,7 @@ public class ShootingSuperstructure {
                                 (mode == TargetMode.GOAL
                                         && !HubShiftUtil.getShiftedShiftInfo().active()),
                         hids),
-                Commands.waitUntil(shooter::velocityAtGoal)
+                Commands.waitUntil(this::shooterVelocityAtGoalWithDistanceTolerance)
                         .andThen(
                                 Commands.runOnce(() -> isShooting = true),
                                 Commands.runOnce(() -> isGoalShooting = true)
@@ -239,7 +239,7 @@ public class ShootingSuperstructure {
     public Command shootOnCondition(Supplier<Boolean> conditional) {
         return Commands.parallel(
                 runFrame(),
-                Commands.waitUntil(shooter::velocityAtGoal)
+                Commands.waitUntil(this::shooterVelocityAtGoalWithDistanceTolerance)
                         .andThen(
                                 idx.runState(() -> IdxMode.REVERSE)
                                         .withTimeout(SpindexerParamsNT.unjammTimeoutSec.getValue()),
@@ -349,6 +349,36 @@ public class ShootingSuperstructure {
     @AutoLogOutput(key = "ShootingSuperstructure/readyToShoot")
     public boolean readyToShoot() {
         return turret.atGoal() && hood.positionAtGoal() && shooter.velocityAtGoal();
+    }
+
+    /**
+     * Check if shooter velocity is at goal with distance-based tolerance.
+     * For distances > 12m (beyond model range), use relaxed tolerance of 10 RPS
+     * to allow shooting even when exact target speed cannot be reached.
+     */
+    private boolean shooterVelocityAtGoalWithDistanceTolerance() {
+        double currentDistance = getDistance();
+        double toleranceRPS;
+        
+        if (currentDistance > 12.0) {
+            // Beyond model range: use relaxed tolerance
+            toleranceRPS = 10.0;
+            Logger.recordOutput("ShootingSuperstructure/velocityTolerance/relaxed", true);
+        } else {
+            // Within model range: use normal tolerance
+            toleranceRPS = ShooterParamsNT.velocityAtGoalToleranceRPS.getValue();
+            Logger.recordOutput("ShootingSuperstructure/velocityTolerance/relaxed", false);
+        }
+        
+        Logger.recordOutput("ShootingSuperstructure/velocityTolerance/currentRPS", toleranceRPS);
+        
+        double currentVel = shooter.getVelocity().in(RotationsPerSecond);
+        double targetVel = shooter.getCurrSetpoint().in(RotationsPerSecond);
+        double error = Math.abs(currentVel - targetVel);
+        
+        Logger.recordOutput("ShootingSuperstructure/velocityError/rps", error);
+        
+        return error <= toleranceRPS;
     }
 
     @AutoLogOutput(key = "ShootingSuperstructure/isInTower")

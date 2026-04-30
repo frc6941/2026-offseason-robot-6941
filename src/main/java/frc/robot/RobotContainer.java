@@ -318,7 +318,7 @@ public class RobotContainer {
         operator.a().whileTrue(shootingSuperstructure.runSetFrame());
         operator.leftTrigger().whileTrue(intake.runFeed());
         operator.rightBumper().whileTrue(shootingSuperstructure.runUnjamming());
-        operator.povUp().onTrue(intake.toggleFeeding());
+        operator.povUp().whileTrue(intake.runRetractedFeeding());
         driver.leftBumper().onTrue(intake.toggleIntake());
         driver.povUp().onTrue(intake.outZeroCommand());
         driver.povLeft().onTrue(intake.zeroCommand());
@@ -353,6 +353,7 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+
         driver.leftStick()
                 .whileTrue(
                         Commands.parallel(
