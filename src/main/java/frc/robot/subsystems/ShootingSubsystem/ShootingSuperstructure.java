@@ -352,14 +352,14 @@ public class ShootingSuperstructure {
     }
 
     /**
-     * Check if shooter velocity is at goal with distance-based tolerance.
-     * For distances > 12m (beyond model range), use relaxed tolerance of 10 RPS
-     * to allow shooting even when exact target speed cannot be reached.
+     * Check if shooter velocity is at goal with distance-based tolerance. For distances > 12m
+     * (beyond model range), use relaxed tolerance of 10 RPS to allow shooting even when exact
+     * target speed cannot be reached.
      */
     private boolean shooterVelocityAtGoalWithDistanceTolerance() {
         double currentDistance = getDistance();
         double toleranceRPS;
-        
+
         if (currentDistance > 12.0) {
             // Beyond model range: use relaxed tolerance
             toleranceRPS = 10.0;
@@ -369,15 +369,15 @@ public class ShootingSuperstructure {
             toleranceRPS = ShooterParamsNT.velocityAtGoalToleranceRPS.getValue();
             Logger.recordOutput("ShootingSuperstructure/velocityTolerance/relaxed", false);
         }
-        
+
         Logger.recordOutput("ShootingSuperstructure/velocityTolerance/currentRPS", toleranceRPS);
-        
+
         double currentVel = shooter.getVelocity().in(RotationsPerSecond);
         double targetVel = shooter.getCurrSetpoint().in(RotationsPerSecond);
         double error = Math.abs(currentVel - targetVel);
-        
+
         Logger.recordOutput("ShootingSuperstructure/velocityError/rps", error);
-        
+
         return error <= toleranceRPS;
     }
 
