@@ -129,13 +129,13 @@ public class AutoFile {
                     Commands.defer(
                             () -> shootingSuperstructure.shootWhenReady(false),
                             Set.of(shooter, spindexer)),
-                    buildMiddleDepot());
+                    Commands.sequence(new WaitCommand(3),buildMiddleDepot()));
 
             case MIDDLE_OUTPOST -> Commands.parallel(
                     Commands.defer(
                             () -> shootingSuperstructure.shootWhenReady(false),
                             Set.of(shooter, spindexer)),
-                    buildMiddleOutpost());
+                    Commands.sequence(new WaitCommand(3),buildMiddleOutpost()));
 
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false), Set.of(shooter, spindexer));
