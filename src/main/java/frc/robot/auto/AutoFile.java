@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import lombok.Getter;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -127,18 +129,18 @@ public class AutoFile {
             case MIDDLE_DEPOT -> Commands.parallel(
                     Commands.defer(
                             () -> shootingSuperstructure.shootWhenReady(false),
-                            Collections.singleton(shooter)),
+                            Set.of(shooter,spindexer)),
                     buildMiddleDepot());
 
             case MIDDLE_OUTPOST -> Commands.parallel(
                     Commands.defer(
                             () -> shootingSuperstructure.shootWhenReady(false),
-                            Collections.singleton(shooter)),
+                            Set.of(shooter,spindexer)),
                     buildMiddleOutpost());
 
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false),
-                    Collections.singleton(shooter));
+                    Set.of(shooter,spindexer));
         };
     }
 
