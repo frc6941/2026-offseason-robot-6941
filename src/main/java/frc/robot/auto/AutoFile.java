@@ -234,7 +234,7 @@ public class AutoFile {
                 sweepPathName = "DoubleSweep-1";
                 break;
             case LONG:
-                sweepPathName = "longSweepRightNew";
+                sweepPathName = "longSweepRight";
                 break;
             case NORMAL:
                 sweepPathName = "sweepRight";
@@ -291,7 +291,10 @@ public class AutoFile {
             sweepSequence =
                     Commands.sequence(
                             new WaitCommand(waitingChooser.get() ? 2 : 0),
-                            Commands.deadline(followPathFile(pathToUse, isLeft), intake()));
+                            Commands.deadline(drivePastSlope(isLeft, true), intake()),
+                            followPathFile(pathToUse, isLeft),
+                            drivePastSlope(isLeft, false),
+                            Commands.deadline(driveToShoot(isLeft), shoot()));
         }
 
         return Commands.parallel(
@@ -373,16 +376,8 @@ public class AutoFile {
                                         // INTAKE path
                                         Commands.parallel(
                                                 Commands.sequence(
-                                                        new ConditionalCommand(
-                                                                new WaitUntilCommand(
-                                                                        () ->
-                                                                                autoTimer.get()
-                                                                                        >= 18),
-                                                                new WaitUntilCommand(
-                                                                        () ->
-                                                                                autoTimer.get()
-                                                                                        >= 18),
-                                                                () -> isLeft),
+                                                        new WaitUntilCommand(
+                                                                () -> autoTimer.get() >= 18),
                                                         Commands.runOnce(() -> {})
                                                                 .withTimeout(0.1)
                                                                 .deadlineFor(
