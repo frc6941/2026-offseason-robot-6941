@@ -450,7 +450,7 @@ public class RobotContainer {
 
         // driver.a().whileTrue(AutoActions.allignToClimb(false));
 
-        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
+        new Trigger(DriverStation::isTeleopEnabled).onTrue(hood.zeroCommand());
 
         operator.rightStick()
                 .onTrue(shootingSuperstructure.runResetBallCounter().ignoringDisable(true));
