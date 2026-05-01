@@ -294,7 +294,7 @@ public class AutoFile {
                             Commands.deadline(drivePastSlope(isLeft, true), intake()),
                             followPathFile(pathToUse, isLeft),
                             drivePastSlope(isLeft, false),
-                            Commands.deadline(driveToShoot(isLeft), shoot()));
+                            Commands.deadline(driveToShoot(isLeft), shoot(),oscillateIntakeFeed()));
         }
 
         return Commands.parallel(
