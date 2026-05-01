@@ -208,7 +208,9 @@ public class AutoFile {
                                 followPathFile(sweepPathName, isLeft),
                                 drivePastSlope(isLeft, false),
                                 Commands.deadline(
-                                        new WaitCommand(1), followPathFile("shortPath", isLeft))),
+                                        new WaitCommand(1),
+                                        followPathFile("shortPath", isLeft),
+                                        shoot())),
                         intake()),
                 shootPhase,
                 Commands.runOnce(() -> {})
