@@ -292,9 +292,10 @@ public class AutoFile {
                     Commands.sequence(
                             new WaitCommand(waitingChooser.get() ? 2 : 0),
                             Commands.deadline(drivePastSlope(isLeft, true), intake()),
-                            followPathFile(pathToUse, isLeft),
+                            followPathFile("longSweepRight", isLeft),
                             drivePastSlope(isLeft, false),
-                            Commands.deadline(driveToShoot(isLeft), shoot(),oscillateIntakeFeed()));
+                            Commands.deadline(
+                                    driveToShoot(isLeft), shoot(), oscillateIntakeFeed()));
         }
 
         return Commands.parallel(

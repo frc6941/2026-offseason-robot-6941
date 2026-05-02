@@ -28,7 +28,7 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
         // logger initialization
         // if (Robot.isSimulation()) {
-        // Logger.addDataReceive`r(new NT4Publisher());
+        // Logger.addDataReceiver(new NT4Publisher());
         // } // REMOVE before comp
         Logger.addDataReceiver(new WPILOGWriter());
 
