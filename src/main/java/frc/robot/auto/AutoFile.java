@@ -135,7 +135,7 @@ public class AutoFile {
                     Commands.defer(
                             () -> shootingSuperstructure.shootWhenReady(false),
                             Set.of(shooter, spindexer)),
-                     buildMiddleOutpost());
+                    buildMiddleOutpost());
 
             case SHOOT -> Commands.defer(
                     () -> shootingSuperstructure.shootWhenReady(false), Set.of(shooter, spindexer));
