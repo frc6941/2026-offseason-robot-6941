@@ -47,7 +47,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().setPeriod(0.2);
 
         robotContainer = new RobotContainer();
-        robotContainer.setThrottle(true);
+        robotContainer.setThrottle(false);
 
         // elastic
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
@@ -64,7 +64,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-        robotContainer.setThrottle(true);
+        robotContainer.setThrottle(false);
     }
 
     @Override
