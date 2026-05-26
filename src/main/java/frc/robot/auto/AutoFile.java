@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -124,9 +125,20 @@ public class AutoFile {
             case TEST -> buildTest();
             case COMPETITION, ANTI_SWEEP_COMPETITION -> buildCompetition();
             case HUNT -> buildHunt();
+            case MIDDLE_DEPOT -> Commands.parallel(
+                    Commands.defer(
+                            () -> shootingSuperstructure.shootWhenReady(false),
+                            Set.of(shooter, spindexer)),
+                    buildMiddleDepot());
+
+            case MIDDLE_OUTPOST -> Commands.parallel(
+                    Commands.defer(
+                            () -> shootingSuperstructure.shootWhenReady(false),
+                            Set.of(shooter, spindexer)),
+                    buildMiddleOutpost());
+
             case SHOOT -> Commands.defer(
-                    () -> shootingSuperstructure.shootWhenReady(false),
-                    Collections.singleton(shooter));
+                    () -> shootingSuperstructure.shootWhenReady(false), Set.of(shooter, spindexer));
         };
     }
 
@@ -171,19 +183,38 @@ public class AutoFile {
      * @param isLeft Whether this is the left side
      * @return Command for one sweep/shoot cycle
      */
-    private static Command buildSweepShootCycle(String sweepPathName, boolean isLeft) {
-        return Commands.sequence(
-                Commands.deadline(followPathFile(sweepPathName, isLeft), intake()),
-                Commands.parallel(
-                        rotateToShoot(isLeft),
-                        new WaitCommand(3)
-                                .withTimeout(3)
+    private static Command buildSweepShootCycle(
+            String sweepPathName, boolean isLeft, boolean skipRotateToShoot) {
+        Command shootPhase =
+                skipRotateToShoot
+                        ? new WaitCommand(3)
+                                .withTimeout(0.02)
                                 .deadlineFor(
                                         shootingSuperstructure
                                                 .shootWhenReady(false)
-                                                .alongWith(oscillateIntakeFeed()))),
+                                                .alongWith(oscillateIntakeFeed()))
+                        : Commands.parallel(
+                                rotateToShoot(isLeft),
+                                new WaitCommand(3)
+                                        .withTimeout(3)
+                                        .deadlineFor(
+                                                shootingSuperstructure
+                                                        .shootWhenReady(false)
+                                                        .alongWith(oscillateIntakeFeed())));
+        return Commands.sequence(
+                Commands.deadline(
+                        Commands.sequence(
+                                drivePastSlope(isLeft, true),
+                                followPathFile(sweepPathName, isLeft),
+                                drivePastSlope(isLeft, false),
+                                Commands.deadline(
+                                        new WaitCommand(1),
+                                        followPathFile("shortPath", isLeft),
+                                        shoot())),
+                        intake()),
+                shootPhase,
                 Commands.runOnce(() -> {})
-                        .withTimeout(0.1)
+                        .withTimeout(0.02)
                         .deadlineFor(
                                 shooterDefault(),
                                 shootingSuperstructure.getIdx().runState(() -> IdxMode.OFF)));
@@ -203,7 +234,7 @@ public class AutoFile {
                 sweepPathName = "DoubleSweep-1";
                 break;
             case LONG:
-                sweepPathName = "longSweepRightNew";
+                sweepPathName = "longSweepRight";
                 break;
             case NORMAL:
                 sweepPathName = "sweepRight";
@@ -248,7 +279,9 @@ public class AutoFile {
                                             followPathFile(pathToUse, isLeft), intake(), shoot()));
                 } else {
                     // All cycles: full sweep/shoot cycle
-                    cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft);
+                    boolean skipRotate =
+                            i == 1 && endBehaviourChooser.get() == EndBehaviour.FUEL && isLeft;
+                    cycleCommands[i] = buildSweepShootCycle(pathToUse, isLeft, skipRotate);
                 }
             }
             sweepSequence = Commands.sequence(cycleCommands);
@@ -258,16 +291,16 @@ public class AutoFile {
             sweepSequence =
                     Commands.sequence(
                             new WaitCommand(waitingChooser.get() ? 2 : 0),
-                            Commands.deadline(followPathFile(pathToUse, isLeft), intake()));
+                            Commands.deadline(drivePastSlope(isLeft, true), intake()),
+                            followPathFile("longSweepRight", isLeft),
+                            drivePastSlope(isLeft, false),
+                            Commands.deadline(
+                                    driveToShoot(isLeft), shoot(), oscillateIntakeFeed()));
         }
 
         return Commands.parallel(
                 // shooterDefault(),
                 Commands.sequence(
-                                Commands.runOnce(() -> {})
-                                        .withTimeout(0.1)
-                                        .deadlineFor(shootingSuperstructure.runFrame()),
-
                                 // Wait before starting (only for AntiSweep)
                                 new WaitCommand(
                                         isAntiSweep
@@ -344,16 +377,8 @@ public class AutoFile {
                                         // INTAKE path
                                         Commands.parallel(
                                                 Commands.sequence(
-                                                        new ConditionalCommand(
-                                                                new WaitUntilCommand(
-                                                                        () ->
-                                                                                autoTimer.get()
-                                                                                        >= 18),
-                                                                new WaitUntilCommand(
-                                                                        () ->
-                                                                                autoTimer.get()
-                                                                                        >= 18),
-                                                                () -> isLeft),
+                                                        new WaitUntilCommand(
+                                                                () -> autoTimer.get() >= 18),
                                                         Commands.runOnce(() -> {})
                                                                 .withTimeout(0.1)
                                                                 .deadlineFor(
@@ -414,9 +439,25 @@ public class AutoFile {
                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming);
     }
 
+    private static Command buildMiddleDepot() {
+        return sequence(
+                followPathFile("middle-depot", false),
+                intake(),
+                followPathFile("middle-depot-intake", false));
+    }
+
+    private static Command buildMiddleOutpost() {
+        return sequence(
+                followPathFile("middle-outpost", false),
+                intake(),
+                followPathFile("middle-outpost-intake", false));
+    }
+
     private enum AutoType {
         COMPETITION,
         TEST,
+        MIDDLE_DEPOT,
+        MIDDLE_OUTPOST,
         SHOOT,
         HUNT,
         ANTI_SWEEP_COMPETITION

@@ -318,7 +318,7 @@ public class RobotContainer {
         operator.a().whileTrue(shootingSuperstructure.runSetFrame());
         operator.leftTrigger().whileTrue(intake.runFeed());
         operator.rightBumper().whileTrue(shootingSuperstructure.runUnjamming());
-
+        operator.povUp().whileTrue(intake.runRetractedFeeding());
         driver.leftBumper().onTrue(intake.toggleIntake());
         driver.povUp().onTrue(intake.outZeroCommand());
         driver.povLeft().onTrue(intake.zeroCommand());
@@ -353,6 +353,7 @@ public class RobotContainer {
                                                             indicatorSubsystem.indicateWithTimeout(
                                                                     Patterns.AFTER_SHOOTING, 0.5));
                                         }));
+
         driver.leftStick()
                 .whileTrue(
                         Commands.parallel(
@@ -388,7 +389,7 @@ public class RobotContainer {
         // tester.povUp().whileTrue(spindexerSysId.dynamic(Direction.kReverse));
         // tester.povDown().whileTrue(spindexer.runVelVolt(() -> RotationsPerSecond.of(2.3)));
         // tester.back().onTrue(turret.setCurrentPosition(Degrees.of(-135)).ignoringDisable(true));
-        tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
+        // tester.povUp().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(0)));
         // tester.povRight().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(90)));
         // tester.povDown().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(180)));
         // tester.povLeft().onTrue(turret.setTurretPoseWorld(() -> Degrees.of(270)));
@@ -449,7 +450,7 @@ public class RobotContainer {
 
         // driver.a().whileTrue(AutoActions.allignToClimb(false));
 
-        new Trigger(DriverStation::isEnabled).onTrue(hood.zeroCommand());
+        new Trigger(DriverStation::isTeleopEnabled).onTrue(hood.zeroCommand());
 
         operator.rightStick()
                 .onTrue(shootingSuperstructure.runResetBallCounter().ignoringDisable(true));
@@ -548,7 +549,7 @@ public class RobotContainer {
                                                                 .getVelocityWorldRobotCurrent()
                                                                 .getRotation()
                                                                 .getRadians())
-                                                > 1.2,
+                                                > (DriverStation.isAutonomous() ? 7 : 1.2),
                                 LimeLightConfig.asDeviationParams()),
                         new LimelightIOReal(
                                 LimeLightConfig.limelightBConfig,
@@ -567,7 +568,7 @@ public class RobotContainer {
                                                                 .getVelocityWorldRobotCurrent()
                                                                 .getRotation()
                                                                 .getRadians())
-                                                > 1.2,
+                                                > (DriverStation.isAutonomous() ? 7 : 1.2),
                                 LimeLightConfig.asDeviationParams()))
                 : new LimelightSubsystem(swerve); // TODO: sim
     }

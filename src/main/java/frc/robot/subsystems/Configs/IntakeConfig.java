@@ -79,17 +79,17 @@ public class IntakeConfig {
     @NTParameter(tableName = "Params/" + INTAKER_ROLLER_NAME)
     public static final class IntakerRollerParams {
         // velocity gains
-        public static final double kP = 20;
+        public static final double kP = 40;
         public static final double kI = 0.005;
         public static final double kD = 0.0;
-        public static final double kV = 0.133;
+        public static final double kV = 0.3;
         public static final double kA = 0.0068;
         public static final double kS = 0.13;
 
         public static final double velocityAtGoalToleranceRPS = 30;
 
         public static final double testVelRPS = 110;
-        public static final double intakeVelRPS = 55;
+        public static final double intakeVelRPS = 52;
         public static final double outtakeVelRPS = -50;
         public static final double idleVelRPS = 0;
     }
@@ -111,7 +111,8 @@ public class IntakeConfig {
 
         // Tolerances / behavior
         public static final double atGoalToleranceMeters = 0.01;
-        public static final double deployPosMeters = 0.305;
+        public static final double deployPosMeters = 0.316;
+        public static final double retractedFeedPosMeters = 0.05;
         public static final double feedPosMeters = 0.17;
         public static final double retractPosMeters = 0.01;
 

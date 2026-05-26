@@ -43,8 +43,8 @@ import lib.ironpulse.utils.AllianceFlipUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoActions {
-    public static final double kVerticalSlopelineL = 5.59;
-    public static final double kVerticalSlopelineR = 2.41;
+    public static final double kVerticalSlopelineL = 5.35;
+    public static final double kVerticalSlopelineR = 2.56;
     public static final Pose2d kSweepStartPoseL =
             new Pose2d(7.54, kVerticalSlopelineL, new Rotation2d(Degrees.of(0)));
     public static final Pose2d kSweepStartPoseR =
@@ -59,9 +59,9 @@ public class AutoActions {
     public static final Pose2d kSlopeFrontR =
             new Pose2d(5.84, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
     public static final Pose2d kSlopeEndL =
-            new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(-45)));
+            new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(135)));
     public static final Pose2d kSlopeEndR =
-            new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(45)));
+            new Pose2d(3.385, kVerticalSlopelineR, new Rotation2d(Degrees.of(-135)));
 
     public static final Pose2d kSlopeEndLNormal =
             new Pose2d(3.385, kVerticalSlopelineL, new Rotation2d(Degrees.of(45)));
@@ -303,8 +303,8 @@ public class AutoActions {
     }
 
     public static boolean isPitchStable() {
-        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5;
-        // && Math.abs(swerve.getPitchPosRad()) < 0.08;
+        return Math.abs(swerve.getPitchVelocityRadPerSec()) < 1.5
+                && Math.abs(swerve.getPitchPosRad()) < 0.03;
     }
 
     static Command driveToPose(Supplier<Pose2d> targetPoseSupplier) {

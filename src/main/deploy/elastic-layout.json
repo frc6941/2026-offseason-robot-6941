@@ -135,6 +135,59 @@
               "period": 0.06,
               "sort_options": false
             }
+          },
+          {
+            "title": "Revert Path Chooser",
+            "x": 128.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Revert Path Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Anti Sweep Behaviour Chooser",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Anti Sweep Behaviour Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "AntiSweep Wait Time",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/AntiSweep Wait Time",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Waiting Chooser",
+            "x": 128.0,
+            "y": 640.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Waiting Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
           }
         ]
       }
@@ -146,7 +199,7 @@
         "containers": [
           {
             "title": "distanceScaler",
-            "x": 0.0,
+            "x": 1024.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -159,154 +212,280 @@
             }
           },
           {
-            "title": "lateralVelocityCompScale",
+            "title": "trajectoryBiasDeg [GOAL]",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/trajectoryBiasDeg",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "lateralVelocityCompScale [GOAL]",
             "x": 256.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/lateralVelocityCompScale",
+              "topic": "Params/ShotCalculator/GOAL/lateralVelocityCompScale",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "lookfwdDelayCycles",
+            "title": "lookfwdDelayCycles [GOAL]",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/lookfwdDelayCycles",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "lookfwdFlightScale [GOAL]",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/lookfwdFlightScale",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "lookfwdMaxCycles [GOAL]",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/lookfwdMaxCycles",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "lookfwdMinCycles [GOAL]",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/lookfwdMinCycles",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "loookfwdDistanceScale [GOAL]",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/loookfwdDistanceScale",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "rpmA [GOAL]",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/rpmA",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "rpmB [GOAL]",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/rpmB",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "rpmC [GOAL]",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/GOAL/rpmC",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "trajectoryBiasDeg [FEED]",
             "x": 512.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/lookfwdDelayCycles",
+              "topic": "Params/ShotCalculator/FEED/trajectoryBiasDeg",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "lookfwdFlightScale",
+            "title": "lateralVelocityCompScale [FEED]",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/FEED/lateralVelocityCompScale",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "lookfwdDelayCycles [FEED]",
             "x": 512.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/lookfwdFlightScale",
+              "topic": "Params/ShotCalculator/FEED/lookfwdDelayCycles",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "lookfwdMaxCycles",
+            "title": "lookfwdFlightScale [FEED]",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/FEED/lookfwdFlightScale",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "lookfwdMaxCycles [FEED]",
             "x": 512.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/lookfwdMaxCycles",
+              "topic": "Params/ShotCalculator/FEED/lookfwdMaxCycles",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "lookfwdMinCycles",
+            "title": "lookfwdMinCycles [FEED]",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "Params/ShotCalculator/FEED/lookfwdMinCycles",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "loookfwdDistanceScale [FEED]",
             "x": 512.0,
             "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/lookfwdMinCycles",
+              "topic": "Params/ShotCalculator/FEED/loookfwdDistanceScale",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "loookfwdDistanceScale",
+            "title": "rpmA [FEED]",
             "x": 512.0,
             "y": 512.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/loookfwdDistanceScale",
+              "topic": "Params/ShotCalculator/FEED/rpmA",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "rpmA",
+            "title": "rpmB [FEED]",
             "x": 768.0,
-            "y": 0.0,
+            "y": 512.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/rpmA",
+              "topic": "Params/ShotCalculator/FEED/rpmB",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
             }
           },
           {
-            "title": "rpmB",
-            "x": 768.0,
-            "y": 128.0,
+            "title": "rpmC [FEED]",
+            "x": 512.0,
+            "y": 640.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "Params/ShotCalculator/rpmB",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "rpmC",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "Params/ShotCalculator/rpmC",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "trajectoryBiasDegFEED",
-            "x": 1024.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "Params/ShotCalculator/trajectoryBiasDegFEED",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "trajectoryBiasDegGOAL",
-            "x": 1024.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "Params/ShotCalculator/trajectoryBiasDegGOAL",
+              "topic": "Params/ShotCalculator/FEED/rpmC",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true

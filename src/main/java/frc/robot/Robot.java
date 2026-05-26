@@ -35,8 +35,6 @@ public class Robot extends LoggedRobot {
 
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.start();
-        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-        Logger.start();
 
         // config watchdog
         try {
@@ -52,8 +50,6 @@ public class Robot extends LoggedRobot {
         robotContainer = new RobotContainer();
         robotContainer.setThrottle(false);
 
-        // elastic
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         // elastic
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
@@ -73,12 +69,6 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void disabledPeriodic() {}
-
-    @Override
-    public void disabledExit() {}
-
-    @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
         robotContainer.setThrottle(true);
@@ -86,6 +76,12 @@ public class Robot extends LoggedRobot {
             CommandScheduler.getInstance().schedule(autonomousCommand);
         }
     }
+
+    @Override
+    public void disabledPeriodic() {}
+
+    @Override
+    public void disabledExit() {}
 
     @Override
     public void autonomousPeriodic() {}

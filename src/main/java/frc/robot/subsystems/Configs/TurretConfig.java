@@ -20,9 +20,9 @@ public class TurretConfig {
     public static final int TURRET_ENCODER_G1_ID = 59;
     public static final int TURRET_ENCODER_G2_ID = 58;
     public static final Angle TURRET_ENCODER_G1_OFFSET =
-            Rotations.of(is10541 ? -0.92578125 : -0.370361328125);
+            Rotations.of(is10541 ? -0.420654296875 : -0.370361328125);
     public static final Angle TURRET_ENCODER_G2_OFFSET =
-            Rotations.of(is10541 ? -0.983642578125 : -0.990478515625); // -0.837890625
+            Rotations.of(is10541 ? -0.841064453125 : -0.990478515625); // -0.837890625
     // Zeroing Coder constants
     public static final int G0_TOOTH_COUNT = 88;
     public static final int G1_TOOTH_COUNT = 16;
@@ -32,7 +32,7 @@ public class TurretConfig {
     // Zero offset- the position at which the two encoders are set to zero.
     public static final Angle TURRET_ZERO_OFFSET = Degrees.of(0);
     // Degree of freedom for each direction from zero offset
-    public static final Angle TURRET_DOF_CCW = Degrees.of(70); // Counter-clockwise (left) range
+    public static final Angle TURRET_DOF_CCW = Degrees.of(120); // Counter-clockwise (left) range
     public static final Angle TURRET_DOF_CW = Degrees.of(380); // Clockwise (right) range
     public static final Angle TURRET_SOFT_LIMIT_CCW = TURRET_DOF_CCW.plus(TURRET_ZERO_OFFSET);
     public static final Angle TURRET_SOFT_LIMIT_CW =
@@ -48,8 +48,8 @@ public class TurretConfig {
                     .defaultBrake(true)
                     .forwardSoftLimitDegrees(TURRET_SOFT_LIMIT_CCW)
                     .reverseSoftLimitDegrees(TURRET_SOFT_LIMIT_CW)
-                    .statorCurrentLimitAmps(45)
-                    .supplyCurrentLimitAmps(40)
+                    .statorCurrentLimitAmps(65)
+                    .supplyCurrentLimitAmps(60)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(TURRET_GEAR_RATIO)
@@ -92,8 +92,8 @@ public class TurretConfig {
         public static final double kiTrack = 0.0;
         public static final double kdTrack = 0.01;
 
-        public static final double maxVelocityRPS = 3.5;
-        public static final double maxAccelerationRPS2 = 9;
+        public static final double maxVelocityRPS = 5;
+        public static final double maxAccelerationRPS2 = 25;
         public static final double kchassisVelCompensation = 1.15;
         public static final double positionAtGoalToleranceDegrees = 1.7;
         // Hysteresis thresholds for automatic mode switching.

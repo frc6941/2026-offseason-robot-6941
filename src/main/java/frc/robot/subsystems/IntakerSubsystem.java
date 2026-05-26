@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Robot;
 import frc.robot.subsystems.Configs.IntakeConfig;
 import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
@@ -27,6 +28,8 @@ public class IntakerSubsystem extends SubsystemBase {
     private Timer zeroTimer = new Timer();
     private double currentFilterValue = 0.0;
     private LinearFilter currentFilter;
+
+    @AutoLogOutput(key = "IntakerRoller/autoZeroRunning")
     private boolean autoOutZeroRunning = false;
 
     @Getter
@@ -41,6 +44,7 @@ public class IntakerSubsystem extends SubsystemBase {
             PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> extension) {
         this.roller = roller;
         this.extension = extension;
+        RobotModeTriggers.teleop().onTrue(Commands.runOnce(() -> autoOutZeroRunning = false));
     }
 
     private boolean isDeployMode() {
@@ -70,7 +74,10 @@ public class IntakerSubsystem extends SubsystemBase {
                                                                 && currentMode != IntakeMode.FEEDING
                                                                 && currentMode
                                                                         != IntakeMode
-                                                                                .EXTENDED_REVERSE),
+                                                                                .EXTENDED_REVERSE
+                                                                && currentMode
+                                                                        != IntakeMode
+                                                                                .RETRACTED_FEEDING),
                                 roller.runStop()
                                         .until(
                                                 () ->
@@ -78,11 +85,15 @@ public class IntakerSubsystem extends SubsystemBase {
                                                                 || currentMode == IntakeMode.FEEDING
                                                                 || currentMode
                                                                         == IntakeMode
-                                                                                .EXTENDED_REVERSE),
+                                                                                .EXTENDED_REVERSE
+                                                                || currentMode
+                                                                        == IntakeMode
+                                                                                .RETRACTED_FEEDING),
                                 () ->
                                         currentMode == IntakeMode.INTAKING
                                                 || currentMode == IntakeMode.FEEDING
-                                                || currentMode == IntakeMode.EXTENDED_REVERSE)
+                                                || currentMode == IntakeMode.EXTENDED_REVERSE
+                                                || currentMode == IntakeMode.RETRACTED_FEEDING)
                         .repeatedly());
         extension.setDefaultCommand(
                 extension.runMotionMagic(
@@ -96,6 +107,9 @@ public class IntakerSubsystem extends SubsystemBase {
                                             IntakerExtensionParamsNT.retractPosMeters.getValue());
                                     case FEEDING -> Meters.of(
                                             IntakerExtensionParamsNT.feedPosMeters.getValue());
+                                    case RETRACTED_FEEDING -> Meters.of(
+                                            IntakerExtensionParamsNT.retractedFeedPosMeters
+                                                    .getValue());
                                     default -> Meters.of(
                                             IntakerExtensionParamsNT.retractPosMeters.getValue());
                                 }));
@@ -139,6 +153,13 @@ public class IntakerSubsystem extends SubsystemBase {
                 runExtendedIdle(), runIntake(), () -> fallbackMode == IntakeMode.INTAKING);
     }
 
+    public Command toggleFeeding() {
+        return Commands.either(
+                runIntake(),
+                runRetractedFeeding(),
+                () -> fallbackMode == IntakeMode.RETRACTED_FEEDING);
+    }
+
     //     public Command runFeed() {
     //         return Commands.runOnce(
     //                         () -> feedOscillationStartTime = Timer.getFPGATimestamp(), extension)
@@ -178,6 +199,11 @@ public class IntakerSubsystem extends SubsystemBase {
     public Command runFeed() {
         return Commands.startEnd(
                 () -> currentMode = IntakeMode.FEEDING, () -> currentMode = fallbackMode);
+    }
+
+    public Command runRetractedFeeding() {
+        return Commands.startEnd(
+                () -> currentMode = IntakeMode.RETRACTED_FEEDING, () -> currentMode = fallbackMode);
     }
 
     public Command runExtendedReverse() {
@@ -233,7 +259,7 @@ public class IntakerSubsystem extends SubsystemBase {
                                                         extension.setCurrPos(
                                                                 Meters.of(
                                                                         is10541
-                                                                                ? 0.315766
+                                                                                ? 0.318358
                                                                                 : 0.319718));
                                                     }
                                                 })
@@ -241,7 +267,10 @@ public class IntakerSubsystem extends SubsystemBase {
 
         Command simZero =
                 Commands.sequence(
-                        Commands.runOnce(() -> extension.setCurrPos(Meters.of(0))),
+                        Commands.runOnce(
+                                () ->
+                                        extension.setCurrPos(
+                                                Meters.of(is10541 ? 0.315766 : 0.307895))),
                         new WaitCommand(0.2),
                         Commands.runOnce(
                                 () ->
@@ -267,7 +296,7 @@ public class IntakerSubsystem extends SubsystemBase {
         } else if (!zeroTimer.isRunning()) {
             zeroTimer.start();
         }
-        if (!autoOutZeroRunning && zeroTimer.hasElapsed(0.5)) {
+        if (!autoOutZeroRunning && zeroTimer.hasElapsed(0.3)) {
             autoOutZeroRunning = true;
             CommandScheduler.getInstance()
                     .schedule(
@@ -283,6 +312,7 @@ public class IntakerSubsystem extends SubsystemBase {
         EXTENDED_IDLE,
         RETRACTED,
         FEEDING,
-        EXTENDED_REVERSE
+        EXTENDED_REVERSE,
+        RETRACTED_FEEDING
     }
 }
