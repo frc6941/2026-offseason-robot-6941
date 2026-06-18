@@ -35,9 +35,9 @@ public class RobotContainer {
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
 
         var roller = buildIntakerRoller(isReal && HAS_INTAKER_IO);
-        var topRoller = buildIntakerTopRoller(isReal && HAS_INTAKER_IO);
+        var downRoller = buildIntakerDownRoller(isReal && HAS_INTAKER_IO);
 
-        intake = new IntakerSubsystem(roller, topRoller);
+        intake = new IntakerSubsystem(roller, downRoller);
 
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
@@ -95,15 +95,15 @@ public class RobotContainer {
                 IntakerRollerParamsNT.asVelocityParamSources());
     }
 
-    private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerTopRoller(
+    private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerDownRoller(
             boolean isReal) {
 
         return new VelocityMotorSubsystem<>(
-                IntakeConfig.INTAKER_TOP_ROLLER_CONFIG,
+                IntakeConfig.INTAKER_DOWN_ROLLER_CONFIG,
                 new MotorInputsAutoLogged(),
                 isReal
-                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_TOP_ROLLER_CONFIG)
-                        : new MotorIOSim(IntakeConfig.INTAKER_TOP_ROLLER_CONFIG),
+                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_DOWN_ROLLER_CONFIG)
+                        : new MotorIOSim(IntakeConfig.INTAKER_DOWN_ROLLER_CONFIG),
                 IntakerRollerParamsNT.asVelocityParamSources());
     }
 

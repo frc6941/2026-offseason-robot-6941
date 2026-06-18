@@ -34,20 +34,20 @@ public class IntakeConfig {
                             })
                     .build();
 
-    public static final String INTAKER_TOP_ROLLER_NAME = "IntakerTopRoller";
+    public static final String INTAKER_DOWN_ROLLER_NAME = "IntakerDownRoller";
 
-    private static final int INTAKER_TOP_ROLLER_MOTOR_MAIN_ID = 33;
+    private static final int INTAKER_DOWN_ROLLER_MOTOR_MAIN_ID = 33;
 
-    private static final double INTAKER_TOP_ROLLER_GEAR_RATIO = 1.0;
+    private static final double INTAKER_DOWN_ROLLER_GEAR_RATIO = 1.0;
 
-    public static final SubsystemConfig INTAKER_TOP_ROLLER_CONFIG =
+    public static final SubsystemConfig INTAKER_DOWN_ROLLER_CONFIG =
             SubsystemConfig.builder()
-                    .name(INTAKER_TOP_ROLLER_NAME)
+                    .name(INTAKER_DOWN_ROLLER_NAME)
                     .mainBus(CANIVORE_CAN_BUS)
-                    .mainId(INTAKER_TOP_ROLLER_MOTOR_MAIN_ID)
+                    .mainId(INTAKER_DOWN_ROLLER_MOTOR_MAIN_ID)
                     .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .defaultBrake(true)
-                    .SensorToMechanismRatio(INTAKER_TOP_ROLLER_GEAR_RATIO)
+                    .SensorToMechanismRatio(INTAKER_DOWN_ROLLER_GEAR_RATIO)
                     .build();
 
     @NTParameter(tableName = "Params/" + INTAKER_ROLLER_NAME)

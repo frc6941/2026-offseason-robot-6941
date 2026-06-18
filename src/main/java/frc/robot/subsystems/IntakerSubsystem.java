@@ -13,29 +13,29 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 public class IntakerSubsystem extends SubsystemBase {
 
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller;
-    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> topRoller;
+    private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> downRoller;
 
     public IntakerSubsystem(
             VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> roller,
-            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> topRoller) {
+            VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> downRoller) {
 
         this.roller = roller;
-        this.topRoller = topRoller;
+        this.downRoller = downRoller;
 
         roller.setDefaultCommand(roller.runStop().repeatedly());
-        topRoller.setDefaultCommand(topRoller.runStop().repeatedly());
+        downRoller.setDefaultCommand(downRoller.runStop().repeatedly());
     }
 
     public Command runIntake() {
         return Commands.parallel(
                 roller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.intakeVelRPS)),
-                topRoller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.intakeVelRPS)));
+                downRoller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.intakeVelRPS)));
     }
 
     public Command runOuttake() {
         return Commands.parallel(
                 roller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.outtakeVelRPS)),
-                topRoller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.outtakeVelRPS)));
+                downRoller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.outtakeVelRPS)));
     }
 
     public Command runSlowIntake() {
@@ -45,7 +45,7 @@ public class IntakerSubsystem extends SubsystemBase {
                                 RotationsPerSecond.of(
                                         IntakeParamsNT.intakeVelRPS
                                                 * IntakeParamsNT.slowIntakeMultiplier)),
-                topRoller.runVelTC(
+                downRoller.runVelTC(
                         () ->
                                 RotationsPerSecond.of(
                                         IntakeParamsNT.intakeVelRPS
@@ -53,6 +53,6 @@ public class IntakerSubsystem extends SubsystemBase {
     }
 
     public Command stop() {
-        return Commands.parallel(roller.runStop(), topRoller.runStop());
+        return Commands.parallel(roller.runStop(), downRoller.runStop());
     }
 }
