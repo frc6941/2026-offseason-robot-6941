@@ -1,11 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -13,26 +8,18 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Configs.IntakeConfig;
-import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.IntakerRollerParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.IntakerSubsystem;
-import lib.ironpulse.io.MotorIO;
-import lib.ironpulse.io.MotorIOSim;
-import lib.ironpulse.io.MotorIOTalonFX;
-import lib.ironpulse.io.MotorInputsAutoLogged;
-import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
+import lib.ironpulse.io.*;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
-import lib.ironpulse.swerve.Swerve;
-import lib.ironpulse.swerve.SwerveCommands;
-import lib.ironpulse.swerve.mk5n.ImuIOPigeon;
-import lib.ironpulse.swerve.mk5n.SwerveModuleIOMK5N;
-import lib.ironpulse.swerve.sim.ImuIOSim;
-import lib.ironpulse.swerve.sim.SwerveModuleIOSimpleSim;
+import lib.ironpulse.swerve.*;
+import lib.ironpulse.swerve.mk5n.*;
+import lib.ironpulse.swerve.sim.*;
 
 public class RobotContainer {
-    private static final boolean HAS_INTAKER_ROLLER_IO = true;
-    private static final boolean HAS_INTAKER_EXTENSION_IO = true;
+
+    private static final boolean HAS_INTAKER_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
 
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -42,16 +29,20 @@ public class RobotContainer {
     private final IntakerSubsystem intake;
 
     public RobotContainer() {
-        final boolean isReal = RobotBase.isReal();
 
+        boolean isReal = RobotBase.isReal();
+
+        // ===== Swerve =====
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
 
-        var intakerRoller = buildIntakerRoller(isReal && HAS_INTAKER_ROLLER_IO);
-        var intakerExtension = buildIntakerExtension(isReal && HAS_INTAKER_EXTENSION_IO);
+        // ===== Intake motors =====
+        var roller = buildIntakerRoller(isReal && HAS_INTAKER_IO);
+        var topRoller = buildIntakerTopRoller(isReal && HAS_INTAKER_IO);
 
-        intake = new IntakerSubsystem(intakerRoller, intakerExtension);
+        // ===== Intake subsystem (3 motor version) =====
+        intake = new IntakerSubsystem(roller, topRoller);
 
-        // set default commands
+        // ===== Default drive =====
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
@@ -62,14 +53,25 @@ public class RobotContainer {
                         MetersPerSecond.of(0.04),
                         DegreesPerSecond.of(3.0)));
 
-        intake.setDefaultCommand();
-
-        // basic bindings for intake
-        driver.leftBumper().onTrue(intake.toggleIntake());
-        driver.leftTrigger().whileTrue(intake.runFeed());
-        driver.povDown().onTrue(intake.runRetract());
-        operator.leftBumper().whileTrue(intake.runExtendedReverse());
+        configureBindings();
     }
+
+    private void configureBindings() {
+
+        // RT = intake（核心）
+        driver.leftTrigger().whileTrue(intake.runIntake());
+
+        // LT = outtake
+        driver.rightTrigger().whileTrue(intake.runOuttake());
+
+        // LB = clear jam
+        driver.leftBumper().whileTrue(intake.runOuttake());
+
+        // operator backup control
+        operator.rightTrigger().whileTrue(intake.runIntake());
+    }
+
+    // ================= Swerve =================
 
     private Swerve buildSwerve(boolean isReal) {
         return new Swerve(
@@ -91,8 +93,11 @@ public class RobotContainer {
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
     }
 
+    // ================= Intake Motor 1 =================
+
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerRoller(
             boolean isReal) {
+
         return new VelocityMotorSubsystem<>(
                 IntakeConfig.INTAKER_ROLLER_CONFIG,
                 new MotorInputsAutoLogged(),
@@ -102,27 +107,24 @@ public class RobotContainer {
                 IntakerRollerParamsNT.asVelocityParamSources());
     }
 
-    private PositionMotorSubsystem<
-                    MotorInputsAutoLogged, MotorIO, edu.wpi.first.units.measure.Distance>
-            buildIntakerExtension(boolean isReal) {
-        return new PositionMotorSubsystem<>(
-                IntakeConfig.INTAKER_EXTENSION_CONFIG,
+    // ================= Intake Motor 2 (NEW 33) =================
+
+    private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerTopRoller(
+            boolean isReal) {
+
+        return new VelocityMotorSubsystem<>(
+                IntakeConfig.INTAKER_TOP_ROLLER_CONFIG,
                 new MotorInputsAutoLogged(),
                 isReal
-                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_EXTENSION_CONFIG)
-                        : new MotorIOSim(IntakeConfig.INTAKER_EXTENSION_CONFIG),
-                IntakerExtensionParamsNT.asPositionParamSources(),
-                Meters.of(0),
-                IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION);
+                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_TOP_ROLLER_CONFIG)
+                        : new MotorIOSim(IntakeConfig.INTAKER_TOP_ROLLER_CONFIG),
+                IntakerRollerParamsNT.asVelocityParamSources());
     }
+
+    // ================= Robot periodic =================
 
     public void robotPeriodic() {
-        // Update NTParameters for Intaker/Swerve subsystems
         lib.ntext.NTParameterRegistry.refresh();
-    }
-
-    public void setThrottle(boolean enabled) {
-        // Throttle management for subsystems; placeholder for future expansion
     }
 
     public Command getAutonomousCommand() {
