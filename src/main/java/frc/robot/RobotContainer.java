@@ -32,17 +32,13 @@ public class RobotContainer {
 
         boolean isReal = RobotBase.isReal();
 
-        // ===== Swerve =====
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
 
-        // ===== Intake motors =====
         var roller = buildIntakerRoller(isReal && HAS_INTAKER_IO);
         var topRoller = buildIntakerTopRoller(isReal && HAS_INTAKER_IO);
 
-        // ===== Intake subsystem (3 motor version) =====
         intake = new IntakerSubsystem(roller, topRoller);
 
-        // ===== Default drive =====
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
                         swerve,
@@ -58,20 +54,14 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        // RT = intake（核心）
         driver.leftTrigger().whileTrue(intake.runIntake());
 
-        // LT = outtake
         driver.rightTrigger().whileTrue(intake.runOuttake());
 
-        // LB = clear jam
         driver.leftBumper().whileTrue(intake.runOuttake());
 
-        // operator backup control
         operator.rightTrigger().whileTrue(intake.runIntake());
     }
-
-    // ================= Swerve =================
 
     private Swerve buildSwerve(boolean isReal) {
         return new Swerve(
@@ -93,8 +83,6 @@ public class RobotContainer {
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
     }
 
-    // ================= Intake Motor 1 =================
-
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerRoller(
             boolean isReal) {
 
@@ -107,8 +95,6 @@ public class RobotContainer {
                 IntakerRollerParamsNT.asVelocityParamSources());
     }
 
-    // ================= Intake Motor 2 (NEW 33) =================
-
     private VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> buildIntakerTopRoller(
             boolean isReal) {
 
@@ -120,8 +106,6 @@ public class RobotContainer {
                         : new MotorIOSim(IntakeConfig.INTAKER_TOP_ROLLER_CONFIG),
                 IntakerRollerParamsNT.asVelocityParamSources());
     }
-
-    // ================= Robot periodic =================
 
     public void robotPeriodic() {
         lib.ntext.NTParameterRegistry.refresh();

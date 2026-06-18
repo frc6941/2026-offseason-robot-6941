@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,44 +28,31 @@ public class IntakerSubsystem extends SubsystemBase {
 
     public Command runIntake() {
         return Commands.parallel(
-                roller.runVelTC(
-                        () -> RotationsPerSecond.of(
-                                IntakeParamsNT.intakeVelRPS)),
-
-                topRoller.runVelTC(
-                        () -> RotationsPerSecond.of(
-                                IntakeParamsNT.intakeVelRPS))
-        );
+                roller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.intakeVelRPS)),
+                topRoller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.intakeVelRPS)));
     }
 
     public Command runOuttake() {
         return Commands.parallel(
-                roller.runVelTC(
-                        () -> RotationsPerSecond.of(
-                                IntakeParamsNT.outtakeVelRPS)),
-
-                topRoller.runVelTC(
-                        () -> RotationsPerSecond.of(
-                                IntakeParamsNT.outtakeVelRPS))
-        );
+                roller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.outtakeVelRPS)),
+                topRoller.runVelTC(() -> RotationsPerSecond.of(IntakeParamsNT.outtakeVelRPS)));
     }
 
     public Command runSlowIntake() {
         return Commands.parallel(
                 roller.runVelTC(
-                        () -> RotationsPerSecond.of(
-                                IntakeParamsNT.intakeVelRPS * IntakeParamsNT.slowIntakeMultiplier)),
-
+                        () ->
+                                RotationsPerSecond.of(
+                                        IntakeParamsNT.intakeVelRPS
+                                                * IntakeParamsNT.slowIntakeMultiplier)),
                 topRoller.runVelTC(
-                        () -> RotationsPerSecond.of(
-                                IntakeParamsNT.intakeVelRPS * IntakeParamsNT.slowIntakeMultiplier))
-        );
+                        () ->
+                                RotationsPerSecond.of(
+                                        IntakeParamsNT.intakeVelRPS
+                                                * IntakeParamsNT.slowIntakeMultiplier)));
     }
 
     public Command stop() {
-        return Commands.parallel(
-                roller.runStop(),
-                topRoller.runStop()
-        );
+        return Commands.parallel(roller.runStop(), topRoller.runStop());
     }
 }
