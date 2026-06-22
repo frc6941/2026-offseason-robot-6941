@@ -81,14 +81,18 @@ public class VelocityMotorSubsystem<T extends MotorInputsAutoLogged, U extends M
         return runVelVolt(() -> velocity);
     }
 
+    /** Set voltage-domain velocity setpoint directly. */
+    public void setVelVoltSetpoint(AngularVelocity velocity) {
+        io.setVelVoltSetpoint(velocity);
+        currSetpoint = velocity;
+        mode = ControlMode.VEL_VOL;
+    }
+
     /** Set voltage-domain velocity setpoint command. */
     public Command runVelVolt(Supplier<AngularVelocity> velocity) {
         return Commands.run(
                 () -> {
-                    AngularVelocity sp = velocity.get();
-                    io.setVelVoltSetpoint(sp);
-                    currSetpoint = sp;
-                    mode = ControlMode.VEL_VOL;
+                    setVelVoltSetpoint(velocity.get());
                 },
                 this);
     }

@@ -54,13 +54,13 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        driver.leftTrigger().whileTrue(intake.runIntake());
+        driver.leftTrigger().whileTrue(intake.runIntakeRPS()).onFalse(intake.rampStopRPS());
 
-        driver.rightTrigger().whileTrue(intake.runOuttake());
+        driver.rightTrigger().whileTrue(intake.runIntakeRPS()).onFalse(intake.rampStopRPS());
 
         driver.leftBumper().whileTrue(intake.runOuttake());
 
-        operator.rightTrigger().whileTrue(intake.runIntake());
+        operator.rightTrigger().whileTrue(intake.runIntakeRPS()).onFalse(intake.rampStopRPS());
     }
 
     private Swerve buildSwerve(boolean isReal) {
