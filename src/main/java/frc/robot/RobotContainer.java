@@ -1,17 +1,21 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.Configs.IntakeConfig;
+import frc.robot.subsystems.Configs.IntakerExtensionParamsNT;
 import frc.robot.subsystems.Configs.IntakerRollerParamsNT;
 import frc.robot.subsystems.Configs.SwerveMK5Config;
 import frc.robot.subsystems.IntakerSubsystem;
 import lib.ironpulse.io.*;
+import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
 import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.*;
 import lib.ironpulse.swerve.mk5n.*;
@@ -36,8 +40,10 @@ public class RobotContainer {
 
         var roller = buildIntakerRoller(isReal && HAS_INTAKER_IO);
         var downRoller = buildIntakerDownRoller(isReal && HAS_INTAKER_IO);
+        var extension = buildIntakerExtension(isReal && HAS_INTAKER_IO);
 
-        intake = new IntakerSubsystem(roller, downRoller);
+        intake = new IntakerSubsystem(roller, downRoller, extension);
+        intake.setDefaultCommand();
 
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
@@ -54,13 +60,20 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        driver.leftTrigger().whileTrue(intake.runIntakeRPS()).onFalse(intake.rampStopRPS());
-
+        // ========== 保留原有 Roller 控制（功能不丢） ==========
+        driver.leftTrigger().whileTrue(intake.toggleIntake()).onFalse(intake.runRetract());
         driver.rightTrigger().whileTrue(intake.runIntakeRPS()).onFalse(intake.rampStopRPS());
-
         driver.leftBumper().whileTrue(intake.runOuttake());
 
         operator.rightTrigger().whileTrue(intake.runIntakeRPS()).onFalse(intake.rampStopRPS());
+
+        driver.povUp().onTrue(intake.outZeroCommand()); // 外零位
+        driver.povLeft().onTrue(intake.zeroCommand()); // 零位
+
+        operator.leftBumper().whileTrue(intake.runExtendedReverse());
+        operator.leftTrigger().whileTrue(intake.runFeed());
+        operator.povUp().whileTrue(intake.runRetractedFeeding());
+        operator.y().onTrue(intake.runExtendedIdle());
     }
 
     private Swerve buildSwerve(boolean isReal) {
@@ -105,6 +118,20 @@ public class RobotContainer {
                         ? new MotorIOTalonFX(IntakeConfig.INTAKER_DOWN_ROLLER_CONFIG)
                         : new MotorIOSim(IntakeConfig.INTAKER_DOWN_ROLLER_CONFIG),
                 IntakerRollerParamsNT.asVelocityParamSources());
+    }
+
+    private PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Distance> buildIntakerExtension(
+            boolean isReal) {
+
+        return new PositionMotorSubsystem<>(
+                IntakeConfig.INTAKER_EXTENSION_CONFIG,
+                new MotorInputsAutoLogged(),
+                isReal
+                        ? new MotorIOTalonFX(IntakeConfig.INTAKER_EXTENSION_CONFIG)
+                        : new MotorIOSim(IntakeConfig.INTAKER_EXTENSION_CONFIG),
+                IntakerExtensionParamsNT.asPositionParamSources(),
+                Meters.of(0),
+                Meters.of(IntakeConfig.INTAKE_EXTENSION_METERS_PER_ROTATION));
     }
 
     public void robotPeriodic() {
