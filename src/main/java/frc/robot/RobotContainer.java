@@ -7,7 +7,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.Configs.SwerveMK5Config;
+import frc.robot.subsystems.Configs.*;
+import frc.robot.subsystems.SpindexerSubsystem;
 import lib.ironpulse.io.*;
 import lib.ironpulse.swerve.*;
 import lib.ironpulse.swerve.mk5n.*;
@@ -15,19 +16,20 @@ import lib.ironpulse.swerve.sim.*;
 
 public class RobotContainer {
 
-    private static final boolean HAS_INTAKER_IO = true;
+    private static final boolean HAS_SPINDEXER_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
 
     private final CommandXboxController driver = new CommandXboxController(0);
-    private final CommandXboxController operator = new CommandXboxController(1);
 
     private final Swerve swerve;
+    private final SpindexerSubsystem spindexer;
 
     public RobotContainer() {
 
         boolean isReal = RobotBase.isReal();
 
         swerve = buildSwerve(isReal && HAS_SWERVE_IO);
+        spindexer = buildSpindexer(isReal && HAS_SPINDEXER_IO);
 
         swerve.setDefaultCommand(
                 SwerveCommands.driveWithJoystick(
@@ -62,6 +64,16 @@ public class RobotContainer {
                 isReal
                         ? new SwerveModuleIOMK5N(SwerveMK5Config.kRealConfig, 3)
                         : new SwerveModuleIOSimpleSim(SwerveMK5Config.kSimConfig, 3));
+    }
+
+    private SpindexerSubsystem buildSpindexer(boolean isReal) {
+        return new SpindexerSubsystem(
+                SpindexConfig.SPINDEXER_CONFIG,
+                new MotorInputsAutoLogged(),
+                isReal
+                        ? new MotorIOTalonFX(SpindexConfig.SPINDEXER_CONFIG)
+                        : new MotorIOSim(SpindexConfig.SPINDEXER_CONFIG),
+                SpindexerParamsNT.asVelocityParamSources());
     }
 
     public void robotPeriodic() {
