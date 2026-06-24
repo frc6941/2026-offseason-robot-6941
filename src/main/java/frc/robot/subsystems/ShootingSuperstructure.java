@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
 import lib.ironpulse.subsystem.position.PositionMotorSubsystem;
@@ -54,6 +55,11 @@ public class ShootingSuperstructure {
                                                         .in(Degrees),
                                                 0,
                                                 47))));
+        idx.setDefaultCommand(
+                idx.runVelVolt(
+                        () ->
+                                RotationsPerSecond.of(
+                                        SpindexerParamsNT.velocityAtGoalToleranceRPS.getValue())));
     }
 
     public Command runShoot() {
@@ -62,6 +68,10 @@ public class ShootingSuperstructure {
                         () -> RobotStateRecorder.getCmdFrame().turretAngleWorld()),
                 hood.runPosition(() -> Degrees.of(45)),
                 shooter.runVelVolt(
-                        () -> RotationsPerSecond.of(ShooterParamsNT.runVelRPS.getValue())));
+                        () -> RotationsPerSecond.of(ShooterParamsNT.runVelRPS.getValue())),
+                idx.runVelVolt(
+                        () ->
+                                RotationsPerSecond.of(
+                                        SpindexerParamsNT.unjammTriggerBelowRps.getValue())));
     }
 }

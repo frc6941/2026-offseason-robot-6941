@@ -21,7 +21,6 @@ import lib.ironpulse.subsystem.velocity.VelocityMotorSubsystem;
 import lib.ironpulse.swerve.*;
 import lib.ironpulse.swerve.mk5n.*;
 import lib.ironpulse.swerve.sim.*;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
 
