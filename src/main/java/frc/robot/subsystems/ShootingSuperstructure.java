@@ -38,6 +38,7 @@ public class ShootingSuperstructure {
         this.turret = turret;
         this.idx = idx;
         this.hood = hood;
+        this.turret.setHoodAngleSupplier(() -> hood.getCurrPos());
     }
 
     public void setDefaultCommand() {
@@ -66,7 +67,15 @@ public class ShootingSuperstructure {
         return Commands.parallel(
                 turret.setTurretPoseWorld(
                         () -> RobotStateRecorder.getCmdFrame().turretAngleWorld()),
-                hood.runPosition(() -> Degrees.of(45)),
+                hood.runPosition(
+                        () ->
+                                Degrees.of(
+                                        MathUtil.clamp(
+                                                RobotStateRecorder.getCmdFrame()
+                                                        .hoodAngle()
+                                                        .in(Degrees),
+                                                0,
+                                                47))),
                 shooter.runVelVolt(
                         () -> RotationsPerSecond.of(ShooterParamsNT.runVelRPS.getValue())),
                 idx.runVelVolt(

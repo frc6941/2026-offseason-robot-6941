@@ -2,12 +2,15 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.subsystems.Configs.TurretConfig.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -81,6 +84,7 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     private TurretMode lastControllerMode = null;
     private Supplier<Angle> targetAngleWorld = () -> Degrees.of(0.0);
+    private Supplier<Angle> hoodAngleSupplier = () -> Degrees.of(0.0);
     private Angle targetAngleRobotWrapped = Degrees.of(0.0);
     private Angle targetAngleRobot = Degrees.of(0.0);
 
@@ -175,6 +179,10 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
 
     public Command setTurretPoseWorld(Supplier<Angle> targetAngleSupplier) {
         return Commands.run(() -> targetAngleWorld = targetAngleSupplier);
+    }
+
+    public void setHoodAngleSupplier(Supplier<Angle> supplier) {
+        this.hoodAngleSupplier = supplier;
     }
 
     public Command runTurretTargetLoop() {
@@ -320,11 +328,19 @@ public class TurretSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLogge
         return Degrees.of(robotRelative.getDegrees());
     }
 
-    private Pose2d getCurrentTurretPoseWorld() {
-        Pose2d robotPose = RobotStateRecorder.getPoseWorldRobotCurrent().toPose2d();
+    private Pose3d getCurrentTurretPoseWorld() {
+        Pose3d robotPose = RobotStateRecorder.getPoseWorldRobotCurrent();
         Rotation2d turretRotation =
-                robotPose.getRotation().rotateBy(Rotation2d.fromDegrees(getPosition().in(Degrees)));
-        return new Pose2d(robotPose.getTranslation(), turretRotation);
+                robotPose
+                        .getRotation()
+                        .toRotation2d()
+                        .rotateBy(Rotation2d.fromDegrees(getPosition().in(Degrees)));
+        return new Pose3d(
+                robotPose.getX(),
+                robotPose.getY(),
+                0.5,
+                new Rotation3d(
+                        0.0, hoodAngleSupplier.get().in(Radians), turretRotation.getRadians()));
     }
 
     private Pose2d getTargetTurretPoseWorld() {
