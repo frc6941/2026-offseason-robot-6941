@@ -22,6 +22,21 @@ public final class SwerveMK5Config {
     public static final double kSwerveHalfLength = 0.30468; // m
     public static final double kSwerveHalfWidth = 0.24218; // m
 
+    private static final int LB_DRIVE_ID = 10;
+    private static final int LB_STEER_ID = 11;
+    private static final int LF_DRIVE_ID = 12;
+    private static final int LF_STEER_ID = 13;
+    private static final int RB_DRIVE_ID = 14;
+    private static final int RB_STEER_ID = 15;
+    private static final int RF_DRIVE_ID = 16;
+    private static final int RF_STEER_ID = 17;
+
+    private static final int LB_ENCODER_ID = 20;
+    private static final int LF_ENCODER_ID = 21;
+    private static final int RB_ENCODER_ID = 22;
+    private static final int RF_ENCODER_ID = 23;
+
+
     public static ImuPigeonConfig pigeonConfig =
             ImuPigeonConfig.builder()
                     .mountPoseYaw(88.95365142822266)
@@ -113,9 +128,9 @@ public final class SwerveMK5Config {
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("LB")
                     .location(new Translation2d(-kSwerveHalfLength, kSwerveHalfWidth))
-                    .driveMotorId(5)
-                    .steerMotorId(6)
-                    .encoderId(11)
+                    .driveMotorId(LB_DRIVE_ID)
+                    .steerMotorId(LB_STEER_ID)
+                    .encoderId(LB_ENCODER_ID)
                     .driveMotorEncoderOffset(Degree.of(0))
                     .steerMotorEncoderOffset(
                             Rotations.of(is10541 ? -0.11083984375 : 0.165771484375))
@@ -127,9 +142,9 @@ public final class SwerveMK5Config {
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("LF")
                     .location(new Translation2d(kSwerveHalfLength, kSwerveHalfWidth))
-                    .driveMotorId(10)
-                    .steerMotorId(20)
-                    .encoderId(9)
+                    .driveMotorId(LF_DRIVE_ID)
+                    .steerMotorId(LF_STEER_ID)
+                    .encoderId(LF_ENCODER_ID)
                     .driveMotorEncoderOffset(Degree.of(0))
                     .steerMotorEncoderOffset(Rotations.of(is10541 ? 0.3994140625 : 0.008544921875))
                     .driveInverted(false)
@@ -140,9 +155,9 @@ public final class SwerveMK5Config {
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("RB")
                     .location(new Translation2d(-kSwerveHalfLength, -kSwerveHalfWidth))
-                    .driveMotorId(7)
-                    .steerMotorId(8)
-                    .encoderId(12)
+                    .driveMotorId(RB_DRIVE_ID)
+                    .steerMotorId(RB_STEER_ID)
+                    .encoderId(RB_ENCODER_ID)
                     .driveMotorEncoderOffset(Degree.of(0))
                     .steerMotorEncoderOffset(
                             Rotations.of(is10541 ? -0.12939453125 : 0.220947265625))
@@ -154,9 +169,9 @@ public final class SwerveMK5Config {
             SwerveConfig.SwerveModuleConfig.builder()
                     .name("RF")
                     .location(new Translation2d(kSwerveHalfLength, -kSwerveHalfWidth))
-                    .driveMotorId(3)
-                    .steerMotorId(4)
-                    .encoderId(10)
+                    .driveMotorId(RF_DRIVE_ID)
+                    .steerMotorId(RF_STEER_ID)
+                    .encoderId(RF_ENCODER_ID)
                     .driveMotorEncoderOffset(Degree.of(0))
                     .steerMotorEncoderOffset(
                             Rotations.of(is10541 ? -0.462158203125 : 0.26318359375))

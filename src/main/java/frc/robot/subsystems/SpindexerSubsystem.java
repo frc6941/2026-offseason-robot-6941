@@ -14,4 +14,6 @@ public class SpindexerSubsystem extends VelocityMotorSubsystem<MotorInputsAutoLo
             VelocityParamSources params) {
         super(config, inputs, io, params);
     }
+
+
 }

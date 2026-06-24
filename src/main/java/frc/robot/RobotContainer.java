@@ -18,6 +18,7 @@ public class RobotContainer {
 
     private static final boolean HAS_SPINDEXER_IO = true;
     private static final boolean HAS_SWERVE_IO = true;
+    private static final boolean HAS_SHOOTER_IO = true;
 
     private final CommandXboxController driver = new CommandXboxController(0);
 
