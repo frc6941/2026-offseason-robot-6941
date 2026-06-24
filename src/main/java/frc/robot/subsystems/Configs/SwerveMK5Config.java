@@ -36,7 +36,6 @@ public final class SwerveMK5Config {
     private static final int RB_ENCODER_ID = 22;
     private static final int RF_ENCODER_ID = 23;
 
-
     public static ImuPigeonConfig pigeonConfig =
             ImuPigeonConfig.builder()
                     .mountPoseYaw(88.95365142822266)

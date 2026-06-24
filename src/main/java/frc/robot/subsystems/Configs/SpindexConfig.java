@@ -40,6 +40,14 @@ public class SpindexConfig {
                             })
                     .build();
 
+    @NTParameter(tableName = "Params/IdxModes")
+    public static final class SpindexerModeParams {
+        public static final double feedRPS = 2.7; // 1.6 for 10541
+
+        public static final double revRPS = -1;
+        public static final double idleRPS = 0.0;
+    }
+
     @NTParameter(tableName = "Params/" + SPINDEXER_NAME)
     public static final class SpindexerParams {
 
@@ -50,5 +58,18 @@ public class SpindexConfig {
         public static final double kV = 0.0;
         public static final double kA = 0.0;
         public static final double kS = 0.0;
+
+        public static final double unjammTimeoutSec = 0.16;
+        public static final double unjammTriggerAmps = 60;
+        public static final double unjammTriggerBelowRps = 1.4; // 1.5 for 10541
+        public static final double unjammTriggerSec = 0.08;
+        public static final double unjammLockoutSec = 0.2;
+        public static final boolean periodicUnjamEnabled = false;
+        public static final double periodicUnjamIntervalSec = 1.0;
+        public static final boolean unjamBeforeFeedEnabled = false;
+
+        public static final boolean isBrake = true;
+
+        public static final double velocityAtGoalToleranceRPS = 0.1;
     }
 }

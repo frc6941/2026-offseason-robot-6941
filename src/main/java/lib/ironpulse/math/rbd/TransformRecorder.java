@@ -93,6 +93,10 @@ public class TransformRecorder {
         fromNode.dynamicChildren.remove(to);
     }
 
+    public void putTransformWorldRobot(Pose3d transform, Time time) {
+        putTransform(transform, time, kFrameWorld, kFrameRobot);
+    }
+
     public void putTransformWorldRobot(Pose2d transform, Time time) {
         putTransform(new Pose3d(transform), time, kFrameWorld, kFrameRobot);
     }

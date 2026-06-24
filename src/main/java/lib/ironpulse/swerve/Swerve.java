@@ -124,6 +124,9 @@ public class Swerve extends SubsystemBase implements Localizable {
         Logger.recordOutput(config.name + "/ChassisSpeedCmd", setpointCurr.chassisSpeeds());
         Logger.recordOutput(
                 config.name + "/SwerveEstimatorPose", poseEstimator.getEstimatedPosition());
+        Logger.recordOutput(
+                config.name + "/SwerveEstimatorHeadingDeg",
+                poseEstimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
 
         var limit = getSwerveLimit();
         Logger.recordOutput(
