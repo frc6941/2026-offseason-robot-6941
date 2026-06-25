@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.MathUtil;
@@ -8,6 +9,7 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotStateRecorder;
 import frc.robot.subsystems.Configs.ShooterParamsNT;
+import frc.robot.subsystems.Configs.ShotCalculatorParamsGOALNT;
 import frc.robot.subsystems.Configs.SpindexerParamsNT;
 import lib.ironpulse.io.MotorIO;
 import lib.ironpulse.io.MotorInputsAutoLogged;
@@ -77,7 +79,15 @@ public class ShootingSuperstructure {
                                                 0,
                                                 47))),
                 shooter.runVelVolt(
-                        () -> RotationsPerSecond.of(ShooterParamsNT.runVelRPS.getValue())),
+                        () ->
+                                RotationsPerSecond.of(
+                                        (ShotCalculatorParamsGOALNT.rpmA.getValue()
+                                                                * RobotStateRecorder.getCmdFrame()
+                                                                        .muzzleSpeed()
+                                                                        .in(MetersPerSecond)
+                                                        + ShotCalculatorParamsGOALNT.rpmC
+                                                                .getValue())
+                                                / 60.0)),
                 idx.runVelVolt(
                         () ->
                                 RotationsPerSecond.of(

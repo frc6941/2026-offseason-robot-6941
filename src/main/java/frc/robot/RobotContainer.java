@@ -4,11 +4,20 @@ import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.*;
@@ -39,6 +48,7 @@ public class RobotContainer {
     private final PositionMotorSubsystem<MotorInputsAutoLogged, MotorIO, Angle> hood;
     private final VelocityMotorSubsystem<MotorInputsAutoLogged, MotorIO> shooter;
     private final ShotCalculator shotCalculator;
+    private final SendableChooser<Command> autoChooser;
 
     private final CANCoderIOSim encoderG1Sim = new CANCoderIOSim();
     private final CANCoderIOSim encoderG2Sim = new CANCoderIOSim();
@@ -81,6 +91,39 @@ public class RobotContainer {
                         DegreesPerSecond.of(3.0)));
 
         configureBindings();
+        configureAutoBuilder();
+
+        NamedCommands.registerCommand(
+                "runShoot",
+                shootingSuperstructure
+                        .runShoot()
+                        .withTimeout(AutoParamsNT.shootTimeoutSec.getValue()));
+
+        autoChooser = AutoBuilder.buildAutoChooser("Auto Chooser");
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
+    private void configureAutoBuilder() {
+        AutoBuilder.configure(
+                () -> swerve.getEstimatedPose().toPose2d(),
+                pose -> swerve.resetEstimatedPose(new Pose3d(pose)),
+                swerve::getChassisSpeeds,
+                (ChassisSpeeds speeds, DriveFeedforwards feedforwards) -> swerve.runTwist(speeds),
+                new PPHolonomicDriveController(
+                        new PIDConstants(
+                                AutoParamsNT.translationKP.getValue(),
+                                AutoParamsNT.translationKI.getValue(),
+                                AutoParamsNT.translationKD.getValue()),
+                        new PIDConstants(
+                                AutoParamsNT.rotationKP.getValue(),
+                                AutoParamsNT.rotationKI.getValue(),
+                                AutoParamsNT.rotationKD.getValue())),
+                RobotConstants.AUTO_ROBOT_CONFIG,
+                () -> {
+                    var alliance = DriverStation.getAlliance();
+                    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+                },
+                swerve);
     }
 
     private void configureBindings() {
@@ -177,6 +220,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return autoChooser.getSelected();
     }
 }
