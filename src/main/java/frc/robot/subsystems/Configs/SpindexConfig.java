@@ -13,7 +13,8 @@ public class SpindexConfig {
     private static final CANBus CANBUS = CANIVORE_CAN_BUS;
 
     private static final int SPINDEXER_ID = 4;
-    private static final int SPINDEXER_FOLLOWER_ID = 5;
+    private static final int SPINDEXER_FOLLOWER1_ID = 5;
+    private static final int SPINDEXER_FOLLOWER2_ID = 6;
 
     public static final String SPINDEXER_NAME = "spindexer";
     private static final double SPINDEXER_GEAR_RATIO = 1.0 / 1.0;
@@ -25,7 +26,7 @@ public class SpindexConfig {
                     .mainBus(CANBUS)
                     .SensorToMechanismRatio(SPINDEXER_GEAR_RATIO)
                     .defaultBrake(true)
-                    .motorInvertedValue(InvertedValue.Clockwise_Positive)
+                    .motorInvertedValue(InvertedValue.CounterClockwise_Positive)
                     .simConfig(
                             SubsystemConfig.SimConfig.builder()
                                     .gearRatio(SPINDEXER_GEAR_RATIO)
@@ -33,11 +34,20 @@ public class SpindexConfig {
                     .followers(
                             new SubsystemConfig.FollowerConfig[] {
                                 SubsystemConfig.FollowerConfig.builder()
-                                        .id(SPINDEXER_ID)
+                                        .id(SPINDEXER_FOLLOWER1_ID)
                                         .bus(CANBUS)
-                                        .opposeMain(MotorAlignmentValue.Aligned)
+                                        .opposeMain(MotorAlignmentValue.Opposed)
                                         .build()
                             })
+                    .followers(
+                            new SubsystemConfig.FollowerConfig[]{
+                                    SubsystemConfig.FollowerConfig.builder()
+                                            .id(SPINDEXER_FOLLOWER2_ID)
+                                            .bus(CANBUS)
+                                            .opposeMain(MotorAlignmentValue.Opposed)
+                                            .build()
+                            }
+                    )
                     .build();
 
     @NTParameter(tableName = "Params/IdxModes")
