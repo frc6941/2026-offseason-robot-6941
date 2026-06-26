@@ -1,9 +1,10 @@
 package frc.robot.subsystems.Configs;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.RobotConstants.CANIVORE_CAN_BUS;
+import static frc.robot.RobotConstants.ROBORIO_CAN_BUS;
 import static frc.robot.RobotConstants.is10541;
 
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import frc.robot.RobotConstants;
@@ -17,6 +18,8 @@ import lib.ntext.NTParameter;
 
 /** Constants specific to the swerve drivetrain configuration. */
 public final class SwerveMK5Config {
+    private static final CANBus CANBUS = ROBORIO_CAN_BUS;
+
     public static final String kSwerveTag = "Swerve";
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
     public static final double kSwerveHalfLength = 0.375; // m
@@ -223,7 +226,7 @@ public final class SwerveMK5Config {
                     .driveSupplyCurrentLimit(Amps.of(65))
                     .steerStatorCurrentLimit(Amps.of(55))
                     .steerSupplyCurrentLimit(Amps.of(40))
-                    .canivoreCanBus(CANIVORE_CAN_BUS)
+                    .canivoreCanBus(CANBUS)
                     .pigeonId(RobotConstants.PIGEON_ID)
                     .build();
 
