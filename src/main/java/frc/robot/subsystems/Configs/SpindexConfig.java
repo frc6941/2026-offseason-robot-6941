@@ -40,14 +40,13 @@ public class SpindexConfig {
                                         .build()
                             })
                     .followers(
-                            new SubsystemConfig.FollowerConfig[]{
-                                    SubsystemConfig.FollowerConfig.builder()
-                                            .id(SPINDEXER_FOLLOWER2_ID)
-                                            .bus(CANBUS)
-                                            .opposeMain(MotorAlignmentValue.Opposed)
-                                            .build()
-                            }
-                    )
+                            new SubsystemConfig.FollowerConfig[] {
+                                SubsystemConfig.FollowerConfig.builder()
+                                        .id(SPINDEXER_FOLLOWER2_ID)
+                                        .bus(CANBUS)
+                                        .opposeMain(MotorAlignmentValue.Opposed)
+                                        .build()
+                            })
                     .build();
 
     @NTParameter(tableName = "Params/IdxModes")

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Configs.*;
 import java.nio.file.Path;
@@ -129,6 +130,10 @@ public class RobotContainer {
     private void configureBindings() {
 
         driver.rightTrigger().whileTrue(shootingSuperstructure.runShoot());
+
+        new Trigger(DriverStation::isEnabled).onTrue(shootingSuperstructure.runZero());
+
+        driver.back().onTrue(shootingSuperstructure.runZero());
     }
 
     private Swerve buildSwerve(boolean isReal) {

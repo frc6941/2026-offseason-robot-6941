@@ -19,8 +19,8 @@ import lib.ntext.NTParameter;
 public final class SwerveMK5Config {
     public static final String kSwerveTag = "Swerve";
     public static final String kSwerveModuleTag = "Swerve/SwerveModule";
-    public static final double kSwerveHalfLength = 0.30468; // m
-    public static final double kSwerveHalfWidth = 0.24218; // m
+    public static final double kSwerveHalfLength = 0.375; // m
+    public static final double kSwerveHalfWidth = 0.30; // m
 
     private static final int LB_DRIVE_ID = 10;
     private static final int LB_STEER_ID = 11;

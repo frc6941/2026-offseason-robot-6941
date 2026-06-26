@@ -65,6 +65,10 @@ public class ShootingSuperstructure {
                                         SpindexerParamsNT.velocityAtGoalToleranceRPS.getValue())));
     }
 
+    public Command runZero() {
+        return hood.zeroCommand();
+    }
+
     public Command runShoot() {
         return Commands.parallel(
                 turret.setTurretPoseWorld(
